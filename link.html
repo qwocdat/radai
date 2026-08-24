@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DigitalSMod - CHIA SẺ FILE APK & AUTO KEY</title>
+    <title>DigitalSMod - CHIA SẺ FILE APK & LINK TẢI VIP</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- hCaptcha SDK -->
+    <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0a0e17; color: #f8fafc; overflow-x: hidden; }
@@ -16,11 +18,33 @@
         .marquee-container { white-space: nowrap; overflow: hidden; }
         .marquee-content { display: inline-block; animation: marquee 18s linear infinite; }
         @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+        /* LOADING ANIMATION */
+        #preloader { transition: opacity 0.5s ease, visibility 0.5s ease; }
+        .spinner-ring {
+            border: 4px solid rgba(14, 165, 233, 0.15); border-top: 4px solid #0ea5e9;
+            border-right: 4px solid #a855f7; border-radius: 50%; animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="min-h-screen pb-24">
 
-    <!-- THANH CHẠY THÔNG BÁO -->
+    <!-- PRELOADER MÀN HÌNH TẢI -->
+    <div id="preloader" class="fixed inset-0 z-[99999] bg-[#0a0e17] flex flex-col items-center justify-center space-y-6">
+        <div class="relative w-28 h-28 flex items-center justify-center">
+            <div class="spinner-ring absolute inset-0 w-full h-full shadow-lg shadow-sky-500/20"></div>
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-600 to-indigo-600 flex items-center justify-center font-black text-white text-2xl shadow-xl shadow-sky-500/30 animate-pulse">
+                DS
+            </div>
+        </div>
+        <div class="text-center space-y-1">
+            <h2 class="text-lg font-black bg-gradient-to-r from-sky-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent">DigitalSMod</h2>
+            <p class="text-xs text-slate-400 font-semibold tracking-wide">Đang nạp dữ liệu máy chủ Link...</p>
+        </div>
+    </div>
+
+    <!-- THANH CHẠY THÔNG BÁO TỪ ADMIN -->
     <div class="bg-gradient-to-r from-sky-900/60 via-indigo-900/60 to-purple-900/60 border-b border-sky-500/20 py-1.5 text-xs font-semibold text-sky-300 marquee-container">
         <div id="marquee-list" class="marquee-content flex items-center gap-6">
             <span>🚀 Đang tải thông báo từ hệ thống...</span>
@@ -87,29 +111,24 @@
         <div id="apk-section" class="space-y-2.5 hidden">
             <div class="flex items-center gap-2 px-1">
                 <i class="fa-brands fa-android text-green-400 text-sm"></i>
-                <h3 class="text-xs font-black text-white uppercase tracking-wide">Chia Sẻ File APK</h3>
+                <h3 class="text-xs font-black text-white uppercase tracking-wide">Chia Sẻ File APK (Trang LINK)</h3>
             </div>
             <div id="apk-container" class="space-y-2.5"></div>
         </div>
 
-        <!-- TÌM KIẾM & DANH MỤC -->
+        <!-- TÌM KIẾM SẢN PHẨM LINK -->
         <div class="space-y-3 pt-2">
             <div class="relative">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-500 text-xs"></i>
-                <input type="text" id="searchInput" onkeyup="filterProducts()" placeholder="Tìm ứng dụng, key, sản phẩm..." class="w-full bg-slate-900/90 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 transition">
-            </div>
-            <div id="categories-bar" class="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
-                <button onclick="selectCatFilter('all')" id="cat-btn-all" class="bg-amber-500 text-slate-950 font-black px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 shrink-0 transition">
-                    <i class="fa-solid fa-border-all text-[10px]"></i> Tất cả
-                </button>
+                <input type="text" id="searchInput" onkeyup="filterLinkProducts()" placeholder="Tìm file hack, mod, key VIP..." class="w-full bg-slate-900/90 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 transition">
             </div>
         </div>
 
-        <!-- GRID SẢN PHẨM -->
-        <div class="grid grid-cols-2 gap-3" id="productGrid">
+        <!-- GRID SẢN PHẨM LINK -->
+        <div class="grid grid-cols-2 gap-3" id="linkProductGrid">
             <div class="col-span-2 text-center py-10 card-bg rounded-2xl">
                 <i class="fa-solid fa-spinner fa-spin text-2xl text-sky-400 mb-2"></i>
-                <p class="text-xs text-slate-400">Đang nạp danh sách dữ liệu...</p>
+                <p class="text-xs text-slate-400">Đang tải dữ liệu sản phẩm link...</p>
             </div>
         </div>
     </main>
@@ -145,9 +164,9 @@
     <!-- BOTTOM NAVIGATION BAR -->
     <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#0a0e17]/95 border-t border-slate-800/80 backdrop-blur-md px-4 py-2.5 z-40">
         <div class="grid grid-cols-4 text-center">
-            <a href="/" class="flex flex-col items-center gap-1 text-sky-400">
+            <a href="/" class="flex flex-col items-center gap-1 text-slate-400 hover:text-sky-400">
                 <i class="fa-solid fa-house text-sm"></i>
-                <span class="text-[10px] font-extrabold">TRANG CHỦ</span>
+                <span class="text-[10px] font-bold">TRANG CHỦ</span>
             </a>
             <a href="/nhanacc/" class="flex flex-col items-center gap-1 text-amber-400 relative">
                 <i class="fa-solid fa-gift text-sm animate-bounce"></i>
@@ -164,7 +183,33 @@
         </div>
     </nav>
 
-    <!-- MODAL CHI TIẾT SẢN PHẨM -->
+    <!-- MODAL POPUP THÔNG BÁO TỪ ADMIN -->
+    <div id="admin-notify-modal" class="fixed inset-0 z-[80] bg-slate-950/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="card-bg border border-slate-800 rounded-3xl max-w-sm w-full p-6 space-y-4 text-center relative">
+            <button onclick="closeAdminNotifyModal()" class="absolute top-3 right-3 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <div id="admin-notify-body"></div>
+            <button onclick="closeAdminNotifyModal()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-2.5 rounded-xl text-xs transition">ĐÃ HIỂU</button>
+        </div>
+    </div>
+
+    <!-- MODAL HCAPTCHA BẢO MẬT -->
+    <div id="modal-hcaptcha" class="fixed inset-0 z-[85] bg-slate-950/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="card-bg border border-slate-800 rounded-3xl max-w-sm w-full p-6 space-y-5 text-center">
+            <h3 class="text-base font-bold text-white"><i class="fa-solid fa-shield-halved text-sky-400 mr-2"></i>Xác Minh hCaptcha Bảo Mật</h3>
+            <p class="text-xs text-slate-400">Vui lòng hoàn thành hCaptcha để lấy link tải sản phẩm!</p>
+
+            <div class="flex justify-center">
+                <div class="h-captcha" id="hcaptcha-container" data-sitekey="a474f7be-8ce0-4940-8830-b3ee33a26abc"></div>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="closeHcaptchaModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-xs transition">Hủy</button>
+                <button onclick="confirmHcaptchaAndOpen()" class="flex-1 bg-sky-600 hover:bg-sky-500 text-white font-bold py-2.5 rounded-xl text-xs transition">Bắt Đầu Tải</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CHI TIẾT SẢN PHẨM LINK -->
     <div id="product-modal" class="fixed inset-0 z-[70] bg-slate-950/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="card-bg w-full max-w-sm rounded-3xl overflow-hidden relative transform transition-all scale-95 opacity-0 duration-300" id="product-modal-content">
             <button onclick="closeProductModal()" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-900 border border-slate-700 text-white flex items-center justify-center z-10 hover:bg-slate-800 transition">
@@ -185,8 +230,8 @@
                 </div>
                 
                 <div class="pt-3">
-                    <a id="modal-action-btn" href="#" target="_blank" class="block w-full bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white text-sm font-black py-3.5 rounded-xl text-center shadow-lg shadow-sky-900/50 transition">
-                    </a>
+                    <button id="modal-action-btn" onclick="triggerHcaptchaForDownload()" class="block w-full bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white text-sm font-black py-3.5 rounded-xl text-center shadow-lg shadow-sky-900/50 transition">
+                    </button>
                 </div>
             </div>
         </div>
@@ -198,13 +243,21 @@
         const BASE_URL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
         const DEFAULT_FALLBACK_IMG = "https://ui-avatars.com/api/?name=Digital+Shop&background=0ea5e9&color=fff&size=150&bold=true";
 
-        let storeCategories = [];
-        let storeProducts = [];
-        let selectedCat = 'all';
+        let storeLinkProducts = [];
+        let activeTargetUrl = "";
 
         function escapeHtml(str) {
             if (!str) return '';
             return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function hidePreloader() {
+            const preloader = document.getElementById('preloader');
+            if (preloader) {
+                preloader.style.opacity = '0';
+                preloader.style.visibility = 'hidden';
+                setTimeout(() => preloader.style.display = 'none', 500);
+            }
         }
 
         function parseFirestoreFields(fields) {
@@ -219,7 +272,7 @@
             return res;
         }
 
-        async function fetchPageData() {
+        async function fetchLinkPageData() {
             try {
                 // Tải Avatar từ Settings
                 try {
@@ -233,17 +286,32 @@
                     }
                 } catch (e) {}
 
-                // Tải Thông báo chữ chạy
+                // Tải Thông báo chạy chữ & Popup cho trang LINK
                 try {
                     let nRes = await fetch(`${BASE_URL}/notifications?pageSize=100`);
                     let nData = await nRes.json();
-                    let notifs = (nData.documents || []).map(doc => parseFirestoreFields(doc.fields || {}))
-                        .filter(n => (n.status || 'active') === 'active' && (n.type || 'text') === 'text' && n.content);
+                    let allNotifs = (nData.documents || []).map(doc => parseFirestoreFields(doc.fields || {}))
+                        .filter(n => (n.status || 'active') === 'active');
 
-                    if (notifs.length > 0) {
-                        document.getElementById('marquee-list').innerHTML = notifs.map(n => `<span>${escapeHtml(n.content)}</span>`).join('');
+                    // Header Text
+                    let textNotifs = allNotifs.filter(n => (n.type || 'text') === 'text' && (n.target_page === 'link' || n.target_page === 'all'));
+                    if (textNotifs.length > 0) {
+                        document.getElementById('marquee-list').innerHTML = textNotifs.map(n => `<span>${escapeHtml(n.content)}</span>`).join('');
                     } else {
                         document.getElementById('marquee-list').innerHTML = `<span>🚀 Hệ thống chia sẻ File Hack Mod & Key VIP tự động 24/7!</span>`;
+                    }
+
+                    // Popup Modal
+                    let popupNotif = allNotifs.find(n => (n.type === 'popup' || n.type === 'image') && (n.target_page === 'link' || n.target_page === 'all'));
+                    if (popupNotif) {
+                        let html = '';
+                        if (popupNotif.image) {
+                            html += `<img src="${escapeHtml(popupNotif.image)}" class="w-full h-40 object-cover rounded-xl mb-3">`;
+                        }
+                        html += `<h3 class="text-base font-bold text-sky-400 mb-2">${escapeHtml(popupNotif.title || 'THÔNG BÁO')}</h3>
+                                 <p class="text-xs text-slate-300 mb-4 whitespace-pre-wrap">${escapeHtml(popupNotif.content)}</p>`;
+                        document.getElementById('admin-notify-body').innerHTML = html;
+                        document.getElementById('admin-notify-modal').classList.remove('hidden');
                     }
                 } catch (e) {}
 
@@ -257,7 +325,7 @@
                     if (apks.length > 0) {
                         document.getElementById('apk-section').classList.remove('hidden');
                         document.getElementById('apk-container').innerHTML = apks.map(app => `
-                            <a href="${escapeHtml(app.file_url)}" target="_blank" class="card-bg p-3.5 rounded-2xl flex items-center justify-between hover:border-green-500/50 transition group cursor-pointer">
+                            <div onclick="openHcaptchaForUrl('${escapeHtml(app.file_url)}')" class="card-bg p-3.5 rounded-2xl flex items-center justify-between hover:border-green-500/50 transition group cursor-pointer">
                                 <div class="flex items-center gap-3">
                                     <img src="${escapeHtml(app.icon || DEFAULT_FALLBACK_IMG)}" class="w-10 h-10 rounded-xl object-cover border border-slate-700">
                                     <div>
@@ -268,69 +336,36 @@
                                 <span class="w-8 h-8 rounded-lg bg-green-500/10 border border-green-500/30 text-green-400 flex items-center justify-center group-hover:bg-green-500 group-hover:text-slate-950 transition">
                                     <i class="fa-solid fa-download text-xs"></i>
                                 </span>
-                            </a>
+                            </div>
                         `).join('');
                     }
                 } catch (e) {}
 
-                // Tải Danh mục
-                let catRes = await fetch(`${BASE_URL}/categories?pageSize=100`);
-                let catData = await catRes.json();
-                storeCategories = (catData.documents || []).map(doc => {
-                    let f = parseFirestoreFields(doc.fields || {});
-                    f.id = doc.name.split('/').pop();
-                    return f;
-                }).filter(c => (c.status || 'active') === 'active');
-
-                renderCategoriesBar();
-
-                // Tải Sản phẩm
-                let prodRes = await fetch(`${BASE_URL}/products?pageSize=100`);
-                let prodData = await prodRes.json();
-                storeProducts = (prodData.documents || []).map(doc => {
+                // Tải Sản phẩm dành riêng cho trang LINK (link_products)
+                let linkProdRes = await fetch(`${BASE_URL}/link_products?pageSize=100`);
+                let linkProdData = await linkProdRes.json();
+                storeLinkProducts = (linkProdData.documents || []).map(doc => {
                     let f = parseFirestoreFields(doc.fields || {});
                     f.id = doc.name.split('/').pop();
                     return f;
                 });
 
-                filterProducts();
+                filterLinkProducts();
             } catch (err) {
-                document.getElementById('productGrid').innerHTML = `<div class="col-span-2 text-center py-10 card-bg rounded-2xl"><p class="text-xs text-red-400">Không thể kết nối dữ liệu Firebase!</p></div>`;
+                document.getElementById('linkProductGrid').innerHTML = `<div class="col-span-2 text-center py-10 card-bg rounded-2xl"><p class="text-xs text-red-400">Lỗi kết nối máy chủ Firebase!</p></div>`;
+            } finally {
+                hidePreloader();
             }
         }
 
-        function renderCategoriesBar() {
-            const bar = document.getElementById('categories-bar');
-            bar.innerHTML = `<button onclick="selectCatFilter('all')" id="cat-btn-all" class="bg-amber-500 text-slate-950 font-black px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 shrink-0 transition"><i class="fa-solid fa-border-all text-[10px]"></i> Tất cả</button>` + 
-                storeCategories.map(c => `
-                    <button onclick="selectCatFilter('${c.id}')" id="cat-btn-${c.id}" class="bg-slate-900 border border-slate-800 text-slate-300 font-bold hover:border-slate-700 px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 shrink-0 transition">
-                        <i class="fa-solid fa-folder text-[10px]"></i> ${escapeHtml(c.name)}
-                    </button>
-                `).join('');
-        }
-
-        function selectCatFilter(catId) {
-            selectedCat = catId;
-            document.querySelectorAll('#categories-bar button').forEach(btn => {
-                btn.className = "bg-slate-900 border border-slate-800 text-slate-300 font-bold hover:border-slate-700 px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 shrink-0 transition";
-            });
-            let activeBtn = document.getElementById(`cat-btn-${catId}`);
-            if (activeBtn) activeBtn.className = "bg-amber-500 text-slate-950 font-black px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 shrink-0 transition";
-            filterProducts();
-        }
-
-        function filterProducts() {
+        function filterLinkProducts() {
             const search = document.getElementById('searchInput').value.toLowerCase();
-            const grid = document.getElementById('productGrid');
+            const grid = document.getElementById('linkProductGrid');
 
-            const filtered = storeProducts.filter(p => {
-                const matchSearch = (p.title || '').toLowerCase().includes(search);
-                const matchCat = (selectedCat === 'all') || (p.category_id === selectedCat);
-                return matchSearch && matchCat;
-            });
+            const filtered = storeLinkProducts.filter(p => (p.title || '').toLowerCase().includes(search));
 
             if (filtered.length === 0) {
-                grid.innerHTML = `<div class="col-span-2 text-center py-10 card-bg rounded-2xl"><i class="fa-solid fa-box-open text-3xl text-slate-600 mb-2"></i><p class="text-xs text-slate-400">Chưa có sản phẩm nào thuộc danh mục này.</p></div>`;
+                grid.innerHTML = `<div class="col-span-2 text-center py-10 card-bg rounded-2xl"><i class="fa-solid fa-box-open text-3xl text-slate-600 mb-2"></i><p class="text-xs text-slate-400">Chưa có sản phẩm nào cho trang Link.</p></div>`;
                 return;
             }
 
@@ -338,26 +373,18 @@
                 let pImg = prod.image || DEFAULT_FALLBACK_IMG;
                 let pStatus = prod.status || 'available';
                 let pPrice = parseFloat(prod.price || 0);
-                let pTitle = prod.title || 'Sản phẩm mới';
+                let pTitle = prod.title || 'Sản phẩm Trang Link';
                 let pDesc = prod.description || '';
                 
-                let priceText = pPrice > 0 ? Number(pPrice).toLocaleString('vi-VN') + 'đ' : 'FREE / VIP';
+                let priceText = pPrice > 0 ? Number(pPrice).toLocaleString('vi-VN') + 'đ' : 'FREE / LINK VIP';
                 let isPaid = pPrice > 0;
-                let actionLink = '#';
-
-                if (isPaid) {
-                    actionLink = "https://zalo.me";
-                } else {
-                    let accLines = (prod.account_data || '').split('\n').map(l => l.trim()).filter(l => l.length > 0);
-                    let firstLine = accLines[0] || '';
-                    if (firstLine.indexOf('http') === 0) actionLink = firstLine;
-                }
+                let actionLink = prod.account_data || 'https://zalo.me';
 
                 return `
                     <div class="product-item card-bg rounded-2xl p-2.5 flex flex-col justify-between relative group hover:border-slate-700 transition cursor-pointer"
                          onclick="openProductModal('${escapeHtml(pTitle)}', '${escapeHtml(pImg)}', '${escapeHtml(priceText)}', '${escapeHtml(pDesc)}', '${escapeHtml(actionLink)}', ${isPaid})">
                         
-                        ${pStatus === 'maintenance' ? `<span class="absolute top-4 left-4 bg-red-600 text-white text-[9px] font-black px-2 py-0.5 rounded shadow z-10">BẢO TRÌ</span>` : `<span class="absolute top-4 left-4 bg-indigo-600 text-white text-[9px] font-black px-2 py-0.5 rounded shadow z-10">HOT</span>`}
+                        ${pStatus === 'maintenance' ? `<span class="absolute top-4 left-4 bg-red-600 text-white text-[9px] font-black px-2 py-0.5 rounded shadow z-10">BẢO TRÌ</span>` : `<span class="absolute top-4 left-4 bg-sky-600 text-white text-[9px] font-black px-2 py-0.5 rounded shadow z-10">VIP</span>`}
 
                         <div class="w-full h-32 rounded-xl bg-slate-800 overflow-hidden relative mb-2">
                             <img src="${escapeHtml(pImg)}" onerror="this.onerror=null; this.src='${DEFAULT_FALLBACK_IMG}';" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
@@ -369,14 +396,42 @@
                         <div class="space-y-1">
                             <h3 class="product-title font-extrabold text-xs text-white line-clamp-1">${escapeHtml(pTitle)}</h3>
                             ${pStatus === 'maintenance' ? `<div class="text-[10px] text-amber-400 font-semibold">● Đang nâng cấp</div>` : `<div class="text-[10px] text-green-400 font-semibold">● Bản mới nhất 100%</div>`}
-                            <div class="text-[10px] text-slate-400 line-clamp-1">🛡️ ${escapeHtml(pDesc || 'Sản phẩm uy tín chất lượng')}</div>
+                            <div class="text-[10px] text-slate-400 line-clamp-1">🛡️ ${escapeHtml(pDesc || 'File hack mod an toàn')}</div>
                         </div>
 
                         <button type="button" class="mt-3 w-full ${pStatus === 'maintenance' ? 'bg-slate-900 text-slate-600' : 'bg-slate-800 hover:bg-sky-600 text-white'} text-[11px] font-black py-2 rounded-xl text-center transition">
-                            ${pStatus === 'maintenance' ? 'BẢO TRÌ' : 'XEM CHI TIẾT'}
+                            ${pStatus === 'maintenance' ? 'BẢO TRÌ' : 'TẢI FILE / XEM'}
                         </button>
                     </div>`;
             }).join('');
+        }
+
+        // HCAPTCHA FLOW
+        function openHcaptchaForUrl(url) {
+            activeTargetUrl = url;
+            document.getElementById('modal-hcaptcha').classList.remove('hidden');
+        }
+
+        function triggerHcaptchaForDownload() {
+            closeProductModal();
+            document.getElementById('modal-hcaptcha').classList.remove('hidden');
+        }
+
+        function confirmHcaptchaAndOpen() {
+            if (!window.hcaptcha || !hcaptcha.getResponse()) {
+                alert("Vui lòng tích chọn hCaptcha để xác minh!");
+                return;
+            }
+            closeHcaptchaModal();
+            window.open(activeTargetUrl, '_blank');
+        }
+
+        function closeHcaptchaModal() {
+            document.getElementById('modal-hcaptcha').classList.add('hidden');
+        }
+
+        function closeAdminNotifyModal() {
+            document.getElementById('admin-notify-modal').classList.add('hidden');
         }
 
         function toggleDrawer() {
@@ -384,6 +439,7 @@
         }
 
         function openProductModal(title, image, priceText, desc, actionLink, isPaid) {
+            activeTargetUrl = actionLink;
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-img').src = image;
             document.getElementById('modal-price-badge').innerText = priceText;
@@ -392,10 +448,8 @@
             const btn = document.getElementById('modal-action-btn');
             if (isPaid) {
                 btn.innerHTML = '<i class="fa-solid fa-comment-dots me-1"></i> LIÊN HỆ MUA QUA ZALO';
-                btn.href = actionLink;
             } else {
-                btn.innerHTML = '<i class="fa-solid fa-download me-1"></i> TẢI XUỐNG NGAY';
-                btn.href = actionLink;
+                btn.innerHTML = '<i class="fa-solid fa-download me-1"></i> XÁC MINH & TẢI XUỐNG';
             }
 
             const modal = document.getElementById('product-modal');
@@ -416,7 +470,7 @@
         }
 
         window.onload = function() {
-            fetchPageData();
+            fetchLinkPageData();
         };
     </script>
 </body>
