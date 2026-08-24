@@ -583,6 +583,24 @@
 
         async function fetchStoreData() {
             try {
+                // TỰ ĐỘNG ĐỒNG BỘ SỐ DƯ MỚI NHẤT TỪ FIREBASE TỪ USER ID
+                if (currentUser && currentUser.id) {
+                    try {
+                        let userRes = await fetch(`${BASE_URL}/users/${currentUser.id}`);
+                        if (userRes.ok) {
+                            let userData = await userRes.json();
+                            let updatedFields = parseFirestoreFields(userData.fields || {});
+                            currentUser.balance = updatedFields.balance || 0;
+                            
+                            let storedData = JSON.parse(localStorage.getItem('ds_user')) || {};
+                            storedData.balance = currentUser.balance;
+                            localStorage.setItem('ds_user', JSON.stringify(storedData));
+                            
+                            renderHeaderAuth();
+                        }
+                    } catch(e) {}
+                }
+
                 // Tải danh mục
                 let catRes = await fetch(`${BASE_URL}/categories?pageSize=100`);
                 let catData = await catRes.json();
