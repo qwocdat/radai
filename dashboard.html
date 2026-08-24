@@ -40,10 +40,11 @@
     <div class="nav flex-column nav-pills">
         <a class="nav-link nav-btn-tab active" data-tab="dashboard" onclick="switchTab('dashboard')"><i class="fa-solid fa-chart-line me-2"></i>Tổng Quan</a>
         <a class="nav-link nav-btn-tab" data-tab="notify" onclick="switchTab('notify')"><i class="fa-solid fa-bullhorn me-2"></i>Gửi Thông Báo Trang Chủ</a>
-        <a class="nav-link nav-btn-tab" data-tab="apps" onclick="switchTab('apps')"><i class="fa-brands fa-android me-2"></i>Chia Sẻ File APK</a>
+        <a class="nav-link nav-btn-tab" data-tab="apps" onclick="switchTab('apps')"><i class="fa-brands fa-android me-2"></i>Chia Sẻ File APK (Trang LINK)</a>
+        <a class="nav-link nav-btn-tab" data-tab="link_products" onclick="switchTab('link_products')"><i class="fa-solid fa-link me-2"></i>Sản Phẩm Trang LINK</a>
         <a class="nav-link nav-btn-tab" data-tab="free_accs" onclick="switchTab('free_accs')"><i class="fa-solid fa-gift me-2"></i>Quản Lý Acc Free (Nhận Acc)</a>
         <a class="nav-link nav-btn-tab" data-tab="categories" onclick="switchTab('categories')"><i class="fa-solid fa-layer-group me-2"></i>Quản Lý Danh Mục Shop</a>
-        <a class="nav-link nav-btn-tab" data-tab="products" onclick="switchTab('products')"><i class="fa-solid fa-box-open me-2"></i>Quản Lý Sản Phẩm Shop</a>
+        <a class="nav-link nav-btn-tab" data-tab="products" onclick="switchTab('products')"><i class="fa-solid fa-box-open me-2"></i>Quản Lý Sản Phẩm Shop (INDEX)</a>
         <a class="nav-link nav-btn-tab" data-tab="deposits" onclick="switchTab('deposits')"><i class="fa-solid fa-money-bill-transfer me-2"></i>Quản Lý Nạp Tiền</a>
         <a class="nav-link nav-btn-tab" data-tab="users" onclick="switchTab('users')"><i class="fa-solid fa-users me-2"></i>Quản Lý Thành Viên</a>
         <a class="nav-link nav-btn-tab" data-tab="orders" onclick="switchTab('orders')"><i class="fa-solid fa-receipt me-2"></i>Lịch Sử Đơn Hàng</a>
@@ -61,10 +62,11 @@
             <div class="nav flex-column nav-pills">
                 <a class="nav-link nav-btn-tab active" data-tab="dashboard" onclick="switchTab('dashboard')"><i class="fa-solid fa-chart-line me-2"></i>Tổng Quan</a>
                 <a class="nav-link nav-btn-tab" data-tab="notify" onclick="switchTab('notify')"><i class="fa-solid fa-bullhorn me-2"></i>Gửi Thông Báo Trang Chủ</a>
-                <a class="nav-link nav-btn-tab" data-tab="apps" onclick="switchTab('apps')"><i class="fa-brands fa-android me-2"></i>Chia Sẻ File APK</a>
+                <a class="nav-link nav-btn-tab" data-tab="apps" onclick="switchTab('apps')"><i class="fa-brands fa-android me-2"></i>Chia Sẻ File APK (Trang LINK)</a>
+                <a class="nav-link nav-btn-tab" data-tab="link_products" onclick="switchTab('link_products')"><i class="fa-solid fa-link me-2"></i>Sản Phẩm Trang LINK</a>
                 <a class="nav-link nav-btn-tab" data-tab="free_accs" onclick="switchTab('free_accs')"><i class="fa-solid fa-gift me-2"></i>Quản Lý Acc Free (Nhận Acc)</a>
                 <a class="nav-link nav-btn-tab" data-tab="categories" onclick="switchTab('categories')"><i class="fa-solid fa-layer-group me-2"></i>Quản Lý Danh Mục Shop</a>
-                <a class="nav-link nav-btn-tab" data-tab="products" onclick="switchTab('products')"><i class="fa-solid fa-box-open me-2"></i>Quản Lý Sản Phẩm Shop</a>
+                <a class="nav-link nav-btn-tab" data-tab="products" onclick="switchTab('products')"><i class="fa-solid fa-box-open me-2"></i>Quản Lý Sản Phẩm Shop (INDEX)</a>
                 <a class="nav-link nav-btn-tab" data-tab="deposits" onclick="switchTab('deposits')"><i class="fa-solid fa-money-bill-transfer me-2"></i>Quản Lý Nạp Tiền</a>
                 <a class="nav-link nav-btn-tab" data-tab="users" onclick="switchTab('users')"><i class="fa-solid fa-users me-2"></i>Quản Lý Thành Viên</a>
                 <a class="nav-link nav-btn-tab" data-tab="orders" onclick="switchTab('orders')"><i class="fa-solid fa-receipt me-2"></i>Lịch Sử Đơn Hàng</a>
@@ -265,12 +267,12 @@
                 </div>
             </div>
 
-            <!-- TAB 3: QUẢN LÝ SẢN PHẨM SHOP -->
+            <!-- TAB 3: QUẢN LÝ SẢN PHẨM SHOP (INDEX.HTML) -->
             <div id="tab-products" class="tab-pane">
                 <div class="card p-3 p-md-4 mb-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h4 id="prod-form-title" class="text-warning mb-0">
-                            <i class="fa-solid fa-box-open me-2"></i>Đăng Sản Phẩm Mới (Shop index.html)
+                            <i class="fa-solid fa-box-open me-2"></i>Đăng Sản Phẩm Mới (Chỉ Cho Shop index.html)
                         </h4>
                     </div>
 
@@ -281,7 +283,7 @@
                         <div class="row g-3">
                             <div class="col-12 col-md-6">
                                 <label class="form-label">Tên sản phẩm *</label>
-                                <input type="text" id="prod_title" class="form-control" placeholder="VD: HACK MAP ESP APK CHẤP TỔ" required>
+                                <input type="text" id="prod_title" class="form-control" placeholder="VD: ACC LIÊN QUÂN VIP PRO" required>
                             </div>
 
                             <div class="col-12 col-sm-6 col-md-3">
@@ -321,12 +323,12 @@
                             </div>
 
                             <div class="col-12">
-                                <label class="form-label text-warning fw-bold"><i class="fa-solid fa-key me-1"></i> Dữ Liệu Tài Khoản (Mỗi dòng 1 Item: tk|mk hoặc Link)</label>
+                                <label class="form-label text-warning fw-bold"><i class="fa-solid fa-key me-1"></i> Dữ Liệu Tài Khoản (Mỗi dòng 1 Item: tk|mk)</label>
                                 <textarea id="prod_account_data" class="form-control font-monospace" rows="4" placeholder="acc1|pass1"></textarea>
                             </div>
 
                             <div class="col-12">
-                                <button type="submit" class="btn btn-warning fw-bold"><i class="fa-solid fa-save me-1"></i> Lưu Sản Phẩm</button>
+                                <button type="submit" class="btn btn-warning fw-bold"><i class="fa-solid fa-save me-1"></i> Lưu Sản Phẩm Index</button>
                                 <button type="button" id="btn-cancel-prod" onclick="resetProdForm()" class="btn btn-secondary d-none">Hủy Sửa</button>
                             </div>
                         </div>
@@ -335,7 +337,7 @@
 
                 <div class="card p-3 p-md-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 class="text-white mb-0"><i class="fa-solid fa-boxes-stacked me-2"></i>Kho Sản Phẩm</h4>
+                        <h4 class="text-white mb-0"><i class="fa-solid fa-boxes-stacked me-2"></i>Kho Sản Phẩm Index.html</h4>
                     </div>
 
                     <div class="table-responsive">
@@ -354,6 +356,92 @@
                             </thead>
                             <tbody id="table-products">
                                 <tr><td colspan="8" class="text-center text-muted">Đang tải...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB MỚI: QUẢN LÝ SẢN PHẨM TRANG LINK (LINK.HTML) -->
+            <div id="tab-link_products" class="tab-pane">
+                <div class="card p-3 p-md-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 id="link-prod-form-title" class="text-info mb-0">
+                            <i class="fa-solid fa-link me-2"></i>Đăng Sản Phẩm / Tải File Mới (Dành Riêng Cho link.html)
+                        </h4>
+                    </div>
+
+                    <form onsubmit="handleSaveLinkProduct(event)">
+                        <input type="hidden" id="link_prod_id">
+                        <input type="hidden" id="link_prod_existing_image">
+
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Tên sản phẩm / File *</label>
+                                <input type="text" id="link_prod_title" class="form-control" placeholder="VD: HACK MAP CHẤP TỔ APK VIP" required>
+                            </div>
+
+                            <div class="col-12 col-sm-6 col-md-3">
+                                <label class="form-label">Giá bán (VNĐ) hoặc 0đ</label>
+                                <input type="number" id="link_prod_price" class="form-control" value="0">
+                            </div>
+
+                            <div class="col-12 col-sm-6 col-md-3">
+                                <label class="form-label">Trạng thái hiển thị</label>
+                                <select id="link_prod_status" class="form-select">
+                                    <option value="available">Bình Thường / Tải Ngay</option>
+                                    <option value="maintenance">Bảo Trì</option>
+                                    <option value="disabled">Ẩn File</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Chọn Tệp Ảnh (Auto Upload ImgBB)</label>
+                                <input type="file" id="link_prod_image_file" class="form-control" accept="image/*">
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Hoặc Dán Direct Link Ảnh Online</label>
+                                <input type="text" id="link_prod_image_url" class="form-control" placeholder="https://i.ibb.co/...">
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Mô tả sản phẩm Trang LINK</label>
+                                <textarea id="link_prod_description" class="form-control" rows="2" placeholder="Ghi chú file hack, hướng dẫn..."></textarea>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label text-info fw-bold"><i class="fa-solid fa-download me-1"></i> Link Tải File / Dữ Liệu Bàn Giao (Link Google Drive, Mediafire...)</label>
+                                <textarea id="link_prod_account_data" class="form-control font-monospace" rows="3" placeholder="https://mediafire.com/..."></textarea>
+                            </div>
+
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-info fw-bold text-white"><i class="fa-solid fa-save me-1"></i> Lưu Sản Phẩm Link.html</button>
+                                <button type="button" id="btn-cancel-link-prod" onclick="resetLinkProdForm()" class="btn btn-secondary d-none">Hủy Sửa</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card p-3 p-md-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="text-white mb-0"><i class="fa-solid fa-boxes-stacked me-2"></i>Kho Dữ Liệu Trang LINK (link.html)</h4>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Ảnh</th>
+                                    <th>Tên Sản Phẩm / File</th>
+                                    <th>Giá</th>
+                                    <th>Trạng Thái</th>
+                                    <th>Thao Tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-link-products">
+                                <tr><td colspan="6" class="text-center text-muted">Đang tải...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -448,11 +536,11 @@
                 </div>
             </div>
 
-            <!-- TAB APPS: CHIA SẺ FILE APK -->
+            <!-- TAB APPS: CHIA SẺ FILE APK (TRANG LINK.HTML) -->
             <div id="tab-apps" class="tab-pane">
                 <div class="card p-3 p-md-4 mb-4">
                     <h4 id="apk-form-title" class="text-warning mb-3">
-                        <i class="fa-brands fa-android me-2"></i>Thêm File APK Mới (Chia sẻ lên link.html)
+                        <i class="fa-brands fa-android me-2"></i>Thêm File APK Mới (Chia sẻ dành riêng cho link.html)
                     </h4>
                     <form onsubmit="handleSaveApk(event)">
                         <input type="hidden" id="apk_id">
@@ -494,7 +582,7 @@
                             </div>
                             
                             <div class="col-12">
-                                <button type="submit" class="btn btn-warning fw-bold"><i class="fa-solid fa-save me-1"></i> Lưu File APK</button>
+                                <button type="submit" class="btn btn-warning fw-bold"><i class="fa-solid fa-save me-1"></i> Lưu File APK Cho Link.html</button>
                                 <button type="button" id="btn-cancel-apk" onclick="resetApkForm()" class="btn btn-secondary d-none">Hủy Sửa</button>
                             </div>
                         </div>
@@ -595,6 +683,7 @@
     let cacheData = {
         categories: [],
         products: [],
+        linkProducts: [],
         freeTypes: [],
         notifications: [],
         apks: [],
@@ -739,6 +828,15 @@
             });
             renderProductsTable();
 
+            // LẤY SẢN PHẨM RIÊNG CỦA TRANG LINK.HTML
+            let linkProdDocs = await fetchAllCollectionDocs('link_products');
+            cacheData.linkProducts = linkProdDocs.map(doc => {
+                let f = parseFirestoreFields(doc.fields || {});
+                f.id = doc.name.split('/').pop();
+                return f;
+            });
+            renderLinkProductsTable();
+
             let freeDocs = await fetchAllCollectionDocs('free_types');
             cacheData.freeTypes = freeDocs.map(doc => {
                 let f = parseFirestoreFields(doc.fields || {});
@@ -830,7 +928,7 @@
     function renderProductsTable() {
         const tbody = document.getElementById('table-products');
         if (cacheData.products.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Không có sản phẩm nào</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Không có sản phẩm nào cho Index</td></tr>';
             return;
         }
         let catMap = {};
@@ -848,6 +946,28 @@
                 <td>
                     <button onclick="editProduct('${p.id}')" class="btn btn-sm btn-primary me-1"><i class="fa-solid fa-pen"></i> Sửa</button>
                     <button onclick="deleteDocument('products', '${p.id}')" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i> Xóa</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function renderLinkProductsTable() {
+        const tbody = document.getElementById('table-link-products');
+        if (cacheData.linkProducts.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Chưa có sản phẩm nào cho Trang LINK (link.html)</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = cacheData.linkProducts.map(lp => `
+            <tr>
+                <td><small class="font-monospace text-info">${escapeHtml(lp.id)}</small></td>
+                <td><img src="${escapeHtml(lp.image || DEFAULT_PLACEHOLDER)}" class="thumb-preview"></td>
+                <td class="fw-bold text-info">${escapeHtml(lp.title)}</td>
+                <td class="text-success fw-bold">${Number(lp.price || 0).toLocaleString('vi-VN')} đ</td>
+                <td><span class="badge bg-${lp.status === 'available' ? 'success' : 'warning'}">${lp.status === 'available' ? 'Hiển thị' : 'Ẩn/Bảo Trì'}</span></td>
+                <td>
+                    <button onclick="editLinkProduct('${lp.id}')" class="btn btn-sm btn-primary me-1"><i class="fa-solid fa-pen"></i> Sửa</button>
+                    <button onclick="deleteDocument('link_products', '${lp.id}')" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i> Xóa</button>
                 </td>
             </tr>
         `).join('');
@@ -901,7 +1021,7 @@
     function renderApksTable() {
         const tbody = document.getElementById('table-apks');
         if (cacheData.apks.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Chưa có ứng dụng nào</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Chưa có ứng dụng nào dành cho link.html</td></tr>';
             return;
         }
         tbody.innerHTML = cacheData.apks.map(a => `
@@ -1067,6 +1187,7 @@
         document.getElementById('btn-cancel-cat').classList.add('d-none');
     }
 
+    // XỬ LÝ SẢN PHẨM TRANG INDEX
     async function handleSaveProduct(e) {
         e.preventDefault();
         let id = document.getElementById('prod_id').value || ('prod_' + Date.now());
@@ -1096,7 +1217,7 @@
             body: JSON.stringify(body)
         });
 
-        showAlert('Lưu sản phẩm thành công!');
+        showAlert('Lưu sản phẩm cho Index thành công!');
         resetProdForm();
         loadAllDashboardData();
     }
@@ -1113,7 +1234,7 @@
         document.getElementById('prod_account_data').value = p.account_data || '';
         document.getElementById('prod_existing_image').value = p.image || '';
         document.getElementById('prod_image_url').value = p.image || '';
-        document.getElementById('prod-form-title').innerText = 'Sửa Sản Phẩm #' + p.id;
+        document.getElementById('prod-form-title').innerText = 'Sửa Sản Phẩm Index #' + p.id;
         document.getElementById('btn-cancel-prod').classList.remove('d-none');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -1127,8 +1248,71 @@
         document.getElementById('prod_image_url').value = '';
         document.getElementById('prod_existing_image').value = '';
         document.getElementById('prod_image_file').value = '';
-        document.getElementById('prod-form-title').innerText = 'Đăng Sản Phẩm Mới (Shop index.html)';
+        document.getElementById('prod-form-title').innerText = 'Đăng Sản Phẩm Mới (Chỉ Cho Shop index.html)';
         document.getElementById('btn-cancel-prod').classList.add('d-none');
+    }
+
+    // XỬ LÝ SẢN PHẨM TRANG LINK (LINK.HTML)
+    async function handleSaveLinkProduct(e) {
+        e.preventDefault();
+        let id = document.getElementById('link_prod_id').value || ('linkprod_' + Date.now());
+        let title = document.getElementById('link_prod_title').value.trim();
+        let price = parseFloat(document.getElementById('link_prod_price').value || 0);
+        let status = document.getElementById('link_prod_status').value;
+        let description = document.getElementById('link_prod_description').value.trim();
+        let account_data = document.getElementById('link_prod_account_data').value.trim();
+        let url = document.getElementById('link_prod_image_url').value.trim() || document.getElementById('link_prod_existing_image').value || DEFAULT_PLACEHOLDER;
+        let file = document.getElementById('link_prod_image_file').files[0];
+
+        if (file) {
+            let uploaded = await uploadToImgBB(file);
+            if (!uploaded) {
+                showAlert('Đăng ảnh sản phẩm link lên ImgBB thất bại!', 'danger');
+                return;
+            }
+            url = uploaded;
+        }
+
+        let body = encodeFirestoreFields({ title, price, status, description, account_data, image: url, updated_at: new Date().toISOString() });
+
+        await fetch(`${BASE_URL}/link_products/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+
+        showAlert('Lưu sản phẩm cho trang LINK thành công!');
+        resetLinkProdForm();
+        loadAllDashboardData();
+    }
+
+    function editLinkProduct(id) {
+        let lp = cacheData.linkProducts.find(item => item.id === id);
+        if (!lp) return;
+        document.getElementById('link_prod_id').value = lp.id;
+        document.getElementById('link_prod_title').value = lp.title || '';
+        document.getElementById('link_prod_price').value = lp.price || 0;
+        document.getElementById('link_prod_status').value = lp.status || 'available';
+        document.getElementById('link_prod_description').value = lp.description || '';
+        document.getElementById('link_prod_account_data').value = lp.account_data || '';
+        document.getElementById('link_prod_existing_image').value = lp.image || '';
+        document.getElementById('link_prod_image_url').value = lp.image || '';
+        document.getElementById('link-prod-form-title').innerText = 'Sửa Sản Phẩm Link.html #' + lp.id;
+        document.getElementById('btn-cancel-link-prod').classList.remove('d-none');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetLinkProdForm() {
+        document.getElementById('link_prod_id').value = '';
+        document.getElementById('link_prod_title').value = '';
+        document.getElementById('link_prod_price').value = '0';
+        document.getElementById('link_prod_description').value = '';
+        document.getElementById('link_prod_account_data').value = '';
+        document.getElementById('link_prod_image_url').value = '';
+        document.getElementById('link_prod_existing_image').value = '';
+        document.getElementById('link_prod_image_file').value = '';
+        document.getElementById('link-prod-form-title').innerText = 'Đăng Sản Phẩm / Tải File Mới (Dành Riêng Cho link.html)';
+        document.getElementById('btn-cancel-link-prod').classList.add('d-none');
     }
 
     async function handleSaveFreeType(e) {
@@ -1282,7 +1466,7 @@
             body: JSON.stringify(body)
         });
 
-        showAlert('Lưu File APK thành công!');
+        showAlert('Lưu File APK cho link.html thành công!');
         resetApkForm();
         loadAllDashboardData();
     }
@@ -1298,7 +1482,7 @@
         document.getElementById('apk_desc').value = a.description || '';
         document.getElementById('apk_existing_icon').value = a.icon || '';
         document.getElementById('apk_icon_url').value = a.icon || '';
-        document.getElementById('apk-form-title').innerText = 'Sửa File APK';
+        document.getElementById('apk-form-title').innerText = 'Sửa File APK Trang LINK';
         document.getElementById('btn-cancel-apk').classList.remove('d-none');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -1312,7 +1496,7 @@
         document.getElementById('apk_icon_url').value = '';
         document.getElementById('apk_existing_icon').value = '';
         document.getElementById('apk_icon_file').value = '';
-        document.getElementById('apk-form-title').innerText = 'Thêm File APK Mới (Chia sẻ lên link.html)';
+        document.getElementById('apk-form-title').innerText = 'Thêm File APK Mới (Chia sẻ dành riêng cho link.html)';
         document.getElementById('btn-cancel-apk').classList.add('d-none');
     }
 
