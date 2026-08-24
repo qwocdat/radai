@@ -580,7 +580,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- JAVASCRIPT DIRECT FIREBASE & IMGBB CORE ENGINE (ĐÃ FIX TẤT CẢ LỖI KỸ THUẬT VÀ GIỮ NGUYÊN CODE CŨ) -->
+<!-- JAVASCRIPT DIRECT FIREBASE & IMGBB CORE ENGINE -->
 <script>
     const FIREBASE_PROJECT_ID = "quocdat-396fe";
     const BASE_URL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
@@ -686,7 +686,6 @@
         return { fields };
     }
 
-    // Cơ chế phân trang tự động lấy toàn bộ tài liệu không bị đứt đoạn ở 300 danh mục
     async function fetchAllCollectionDocs(collectionName) {
         let documents = [];
         let pageToken = '';
@@ -941,7 +940,6 @@
         `).join('');
     }
 
-    // Hiển thị tên tài khoản ở bảng Nạp Tiền
     function renderDepositsTable() {
         const tbody = document.getElementById('table-deposits');
         if (cacheData.deposits.length === 0) {
@@ -958,7 +956,7 @@
                 <td class="text-success fw-bold">${Number(d.amount || 0).toLocaleString('vi-VN')} đ</td>
                 <td class="text-warning font-monospace">${escapeHtml(d.trans_id || '')}</td>
                 <td><span class="badge bg-${d.status === 'success' ? 'success' : 'warning'}">${d.status || 'pending'}</span></td>
-                <td class="text-muted"><small>${escapeHtml(d.created_at || '')}</small></td>
+                <td><text class="text-muted"><small>${escapeHtml(d.created_at || '')}</small></text></td>
                 <td>
                     ${d.status === 'pending' ? `<button onclick="approveDeposit('${d.id}', '${d.user_id}', ${d.amount})" class="btn btn-sm btn-success"><i class="fa-solid fa-check"></i> Duyệt Nạp</button>` : '<span class="text-muted small">Đã xử lý</span>'}
                 </td>
@@ -966,7 +964,6 @@
         `).join('');
     }
 
-    // Hiển thị tên tài khoản ở bảng Lịch Sử Đơn Hàng
     function renderOrdersTable() {
         const tbody = document.getElementById('table-orders');
         if (cacheData.orders.length === 0) {
@@ -983,7 +980,7 @@
                 <td class="fw-bold text-white">${escapeHtml(o.product_title || '')}</td>
                 <td class="text-success fw-bold">${Number(o.price || 0).toLocaleString('vi-VN')} đ</td>
                 <td><small class="font-monospace text-warning select-all" style="white-space: pre-wrap;">${escapeHtml(o.delivered_data || '')}</small></td>
-                <td class="text-muted"><small>${escapeHtml(o.created_at || '')}</small></td>
+                <td><text class="text-muted"><small>${escapeHtml(o.created_at || '')}</small></text></td>
             </tr>
         `).join('');
     }
@@ -1326,7 +1323,6 @@
         loadAllDashboardData();
     }
 
-    // ĐÃ FIX: TRUY VẤN SỐ DƯ MỚI NHẤT VÀ DÙNG updateMask ĐỂ TRÁNH MẤT TÀI KHOẢN
     async function approveDeposit(depId, userId, amount) {
         if (!confirm(`Xác nhận duyệt nạp ${Number(amount).toLocaleString('vi-VN')} đ cho tài khoản ${userId}?`)) return;
 
@@ -1358,7 +1354,6 @@
         loadAllDashboardData();
     }
 
-    // ĐÃ FIX: TRUY VẤN TRỰC TIẾP FIRESTORE THẬT VÀ DÙNG updateMask CẬP NHẬT
     async function adjustUserBalance(userId) {
         let currentBalance = 0;
         try {
