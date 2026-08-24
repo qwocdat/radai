@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DIGITALSHOP - Hệ Thống Quản Trị Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #0b0f19; color: #e2e8f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .sidebar { background: #151e32; min-height: 100vh; border-right: 1px solid #1e293b; }
+        .sidebar .nav-link, .offcanvas-body .nav-link { color: #94a3b8; padding: 12px 20px; margin-bottom: 4px; border-radius: 8px; transition: all 0.2s; cursor: pointer; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active,
+        .offcanvas-body .nav-link:hover, .offcanvas-body .nav-link.active { background: #ea580c; color: #fff; }
+        .card { background: #151e32; border: 1px solid #1e293b; border-radius: 12px; color: #f8fafc; }
+        .table { color: #cbd5e1; vertical-align: middle; }
+        .form-control, .form-select { background: #0b0f19; border: 1px solid #334155; color: #fff; }
+        .form-control:focus, .form-select:focus { background: #1e293b; color: #fff; border-color: #ea580c; box-shadow: none; }
+        .mobile-header { border-bottom: 1px solid #1e293b; background: #151e32 !important; }
+        .thumb-preview { width: 50px; height: 35px; object-fit: cover; border-radius: 4px; border: 1px solid #334155; }
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+    </style>
+</head>
+<body>
+
+<div class="d-md-none mobile-header p-3 d-flex justify-content-between align-items-center sticky-top">
+    <h5 class="text-warning fw-bold mb-0"><i class="fa-solid fa-shield-halved me-2"></i>DIGITALSHOP ADMIN</h5>
+    <button class="btn btn-warning btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar">
+        <i class="fa-solid fa-bars me-1"></i> Menu
+    </button>
+</div>
+
+<div class="offcanvas offcanvas-start bg-dark text-white" tabindex="-1" id="mobileSidebar">
+  <div class="offcanvas-header border-bottom border-secondary">
+    <h5 class="offcanvas-title text-warning"><i class="fa-solid fa-shield-halved me-2"></i>DIGITALSHOP</h5>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+  </div>
+  <div class="offcanvas-body">
+    <div class="nav flex-column nav-pills">
+        <a class="nav-link nav-btn-tab active" data-tab="dashboard" onclick="switchTab('dashboard')"><i class="fa-solid fa-chart-line me-2"></i>Tổng Quan</a>
+        <a class="nav-link nav-btn-tab" data-tab="notify" onclick="switchTab('notify')"><i class="fa-solid fa-bullhorn me-2"></i>Gửi Thông Báo Trang Chủ</a>
+        <a class="nav-link nav-btn-tab" data-tab="apps" onclick="switchTab('apps')"><i class="fa-brands fa-android me-2"></i>Chia Sẻ File APK</a>
+        <a class="nav-link nav-btn-tab" data-tab="free_accs" onclick="switchTab('free_accs')"><i class="fa-solid fa-gift me-2"></i>Quản Lý Acc Free (Nhận Acc)</a>
+        <a class="nav-link nav-btn-tab" data-tab="categories" onclick="switchTab('categories')"><i class="fa-solid fa-layer-group me-2"></i>Quản Lý Danh Mục Shop</a>
+        <a class="nav-link nav-btn-tab" data-tab="products" onclick="switchTab('products')"><i class="fa-solid fa-box-open me-2"></i>Quản Lý Sản Phẩm Shop</a>
+        <a class="nav-link nav-btn-tab" data-tab="deposits" onclick="switchTab('deposits')"><i class="fa-solid fa-money-bill-transfer me-2"></i>Quản Lý Nạp Tiền</a>
+        <a class="nav-link nav-btn-tab" data-tab="users" onclick="switchTab('users')"><i class="fa-solid fa-users me-2"></i>Quản Lý Thành Viên</a>
+        <a class="nav-link nav-btn-tab" data-tab="orders" onclick="switchTab('orders')"><i class="fa-solid fa-receipt me-2"></i>Lịch Sử Đơn Hàng</a>
+        <hr class="border-secondary">
+        <a class="nav-link text-warning" href="/" target="_blank"><i class="fa-solid fa-globe me-2"></i>Xem Trang Client Shop</a>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar Desktop -->
+        <div class="col-md-2 sidebar p-3 d-none d-md-block">
+            <h4 class="text-warning fw-bold mb-4 text-center"><i class="fa-solid fa-shield-halved me-2"></i>DIGITALSHOP</h4>
+            <div class="nav flex-column nav-pills">
+                <a class="nav-link nav-btn-tab active" data-tab="dashboard" onclick="switchTab('dashboard')"><i class="fa-solid fa-chart-line me-2"></i>Tổng Quan</a>
+                <a class="nav-link nav-btn-tab" data-tab="notify" onclick="switchTab('notify')"><i class="fa-solid fa-bullhorn me-2"></i>Gửi Thông Báo Trang Chủ</a>
+                <a class="nav-link nav-btn-tab" data-tab="apps" onclick="switchTab('apps')"><i class="fa-brands fa-android me-2"></i>Chia Sẻ File APK</a>
+                <a class="nav-link nav-btn-tab" data-tab="free_accs" onclick="switchTab('free_accs')"><i class="fa-solid fa-gift me-2"></i>Quản Lý Acc Free (Nhận Acc)</a>
+                <a class="nav-link nav-btn-tab" data-tab="categories" onclick="switchTab('categories')"><i class="fa-solid fa-layer-group me-2"></i>Quản Lý Danh Mục Shop</a>
+                <a class="nav-link nav-btn-tab" data-tab="products" onclick="switchTab('products')"><i class="fa-solid fa-box-open me-2"></i>Quản Lý Sản Phẩm Shop</a>
+                <a class="nav-link nav-btn-tab" data-tab="deposits" onclick="switchTab('deposits')"><i class="fa-solid fa-money-bill-transfer me-2"></i>Quản Lý Nạp Tiền</a>
+                <a class="nav-link nav-btn-tab" data-tab="users" onclick="switchTab('users')"><i class="fa-solid fa-users me-2"></i>Quản Lý Thành Viên</a>
+                <a class="nav-link nav-btn-tab" data-tab="orders" onclick="switchTab('orders')"><i class="fa-solid fa-receipt me-2"></i>Lịch Sử Đơn Hàng</a>
+                <hr class="border-secondary">
+                <a class="nav-link text-warning" href="/" target="_blank"><i class="fa-solid fa-globe me-2"></i>Xem Trang Client Shop</a>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="col-md-10 p-3 p-md-4">
+            <div id="alert-box"></div>
+
+            <!-- TAB 1: TỔNG QUAN -->
+            <div id="tab-dashboard" class="tab-pane active">
+                <h3 class="mb-4 text-center text-md-start text-warning">Tổng Quan Hệ Thống DIGITALSHOP</h3>
+                
+                <div class="card p-3 p-md-4 mb-4 border-warning">
+                    <h5 class="mb-3 text-warning"><i class="fa-solid fa-image me-2"></i>Cài Đặt Ảnh Đại Diện (Avatar Trang Chủ)</h5>
+                    <form onsubmit="handleSaveSettings(event)">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-5">
+                                <label class="form-label fw-bold">Tải Ảnh Avatar Lên (Auto Upload ImgBB)</label>
+                                <input type="file" id="avatar_file" class="form-control" accept="image/*">
+                            </div>
+                            <div class="col-12 col-md-5">
+                                <label class="form-label text-muted">Hoặc dùng Link Ảnh trực tiếp (Tùy chọn)</label>
+                                <input type="text" id="avatar_url" class="form-control" placeholder="VD: https://i.ibb.co/...">
+                            </div>
+                            <div class="col-12 col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-warning fw-bold w-100"><i class="fa-solid fa-save me-1"></i> Lưu Avatar</button>
+                            </div>
+                        </div>
+                        <div id="avatar-preview-box" class="mt-3 d-none">
+                            <p class="text-success small mb-1"><i class="fa-solid fa-check"></i> Ảnh hiện tại:</p>
+                            <img id="current-avatar-img" src="" alt="Current Avatar" style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid #ea580c; object-fit: cover;">
+                        </div>
+                    </form>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="card p-3 border-start border-4 border-success">
+                            <small class="text-muted">Tổng Doanh Thu</small>
+                            <h3 id="stat-revenue" class="text-success fw-bold mb-0">0 đ</h3>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="card p-3 border-start border-4 border-primary">
+                            <small class="text-muted">Tổng Thành Viên</small>
+                            <h3 id="stat-users" class="text-primary fw-bold mb-0">0</h3>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="card p-3 border-start border-4 border-warning">
+                            <small class="text-muted">Tổng Số Sản Phẩm Shop</small>
+                            <h3 id="stat-products" class="text-warning fw-bold mb-0">0</h3>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="card p-3 border-start border-4 border-info">
+                            <small class="text-muted">Loại Acc Free</small>
+                            <h3 id="stat-free" class="text-info fw-bold mb-0">0</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: QUẢN LÝ ACC FREE (NHẬN ACC) -->
+            <div id="tab-free_accs" class="tab-pane">
+                <div class="card p-3 p-md-4 mb-4">
+                    <h4 id="free-form-title" class="text-warning mb-3">
+                        <i class="fa-solid fa-gift me-2"></i>Thêm Loại Acc Free Mới (Hiển Thị Ở Trang Nhận Acc)
+                    </h4>
+                    <form onsubmit="handleSaveFreeType(event)">
+                        <input type="hidden" id="free_id">
+                        <input type="hidden" id="free_existing_image">
+
+                        <div class="row g-3">
+                            <div class="col-12 col-md-4">
+                                <label class="form-label">Tên Loại Acc Free *</label>
+                                <input type="text" id="free_title" class="form-control" placeholder="VD: RANK KIM CƯƠNG, 200 SKIN..." required>
+                            </div>
+                            <div class="col-12 col-sm-6 col-md-4">
+                                <label class="form-label">Số Lần Vượt Link Bắt Buộc</label>
+                                <input type="number" id="free_required_links" class="form-control" value="3" min="1" max="10" required>
+                            </div>
+                            <div class="col-12 col-sm-6 col-md-4">
+                                <label class="form-label">Giới Hạn Lượt/Ngày</label>
+                                <input type="number" id="free_daily_limit" class="form-control" value="1" min="1" required>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Tải Ảnh/Logo Lên (Auto Upload ImgBB)</label>
+                                <input type="file" id="free_image_file" class="form-control" accept="image/*">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Hoặc Dán Direct Link Ảnh</label>
+                                <input type="text" id="free_image_url" class="form-control" placeholder="https://i.ibb.co/...">
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label text-warning fw-bold"><i class="fa-solid fa-key me-1"></i> Kho Tài Khoản Game (Mỗi dòng 1 Account: tk|mk) *</label>
+                                <textarea id="free_account_data" class="form-control font-monospace" rows="5" placeholder="acc1|pass1&#10;acc2|pass2&#10;acc3|pass3" required></textarea>
+                            </div>
+
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-warning fw-bold"><i class="fa-solid fa-save me-1"></i> Lưu Cấu Hình Acc Free</button>
+                                <button type="button" id="btn-cancel-free" onclick="resetFreeForm()" class="btn btn-secondary d-none">Hủy Sửa</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card p-3 p-md-4">
+                    <h4 class="text-white mb-3"><i class="fa-solid fa-list me-2"></i>Danh Sách Phân Loại Acc Free</h4>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Ảnh Logo</th>
+                                    <th>Tên Loại Acc</th>
+                                    <th>Vượt Link</th>
+                                    <th>Hạn Mức/Ngày</th>
+                                    <th>Kho Còn</th>
+                                    <th>Thao Tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-free-types">
+                                <tr><td colspan="7" class="text-center text-muted">Đang tải dữ liệu...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: QUẢN LÝ DANH MỤC SHOP -->
+            <div id="tab-categories" class="tab-pane">
+                <div class="card p-3 p-md-4 mb-4">
+                    <h4 id="cat-form-title" class="text-warning mb-3">
+                        <i class="fa-solid fa-layer-group me-2"></i>Tạo Danh Mục Mới
+                    </h4>
+                    <form onsubmit="handleSaveCategory(event)">
+                        <input type="hidden" id="cat_id">
+                        <input type="hidden" id="cat_existing_image">
+
+                        <div class="row g-3">
+                            <div class="col-12 col-md-4">
+                                <label class="form-label">Tên Danh Mục *</label>
+                                <input type="text" id="cat_name" class="form-control" placeholder="VD: Bản Hack Map, Mod Skin..." required>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="form-label">Chọn Tệp Ảnh (Auto Upload ImgBB)</label>
+                                <input type="file" id="cat_image_file" class="form-control" accept="image/*">
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="form-label">Hoặc Dán Direct Link Ảnh Online</label>
+                                <input type="text" id="cat_image_url" class="form-control" placeholder="https://i.ibb.co/...">
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="form-label">Trạng Thái</label>
+                                <select id="cat_status" class="form-select">
+                                    <option value="active">Bật (Hiển thị)</option>
+                                    <option value="inactive">Tắt (Ẩn)</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-8">
+                                <label class="form-label">Mô Tả Danh Mục</label>
+                                <input type="text" id="cat_desc" class="form-control" placeholder="Mô tả ngắn...">
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-warning fw-bold"><i class="fa-solid fa-save me-1"></i> Lưu Danh Mục</button>
+                                <button type="button" id="btn-cancel-cat" onclick="resetCatForm()" class="btn btn-secondary d-none">Hủy Sửa</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card p-3 p-md-4">
+                    <h4 class="text-white mb-3"><i class="fa-solid fa-list me-2"></i>Danh Sách Danh Mục Game</h4>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Ảnh</th>
+                                    <th>Tên Danh Mục</th>
+                                    <th>Mô Tả</th>
+                                    <th>Trạng Thái</th>
+                                    <th>Thao Tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-categories">
+                                <tr><td colspan="6" class="text-center text-muted">Đang tải...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: QUẢN LÝ SẢN PHẨM SHOP -->
+            <div id="tab-products" class="tab-pane">
+                <div class="card p-3 p-md-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 id="prod-form-title" class="text-warning mb-0">
+                            <i class="fa-solid fa-box-open me-2"></i>Đăng Sản Phẩm Mới (Shop index.html)
+                        </h4>
+                    </div>
+
+                    <form onsubmit="handleSaveProduct(event)">
+                        <input type="hidden" id="prod_id">
+                        <input type="hidden" id="prod_existing_image">
+
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Tên sản phẩm *</label>
+                                <input type="text" id="prod_title" class="form-control" placeholder="VD: HACK MAP ESP APK CHẤP TỔ" required>
+                            </div>
+
+                            <div class="col-12 col-sm-6 col-md-3">
+                                <label class="form-label">Thuộc Danh Mục *</label>
+                                <select id="prod_category_id" class="form-select" required>
+                                    <option value="">-- Chọn danh mục --</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-sm-6 col-md-3">
+                                <label class="form-label">Giá bán (VNĐ)</label>
+                                <input type="number" id="prod_price" class="form-control" value="0">
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <label class="form-label">Chọn Tệp Ảnh (Auto Upload ImgBB)</label>
+                                <input type="file" id="prod_image_file" class="form-control" accept="image/*">
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <label class="form-label">Hoặc Dán Direct Link Ảnh Online</label>
+                                <input type="text" id="prod_image_url" class="form-control" placeholder="https://i.ibb.co/...">
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <label class="form-label">Trạng thái hiển thị</label>
+                                <select id="prod_status" class="form-select">
+                                    <option value="available">Đang Bán / Tải Ngay</option>
+                                    <option value="maintenance">Bảo Trì</option>
+                                    <option value="out_of_stock">Hết Hàng</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Mô tả ngắn sản phẩm / Ghi chú phiên bản</label>
+                                <textarea id="prod_description" class="form-control" rows="2" placeholder="Ví dụ: Bản mới nhất v1.63..."></textarea>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label text-warning fw-bold"><i class="fa-solid fa-key me-1"></i> Dữ Liệu Tài Khoản (Mỗi dòng 1 Item: tk|mk hoặc Link)</label>
+                                <textarea id="prod_account_data" class="form-control font-monospace" rows="4" placeholder="acc1|pass1"></textarea>
+                            </div>
+
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-warning fw-bold"><i class="fa-solid fa-save me-1"></i> Lưu Sản Phẩm</button>
+                                <button type="button" id="btn-cancel-prod" onclick="resetProdForm()" class="btn btn-secondary d-none">Hủy Sửa</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card p-3 p-md-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="text-white mb-0"><i class="fa-solid fa-boxes-stacked me-2"></i>Kho Sản Phẩm</h4>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Ảnh</th>
+                                    <th>Tên Sản Phẩm</th>
+                                    <th>Danh Mục</th>
+                                    <th>Giá</th>
+                                    <th>Kho/Data</th>
+                                    <th>Trạng Thái</th>
+                                    <th>Thao Tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-products">
+                                <tr><td colspan="8" class="text-center text-muted">Đang tải...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB NOTIFY: THÔNG BÁO -->
+            <div id="tab-notify" class="tab-pane">
+                <div class="card p-3 p-md-4 mb-4">
+                    <h4 id="notify-form-title" class="text-warning mb-3">
+                        <i class="fa-solid fa-bullhorn me-2"></i>Tạo Thông Báo Mới
+                    </h4>
+                    <form onsubmit="handleSaveNotify(event)">
+                        <input type="hidden" id="notify_id">
+                        <input type="hidden" id="notify_existing_image">
+
+                        <div class="row g-3">
+                            <div class="col-12 col-md-3">
+                                <label class="form-label">Loại thông báo</label>
+                                <select id="notify_type" class="form-select">
+                                    <option value="text">Chữ chạy ngang (Header)</option>
+                                    <option value="popup">Popup (Bật giữa màn hình)</option>
+                                    <option value="image">Popup Ảnh</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-3">
+                                <label class="form-label">Trang hiển thị</label>
+                                <select id="notify_target_page" class="form-select">
+                                    <option value="all">Cả 2 trang</option>
+                                    <option value="index">Chỉ index.html (Shop)</option>
+                                    <option value="link">Chỉ link.html (Tải APK)</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Tiêu đề Popup</label>
+                                <input type="text" id="notify_title" class="form-control" placeholder="VD: THÔNG BÁO HỆ THỐNG">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Nội dung thông báo *</label>
+                                <textarea id="notify_content" class="form-control" rows="3" placeholder="Nhập nội dung..."></textarea>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Link chuyển hướng khi bấm (Tùy chọn)</label>
+                                <input type="text" id="notify_link" class="form-control">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Trạng Thái</label>
+                                <select id="notify_status" class="form-select">
+                                    <option value="active">Đang Bật</option>
+                                    <option value="inactive">Đã Tắt</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label class="form-label text-muted fw-bold">Dành cho Popup Ảnh:</label>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Chọn Ảnh (Auto Upload ImgBB)</label>
+                                <input type="file" id="notify_image_file" class="form-control" accept="image/*">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Hoặc Link Ảnh Online</label>
+                                <input type="text" id="notify_image_url" class="form-control">
+                            </div>
+
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-warning fw-bold"><i class="fa-solid fa-bullhorn me-1"></i> Lưu Thông Báo</button>
+                                <button type="button" id="btn-cancel-notify" onclick="resetNotifyForm()" class="btn btn-secondary d-none">Hủy Sửa</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card p-3 p-md-4">
+                    <h4 class="text-white mb-3"><i class="fa-solid fa-list me-2"></i>Danh Sách Thông Báo</h4>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Loại</th>
+                                    <th>Hiển Thị</th>
+                                    <th>Tiêu Đề / Nội Dung</th>
+                                    <th>Trạng Thái</th>
+                                    <th>Thao Tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-notifications">
+                                <tr><td colspan="5" class="text-center text-muted">Đang tải...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB APPS: CHIA SẺ FILE APK -->
+            <div id="tab-apps" class="tab-pane">
+                <div class="card p-3 p-md-4 mb-4">
+                    <h4 id="apk-form-title" class="text-warning mb-3">
+                        <i class="fa-brands fa-android me-2"></i>Thêm File APK Mới (Chia sẻ lên link.html)
+                    </h4>
+                    <form onsubmit="handleSaveApk(event)">
+                        <input type="hidden" id="apk_id">
+                        <input type="hidden" id="apk_existing_icon">
+
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Tên Ứng dụng / File *</label>
+                                <input type="text" id="apk_name" class="form-control" placeholder="VD: Liên Quân Mobile Mod Skin" required>
+                            </div>
+                            <div class="col-12 col-sm-6 col-md-3">
+                                <label class="form-label">Phiên bản (VD: 1.0)</label>
+                                <input type="text" id="apk_version" class="form-control" placeholder="1.0">
+                            </div>
+                            <div class="col-12 col-sm-6 col-md-3">
+                                <label class="form-label">Trạng thái</label>
+                                <select id="apk_status" class="form-select">
+                                    <option value="active">Hiển thị</option>
+                                    <option value="inactive">Ẩn</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Link tải trực tiếp (Google Drive, MediaFire...) *</label>
+                                <input type="text" id="apk_file_url" class="form-control" placeholder="https://..." required>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Mô tả ngắn</label>
+                                <input type="text" id="apk_desc" class="form-control" placeholder="Dùng để tải phần mềm...">
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Tải Icon Lên (Auto Upload ImgBB)</label>
+                                <input type="file" id="apk_icon_file" class="form-control" accept="image/*">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Hoặc dán Link Icon Online</label>
+                                <input type="text" id="apk_icon_url" class="form-control">
+                            </div>
+                            
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-warning fw-bold"><i class="fa-solid fa-save me-1"></i> Lưu File APK</button>
+                                <button type="button" id="btn-cancel-apk" onclick="resetApkForm()" class="btn btn-secondary d-none">Hủy Sửa</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card p-3 p-md-4">
+                    <h4 class="text-white mb-3"><i class="fa-brands fa-android me-2"></i>Danh Sách Ứng Dụng (link.html)</h4>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Icon</th>
+                                    <th>Tên Ứng Dụng</th>
+                                    <th>Version</th>
+                                    <th>Trạng Thái</th>
+                                    <th>Thao Tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-apks">
+                                <tr><td colspan="6" class="text-center text-muted">Đang tải...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB DEPOSITS: QUẢN LÝ NẠP TIỀN -->
+            <div id="tab-deposits" class="tab-pane">
+                <div class="card p-3 p-md-4">
+                    <h4 class="text-white mb-3"><i class="fa-solid fa-money-bill-transfer me-2"></i>Lịch Sử & Yêu Cầu Nạp Tiền</h4>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle">
+                            <thead>
+                                <tr><th>ID</th><th>User ID</th><th>Số Tiền</th><th>Mã GD</th><th>Trạng Thái</th><th>Thời Gian</th><th>Thao Tác</th></tr>
+                            </thead>
+                            <tbody id="table-deposits">
+                                <tr><td colspan="7" class="text-center text-muted">Đang tải...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB USERS: QUẢN LÝ THÀNH VIÊN -->
+            <div id="tab-users" class="tab-pane">
+                <div class="card p-3 p-md-4">
+                    <h4 class="text-white mb-3"><i class="fa-solid fa-users me-2"></i>Quản Lý Thành Viên</h4>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle">
+                            <thead>
+                                <tr><th>ID</th><th>Tên Tài Khoản</th><th>Email</th><th>Số Dư</th><th>Chức Vụ</th><th>Thao Tác</th></tr>
+                            </thead>
+                            <tbody id="table-users">
+                                <tr><td colspan="6" class="text-center text-muted">Đang tải...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB ORDERS: LỊCH SỬ ĐƠN HÀNG -->
+            <div id="tab-orders" class="tab-pane">
+                <div class="card p-3 p-md-4">
+                    <h4 class="text-white mb-3"><i class="fa-solid fa-receipt me-2"></i>Lịch Sử Đơn Hàng Mua</h4>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle">
+                            <thead>
+                                <tr><th>Mã Đơn</th><th>User ID</th><th>Sản Phẩm</th><th>Giá</th><th>Dữ Liệu Bàn Giao</th><th>Thời Gian</th></tr>
+                            </thead>
+                            <tbody id="table-orders">
+                                <tr><td colspan="6" class="text-center text-muted">Đang tải...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- JAVASCRIPT DIRECT FIREBASE & IMGBB CORE ENGINE -->
+<script>
+    const FIREBASE_PROJECT_ID = "quocdat-396fe";
+    const BASE_URL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
+    const DEFAULT_PLACEHOLDER = "https://i.ibb.co/M8P23sV/placeholder.png";
+
+    const IMGBB_KEYS = [
+        '058d41ab0d2788767f411135ef36ec56',
+        'cafeb77854330599830d8d7ed8fa3bcf',
+        '527b905c22ff5ea8d64e683ca3ce48a4'
+    ];
+
+    let cacheData = {
+        categories: [],
+        products: [],
+        freeTypes: [],
+        notifications: [],
+        apks: [],
+        users: [],
+        deposits: [],
+        orders: []
+    };
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function showAlert(msg, type = 'success') {
+        const box = document.getElementById('alert-box');
+        box.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-${type === 'success' ? 'check-circle' : 'triangle-exclamation'} me-2"></i>${escapeHtml(msg)}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>`;
+        setTimeout(() => box.innerHTML = '', 4000);
+    }
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-btn-tab').forEach(el => el.classList.remove('active'));
+
+        const targetPane = document.getElementById(`tab-${tabId}`);
+        if (targetPane) targetPane.classList.add('active');
+
+        document.querySelectorAll(`.nav-btn-tab[data-tab="${tabId}"]`).forEach(el => el.classList.add('active'));
+
+        // Đóng menu mobile nếu đang bật
+        const offcanvasEl = document.getElementById('mobileSidebar');
+        const bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
+        if (bsOffcanvas) bsOffcanvas.hide();
+    }
+
+    async function uploadToImgBB(file) {
+        if (!file) return null;
+        const randomKey = IMGBB_KEYS[Math.floor(Math.random() * IMGBB_KEYS.length)];
+        
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = async function() {
+                const base64Data = reader.result.split(',')[1];
+                const formData = new FormData();
+                formData.append('key', randomKey);
+                formData.append('image', base64Data);
+
+                try {
+                    const res = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: formData });
+                    const json = await res.json();
+                    if (json.success && json.data && json.data.url) {
+                        resolve(json.data.url);
+                    } else {
+                        resolve(null);
+                    }
+                } catch (e) {
+                    resolve(null);
+                }
+            };
+        });
+    }
+
+    function parseFirestoreFields(fields) {
+        let res = {};
+        for (let k in fields) {
+            let obj = fields[k];
+            if (obj.stringValue !== undefined) res[k] = obj.stringValue;
+            else if (obj.doubleValue !== undefined) res[k] = parseFloat(obj.doubleValue);
+            else if (obj.integerValue !== undefined) res[k] = parseInt(obj.integerValue);
+            else if (obj.booleanValue !== undefined) res[k] = obj.booleanValue;
+        }
+        return res;
+    }
+
+    function encodeFirestoreFields(data) {
+        let fields = {};
+        for (let k in data) {
+            let v = data[k];
+            if (typeof v === 'number') fields[k] = { doubleValue: v };
+            else if (typeof v === 'boolean') fields[k] = { booleanValue: v };
+            else fields[k] = { stringValue: String(v || '') };
+        }
+        return { fields };
+    }
+
+    async function loadAllDashboardData() {
+        try {
+            // Settings
+            try {
+                let sRes = await fetch(`${BASE_URL}/settings/site_config`);
+                if (sRes.ok) {
+                    let sData = await sRes.json();
+                    let fields = parseFirestoreFields(sData.fields || {});
+                    if (fields.avatar_url) {
+                        document.getElementById('avatar_url').value = fields.avatar_url;
+                        document.getElementById('current-avatar-img').src = fields.avatar_url;
+                        document.getElementById('avatar-preview-box').classList.remove('d-none');
+                    }
+                }
+            } catch (e) {}
+
+            // Categories
+            let catRes = await fetch(`${BASE_URL}/categories?pageSize=300`);
+            let catData = await catRes.json();
+            cacheData.categories = (catData.documents || []).map(doc => {
+                let f = parseFirestoreFields(doc.fields || {});
+                f.id = doc.name.split('/').pop();
+                return f;
+            });
+            renderCategoriesTable();
+
+            // Products
+            let prodRes = await fetch(`${BASE_URL}/products?pageSize=300`);
+            let prodData = await prodRes.json();
+            cacheData.products = (prodData.documents || []).map(doc => {
+                let f = parseFirestoreFields(doc.fields || {});
+                f.id = doc.name.split('/').pop();
+                let lines = (f.account_data || '').split('\n').filter(l => l.trim().length > 0);
+                f.stock = lines.length;
+                return f;
+            });
+            renderProductsTable();
+
+            // Free Types
+            let freeRes = await fetch(`${BASE_URL}/free_types?pageSize=300`);
+            let freeData = await freeRes.json();
+            cacheData.freeTypes = (freeData.documents || []).map(doc => {
+                let f = parseFirestoreFields(doc.fields || {});
+                f.id = doc.name.split('/').pop();
+                let lines = (f.account_data || '').split('\n').filter(l => l.trim().length > 0);
+                f.stock = lines.length;
+                return f;
+            });
+            renderFreeTypesTable();
+
+            // Notifications
+            let notifyRes = await fetch(`${BASE_URL}/notifications?pageSize=300`);
+            let notifyData = await notifyRes.json();
+            cacheData.notifications = (notifyData.documents || []).map(doc => {
+                let f = parseFirestoreFields(doc.fields || {});
+                f.id = doc.name.split('/').pop();
+                return f;
+            });
+            renderNotificationsTable();
+
+            // APKs
+            let apkRes = await fetch(`${BASE_URL}/apk_files?pageSize=300`);
+            let apkData = await apkRes.json();
+            cacheData.apks = (apkData.documents || []).map(doc => {
+                let f = parseFirestoreFields(doc.fields || {});
+                f.id = doc.name.split('/').pop();
+                return f;
+            });
+            renderApksTable();
+
+            // Users
+            let userRes = await fetch(`${BASE_URL}/users?pageSize=300`);
+            let userData = await userRes.json();
+            cacheData.users = (userData.documents || []).map(doc => {
+                let f = parseFirestoreFields(doc.fields || {});
+                f.id = doc.name.split('/').pop();
+                return f;
+            });
+            renderUsersTable();
+
+            // Deposits
+            let depRes = await fetch(`${BASE_URL}/deposits?pageSize=300`);
+            let depData = await depRes.json();
+            cacheData.deposits = (depData.documents || []).map(doc => {
+                let f = parseFirestoreFields(doc.fields || {});
+                f.id = doc.name.split('/').pop();
+                return f;
+            });
+            renderDepositsTable();
+
+            // Orders
+            let orderRes = await fetch(`${BASE_URL}/orders?pageSize=300`);
+            let orderData = await orderRes.json();
+            cacheData.orders = (orderData.documents || []).map(doc => {
+                let f = parseFirestoreFields(doc.fields || {});
+                f.id = doc.name.split('/').pop();
+                return f;
+            });
+            renderOrdersTable();
+
+            // Thống kê
+            let totalRevenue = cacheData.orders.reduce((sum, o) => sum + (o.price || 0), 0);
+            document.getElementById('stat-revenue').innerText = Number(totalRevenue).toLocaleString('vi-VN') + ' đ';
+            document.getElementById('stat-users').innerText = cacheData.users.length;
+            document.getElementById('stat-products').innerText = cacheData.products.length;
+            document.getElementById('stat-free').innerText = cacheData.freeTypes.length;
+
+        } catch (err) {
+            showAlert('Lỗi khi tải toàn bộ dữ liệu từ Firebase!', 'danger');
+        }
+    }
+
+    // --- RENDER TABLES ---
+    function renderCategoriesTable() {
+        const tbody = document.getElementById('table-categories');
+        const selectProdCat = document.getElementById('prod_category_id');
+        
+        selectProdCat.innerHTML = '<option value="">-- Chọn danh mục --</option>' + 
+            cacheData.categories.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+
+        if (cacheData.categories.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Chưa có danh mục nào</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = cacheData.categories.map(c => `
+            <tr>
+                <td><small class="font-monospace text-info">${escapeHtml(c.id)}</small></td>
+                <td><img src="${escapeHtml(c.image || DEFAULT_PLACEHOLDER)}" class="thumb-preview"></td>
+                <td class="fw-bold text-warning">${escapeHtml(c.name)}</td>
+                <td><small class="text-muted">${escapeHtml(c.description || '')}</small></td>
+                <td><span class="badge bg-${c.status === 'active' ? 'success' : 'secondary'}">${c.status === 'active' ? 'Hiển thị' : 'Tắt'}</span></td>
+                <td>
+                    <button onclick="editCategory('${c.id}')" class="btn btn-sm btn-primary me-1"><i class="fa-solid fa-pen"></i> Sửa</button>
+                    <button onclick="deleteDocument('categories', '${c.id}')" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i> Xóa</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function renderProductsTable() {
+        const tbody = document.getElementById('table-products');
+        if (cacheData.products.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Không có sản phẩm nào</td></tr>';
+            return;
+        }
+        let catMap = {};
+        cacheData.categories.forEach(c => catMap[c.id] = c.name);
+
+        tbody.innerHTML = cacheData.products.map(p => `
+            <tr>
+                <td><small class="font-monospace text-info">${escapeHtml(p.id)}</small></td>
+                <td><img src="${escapeHtml(p.image || DEFAULT_PLACEHOLDER)}" class="thumb-preview"></td>
+                <td class="fw-bold text-white">${escapeHtml(p.title)}</td>
+                <td><span class="badge bg-secondary">${escapeHtml(catMap[p.category_id] || 'Chưa phân loại')}</span></td>
+                <td class="text-success fw-bold">${Number(p.price || 0).toLocaleString('vi-VN')} đ</td>
+                <td><b class="text-warning">${p.stock || 0}</b> dòng</td>
+                <td><span class="badge bg-${p.status === 'available' ? 'success' : p.status === 'maintenance' ? 'warning' : 'danger'}">${p.status === 'available' ? 'Đang Bán' : p.status === 'maintenance' ? 'Bảo Trì' : 'Hết Hàng'}</span></td>
+                <td>
+                    <button onclick="editProduct('${p.id}')" class="btn btn-sm btn-primary me-1"><i class="fa-solid fa-pen"></i> Sửa</button>
+                    <button onclick="deleteDocument('products', '${p.id}')" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i> Xóa</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function renderFreeTypesTable() {
+        const tbody = document.getElementById('table-free-types');
+        if (cacheData.freeTypes.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Chưa có loại Acc Free nào được cấu hình</td></tr>';
+            return;
+        }
+        tbody.innerHTML = cacheData.freeTypes.map(ft => `
+            <tr>
+                <td><small class="font-monospace text-info">${escapeHtml(ft.id)}</small></td>
+                <td><img src="${escapeHtml(ft.image || DEFAULT_PLACEHOLDER)}" class="thumb-preview"></td>
+                <td class="fw-bold text-warning">${escapeHtml(ft.title)}</td>
+                <td><span class="badge bg-info">${ft.required_links || 1} Lần</span></td>
+                <td><span class="badge bg-secondary">${ft.daily_limit || 1} Acc/Ngày</span></td>
+                <td><b class="text-success">${ft.stock || 0}</b> acc</td>
+                <td>
+                    <button onclick="editFreeType('${ft.id}')" class="btn btn-sm btn-primary me-1"><i class="fa-solid fa-pen"></i> Sửa / Nạp Acc</button>
+                    <button onclick="deleteDocument('free_types', '${ft.id}')" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i> Xóa</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function renderNotificationsTable() {
+        const tbody = document.getElementById('table-notifications');
+        if (cacheData.notifications.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Chưa có thông báo nào</td></tr>';
+            return;
+        }
+        tbody.innerHTML = cacheData.notifications.map(n => `
+            <tr>
+                <td><span class="badge bg-${n.type === 'popup' ? 'danger' : 'info'}">${(n.type || 'text').toUpperCase()}</span></td>
+                <td><span class="badge bg-secondary">${(n.target_page || 'ALL').toUpperCase()}</span></td>
+                <td>
+                    <div class="fw-bold text-white">${escapeHtml(n.title || 'Không Tiêu Đề')}</div>
+                    <small class="text-muted text-wrap" style="max-width: 300px; display: inline-block;">${escapeHtml(n.content || '')}</small>
+                </td>
+                <td><span class="badge bg-${n.status === 'active' ? 'success' : 'danger'}">${n.status === 'active' ? 'Đang bật' : 'Đã tắt'}</span></td>
+                <td>
+                    <button onclick="editNotify('${n.id}')" class="btn btn-sm btn-primary me-1"><i class="fa-solid fa-pen"></i></button>
+                    <button onclick="deleteDocument('notifications', '${n.id}')" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i></button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function renderApksTable() {
+        const tbody = document.getElementById('table-apks');
+        if (cacheData.apks.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Chưa có ứng dụng nào</td></tr>';
+            return;
+        }
+        tbody.innerHTML = cacheData.apks.map(a => `
+            <tr>
+                <td><small class="font-monospace text-info">${escapeHtml(a.id)}</small></td>
+                <td><img src="${escapeHtml(a.icon || DEFAULT_PLACEHOLDER)}" class="thumb-preview rounded-circle" style="width:40px; height:40px;"></td>
+                <td class="fw-bold text-white">${escapeHtml(a.name)}<br><small class="text-muted fw-normal">${escapeHtml(a.description || '')}</small></td>
+                <td><span class="badge bg-secondary">v${escapeHtml(a.version || '1.0')}</span></td>
+                <td><span class="badge bg-${a.status === 'active' ? 'success' : 'danger'}">${a.status === 'active' ? 'Hiển thị' : 'Đã tắt'}</span></td>
+                <td>
+                    <button onclick="editApk('${a.id}')" class="btn btn-sm btn-primary me-1"><i class="fa-solid fa-pen"></i> Sửa</button>
+                    <button onclick="deleteDocument('apk_files', '${a.id}')" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i> Xóa</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function renderUsersTable() {
+        const tbody = document.getElementById('table-users');
+        if (cacheData.users.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Chưa có thành viên nào</td></tr>';
+            return;
+        }
+        tbody.innerHTML = cacheData.users.map(u => `
+            <tr>
+                <td><small class="font-monospace text-info">${escapeHtml(u.id)}</small></td>
+                <td class="fw-bold text-white">${escapeHtml(u.username)}</td>
+                <td class="text-muted">${escapeHtml(u.email || '')}</td>
+                <td class="text-success fw-bold">${Number(u.balance || 0).toLocaleString('vi-VN')} đ</td>
+                <td><span class="badge bg-${u.role === 'admin' ? 'warning' : 'secondary'}">${(u.role || 'user').toUpperCase()}</span></td>
+                <td>
+                    <button onclick="adjustUserBalance('${u.id}', ${u.balance || 0})" class="btn btn-sm btn-success me-1"><i class="fa-solid fa-plus-minus"></i> Cộng/Trừ Tiền</button>
+                    <button onclick="deleteDocument('users', '${u.id}')" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i> Xóa</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function renderDepositsTable() {
+        const tbody = document.getElementById('table-deposits');
+        if (cacheData.deposits.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Chưa có lịch sử nạp nào</td></tr>';
+            return;
+        }
+        tbody.innerHTML = cacheData.deposits.map(d => `
+            <tr>
+                <td><small class="font-monospace text-info">${escapeHtml(d.id)}</small></td>
+                <td><small class="font-monospace text-white">${escapeHtml(d.user_id || '')}</small></td>
+                <td class="text-success fw-bold">${Number(d.amount || 0).toLocaleString('vi-VN')} đ</td>
+                <td class="text-warning font-monospace">${escapeHtml(d.trans_id || '')}</td>
+                <td><span class="badge bg-${d.status === 'success' ? 'success' : 'warning'}">${d.status || 'pending'}</span></td>
+                <td class="text-muted"><small>${escapeHtml(d.created_at || '')}</small></td>
+                <td>
+                    ${d.status === 'pending' ? `<button onclick="approveDeposit('${d.id}', '${d.user_id}', ${d.amount})" class="btn btn-sm btn-success"><i class="fa-solid fa-check"></i> Duyệt Nạp</button>` : '<span class="text-muted small">Đã xử lý</span>'}
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function renderOrdersTable() {
+        const tbody = document.getElementById('table-orders');
+        if (cacheData.orders.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Chưa có đơn hàng nào</td></tr>';
+            return;
+        }
+        tbody.innerHTML = cacheData.orders.map(o => `
+            <tr>
+                <td><small class="font-monospace text-info">${escapeHtml(o.id)}</small></td>
+                <td><small class="font-monospace text-white">${escapeHtml(o.user_id || '')}</small></td>
+                <td class="fw-bold text-white">${escapeHtml(o.product_title || '')}</td>
+                <td class="text-success fw-bold">${Number(o.price || 0).toLocaleString('vi-VN')} đ</td>
+                <td><small class="font-monospace text-warning select-all">${escapeHtml(o.delivered_data || '')}</small></td>
+                <td class="text-muted"><small>${escapeHtml(o.created_at || '')}</small></td>
+            </tr>
+        `).join('');
+    }
+
+    // --- FORM ACTIONS ---
+    async function handleSaveSettings(e) {
+        e.preventDefault();
+        let url = document.getElementById('avatar_url').value.trim();
+        let file = document.getElementById('avatar_file').files[0];
+
+        if (file) {
+            let uploaded = await uploadToImgBB(file);
+            if (uploaded) url = uploaded;
+        }
+
+        if (url) {
+            await fetch(`${BASE_URL}/settings/site_config`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fields: { avatar_url: { stringValue: url } } })
+            });
+            showAlert('Lưu Avatar thành công!');
+            loadAllDashboardData();
+        }
+    }
+
+    async function handleSaveCategory(e) {
+        e.preventDefault();
+        let id = document.getElementById('cat_id').value || ('cat_' + Date.now());
+        let name = document.getElementById('cat_name').value.trim();
+        let desc = document.getElementById('cat_desc').value.trim();
+        let status = document.getElementById('cat_status').value;
+        let url = document.getElementById('cat_image_url').value.trim() || document.getElementById('cat_existing_image').value || DEFAULT_PLACEHOLDER;
+        let file = document.getElementById('cat_image_file').files[0];
+
+        if (file) {
+            let uploaded = await uploadToImgBB(file);
+            if (uploaded) url = uploaded;
+        }
+
+        let body = encodeFirestoreFields({ name, description: desc, status, image: url, updated_at: new Date().toISOString() });
+
+        await fetch(`${BASE_URL}/categories/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+
+        showAlert('Lưu danh mục thành công!');
+        resetCatForm();
+        loadAllDashboardData();
+    }
+
+    function editCategory(id) {
+        let c = cacheData.categories.find(item => item.id === id);
+        if (!c) return;
+        document.getElementById('cat_id').value = c.id;
+        document.getElementById('cat_name').value = c.name || '';
+        document.getElementById('cat_desc').value = c.description || '';
+        document.getElementById('cat_status').value = c.status || 'active';
+        document.getElementById('cat_existing_image').value = c.image || '';
+        document.getElementById('cat_image_url').value = c.image || '';
+        document.getElementById('cat-form-title').innerText = 'Sửa Danh Mục: ' + c.name;
+        document.getElementById('btn-cancel-cat').classList.remove('d-none');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetCatForm() {
+        document.getElementById('cat_id').value = '';
+        document.getElementById('cat_name').value = '';
+        document.getElementById('cat_desc').value = '';
+        document.getElementById('cat_image_url').value = '';
+        document.getElementById('cat_existing_image').value = '';
+        document.getElementById('cat_image_file').value = '';
+        document.getElementById('cat-form-title').innerText = 'Tạo Danh Mục Mới';
+        document.getElementById('btn-cancel-cat').classList.add('d-none');
+    }
+
+    async function handleSaveProduct(e) {
+        e.preventDefault();
+        let id = document.getElementById('prod_id').value || ('prod_' + Date.now());
+        let title = document.getElementById('prod_title').value.trim();
+        let category_id = document.getElementById('prod_category_id').value;
+        let price = parseFloat(document.getElementById('prod_price').value || 0);
+        let status = document.getElementById('prod_status').value;
+        let description = document.getElementById('prod_description').value.trim();
+        let account_data = document.getElementById('prod_account_data').value.trim();
+        let url = document.getElementById('prod_image_url').value.trim() || document.getElementById('prod_existing_image').value || DEFAULT_PLACEHOLDER;
+        let file = document.getElementById('prod_image_file').files[0];
+
+        if (file) {
+            let uploaded = await uploadToImgBB(file);
+            if (uploaded) url = uploaded;
+        }
+
+        let body = encodeFirestoreFields({ title, category_id, price, status, description, account_data, image: url, updated_at: new Date().toISOString() });
+
+        await fetch(`${BASE_URL}/products/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+
+        showAlert('Lưu sản phẩm thành công!');
+        resetProdForm();
+        loadAllDashboardData();
+    }
+
+    function editProduct(id) {
+        let p = cacheData.products.find(item => item.id === id);
+        if (!p) return;
+        document.getElementById('prod_id').value = p.id;
+        document.getElementById('prod_title').value = p.title || '';
+        document.getElementById('prod_category_id').value = p.category_id || '';
+        document.getElementById('prod_price').value = p.price || 0;
+        document.getElementById('prod_status').value = p.status || 'available';
+        document.getElementById('prod_description').value = p.description || '';
+        document.getElementById('prod_account_data').value = p.account_data || '';
+        document.getElementById('prod_existing_image').value = p.image || '';
+        document.getElementById('prod_image_url').value = p.image || '';
+        document.getElementById('prod-form-title').innerText = 'Sửa Sản Phẩm #' + p.id;
+        document.getElementById('btn-cancel-prod').classList.remove('d-none');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetProdForm() {
+        document.getElementById('prod_id').value = '';
+        document.getElementById('prod_title').value = '';
+        document.getElementById('prod_price').value = '0';
+        document.getElementById('prod_description').value = '';
+        document.getElementById('prod_account_data').value = '';
+        document.getElementById('prod_image_url').value = '';
+        document.getElementById('prod_existing_image').value = '';
+        document.getElementById('prod_image_file').value = '';
+        document.getElementById('prod-form-title').innerText = 'Đăng Sản Phẩm Mới (Shop index.html)';
+        document.getElementById('btn-cancel-prod').classList.add('d-none');
+    }
+
+    async function handleSaveFreeType(e) {
+        e.preventDefault();
+        let id = document.getElementById('free_id').value || ('free_' + Date.now());
+        let title = document.getElementById('free_title').value.trim();
+        let required_links = parseInt(document.getElementById('free_required_links').value || 1);
+        let daily_limit = parseInt(document.getElementById('free_daily_limit').value || 1);
+        let account_data = document.getElementById('free_account_data').value.trim();
+        let url = document.getElementById('free_image_url').value.trim() || document.getElementById('free_existing_image').value || DEFAULT_PLACEHOLDER;
+        let file = document.getElementById('free_image_file').files[0];
+
+        if (file) {
+            let uploaded = await uploadToImgBB(file);
+            if (uploaded) url = uploaded;
+        }
+
+        let body = encodeFirestoreFields({ title, required_links, daily_limit, account_data, image: url, updated_at: new Date().toISOString() });
+
+        await fetch(`${BASE_URL}/free_types/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+
+        showAlert('Lưu cấu hình Acc Free thành công!');
+        resetFreeForm();
+        loadAllDashboardData();
+    }
+
+    function editFreeType(id) {
+        let ft = cacheData.freeTypes.find(item => item.id === id);
+        if (!ft) return;
+        document.getElementById('free_id').value = ft.id;
+        document.getElementById('free_title').value = ft.title || '';
+        document.getElementById('free_required_links').value = ft.required_links || 3;
+        document.getElementById('free_daily_limit').value = ft.daily_limit || 1;
+        document.getElementById('free_account_data').value = ft.account_data || '';
+        document.getElementById('free_existing_image').value = ft.image || '';
+        document.getElementById('free_image_url').value = ft.image || '';
+        document.getElementById('free-form-title').innerText = 'Sửa Loại Acc Free: ' + ft.title;
+        document.getElementById('btn-cancel-free').classList.remove('d-none');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetFreeForm() {
+        document.getElementById('free_id').value = '';
+        document.getElementById('free_title').value = '';
+        document.getElementById('free_required_links').value = '3';
+        document.getElementById('free_daily_limit').value = '1';
+        document.getElementById('free_account_data').value = '';
+        document.getElementById('free_image_url').value = '';
+        document.getElementById('free_existing_image').value = '';
+        document.getElementById('free_image_file').value = '';
+        document.getElementById('free-form-title').innerText = 'Thêm Loại Acc Free Mới (Hiển Thị Ở Trang Nhận Acc)';
+        document.getElementById('btn-cancel-free').classList.add('d-none');
+    }
+
+    async function handleSaveNotify(e) {
+        e.preventDefault();
+        let id = document.getElementById('notify_id').value || ('notify_' + Date.now());
+        let type = document.getElementById('notify_type').value;
+        let target_page = document.getElementById('notify_target_page').value;
+        let title = document.getElementById('notify_title').value.trim();
+        let content = document.getElementById('notify_content').value.trim();
+        let link = document.getElementById('notify_link').value.trim();
+        let status = document.getElementById('notify_status').value;
+        let url = document.getElementById('notify_image_url').value.trim() || document.getElementById('notify_existing_image').value || '';
+        let file = document.getElementById('notify_image_file').files[0];
+
+        if (file) {
+            let uploaded = await uploadToImgBB(file);
+            if (uploaded) url = uploaded;
+        }
+
+        let body = encodeFirestoreFields({ type, target_page, title, content, link, status, image: url, updated_at: new Date().toISOString() });
+
+        await fetch(`${BASE_URL}/notifications/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+
+        showAlert('Lưu thông báo thành công!');
+        resetNotifyForm();
+        loadAllDashboardData();
+    }
+
+    function editNotify(id) {
+        let n = cacheData.notifications.find(item => item.id === id);
+        if (!n) return;
+        document.getElementById('notify_id').value = n.id;
+        document.getElementById('notify_type').value = n.type || 'text';
+        document.getElementById('notify_target_page').value = n.target_page || 'all';
+        document.getElementById('notify_title').value = n.title || '';
+        document.getElementById('notify_content').value = n.content || '';
+        document.getElementById('notify_link').value = n.link || '';
+        document.getElementById('notify_status').value = n.status || 'active';
+        document.getElementById('notify_existing_image').value = n.image || '';
+        document.getElementById('notify_image_url').value = n.image || '';
+        document.getElementById('notify-form-title').innerText = 'Sửa Thông Báo';
+        document.getElementById('btn-cancel-notify').classList.remove('d-none');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetNotifyForm() {
+        document.getElementById('notify_id').value = '';
+        document.getElementById('notify_title').value = '';
+        document.getElementById('notify_content').value = '';
+        document.getElementById('notify_link').value = '';
+        document.getElementById('notify_image_url').value = '';
+        document.getElementById('notify_existing_image').value = '';
+        document.getElementById('notify_image_file').value = '';
+        document.getElementById('notify-form-title').innerText = 'Tạo Thông Báo Mới';
+        document.getElementById('btn-cancel-notify').classList.add('d-none');
+    }
+
+    async function handleSaveApk(e) {
+        e.preventDefault();
+        let id = document.getElementById('apk_id').value || ('apk_' + Date.now());
+        let name = document.getElementById('apk_name').value.trim();
+        let version = document.getElementById('apk_version').value.trim();
+        let status = document.getElementById('apk_status').value;
+        let file_url = document.getElementById('apk_file_url').value.trim();
+        let description = document.getElementById('apk_desc').value.trim();
+        let url = document.getElementById('apk_icon_url').value.trim() || document.getElementById('apk_existing_icon').value || DEFAULT_PLACEHOLDER;
+        let file = document.getElementById('apk_icon_file').files[0];
+
+        if (file) {
+            let uploaded = await uploadToImgBB(file);
+            if (uploaded) url = uploaded;
+        }
+
+        let body = encodeFirestoreFields({ name, version, status, file_url, description, icon: url, updated_at: new Date().toISOString() });
+
+        await fetch(`${BASE_URL}/apk_files/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+
+        showAlert('Lưu File APK thành công!');
+        resetApkForm();
+        loadAllDashboardData();
+    }
+
+    function editApk(id) {
+        let a = cacheData.apks.find(item => item.id === id);
+        if (!a) return;
+        document.getElementById('apk_id').value = a.id;
+        document.getElementById('apk_name').value = a.name || '';
+        document.getElementById('apk_version').value = a.version || '1.0';
+        document.getElementById('apk_status').value = a.status || 'active';
+        document.getElementById('apk_file_url').value = a.file_url || '';
+        document.getElementById('apk_desc').value = a.description || '';
+        document.getElementById('apk_existing_icon').value = a.icon || '';
+        document.getElementById('apk_icon_url').value = a.icon || '';
+        document.getElementById('apk-form-title').innerText = 'Sửa File APK';
+        document.getElementById('btn-cancel-apk').classList.remove('d-none');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetApkForm() {
+        document.getElementById('apk_id').value = '';
+        document.getElementById('apk_name').value = '';
+        document.getElementById('apk_version').value = '';
+        document.getElementById('apk_file_url').value = '';
+        document.getElementById('apk_desc').value = '';
+        document.getElementById('apk_icon_url').value = '';
+        document.getElementById('apk_existing_icon').value = '';
+        document.getElementById('apk_icon_file').value = '';
+        document.getElementById('apk-form-title').innerText = 'Thêm File APK Mới (Chia sẻ lên link.html)';
+        document.getElementById('btn-cancel-apk').classList.add('d-none');
+    }
+
+    async function deleteDocument(collection, id) {
+        if (!confirm('Bạn có chắc chắn muốn xóa mục này? Thao tác này không thể hoàn tác!')) return;
+        await fetch(`${BASE_URL}/${collection}/${id}`, { method: 'DELETE' });
+        showAlert('Đã xóa dữ liệu thành công!');
+        loadAllDashboardData();
+    }
+
+    async function approveDeposit(depId, userId, amount) {
+        if (!confirm(`Xác nhận duyệt nạp ${Number(amount).toLocaleString('vi-VN')} đ cho tài khoản ${userId}?`)) return;
+
+        // Cập nhật trạng thái deposit
+        await fetch(`${BASE_URL}/deposits/${depId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fields: { status: { stringValue: 'success' } } })
+        });
+
+        // Tăng số dư người dùng
+        let u = cacheData.users.find(item => item.id === userId);
+        let currentBalance = u ? (u.balance || 0) : 0;
+        let newBalance = currentBalance + amount;
+
+        await fetch(`${BASE_URL}/users/${userId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fields: { balance: { doubleValue: newBalance } } })
+        });
+
+        showAlert('Duyệt nạp tiền thành công!');
+        loadAllDashboardData();
+    }
+
+    async function adjustUserBalance(userId, currentBal) {
+        let input = prompt(`Nhập số tiền muốn thay đổi cho User ID: ${userId}\n(Gõ số dương để cộng, số âm để trừ):`, "50000");
+        if (!input) return;
+        let amount = parseFloat(input);
+        if (isNaN(amount)) return;
+
+        let newBalance = Math.max(0, currentBal + amount);
+
+        await fetch(`${BASE_URL}/users/${userId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fields: { balance: { doubleValue: newBalance } } })
+        });
+
+        showAlert('Cập nhật số dư thành công!');
+        loadAllDashboardData();
+    }
+
+    window.onload = function() {
+        loadAllDashboardData();
+    };
+</script>
+</body>
+</html>
