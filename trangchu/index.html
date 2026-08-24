@@ -61,7 +61,6 @@
                 </a>
 
                 <div id="nav-auth-container" class="flex items-center gap-2 sm:gap-3">
-                    <!-- Tự động Render qua JS dựa theo Trạng thái Đăng nhập -->
                 </div>
             </div>
         </div>
@@ -87,7 +86,7 @@
 
         <!-- 2 NÚT NỔI BẬT -->
         <section class="space-y-3 sm:space-y-4">
-            <a href="/nhanacc/" class="btn-glow-amber group relative flex items-center justify-between p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 border-2 border-amber-400/80 hover:scale-[1.01] active:scale-[0.99] transition duration-300">
+            <a href="/nhanacc" class="btn-glow-amber group relative flex items-center justify-between p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 border-2 border-amber-400/80 hover:scale-[1.01] active:scale-[0.99] transition duration-300">
                 <div class="flex items-center gap-3 sm:gap-4">
                     <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-slate-950/40 border border-amber-300/40 flex items-center justify-center text-2xl sm:text-3xl shrink-0">
                         🎁
@@ -107,7 +106,7 @@
                 </div>
             </a>
 
-            <a href="/link/" class="btn-glow-cyan group relative flex items-center justify-between p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-700 border-2 border-cyan-400/80 hover:scale-[1.01] active:scale-[0.99] transition duration-300">
+            <a href="/link" class="btn-glow-cyan group relative flex items-center justify-between p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-700 border-2 border-cyan-400/80 hover:scale-[1.01] active:scale-[0.99] transition duration-300">
                 <div class="flex items-center gap-3 sm:gap-4">
                     <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-slate-950/40 border border-cyan-300/40 flex items-center justify-center text-2xl sm:text-3xl shrink-0">
                         ⚡
@@ -448,7 +447,7 @@
                 }).filter(c => c.status !== 'inactive');
 
                 let categoriesKeyed = {};
-                storeCategories.forEach(c => categoriesKeyed[c.id] = c.name);
+                storeCategories.forEach(c => categoriesKeyed[String(c.id)] = c.name);
 
                 // Tải sản phẩm
                 let prodRes = await fetch(`${BASE_URL}/products?pageSize=100`);
@@ -458,7 +457,7 @@
                     fields.id = doc.name.split('/').pop();
                     let accLines = (fields.account_data || '').split('\n').filter(l => l.trim().length > 0);
                     fields.stock = accLines.length;
-                    fields.category_name = categoriesKeyed[fields.category_id] || 'Tài Khoản Game';
+                    fields.category_name = categoriesKeyed[String(fields.category_id)] || 'Tài Khoản Game';
                     return fields;
                 });
 
@@ -524,8 +523,18 @@
         }
 
         function selectCategory(catId) {
-            currentSelectedCategory = catId;
+            currentSelectedCategory = String(catId);
             document.getElementById('category-filter').value = catId;
+            const btnBack = document.getElementById('btn-back-all-cats');
+            if (catId === 'all') {
+                btnBack.classList.add('hidden');
+                document.getElementById('products-title').innerHTML = `<i class="fa-solid fa-fire-flame-curved text-orange-500"></i> Tất Cả Sản Phẩm`;
+            } else {
+                btnBack.classList.remove('hidden');
+                let catObj = storeCategories.find(c => String(c.id) === String(catId));
+                let catName = catObj ? catObj.name : 'Danh Mục Selected';
+                document.getElementById('products-title').innerHTML = `<i class="fa-solid fa-layer-group text-orange-500"></i> Danh Mục: ${escapeHtml(catName)}`;
+            }
             filterProducts();
         }
 
@@ -533,7 +542,7 @@
             const search = document.getElementById('search-input').value.toLowerCase();
             const filtered = storeProducts.filter(p => {
                 const matchSearch = (p.title || '').toLowerCase().includes(search);
-                const matchCat = (currentSelectedCategory === 'all') || (p.category_id == currentSelectedCategory);
+                const matchCat = (currentSelectedCategory === 'all') || (String(p.category_id) === String(currentSelectedCategory));
                 return matchSearch && matchCat;
             });
             renderProducts(filtered);
@@ -580,7 +589,7 @@
                 openModal('modal-login');
                 return;
             }
-            const prod = storeProducts.find(p => p.id == id);
+            const prod = storeProducts.find(p => String(p.id) === String(id));
             if (!prod) return;
 
             document.getElementById('confirm-product-title').innerText = prod.title;
@@ -593,25 +602,31 @@
         }
 
         async function executeBuyProduct(id) {
-            let prod = storeProducts.find(p => p.id == id);
-            if (!prod) return;
-
-            if ((currentUser.balance || 0) < prod.price) {
-                showToast('Số dư không đủ! Vui lòng nạp thêm tiền.', 'error');
-                return;
-            }
-
-            let accLines = (prod.account_data || '').split('\n').filter(l => l.trim().length > 0);
-            if (accLines.length === 0) {
-                showToast('Sản phẩm này hiện tại đã HẾT ACC!', 'error');
-                return;
-            }
-
-            let deliveredData = accLines.shift();
-            let remainingAccs = accLines.join('\n');
-            let newStock = accLines.length;
-
             try {
+                let latestProdRes = await fetch(`${BASE_URL}/products/${id}`);
+                if (!latestProdRes.ok) {
+                    showToast('Sản phẩm không còn tồn tại trên hệ thống!', 'error');
+                    return;
+                }
+                let latestProdData = await latestProdRes.json();
+                let fields = parseFirestoreFields(latestProdData.fields || {});
+
+                if ((currentUser.balance || 0) < fields.price) {
+                    showToast('Số dư không đủ! Vui lòng nạp thêm tiền.', 'error');
+                    return;
+                }
+
+                let accLines = (fields.account_data || '').split('\n').filter(l => l.trim().length > 0);
+                if (accLines.length === 0) {
+                    showToast('Sản phẩm này hiện tại đã HẾT ACC!', 'error');
+                    fetchStoreData();
+                    return;
+                }
+
+                let deliveredData = accLines.shift();
+                let remainingAccs = accLines.join('\n');
+                let newStock = accLines.length;
+
                 // Cập nhật kho sản phẩm
                 await fetch(`${BASE_URL}/products/${id}?updateMask.fieldPaths=account_data&updateMask.fieldPaths=stock`, {
                     method: 'PATCH',
@@ -619,13 +634,13 @@
                     body: JSON.stringify({
                         fields: {
                             account_data: { stringValue: remainingAccs },
-                            stock: { doubleValue: newStock }
+                            stock: { integerValue: newStock }
                         }
                     })
                 });
 
                 // Cập nhật số dư người dùng
-                let newBalance = currentUser.balance - prod.price;
+                let newBalance = currentUser.balance - fields.price;
                 currentUser.balance = newBalance;
                 localStorage.setItem('ds_user', JSON.stringify(currentUser));
 
@@ -646,8 +661,8 @@
                         fields: {
                             id: { stringValue: orderId },
                             user_id: { stringValue: currentUser.id },
-                            product_title: { stringValue: prod.title },
-                            price: { doubleValue: prod.price },
+                            product_title: { stringValue: fields.title },
+                            price: { doubleValue: fields.price },
                             delivered_data: { stringValue: deliveredData },
                             created_at: { stringValue: new Date().toISOString() }
                         }
@@ -700,6 +715,20 @@
             const email = document.getElementById('reg-email').value.trim();
             const pass = document.getElementById('reg-password').value;
 
+            try {
+                let res = await fetch(`${BASE_URL}/users?pageSize=300`);
+                let data = await res.json();
+                let isExist = (data.documents || []).some(doc => {
+                    let fields = parseFirestoreFields(doc.fields || {});
+                    return fields.username === user || fields.email === email;
+                });
+
+                if (isExist) {
+                    showToast('Tài khoản hoặc Email này đã tồn tại!', 'error');
+                    return;
+                }
+            } catch (err) {}
+
             let userId = 'usr_' + Date.now();
             let body = {
                 fields: {
@@ -746,10 +775,10 @@
             openModal('modal-deposit-history');
             const list = document.getElementById('deposit-history-list');
             try {
-                let res = await fetch(`${BASE_URL}/deposits?pageSize=100`);
+                let res = await fetch(`${BASE_URL}/deposits?pageSize=300`);
                 let data = await res.json();
                 let history = (data.documents || []).map(doc => parseFirestoreFields(doc.fields || {}))
-                                .filter(d => d.user_id === currentUser.id);
+                                .filter(d => String(d.user_id) === String(currentUser.id));
 
                 if (history.length > 0) {
                     list.innerHTML = history.map(d => `
@@ -770,13 +799,14 @@
         }
 
         async function openOrderHistory() {
+            if (!currentUser) return;
             openModal('modal-order-history');
             const list = document.getElementById('order-history-list');
             try {
-                let res = await fetch(`${BASE_URL}/orders?pageSize=100`);
+                let res = await fetch(`${BASE_URL}/orders?pageSize=300`);
                 let data = await res.json();
                 let orders = (data.documents || []).map(doc => parseFirestoreFields(doc.fields || {}))
-                                .filter(o => o.user_id === currentUser.id);
+                                .filter(o => String(o.user_id) === String(currentUser.id));
 
                 if (orders.length > 0) {
                     list.innerHTML = orders.map(o => `
