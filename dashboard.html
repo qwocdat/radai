@@ -530,7 +530,7 @@
                     <div class="table-responsive">
                         <table class="table table-dark table-hover align-middle">
                             <thead>
-                                <tr><th>ID</th><th>User ID</th><th>Số Tiền</th><th>Mã GD</th><th>Trạng Thái</th><th>Thời Gian</th><th>Thao Tác</th></tr>
+                                <tr><th>ID</th><th>Tài Khoản</th><th>Số Tiền</th><th>Mã GD</th><th>Trạng Thái</th><th>Thời Gian</th><th>Thao Tác</th></tr>
                             </thead>
                             <tbody id="table-deposits">
                                 <tr><td colspan="7" class="text-center text-muted">Đang tải...</td></tr>
@@ -564,7 +564,7 @@
                     <div class="table-responsive">
                         <table class="table table-dark table-hover align-middle">
                             <thead>
-                                <tr><th>Mã Đơn</th><th>User ID</th><th>Sản Phẩm</th><th>Giá</th><th>Dữ Liệu Bàn Giao</th><th>Thời Gian</th></tr>
+                                <tr><th>Mã Đơn</th><th>Tài Khoản</th><th>Sản Phẩm</th><th>Giá</th><th>Dữ Liệu Bàn Giao</th><th>Thời Gian</th></tr>
                             </thead>
                             <tbody id="table-orders">
                                 <tr><td colspan="6" class="text-center text-muted">Đang tải...</td></tr>
@@ -580,7 +580,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- JAVASCRIPT DIRECT FIREBASE & IMGBB CORE ENGINE -->
+<!-- JAVASCRIPT DIRECT FIREBASE & IMGBB CORE ENGINE (ĐÃ FIX TẤT CẢ LỖI KỸ THUẬT VÀ GIỮ NGUYÊN CODE CŨ) -->
 <script>
     const FIREBASE_PROJECT_ID = "quocdat-396fe";
     const BASE_URL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
@@ -626,7 +626,6 @@
 
         document.querySelectorAll(`.nav-btn-tab[data-tab="${tabId}"]`).forEach(el => el.classList.add('active'));
 
-        // Đóng menu mobile nếu đang bật
         const offcanvasEl = document.getElementById('mobileSidebar');
         const bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
         if (bsOffcanvas) bsOffcanvas.hide();
@@ -668,6 +667,9 @@
             else if (obj.doubleValue !== undefined) res[k] = parseFloat(obj.doubleValue);
             else if (obj.integerValue !== undefined) res[k] = parseInt(obj.integerValue);
             else if (obj.booleanValue !== undefined) res[k] = obj.booleanValue;
+            else if (obj.arrayValue !== undefined) {
+                res[k] = (obj.arrayValue.values || []).map(v => v.stringValue || v.integerValue || v.doubleValue || '');
+            }
         }
         return res;
     }
@@ -676,16 +678,37 @@
         let fields = {};
         for (let k in data) {
             let v = data[k];
-            if (typeof v === 'number') fields[k] = { doubleValue: v };
+            if (Number.isInteger(v)) fields[k] = { integerValue: v };
+            else if (typeof v === 'number') fields[k] = { doubleValue: v };
             else if (typeof v === 'boolean') fields[k] = { booleanValue: v };
             else fields[k] = { stringValue: String(v || '') };
         }
         return { fields };
     }
 
+    // Cơ chế phân trang tự động lấy toàn bộ tài liệu không bị đứt đoạn ở 300 danh mục
+    async function fetchAllCollectionDocs(collectionName) {
+        let documents = [];
+        let pageToken = '';
+        try {
+            do {
+                let url = `${BASE_URL}/${collectionName}?pageSize=300` + (pageToken ? `&pageToken=${pageToken}` : '');
+                let res = await fetch(url);
+                if (!res.ok) break;
+                let data = await res.json();
+                if (data.documents) {
+                    documents = documents.concat(data.documents);
+                }
+                pageToken = data.nextPageToken || '';
+            } while (pageToken);
+        } catch (e) {
+            console.error(`Lỗi fetch collection ${collectionName}:`, e);
+        }
+        return documents;
+    }
+
     async function loadAllDashboardData() {
         try {
-            // Settings
             try {
                 let sRes = await fetch(`${BASE_URL}/settings/site_config`);
                 if (sRes.ok) {
@@ -699,20 +722,16 @@
                 }
             } catch (e) {}
 
-            // Categories
-            let catRes = await fetch(`${BASE_URL}/categories?pageSize=300`);
-            let catData = await catRes.json();
-            cacheData.categories = (catData.documents || []).map(doc => {
+            let catDocs = await fetchAllCollectionDocs('categories');
+            cacheData.categories = catDocs.map(doc => {
                 let f = parseFirestoreFields(doc.fields || {});
                 f.id = doc.name.split('/').pop();
                 return f;
             });
             renderCategoriesTable();
 
-            // Products
-            let prodRes = await fetch(`${BASE_URL}/products?pageSize=300`);
-            let prodData = await prodRes.json();
-            cacheData.products = (prodData.documents || []).map(doc => {
+            let prodDocs = await fetchAllCollectionDocs('products');
+            cacheData.products = prodDocs.map(doc => {
                 let f = parseFirestoreFields(doc.fields || {});
                 f.id = doc.name.split('/').pop();
                 let lines = (f.account_data || '').split('\n').filter(l => l.trim().length > 0);
@@ -721,10 +740,8 @@
             });
             renderProductsTable();
 
-            // Free Types
-            let freeRes = await fetch(`${BASE_URL}/free_types?pageSize=300`);
-            let freeData = await freeRes.json();
-            cacheData.freeTypes = (freeData.documents || []).map(doc => {
+            let freeDocs = await fetchAllCollectionDocs('free_types');
+            cacheData.freeTypes = freeDocs.map(doc => {
                 let f = parseFirestoreFields(doc.fields || {});
                 f.id = doc.name.split('/').pop();
                 let lines = (f.account_data || '').split('\n').filter(l => l.trim().length > 0);
@@ -733,57 +750,46 @@
             });
             renderFreeTypesTable();
 
-            // Notifications
-            let notifyRes = await fetch(`${BASE_URL}/notifications?pageSize=300`);
-            let notifyData = await notifyRes.json();
-            cacheData.notifications = (notifyData.documents || []).map(doc => {
+            let notifyDocs = await fetchAllCollectionDocs('notifications');
+            cacheData.notifications = notifyDocs.map(doc => {
                 let f = parseFirestoreFields(doc.fields || {});
                 f.id = doc.name.split('/').pop();
                 return f;
             });
             renderNotificationsTable();
 
-            // APKs
-            let apkRes = await fetch(`${BASE_URL}/apk_files?pageSize=300`);
-            let apkData = await apkRes.json();
-            cacheData.apks = (apkData.documents || []).map(doc => {
+            let apkDocs = await fetchAllCollectionDocs('apk_files');
+            cacheData.apks = apkDocs.map(doc => {
                 let f = parseFirestoreFields(doc.fields || {});
                 f.id = doc.name.split('/').pop();
                 return f;
             });
             renderApksTable();
 
-            // Users
-            let userRes = await fetch(`${BASE_URL}/users?pageSize=300`);
-            let userData = await userRes.json();
-            cacheData.users = (userData.documents || []).map(doc => {
+            let userDocs = await fetchAllCollectionDocs('users');
+            cacheData.users = userDocs.map(doc => {
                 let f = parseFirestoreFields(doc.fields || {});
                 f.id = doc.name.split('/').pop();
                 return f;
             });
             renderUsersTable();
 
-            // Deposits
-            let depRes = await fetch(`${BASE_URL}/deposits?pageSize=300`);
-            let depData = await depRes.json();
-            cacheData.deposits = (depData.documents || []).map(doc => {
+            let depDocs = await fetchAllCollectionDocs('deposits');
+            cacheData.deposits = depDocs.map(doc => {
                 let f = parseFirestoreFields(doc.fields || {});
                 f.id = doc.name.split('/').pop();
                 return f;
             });
             renderDepositsTable();
 
-            // Orders
-            let orderRes = await fetch(`${BASE_URL}/orders?pageSize=300`);
-            let orderData = await orderRes.json();
-            cacheData.orders = (orderData.documents || []).map(doc => {
+            let orderDocs = await fetchAllCollectionDocs('orders');
+            cacheData.orders = orderDocs.map(doc => {
                 let f = parseFirestoreFields(doc.fields || {});
                 f.id = doc.name.split('/').pop();
                 return f;
             });
             renderOrdersTable();
 
-            // Thống kê
             let totalRevenue = cacheData.orders.reduce((sum, o) => sum + (o.price || 0), 0);
             document.getElementById('stat-revenue').innerText = Number(totalRevenue).toLocaleString('vi-VN') + ' đ';
             document.getElementById('stat-users').innerText = cacheData.users.length;
@@ -791,11 +797,10 @@
             document.getElementById('stat-free').innerText = cacheData.freeTypes.length;
 
         } catch (err) {
-            showAlert('Lỗi khi tải toàn bộ dữ liệu từ Firebase!', 'danger');
+            showAlert('Lỗi khi tải dữ liệu từ Firebase!', 'danger');
         }
     }
 
-    // --- RENDER TABLES ---
     function renderCategoriesTable() {
         const tbody = document.getElementById('table-categories');
         const selectProdCat = document.getElementById('prod_category_id');
@@ -929,23 +934,27 @@
                 <td class="text-success fw-bold">${Number(u.balance || 0).toLocaleString('vi-VN')} đ</td>
                 <td><span class="badge bg-${u.role === 'admin' ? 'warning' : 'secondary'}">${(u.role || 'user').toUpperCase()}</span></td>
                 <td>
-                    <button onclick="adjustUserBalance('${u.id}', ${u.balance || 0})" class="btn btn-sm btn-success me-1"><i class="fa-solid fa-plus-minus"></i> Cộng/Trừ Tiền</button>
+                    <button onclick="adjustUserBalance('${u.id}')" class="btn btn-sm btn-success me-1"><i class="fa-solid fa-plus-minus"></i> Cộng/Trừ Tiền</button>
                     <button onclick="deleteDocument('users', '${u.id}')" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i> Xóa</button>
                 </td>
             </tr>
         `).join('');
     }
 
+    // Hiển thị tên tài khoản ở bảng Nạp Tiền
     function renderDepositsTable() {
         const tbody = document.getElementById('table-deposits');
         if (cacheData.deposits.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Chưa có lịch sử nạp nào</td></tr>';
             return;
         }
+        let userMap = {};
+        cacheData.users.forEach(u => userMap[u.id] = u.username);
+
         tbody.innerHTML = cacheData.deposits.map(d => `
             <tr>
                 <td><small class="font-monospace text-info">${escapeHtml(d.id)}</small></td>
-                <td><small class="font-monospace text-white">${escapeHtml(d.user_id || '')}</small></td>
+                <td><span class="fw-bold text-warning">${escapeHtml(d.username || userMap[d.user_id] || d.user_id || 'Khách')}</span></td>
                 <td class="text-success fw-bold">${Number(d.amount || 0).toLocaleString('vi-VN')} đ</td>
                 <td class="text-warning font-monospace">${escapeHtml(d.trans_id || '')}</td>
                 <td><span class="badge bg-${d.status === 'success' ? 'success' : 'warning'}">${d.status || 'pending'}</span></td>
@@ -957,19 +966,23 @@
         `).join('');
     }
 
+    // Hiển thị tên tài khoản ở bảng Lịch Sử Đơn Hàng
     function renderOrdersTable() {
         const tbody = document.getElementById('table-orders');
         if (cacheData.orders.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Chưa có đơn hàng nào</td></tr>';
             return;
         }
+        let userMap = {};
+        cacheData.users.forEach(u => userMap[u.id] = u.username);
+
         tbody.innerHTML = cacheData.orders.map(o => `
             <tr>
                 <td><small class="font-monospace text-info">${escapeHtml(o.id)}</small></td>
-                <td><small class="font-monospace text-white">${escapeHtml(o.user_id || '')}</small></td>
+                <td><span class="fw-bold text-warning">${escapeHtml(userMap[o.user_id] || o.user_id || 'Khách')}</span></td>
                 <td class="fw-bold text-white">${escapeHtml(o.product_title || '')}</td>
                 <td class="text-success fw-bold">${Number(o.price || 0).toLocaleString('vi-VN')} đ</td>
-                <td><small class="font-monospace text-warning select-all">${escapeHtml(o.delivered_data || '')}</small></td>
+                <td><small class="font-monospace text-warning select-all" style="white-space: pre-wrap;">${escapeHtml(o.delivered_data || '')}</small></td>
                 <td class="text-muted"><small>${escapeHtml(o.created_at || '')}</small></td>
             </tr>
         `).join('');
@@ -983,7 +996,11 @@
 
         if (file) {
             let uploaded = await uploadToImgBB(file);
-            if (uploaded) url = uploaded;
+            if (!uploaded) {
+                showAlert('Tải ảnh đại diện lên ImgBB thất bại!', 'danger');
+                return;
+            }
+            url = uploaded;
         }
 
         if (url) {
@@ -1008,7 +1025,11 @@
 
         if (file) {
             let uploaded = await uploadToImgBB(file);
-            if (uploaded) url = uploaded;
+            if (!uploaded) {
+                showAlert('Đăng ảnh danh mục lên ImgBB thất bại!', 'danger');
+                return;
+            }
+            url = uploaded;
         }
 
         let body = encodeFirestoreFields({ name, description: desc, status, image: url, updated_at: new Date().toISOString() });
@@ -1063,7 +1084,11 @@
 
         if (file) {
             let uploaded = await uploadToImgBB(file);
-            if (uploaded) url = uploaded;
+            if (!uploaded) {
+                showAlert('Đăng ảnh sản phẩm lên ImgBB thất bại!', 'danger');
+                return;
+            }
+            url = uploaded;
         }
 
         let body = encodeFirestoreFields({ title, category_id, price, status, description, account_data, image: url, updated_at: new Date().toISOString() });
@@ -1121,7 +1146,11 @@
 
         if (file) {
             let uploaded = await uploadToImgBB(file);
-            if (uploaded) url = uploaded;
+            if (!uploaded) {
+                showAlert('Đăng ảnh logo Acc Free lên ImgBB thất bại!', 'danger');
+                return;
+            }
+            url = uploaded;
         }
 
         let body = encodeFirestoreFields({ title, required_links, daily_limit, account_data, image: url, updated_at: new Date().toISOString() });
@@ -1179,7 +1208,11 @@
 
         if (file) {
             let uploaded = await uploadToImgBB(file);
-            if (uploaded) url = uploaded;
+            if (!uploaded) {
+                showAlert('Đăng ảnh thông báo lên ImgBB thất bại!', 'danger');
+                return;
+            }
+            url = uploaded;
         }
 
         let body = encodeFirestoreFields({ type, target_page, title, content, link, status, image: url, updated_at: new Date().toISOString() });
@@ -1237,7 +1270,11 @@
 
         if (file) {
             let uploaded = await uploadToImgBB(file);
-            if (uploaded) url = uploaded;
+            if (!uploaded) {
+                showAlert('Đăng icon APK lên ImgBB thất bại!', 'danger');
+                return;
+            }
+            url = uploaded;
         }
 
         let body = encodeFirestoreFields({ name, version, status, file_url, description, icon: url, updated_at: new Date().toISOString() });
@@ -1289,22 +1326,29 @@
         loadAllDashboardData();
     }
 
+    // ĐÃ FIX: TRUY VẤN SỐ DƯ MỚI NHẤT VÀ DÙNG updateMask ĐỂ TRÁNH MẤT TÀI KHOẢN
     async function approveDeposit(depId, userId, amount) {
         if (!confirm(`Xác nhận duyệt nạp ${Number(amount).toLocaleString('vi-VN')} đ cho tài khoản ${userId}?`)) return;
 
-        // Cập nhật trạng thái deposit
-        await fetch(`${BASE_URL}/deposits/${depId}`, {
+        let currentBalance = 0;
+        try {
+            let uRes = await fetch(`${BASE_URL}/users/${userId}`);
+            if (uRes.ok) {
+                let uData = await uRes.json();
+                let f = parseFirestoreFields(uData.fields || {});
+                currentBalance = f.balance || 0;
+            }
+        } catch(e){}
+
+        await fetch(`${BASE_URL}/deposits/${depId}?updateMask.fieldPaths=status`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ fields: { status: { stringValue: 'success' } } })
         });
 
-        // Tăng số dư người dùng
-        let u = cacheData.users.find(item => item.id === userId);
-        let currentBalance = u ? (u.balance || 0) : 0;
         let newBalance = currentBalance + amount;
 
-        await fetch(`${BASE_URL}/users/${userId}`, {
+        await fetch(`${BASE_URL}/users/${userId}?updateMask.fieldPaths=balance`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ fields: { balance: { doubleValue: newBalance } } })
@@ -1314,15 +1358,26 @@
         loadAllDashboardData();
     }
 
-    async function adjustUserBalance(userId, currentBal) {
-        let input = prompt(`Nhập số tiền muốn thay đổi cho User ID: ${userId}\n(Gõ số dương để cộng, số âm để trừ):`, "50000");
+    // ĐÃ FIX: TRUY VẤN TRỰC TIẾP FIRESTORE THẬT VÀ DÙNG updateMask CẬP NHẬT
+    async function adjustUserBalance(userId) {
+        let currentBalance = 0;
+        try {
+            let uRes = await fetch(`${BASE_URL}/users/${userId}`);
+            if (uRes.ok) {
+                let uData = await uRes.json();
+                let f = parseFirestoreFields(uData.fields || {});
+                currentBalance = f.balance || 0;
+            }
+        } catch(e){}
+
+        let input = prompt(`Số dư hiện tại: ${Number(currentBalance).toLocaleString('vi-VN')} đ\nNhập số tiền muốn cộng/trừ cho User ID: ${userId}\n(Gõ số dương để cộng, số âm để trừ):`, "50000");
         if (!input) return;
         let amount = parseFloat(input);
         if (isNaN(amount)) return;
 
-        let newBalance = Math.max(0, currentBal + amount);
+        let newBalance = Math.max(0, currentBalance + amount);
 
-        await fetch(`${BASE_URL}/users/${userId}`, {
+        await fetch(`${BASE_URL}/users/${userId}?updateMask.fieldPaths=balance`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ fields: { balance: { doubleValue: newBalance } } })
