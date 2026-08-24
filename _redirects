@@ -1,4 +1,7 @@
-/  /trangchu/index.html  200
-/admin  /admin/dashboard.html  200
-/link  /bio/link.html  200
-/nhanacc  /nhanacc/nhanacc.html  200
+/ /trangchu/index.html 200
+/admin /admin/dashboard.html 200
+/admin/* /admin/dashboard.html 200
+/link /bio/link.html 200
+/link/* /bio/link.html 200
+/nhanacc /nhanacc/nhanacc.html 200
+/nhanacc/* /nhanacc/nhanacc.html 200
