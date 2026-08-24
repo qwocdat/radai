@@ -43,9 +43,41 @@
             0%, 100% { box-shadow: 0 0 15px rgba(6, 182, 212, 0.4); }
             50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.8); }
         }
+
+        /* LOADING SCREEN ANIMATION */
+        #preloader {
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        .spinner-ring {
+            border: 4px solid rgba(249, 115, 22, 0.15);
+            border-top: 4px solid #f97316;
+            border-right: 4px solid #f59e0b;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="text-slate-100 flex flex-col min-h-full bg-slate-950 selection:bg-orange-600 selection:text-white">
+
+    <!-- FULLSCREEN INITIAL LOADING SCREEN -->
+    <div id="preloader" class="fixed inset-0 z-[99999] bg-slate-950 flex flex-col items-center justify-center space-y-6">
+        <div class="relative w-28 h-28 flex items-center justify-center">
+            <!-- Thanh Load Viền Ngoài -->
+            <div class="spinner-ring absolute inset-0 w-full h-full shadow-lg shadow-orange-500/20"></div>
+            <!-- Chữ DS Trung Tâm Phát Sáng -->
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-orange-600 to-amber-500 flex items-center justify-center font-black text-white text-2xl shadow-xl shadow-amber-500/30 animate-pulse">
+                DS
+            </div>
+        </div>
+        <div class="text-center space-y-1">
+            <h2 class="text-lg font-black bg-gradient-to-r from-orange-400 via-amber-300 to-yellow-400 bg-clip-text text-transparent">DIGITALSHOP</h2>
+            <p id="loader-status-text" class="text-xs text-slate-400 font-semibold tracking-wide">Đang đồng bộ dữ liệu Firebase...</p>
+        </div>
+    </div>
 
     <div id="toast-container" class="fixed top-5 right-5 left-5 sm:left-auto z-[9999] space-y-3 pointer-events-none"></div>
 
@@ -187,7 +219,7 @@
                 <h3 class="text-lg font-bold text-white"><i class="fa-solid fa-right-to-bracket text-orange-500 mr-2"></i>Đăng Nhập DIGITALSHOP</h3>
                 <button onclick="closeModal('modal-login')" class="text-slate-400 hover:text-white text-xl">&times;</button>
             </div>
-            <form onsubmit="submitLogin(event)" class="space-y-4">
+            <form id="form-login" onsubmit="submitLogin(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Tài khoản / Email</label>
                     <input type="text" id="login-account" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:border-orange-500 focus:outline-none">
@@ -209,9 +241,9 @@
                     </label>
                 </div>
 
-                <!-- XÁC MINH HCAPTCHA (ĐÃ CẬP NHẬT SITEKEY MỚI) -->
+                <!-- XÁC MINH HCAPTCHA LOGIN -->
                 <div class="flex justify-center">
-                    <div class="h-captcha" data-sitekey="a474f7be-8ce0-4940-8830-b3ee33a26abc"></div>
+                    <div class="h-captcha" id="hcaptcha-login" data-sitekey="a474f7be-8ce0-4940-8830-b3ee33a26abc"></div>
                 </div>
 
                 <button type="submit" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-3 rounded-xl transition text-sm shadow-lg shadow-orange-600/30">
@@ -228,7 +260,7 @@
                 <h3 class="text-lg font-bold text-white"><i class="fa-solid fa-user-plus text-green-500 mr-2"></i>Đăng Ký Tài Khoản</h3>
                 <button onclick="closeModal('modal-register')" class="text-slate-400 hover:text-white text-xl">&times;</button>
             </div>
-            <form onsubmit="submitRegister(event)" class="space-y-4">
+            <form id="form-register" onsubmit="submitRegister(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Tên tài khoản</label>
                     <input type="text" id="reg-username" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:border-orange-500 focus:outline-none">
@@ -250,9 +282,9 @@
                     </label>
                 </div>
 
-                <!-- XÁC MINH HCAPTCHA (ĐÃ CẬP NHẬT SITEKEY MỚI) -->
+                <!-- XÁC MINH HCAPTCHA REGISTER -->
                 <div class="flex justify-center">
-                    <div class="h-captcha" data-sitekey="a474f7be-8ce0-4940-8830-b3ee33a26abc"></div>
+                    <div class="h-captcha" id="hcaptcha-register" data-sitekey="a474f7be-8ce0-4940-8830-b3ee33a26abc"></div>
                 </div>
 
                 <button type="submit" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl transition text-sm shadow-lg shadow-green-600/30">
@@ -442,6 +474,16 @@
         const FIREBASE_PROJECT_ID = "quocdat-396fe";
         const BASE_URL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
 
+        // TỰ ĐỘNG ẨN MÀN HÌNH LOADING KHI FIREBASE TẢI XONG 100%
+        function hidePreloader() {
+            const preloader = document.getElementById('preloader');
+            if (preloader) {
+                preloader.style.opacity = '0';
+                preloader.style.visibility = 'hidden';
+                setTimeout(() => preloader.style.display = 'none', 500);
+            }
+        }
+
         // KIỂM TRA ĐĂNG NHẬP (HỖ TRỢ LƯU 90 NGÀY HOẶC COOKIE HẾT HẠN)
         function getStoredUser() {
             const stored = localStorage.getItem('ds_user');
@@ -572,9 +614,13 @@
                     storeCategories.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
 
                 filterProducts();
-                fetchSystemPopups();
+                await fetchSystemPopups();
+
             } catch (e) {
                 showToast('Lỗi khi nạp dữ liệu từ Firebase!', 'error');
+            } finally {
+                // ĐÃ TẢI XONG TOÀN BỘ FIREBASE -> ẨN MÀN HÌNH CHỜ LOADING
+                hidePreloader();
             }
         }
 
@@ -786,11 +832,24 @@
             }
         }
 
+        // HÀM LẤY RESPONSE HCAPTCHA TỪ ĐÚNG CONTAINER
+        function getHCaptchaToken(containerId) {
+            if (!window.hcaptcha) return null;
+            const container = document.getElementById(containerId);
+            if (!container) return null;
+            const iframe = container.querySelector('iframe');
+            if (iframe && iframe.getAttribute('data-hcaptcha-widget-id')) {
+                const widgetId = iframe.getAttribute('data-hcaptcha-widget-id');
+                return hcaptcha.getResponse(widgetId);
+            }
+            return hcaptcha.getResponse();
+        }
+
         async function submitLogin(e) {
             e.preventDefault();
             
-            // XÁC MINH HCAPTCHA
-            const hcaptchaVal = hcaptcha.getResponse();
+            // XÁC MINH HCAPTCHA LOGIN
+            const hcaptchaVal = getHCaptchaToken('hcaptcha-login');
             if (!hcaptchaVal) {
                 showToast('Vui lòng hoàn thành xác minh hCaptcha!', 'error');
                 return;
@@ -835,8 +894,8 @@
         async function submitRegister(e) {
             e.preventDefault();
 
-            // XÁC MINH HCAPTCHA
-            const hcaptchaVal = hcaptcha.getResponse();
+            // XÁC MINH HCAPTCHA REGISTER
+            const hcaptchaVal = getHCaptchaToken('hcaptcha-register');
             if (!hcaptchaVal) {
                 showToast('Vui lòng hoàn thành xác minh hCaptcha!', 'error');
                 return;
