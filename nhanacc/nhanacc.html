@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full bg-slate-950">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DIGITALCOINS - NHIỆM VỤ VƯỢT LINK & MINIGAME</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap');
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f19; overflow-x: hidden; }
+        .glow-title { text-shadow: 0 0 15px rgba(56, 189, 248, 0.6); }
+        .card-bg { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .coin-badge { background: linear-gradient(135deg, rgba(250,204,21,0.15), rgba(249,115,22,0.15)); border: 1px solid rgba(250,204,21,0.4); }
+
+        @keyframes dragonWave {
+            0% { transform: translateX(-110%) translateY(20px) scale(0.8) rotate(-4deg); opacity: 0; }
+            20% { opacity: 0.9; }
+            50% { transform: translateX(10%) translateY(-25px) scale(1.05) rotate(5deg); opacity: 1; }
+            80% { opacity: 0.9; }
+            100% { transform: translateX(120%) translateY(15px) scale(0.9) rotate(-3deg); opacity: 0; }
+        }
+        .real-dragon-fly {
+            position: absolute; top: -20px; left: 0; width: 100%; height: 120px; pointer-events: none; z-index: 30;
+            animation: dragonWave 4.2s ease-in-out infinite;
+            filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.8)) drop-shadow(0 0 25px rgba(168, 85, 247, 0.6));
+        }
+        @keyframes mysticGlowPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(56, 189, 248, 0.25), inset 0 0 15px rgba(56, 189, 248, 0.15); border-color: rgba(56, 189, 248, 0.5); }
+            50% { box-shadow: 0 0 35px rgba(168, 85, 247, 0.6), inset 0 0 25px rgba(168, 85, 247, 0.25); border-color: rgba(168, 85, 247, 0.9); }
+        }
+        .mystic-glow-box { animation: mysticGlowPulse 2.8s infinite ease-in-out; }
+        @keyframes coinPulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.06);} }
+        .coin-pulse { animation: coinPulse 1.6s ease-in-out infinite; }
+        .tab-btn.active { background: linear-gradient(135deg,#0ea5e9,#a855f7); color: #fff; }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen pb-12 flex flex-col items-center">
+
+    <div class="max-w-4xl w-full px-4 pt-8 space-y-6">
+
+        <!-- Tiêu đề chính -->
+        <div class="text-center space-y-2">
+            <h1 class="text-2xl sm:text-4xl font-black tracking-wider text-sky-400 uppercase glow-title">
+                DIGITALCOINS
+            </h1>
+            <div class="text-xs font-semibold text-green-400">
+                ● Mạng Hợp Lệ: Client Engine Active
+            </div>
+        </div>
+
+        <!-- Số dư Coin -->
+        <div class="coin-badge rounded-2xl p-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-coins text-amber-400 text-2xl coin-pulse"></i>
+                <div>
+                    <div class="text-[10px] text-slate-400 uppercase tracking-wide">Số dư của bạn</div>
+                    <div id="coin-balance" class="text-xl font-black text-amber-300">0 DGC</div>
+                </div>
+            </div>
+            <div class="text-[10px] text-slate-500 text-right">
+                ID thiết bị:<br><span id="device-id-short" class="font-mono text-slate-400">...</span>
+            </div>
+        </div>
+
+        <div id="key-result-section"></div>
+
+        <!-- Tabs -->
+        <div class="flex gap-2 p-1 bg-slate-900/60 rounded-xl border border-slate-800">
+            <button onclick="switchTab('missions')" id="tab-missions" class="tab-btn active flex-1 py-2 rounded-lg text-xs font-black uppercase transition">
+                <i class="fa-solid fa-link"></i> Nhiệm vụ
+            </button>
+            <button onclick="switchTab('shop')" id="tab-shop" class="tab-btn flex-1 py-2 rounded-lg text-xs font-black uppercase transition">
+                <i class="fa-solid fa-store"></i> Đổi coin
+            </button>
+            <button onclick="switchTab('games')" id="tab-games" class="tab-btn flex-1 py-2 rounded-lg text-xs font-black uppercase transition">
+                <i class="fa-solid fa-gamepad"></i> Minigame
+            </button>
+        </div>
+
+        <!-- TAB: Nhiệm vụ vượt link -->
+        <div id="panel-missions" class="space-y-6">
+            <div id="missions-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+                <div class="col-span-full text-center py-12 text-slate-500">Đang tải danh sách nhiệm vụ...</div>
+            </div>
+
+            <div id="process-section" class="card-bg rounded-2xl p-5 sm:p-6 space-y-4 border border-slate-800 relative overflow-hidden">
+                <h2 class="text-lg font-black text-center text-white tracking-wide uppercase">TIẾN TRÌNH VƯỢT LINK NHẬN COIN</h2>
+                <div id="progress-status-box" class="bg-red-950/40 border border-red-500/30 rounded-xl p-4 text-center text-xs sm:text-sm text-red-400 font-semibold">
+                    Chưa chọn nhiệm vụ nào. Bấm "VƯỢT LINK" ở nhiệm vụ bạn muốn bên trên.
+                </div>
+                <div id="bypass-action-area" class="hidden text-center pt-2 space-y-3">
+                    <p class="text-xs text-slate-400">Bấm nút bên dưới để chuyển sang Layma vượt link, xong sẽ được cộng coin tự động:</p>
+                    <a id="layma-direct-btn" href="#" target="_self" class="inline-block w-full sm:w-auto bg-sky-600 hover:bg-sky-500 text-white font-extrabold text-sm px-6 py-3 rounded-xl transition shadow-lg">
+                        BẮT ĐẦU VƯỢT LINK LAYMA
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: Shop đổi coin lấy acc -->
+        <div id="panel-shop" class="hidden space-y-4">
+            <div id="shop-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+                <div class="col-span-full text-center py-12 text-slate-500">Đang tải danh sách sản phẩm...</div>
+            </div>
+            <div id="shop-result" class="hidden card-bg border-2 border-green-500/50 rounded-2xl p-6 text-center space-y-3 bg-green-950/20"></div>
+        </div>
+
+        <!-- TAB: Minigame -->
+        <div id="panel-games" class="hidden space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <a href="/chess/" class="card-bg rounded-2xl p-5 flex flex-col items-center text-center gap-2 hover:border-sky-500/60 transition group">
+                    <div class="text-4xl">♟️</div>
+                    <div class="font-black uppercase text-white">Cờ Vua AI</div>
+                    <div class="text-[11px] text-slate-400">Thắng AI để nhận DigitalCoins. Càng khó, thưởng càng cao.</div>
+                    <span class="mt-2 text-xs font-bold text-sky-400 group-hover:underline">Chơi ngay →</span>
+                </a>
+                <a href="/caro/" class="card-bg rounded-2xl p-5 flex flex-col items-center text-center gap-2 hover:border-purple-500/60 transition group">
+                    <div class="text-4xl">⚫</div>
+                    <div class="font-black uppercase text-white">Cờ Caro AI</div>
+                    <div class="text-[11px] text-slate-400">5 quân liên tiếp thắng AI để nhận DigitalCoins.</div>
+                    <span class="mt-2 text-xs font-bold text-purple-400 group-hover:underline">Chơi ngay →</span>
+                </a>
+            </div>
+            <div class="card-bg rounded-2xl p-4 text-[11px] text-slate-400 text-center">
+                Mỗi thiết bị được thưởng tối đa 6 ván thắng / game / ngày.
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Firebase SDK Integration -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
+            authDomain: "quocdat-396fe.firebaseapp.com",
+            projectId: "quocdat-396fe",
+            storageBucket: "quocdat-396fe.firebasestorage.app",
+            messagingSenderId: "685476439350",
+            appId: "1:685476439350:web:949054ecba7f0a0c383f97"
+        };
+
+        const LAYMA_TOKEN = "998f583bd647d63c4eab5811f50054a9";
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // ---------- ĐỊNH DANH THIẾT BỊ VÀ QUẢN LÝ COIN LOCAL ----------
+        function getDeviceId() {
+            let id = localStorage.getItem('device_id');
+            if (!id) {
+                const bytes = new Uint8Array(16);
+                crypto.getRandomValues(bytes);
+                const hex = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+                id = 'dev_' + hex;
+                localStorage.setItem('device_id', id);
+            }
+            return id;
+        }
+
+        function getLocalCoins() {
+            return parseInt(localStorage.getItem('dgc_coins') || '0');
+        }
+
+        function setLocalCoins(amount) {
+            localStorage.setItem('dgc_coins', amount.toString());
+            refreshBalance();
+        }
+
+        const DEVICE_ID = getDeviceId();
+        document.getElementById('device-id-short').innerText = DEVICE_ID.slice(0, 12) + '…';
+
+        function refreshBalance() {
+            document.getElementById('coin-balance').innerText = getLocalCoins() + ' DGC';
+        }
+
+        window.switchTab = function(name) {
+            ['missions', 'shop', 'games'].forEach(t => {
+                document.getElementById('panel-' + t).classList.toggle('hidden', t !== name);
+                document.getElementById('tab-' + t).classList.toggle('active', t === name);
+            });
+        };
+
+        // ---------- XỬ LÝ CLAIM REWARD KHI QUAY LẠI TỪ LAYMA ----------
+        function checkUrlClaim() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const claimKey = urlParams.get('key');
+            const rewardCoins = parseInt(urlParams.get('reward') || '0');
+            const resultSection = document.getElementById('key-result-section');
+
+            if (claimKey && rewardCoins > 0) {
+                const usedKeys = JSON.parse(localStorage.getItem('used_claim_keys') || '[]');
+                if (usedKeys.includes(claimKey)) {
+                    resultSection.innerHTML = `
+                        <div class="card-bg border-2 border-red-500/50 rounded-2xl p-6 text-center space-y-3 bg-red-950/20">
+                            <div class="text-red-400 font-black text-lg">XÁC THỰC THẤT BẠI</div>
+                            <div class="text-sm text-slate-300">Mã KEY này đã được sử dụng để nhận coin trước đó!</div>
+                            <div class="pt-2">
+                                <a href="/nhanacc/" class="inline-block bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold px-4 py-2 rounded-xl transition">Thử lại</a>
+                            </div>
+                        </div>`;
+                } else {
+                    usedKeys.push(claimKey);
+                    localStorage.setItem('used_claim_keys', JSON.stringify(usedKeys));
+                    
+                    const newBal = getLocalCoins() + rewardCoins;
+                    setLocalCoins(newBal);
+
+                    resultSection.innerHTML = `
+                        <div class="card-bg border-2 border-green-500/50 rounded-2xl p-6 text-center space-y-3 bg-green-950/20 shadow-2xl">
+                            <div class="text-green-400 font-black text-xl">VƯỢT LINK THÀNH CÔNG!</div>
+                            <div class="text-xs text-slate-300">Nhiệm vụ: <span class="text-sky-400">Vượt link nhận coin</span></div>
+                            <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl font-mono text-amber-300 font-bold text-xl">
+                                +${rewardCoins} DGC
+                            </div>
+                            <div class="text-xs text-slate-400">Số dư mới: <b class="text-amber-300">${newBal} DGC</b></div>
+                            <div class="pt-2">
+                                <a href="/nhanacc/" class="inline-block bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold px-4 py-2 rounded-xl transition">← Quay lại trang chủ</a>
+                            </div>
+                        </div>`;
+                }
+                resultSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // ---------- TAB NHIỆM VỤ (vượt link nhận coin) ----------
+        async function loadMissions() {
+            const grid = document.getElementById('missions-grid');
+            try {
+                const querySnap = await getDocs(collection(db, "coin_missions"));
+                if (querySnap.empty) {
+                    grid.innerHTML = '<div class="col-span-full text-center py-6 text-slate-500">Chưa có nhiệm vụ nào!</div>';
+                    return;
+                }
+                let html = '';
+                querySnap.forEach(d => {
+                    const data = d.data();
+                    const missionId = d.id;
+                    const title = data.title || 'NHIỆM VỤ';
+                    const image = data.image || 'https://i.ibb.co/M8P23sV/placeholder.png';
+                    const reward = data.reward_coins || 0;
+                    const dailyLimit = data.daily_limit || 1;
+
+                    html += `
+                        <div class="card-bg rounded-2xl p-4 flex flex-col items-center justify-between text-center relative overflow-hidden group hover:border-slate-700 transition">
+                            <span class="absolute top-2 left-2 bg-indigo-600 text-white text-[9px] font-black px-2 py-0.5 rounded uppercase">MIỄN PHÍ</span>
+                            <div class="w-16 h-16 rounded-2xl bg-slate-800 p-2 my-2 flex items-center justify-center">
+                                <img src="${image}" class="w-full h-full object-contain" onerror="this.src='https://i.ibb.co/M8P23sV/placeholder.png';">
+                            </div>
+                            <div class="space-y-1 w-full">
+                                <h3 class="font-extrabold text-sm text-white uppercase">${title}</h3>
+                                <div class="text-[11px] font-bold text-amber-400">+${reward} DGC</div>
+                                <div class="text-[10px] text-slate-400">Giới hạn: <b class="text-amber-400">${dailyLimit} lần/ngày</b></div>
+                            </div>
+                            <button onclick="generateBypassKey('${missionId}', '${title.replace(/'/g, "\\'")}', ${reward})"
+                                class="mt-3 w-full py-2 rounded-xl text-xs font-black transition bg-slate-700 hover:bg-sky-600 text-white cursor-pointer shadow-lg">
+                                VƯỢT LINK
+                            </button>
+                        </div>`;
+                });
+                grid.innerHTML = html;
+            } catch(e) {
+                grid.innerHTML = `<div class="col-span-full text-center py-6 text-red-400">Lỗi tải dữ liệu: ${e.message}</div>`;
+            }
+        }
+
+        window.generateBypassKey = function(missionId, title, rewardCoins) {
+            const processSection = document.getElementById('process-section');
+            const statusBox = document.getElementById('progress-status-box');
+            const actionArea = document.getElementById('bypass-action-area');
+            const directBtn = document.getElementById('layma-direct-btn');
+
+            processSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            const randomBytes = new Uint8Array(16);
+            crypto.getRandomValues(randomBytes);
+            const key = Array.from(randomBytes).map(b => b.toString(16).padStart(2, '0')).join('');
+
+            const redirectUrl = `${window.location.origin}${window.location.pathname}?key=${key}&reward=${rewardCoins}&device_id=${encodeURIComponent(DEVICE_ID)}`;
+            const laymaUrl = `https://api.layma.net/api/admin/shortlink/quicklink?tokenUser=${LAYMA_TOKEN}&url=${encodeURIComponent(redirectUrl)}&link_du_phong=${encodeURIComponent(redirectUrl)}`;
+
+            statusBox.className = "relative overflow-hidden mystic-glow-box bg-slate-900/95 border rounded-xl p-5 text-center space-y-2";
+            statusBox.innerHTML = `
+                <div class="real-dragon-fly">
+                    <svg viewBox="0 0 600 120" class="w-full h-full fill-none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10,60 C80,10 150,110 230,50 C300,-10 380,110 460,40 C520,0 570,80 590,60"
+                              stroke="url(#dragonGradient)" stroke-width="6" stroke-linecap="round"/>
+                        <path d="M20,60 C90,15 160,105 235,52 C305,-5 385,105 465,42"
+                              stroke="#ffffff" stroke-width="2" stroke-dasharray="8 6"/>
+                        <circle cx="585" cy="58" r="8" fill="#38bdf8"/>
+                        <circle cx="588" cy="56" r="3" fill="#ffffff"/>
+                        <defs>
+                            <linearGradient id="dragonGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#38bdf8" />
+                                <stop offset="50%" stop-color="#a855f7" />
+                                <stop offset="100%" stop-color="#f43f5e" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <div class="text-xs font-black uppercase tracking-widest text-sky-400 animate-pulse">PHONG ẤN BẢO MẬT KEY THÀNH CÔNG</div>
+                <div class="text-[11px] text-slate-300 font-mono flex items-center justify-center gap-2 pt-1">
+                    <span>MÃ ĐỊNH DANH:</span>
+                    <span class="filter blur-[5px] select-none text-sky-300 font-bold tracking-widest bg-sky-950/80 px-3 py-1 rounded border border-sky-500/40">
+                        XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    </span>
+                </div>`;
+
+            directBtn.href = laymaUrl;
+            actionArea.classList.remove('hidden');
+            setTimeout(() => actionArea.scrollIntoView({ behavior: 'smooth', block: 'center' }), 200);
+        };
+
+        // ---------- TAB SHOP (đổi coin lấy acc) ----------
+        async function loadShop() {
+            const grid = document.getElementById('shop-grid');
+            try {
+                const querySnap = await getDocs(collection(db, "free_types"));
+                if (querySnap.empty) {
+                    grid.innerHTML = '<div class="col-span-full text-center py-6 text-slate-500">Chưa có sản phẩm nào!</div>';
+                    return;
+                }
+                let html = '';
+                querySnap.forEach(d => {
+                    const data = d.data();
+                    const typeId = d.id;
+                    const title = data.title || 'ACC';
+                    const image = data.image || 'https://i.ibb.co/M8P23sV/placeholder.png';
+                    const coinCost = data.coin_cost ?? 0;
+                    const accLines = (data.account_data || '').split('\n').map(l => l.trim()).filter(l => l !== '');
+                    const stock = accLines.length;
+                    const isOutOfStock = stock <= 0;
+
+                    html += `
+                        <div class="card-bg rounded-2xl p-4 flex flex-col items-center justify-between text-center relative overflow-hidden group hover:border-slate-700 transition">
+                            <div class="w-16 h-16 rounded-2xl bg-slate-800 p-2 my-2 flex items-center justify-center">
+                                <img src="${image}" class="w-full h-full object-contain" onerror="this.src='https://i.ibb.co/M8P23sV/placeholder.png';">
+                            </div>
+                            <div class="space-y-1 w-full">
+                                <h3 class="font-extrabold text-sm text-white uppercase">${title}</h3>
+                                <div class="text-[11px] font-bold ${isOutOfStock ? 'text-red-400' : 'text-amber-400'}">
+                                    ${isOutOfStock ? 'HẾT ACC' : `KHO CÒN: ${stock} ACC`}
+                                </div>
+                                <div class="text-[11px] font-bold text-amber-300">Giá: ${coinCost} DGC</div>
+                            </div>
+                            <button onclick="redeemProduct('${typeId}', '${title.replace(/'/g, "\\'")}', ${coinCost}, \`${encodeURIComponent(data.account_data || '')}\`)"
+                                ${isOutOfStock ? 'disabled' : ''}
+                                class="mt-3 w-full py-2 rounded-xl text-xs font-black transition ${isOutOfStock ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-slate-700 hover:bg-purple-600 text-white cursor-pointer shadow-lg'}">
+                                ${isOutOfStock ? 'HẾT HÀNG' : 'ĐỔI NGAY'}
+                            </button>
+                        </div>`;
+                });
+                grid.innerHTML = html;
+            } catch(e) {
+                grid.innerHTML = `<div class="col-span-full text-center py-6 text-red-400">Lỗi tải dữ liệu: ${e.message}</div>`;
+            }
+        }
+
+        window.redeemProduct = async function(typeId, title, coinCost, encodedAccData) {
+            const resultBox = document.getElementById('shop-result');
+            const currentCoins = getLocalCoins();
+
+            if (currentCoins < coinCost) {
+                resultBox.classList.remove('hidden');
+                resultBox.className = "card-bg border-2 border-red-500/50 rounded-2xl p-6 text-center bg-red-950/20";
+                resultBox.innerHTML = `<div class="text-red-400 font-black">Không đủ DigitalCoins. Cần ${coinCost} DGC, bạn có ${currentCoins} DGC.</div>`;
+                resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            try {
+                const rawAccData = decodeURIComponent(encodedAccData);
+                let accLines = rawAccData.split('\n').map(l => l.trim()).filter(l => l !== '');
+
+                if (accLines.length === 0) {
+                    resultBox.classList.remove('hidden');
+                    resultBox.className = "card-bg border-2 border-red-500/50 rounded-2xl p-6 text-center bg-red-950/20";
+                    resultBox.innerHTML = `<div class="text-red-400 font-black">Rất tiếc, kho sản phẩm này vừa hết hàng!</div>`;
+                    return;
+                }
+
+                const deliveredAcc = accLines.shift();
+                const newAccDataStr = accLines.join('\n');
+
+                const docRef = doc(db, "free_types", typeId);
+                await updateDoc(docRef, {
+                    account_data: newAccDataStr,
+                    stock: accLines.length
+                });
+
+                const newBal = currentCoins - coinCost;
+                setLocalCoins(newBal);
+
+                resultBox.classList.remove('hidden');
+                resultBox.className = "card-bg border-2 border-green-500/50 rounded-2xl p-6 text-center space-y-3 bg-green-950/20";
+                resultBox.innerHTML = `
+                    <div class="text-green-400 font-black text-lg">ĐỔI THÀNH CÔNG: ${title}</div>
+                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl font-mono text-yellow-300 font-bold select-all text-base">${deliveredAcc}</div>
+                    <div class="text-xs text-slate-400">Đã trừ ${coinCost} DGC — Số dư còn lại: <b class="text-amber-300">${newBal} DGC</b></div>`;
+                resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                loadShop();
+            } catch(e) {
+                alert("Không thể kết nối máy chủ Firestore để đổi hàng!");
+            }
+        };
+
+        window.onload = function() {
+            loadMissions();
+            loadShop();
+            refreshBalance();
+            checkUrlClaim();
+        };
+    </script>
+</body>
+</html>
