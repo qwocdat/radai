@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DIGITALCOINS - NHIỆM VỤ VƯỢT LINK & MINIGAME</title>
+    <title>DIGITALCOINS - NHIỆM VỤ VƯỢT LINK & MINIGAME TÀI XỈU</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- hCaptcha SDK -->
+    <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap');
         html { scroll-behavior: smooth; }
@@ -14,33 +16,53 @@
         .card-bg { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .coin-badge { background: linear-gradient(135deg, rgba(250,204,21,0.15), rgba(249,115,22,0.15)); border: 1px solid rgba(250,204,21,0.4); }
 
-        @keyframes dragonWave {
-            0% { transform: translateX(-110%) translateY(20px) scale(0.8) rotate(-4deg); opacity: 0; }
-            20% { opacity: 0.9; }
-            50% { transform: translateX(10%) translateY(-25px) scale(1.05) rotate(5deg); opacity: 1; }
-            80% { opacity: 0.9; }
-            100% { transform: translateX(120%) translateY(15px) scale(0.9) rotate(-3deg); opacity: 0; }
+        /* LOADING ANIMATION */
+        #preloader { transition: opacity 0.5s ease, visibility 0.5s ease; }
+        .spinner-ring {
+            border: 4px solid rgba(249, 115, 22, 0.15); border-top: 4px solid #f97316;
+            border-right: 4px solid #f59e0b; border-radius: 50%; animation: spin 1s linear infinite;
         }
-        .real-dragon-fly {
-            position: absolute; top: -20px; left: 0; width: 100%; height: 120px; pointer-events: none; z-index: 30;
-            animation: dragonWave 4.2s ease-in-out infinite;
-            filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.8)) drop-shadow(0 0 25px rgba(168, 85, 247, 0.6));
-        }
-        @keyframes mysticGlowPulse {
-            0%, 100% { box-shadow: 0 0 20px rgba(56, 189, 248, 0.25), inset 0 0 15px rgba(56, 189, 248, 0.15); border-color: rgba(56, 189, 248, 0.5); }
-            50% { box-shadow: 0 0 35px rgba(168, 85, 247, 0.6), inset 0 0 25px rgba(168, 85, 247, 0.25); border-color: rgba(168, 85, 247, 0.9); }
-        }
-        .mystic-glow-box { animation: mysticGlowPulse 2.8s infinite ease-in-out; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
         @keyframes coinPulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.06);} }
         .coin-pulse { animation: coinPulse 1.6s ease-in-out infinite; }
         .tab-btn.active { background: linear-gradient(135deg,#0ea5e9,#a855f7); color: #fff; }
+
+        /* TÀI XỈU DICE & CIRCLES */
+        .dice { width: 42px; height: 42px; background: white; border-radius: 8px; display: flex; items-center; justify-content: center; font-size: 22px; font-weight: 900; color: #0f172a; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .history-dot { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; }
+        .dot-tai { background: #ef4444; color: white; border: 1px solid #f87171; }
+        .dot-xiu { background: #3b82f6; color: white; border: 1px solid #60a5fa; }
     </style>
 </head>
 <body class="text-slate-100 min-h-screen pb-12 flex flex-col items-center">
 
-    <div class="max-w-4xl w-full px-4 pt-8 space-y-6">
+    <!-- PRELOADER -->
+    <div id="preloader" class="fixed inset-0 z-[99999] bg-slate-950 flex flex-col items-center justify-center space-y-6">
+        <div class="relative w-28 h-28 flex items-center justify-center">
+            <div class="spinner-ring absolute inset-0 w-full h-full shadow-lg shadow-orange-500/20"></div>
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-orange-600 to-amber-500 flex items-center justify-center font-black text-white text-2xl shadow-xl shadow-amber-500/30 animate-pulse">
+                DS
+            </div>
+        </div>
+        <div class="text-center space-y-1">
+            <h2 class="text-lg font-black bg-gradient-to-r from-orange-400 via-amber-300 to-yellow-400 bg-clip-text text-transparent">DIGITALCOINS</h2>
+            <p class="text-xs text-slate-400 font-semibold tracking-wide">Đang đồng bộ dữ liệu tài khoản...</p>
+        </div>
+    </div>
 
-        <!-- Tiêu đề chính -->
+    <!-- MAIN CONTAINER -->
+    <div class="max-w-4xl w-full px-4 pt-6 space-y-6">
+
+        <!-- HEADER & NAVIGATION -->
+        <div class="flex items-center justify-between">
+            <a href="/" class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 px-3.5 py-2 rounded-xl text-xs font-bold transition">
+                <i class="fa-solid fa-arrow-left"></i> Trở về trang chủ
+            </a>
+            <div id="user-info-head" class="text-xs text-slate-400 font-medium"></div>
+        </div>
+
+        <!-- TIÊU ĐỀ CHÍNH -->
         <div class="text-center space-y-2">
             <h1 class="text-2xl sm:text-4xl font-black tracking-wider text-sky-400 uppercase glow-title">
                 DIGITALCOINS
@@ -50,23 +72,24 @@
             </div>
         </div>
 
-        <!-- Số dư Coin -->
-        <div class="coin-badge rounded-2xl p-4 flex items-center justify-between">
+        <!-- SỐ DƯ COIN & ĐIỂM DANH -->
+        <div class="coin-badge rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-3">
-                <i class="fa-solid fa-coins text-amber-400 text-2xl coin-pulse"></i>
+                <i class="fa-solid fa-coins text-amber-400 text-3xl coin-pulse"></i>
                 <div>
-                    <div class="text-[10px] text-slate-400 uppercase tracking-wide">Số dư của bạn</div>
-                    <div id="coin-balance" class="text-xl font-black text-amber-300">0 DGC</div>
+                    <div class="text-[10px] text-slate-400 uppercase tracking-wide">Số dư DGC của bạn</div>
+                    <div id="coin-balance" class="text-2xl font-black text-amber-300">0 DGC</div>
                 </div>
             </div>
-            <div class="text-[10px] text-slate-500 text-right">
-                ID thiết bị:<br><span id="device-id-short" class="font-mono text-slate-400">...</span>
-            </div>
+            
+            <button onclick="claimDailyReward()" id="btn-daily-claim" class="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-extrabold text-xs px-5 py-2.5 rounded-xl shadow-lg transition flex items-center gap-2">
+                <i class="fa-solid fa-calendar-check text-sm"></i> Điểm Danh Hàng Ngày (+100 DGC)
+            </button>
         </div>
 
         <div id="key-result-section"></div>
 
-        <!-- Tabs -->
+        <!-- TABS -->
         <div class="flex gap-2 p-1 bg-slate-900/60 rounded-xl border border-slate-800">
             <button onclick="switchTab('missions')" id="tab-missions" class="tab-btn active flex-1 py-2 rounded-lg text-xs font-black uppercase transition">
                 <i class="fa-solid fa-link"></i> Nhiệm vụ
@@ -75,65 +98,144 @@
                 <i class="fa-solid fa-store"></i> Đổi coin
             </button>
             <button onclick="switchTab('games')" id="tab-games" class="tab-btn flex-1 py-2 rounded-lg text-xs font-black uppercase transition">
-                <i class="fa-solid fa-gamepad"></i> Minigame
+                <i class="fa-solid fa-dice text-amber-400"></i> Minigame Tài Xỉu
             </button>
         </div>
 
-        <!-- TAB: Nhiệm vụ vượt link -->
+        <!-- TAB: NHIỆM VỤ VƯỢT LINK -->
         <div id="panel-missions" class="space-y-6">
-            <div id="missions-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-                <div class="col-span-full text-center py-12 text-slate-500">Đang tải danh sách nhiệm vụ...</div>
-            </div>
-
-            <div id="process-section" class="card-bg rounded-2xl p-5 sm:p-6 space-y-4 border border-slate-800 relative overflow-hidden">
-                <h2 class="text-lg font-black text-center text-white tracking-wide uppercase">TIẾN TRÌNH VƯỢT LINK NHẬN COIN</h2>
-                <div id="progress-status-box" class="bg-red-950/40 border border-red-500/30 rounded-xl p-4 text-center text-xs sm:text-sm text-red-400 font-semibold">
-                    Chưa chọn nhiệm vụ nào. Bấm "VƯỢT LINK" ở nhiệm vụ bạn muốn bên trên.
+            <div id="missions-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- MISSION LAYMA -->
+                <div class="card-bg rounded-2xl p-5 flex flex-col items-center justify-between text-center relative overflow-hidden group hover:border-sky-500/50 transition">
+                    <span class="absolute top-2 left-2 bg-sky-600 text-white text-[9px] font-black px-2 py-0.5 rounded uppercase">HOT</span>
+                    <div class="w-16 h-16 rounded-2xl bg-slate-800 p-2 my-2 flex items-center justify-center">
+                        <img src="https://i.ibb.co/M8P23sV/placeholder.png" class="w-full h-full object-contain">
+                    </div>
+                    <div class="space-y-1 w-full">
+                        <h3 class="font-extrabold text-sm text-white uppercase">VƯỢT LINK LAYMA</h3>
+                        <div class="text-sm font-black text-amber-400">+700 DGC</div>
+                        <div class="text-[10px] text-slate-400">Thực hiện vượt link Layma.net để nhận thưởng</div>
+                    </div>
+                    <button onclick="openHcaptchaModal('layma', 700)" class="mt-4 w-full py-2.5 rounded-xl text-xs font-black transition bg-sky-600 hover:bg-sky-500 text-white cursor-pointer shadow-lg">
+                        VƯỢT LINK LAYMA (+700 DGC)
+                    </button>
                 </div>
-                <div id="bypass-action-area" class="hidden text-center pt-2 space-y-3">
-                    <p class="text-xs text-slate-400">Bấm nút bên dưới để chuyển sang Layma vượt link, xong sẽ được cộng coin tự động:</p>
-                    <a id="layma-direct-btn" href="#" target="_self" class="inline-block w-full sm:w-auto bg-sky-600 hover:bg-sky-500 text-white font-extrabold text-sm px-6 py-3 rounded-xl transition shadow-lg">
-                        BẮT ĐẦU VƯỢT LINK LAYMA
-                    </a>
+
+                <!-- MISSION LINK4M -->
+                <div class="card-bg rounded-2xl p-5 flex flex-col items-center justify-between text-center relative overflow-hidden group hover:border-purple-500/50 transition">
+                    <span class="absolute top-2 left-2 bg-purple-600 text-white text-[9px] font-black px-2 py-0.5 rounded uppercase">NEW</span>
+                    <div class="w-16 h-16 rounded-2xl bg-slate-800 p-2 my-2 flex items-center justify-center">
+                        <img src="https://i.ibb.co/M8P23sV/placeholder.png" class="w-full h-full object-contain">
+                    </div>
+                    <div class="space-y-1 w-full">
+                        <h3 class="font-extrabold text-sm text-white uppercase">VƯỢT LINK LINK4M</h3>
+                        <div class="text-sm font-black text-amber-400">+500 DGC</div>
+                        <div class="text-[10px] text-slate-400">Thực hiện vượt link Link4m.co để nhận thưởng</div>
+                    </div>
+                    <button onclick="openHcaptchaModal('link4m', 500)" class="mt-4 w-full py-2.5 rounded-xl text-xs font-black transition bg-purple-600 hover:bg-purple-500 text-white cursor-pointer shadow-lg">
+                        VƯỢT LINK LINK4M (+500 DGC)
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- TAB: Shop đổi coin lấy acc -->
+        <!-- TAB: SHOP ĐỔI COIN LẤY ACC -->
         <div id="panel-shop" class="hidden space-y-4">
-            <div id="shop-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+            <div id="shop-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
                 <div class="col-span-full text-center py-12 text-slate-500">Đang tải danh sách sản phẩm...</div>
             </div>
             <div id="shop-result" class="hidden card-bg border-2 border-green-500/50 rounded-2xl p-6 text-center space-y-3 bg-green-950/20"></div>
         </div>
 
-        <!-- TAB: Minigame -->
-        <div id="panel-games" class="hidden space-y-4">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <a href="/chess/" class="card-bg rounded-2xl p-5 flex flex-col items-center text-center gap-2 hover:border-sky-500/60 transition group">
-                    <div class="text-4xl">♟️</div>
-                    <div class="font-black uppercase text-white">Cờ Vua AI</div>
-                    <div class="text-[11px] text-slate-400">Thắng AI để nhận DigitalCoins. Càng khó, thưởng càng cao.</div>
-                    <span class="mt-2 text-xs font-bold text-sky-400 group-hover:underline">Chơi ngay →</span>
-                </a>
-                <a href="/caro/" class="card-bg rounded-2xl p-5 flex flex-col items-center text-center gap-2 hover:border-purple-500/60 transition group">
-                    <div class="text-4xl">⚫</div>
-                    <div class="font-black uppercase text-white">Cờ Caro AI</div>
-                    <div class="text-[11px] text-slate-400">5 quân liên tiếp thắng AI để nhận DigitalCoins.</div>
-                    <span class="mt-2 text-xs font-bold text-purple-400 group-hover:underline">Chơi ngay →</span>
-                </a>
-            </div>
-            <div class="card-bg rounded-2xl p-4 text-[11px] text-slate-400 text-center">
-                Mỗi thiết bị được thưởng tối đa 6 ván thắng / game / ngày.
+        <!-- TAB: MINIGAME TÀI XỈU DGC -->
+        <div id="panel-games" class="hidden space-y-6">
+            <div class="card-bg rounded-3xl p-5 sm:p-6 space-y-6 border border-slate-800 relative">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <h2 class="text-base sm:text-lg font-black text-amber-400 uppercase flex items-center gap-2">
+                        <i class="fa-solid fa-dice text-2xl"></i> TÀI XỈU DGC (100% MIỄN PHÍ)
+                    </h2>
+                    <span id="tx-timer" class="text-xs font-black bg-red-950 border border-red-800 text-red-400 px-3 py-1 rounded-full">
+                        ⏱️ Đặt Cược: 15s
+                    </span>
+                </div>
+
+                <!-- CẦU THỐNG KÊ -->
+                <div class="space-y-2">
+                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Cầu Thống Kê (10 Phiên Gần Nhất)</div>
+                    <div id="tx-history-dots" class="flex items-center gap-2 overflow-x-auto p-2 bg-slate-900/80 rounded-xl border border-slate-800">
+                    </div>
+                </div>
+
+                <!-- BÀN CƯỢC & XÍ NGẦU -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+                    <!-- CỬA TÀI -->
+                    <button onclick="selectTxDoor('TAI')" id="btn-door-tai" class="p-5 rounded-2xl border-2 border-red-500/40 bg-red-950/20 hover:bg-red-900/40 transition flex flex-col items-center justify-center space-y-2">
+                        <span class="text-2xl font-black text-red-500">TÀI</span>
+                        <span class="text-xs font-bold text-slate-400">11 - 17</span>
+                        <span id="tai-cuer-val" class="text-xs font-extrabold text-amber-300">Đã cược: 0 DGC</span>
+                    </button>
+
+                    <!-- KHU VỰC XÍ NGẦU -->
+                    <div class="flex flex-col items-center justify-center space-y-3 bg-slate-900/90 p-4 rounded-2xl border border-slate-800">
+                        <div class="flex gap-2" id="dice-container">
+                            <div class="dice">?</div>
+                            <div class="dice">?</div>
+                            <div class="dice">?</div>
+                        </div>
+                        <div id="tx-result-text" class="text-xs font-black text-amber-400">Hãy chọn cửa & đặt cược</div>
+                    </div>
+
+                    <!-- CỬA XỈU -->
+                    <button onclick="selectTxDoor('XIU')" id="btn-door-xiu" class="p-5 rounded-2xl border-2 border-blue-500/40 bg-blue-950/20 hover:bg-blue-900/40 transition flex flex-col items-center justify-center space-y-2">
+                        <span class="text-2xl font-black text-blue-400">XỈU</span>
+                        <span class="text-xs font-bold text-slate-400">3 - 10</span>
+                        <span id="xiu-cuer-val" class="text-xs font-extrabold text-amber-300">Đã cược: 0 DGC</span>
+                    </button>
+                </div>
+
+                <!-- BẢNG CHỌN TIỀN CƯỢC -->
+                <div class="space-y-3 pt-3 border-t border-slate-800">
+                    <div class="flex items-center justify-between text-xs font-bold">
+                        <span class="text-slate-400">Số dư cược:</span>
+                        <span class="text-amber-300" id="tx-current-bet-display">Đã chọn: 0 DGC</span>
+                    </div>
+                    <div class="grid grid-cols-5 gap-2">
+                        <button onclick="addBetAmount(100)" class="bg-slate-800 hover:bg-slate-700 text-white font-bold py-2 rounded-xl text-xs">100</button>
+                        <button onclick="addBetAmount(500)" class="bg-slate-800 hover:bg-slate-700 text-white font-bold py-2 rounded-xl text-xs">500</button>
+                        <button onclick="addBetAmount(1000)" class="bg-slate-800 hover:bg-slate-700 text-white font-bold py-2 rounded-xl text-xs">1K</button>
+                        <button onclick="addBetAmount(5000)" class="bg-slate-800 hover:bg-slate-700 text-white font-bold py-2 rounded-xl text-xs">5K</button>
+                        <button onclick="betAllIn()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold py-2 rounded-xl text-xs">ALL IN</button>
+                    </div>
+                    <button onclick="resetBet()" class="w-full bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 font-bold py-2 rounded-xl text-xs transition">
+                        Đặt Lại / Hủy Cược
+                    </button>
+                </div>
             </div>
         </div>
 
     </div>
 
-    <!-- Firebase SDK Integration -->
+    <!-- HCAPTCHA MODAL -->
+    <div id="modal-hcaptcha" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden">
+        <div class="card-bg border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-5 text-center">
+            <h3 class="text-lg font-bold text-white"><i class="fa-solid fa-shield-halved text-sky-400 mr-2"></i>Xác Minh hCaptcha</h3>
+            <p class="text-xs text-slate-400">Hoàn thành xác minh bên dưới để bắt đầu nhiệm vụ vượt link!</p>
+            
+            <div class="flex justify-center">
+                <div class="h-captcha" id="hcaptcha-mission" data-sitekey="a474f7be-8ce0-4940-8830-b3ee33a26abc"></div>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="closeHcaptchaModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-xs transition">Hủy</button>
+                <button onclick="executeMissionBypass()" class="flex-1 bg-sky-600 hover:bg-sky-500 text-white font-bold py-2.5 rounded-xl text-xs transition">Xác Nhận & Vượt Link</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIREBASE & CORE ENGINE JS -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
@@ -145,37 +247,56 @@
         };
 
         const LAYMA_TOKEN = "998f583bd647d63c4eab5811f50054a9";
+        const LINK4M_API = "6992df868b3d1e423d1ab833";
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // ---------- ĐỊNH DANH THIẾT BỊ VÀ QUẢN LÝ COIN LOCAL ----------
-        function getDeviceId() {
-            let id = localStorage.getItem('device_id');
-            if (!id) {
-                const bytes = new Uint8Array(16);
-                crypto.getRandomValues(bytes);
-                const hex = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
-                id = 'dev_' + hex;
-                localStorage.setItem('device_id', id);
+        // KÍCH HOẠT HỆ THỐNG USER SHOP INDEX
+        function getStoredUser() {
+            const stored = localStorage.getItem('ds_user');
+            if (!stored) return null;
+            try { return JSON.parse(stored); } catch (e) { return null; }
+        }
+
+        let currentUser = getStoredUser();
+        let pendingMission = null;
+
+        function hidePreloader() {
+            const preloader = document.getElementById('preloader');
+            if (preloader) {
+                preloader.style.opacity = '0';
+                preloader.style.visibility = 'hidden';
+                setTimeout(() => preloader.style.display = 'none', 500);
             }
-            return id;
         }
 
-        function getLocalCoins() {
-            return parseInt(localStorage.getItem('dgc_coins') || '0');
-        }
+        async function syncUserBalance() {
+            if (!currentUser || !currentUser.id) {
+                document.getElementById('user-info-head').innerHTML = `<span class="text-red-400 font-bold">Chưa đăng nhập! Vui lòng đăng nhập ở trang chủ.</span>`;
+                hidePreloader();
+                return;
+            }
 
-        function setLocalCoins(amount) {
-            localStorage.setItem('dgc_coins', amount.toString());
-            refreshBalance();
-        }
+            document.getElementById('user-info-head').innerHTML = `<i class="fa-solid fa-user text-sky-400"></i> <b class="text-white">${currentUser.username}</b>`;
 
-        const DEVICE_ID = getDeviceId();
-        document.getElementById('device-id-short').innerText = DEVICE_ID.slice(0, 12) + '…';
+            try {
+                const userRef = doc(db, "users", currentUser.id);
+                const userSnap = await getDoc(userRef);
+                if (userSnap.exists()) {
+                    const data = userSnap.data();
+                    currentUser.dgc_balance = data.dgc_balance || 0;
+                    currentUser.last_claim_date = data.last_claim_date || '';
+                    localStorage.setItem('ds_user', JSON.stringify(currentUser));
+                    refreshBalance();
+                }
+            } catch (e) { console.error(e); }
+            finally { hidePreloader(); }
+        }
 
         function refreshBalance() {
-            document.getElementById('coin-balance').innerText = getLocalCoins() + ' DGC';
+            const bal = currentUser ? (currentUser.dgc_balance || 0) : 0;
+            document.getElementById('coin-balance').innerText = bal.toLocaleString('vi-VN') + ' DGC';
         }
 
         window.switchTab = function(name) {
@@ -185,137 +306,122 @@
             });
         };
 
-        // ---------- XỬ LÝ CLAIM REWARD KHI QUAY LẠI TỪ LAYMA ----------
-        function checkUrlClaim() {
+        // ĐIỂM DANH HÀNG NGÀY
+        window.claimDailyReward = async function() {
+            if (!currentUser) {
+                alert("Vui lòng đăng nhập tài khoản trước khi điểm danh!");
+                return;
+            }
+            const today = new Date().toISOString().split('T')[0];
+            if (currentUser.last_claim_date === today) {
+                alert("Hôm nay bạn đã điểm danh rồi! Hãy quay lại vào ngày mai.");
+                return;
+            }
+
+            try {
+                const newBal = (currentUser.dgc_balance || 0) + 100;
+                currentUser.dgc_balance = newBal;
+                currentUser.last_claim_date = today;
+                localStorage.setItem('ds_user', JSON.stringify(currentUser));
+
+                const userRef = doc(db, "users", currentUser.id);
+                await updateDoc(userRef, {
+                    dgc_balance: newBal,
+                    last_claim_date: today
+                });
+
+                refreshBalance();
+                alert("Điểm danh thành công! Bạn nhận được +100 DGC.");
+            } catch (e) {
+                alert("Lỗi khi điểm danh!");
+            }
+        };
+
+        // HCAPTCHA MODAL CONTROL
+        window.openHcaptchaModal = function(type, reward) {
+            if (!currentUser) {
+                alert("Vui lòng đăng nhập ở trang chủ trước khi làm nhiệm vụ!");
+                window.location.href = "/";
+                return;
+            }
+            pendingMission = { type, reward };
+            document.getElementById('modal-hcaptcha').classList.remove('hidden');
+        };
+
+        window.closeHcaptchaModal = function() {
+            document.getElementById('modal-hcaptcha').classList.add('hidden');
+            pendingMission = null;
+        };
+
+        window.executeMissionBypass = function() {
+            if (!window.hcaptcha || !hcaptcha.getResponse()) {
+                alert("Vui lòng tick chọn hCaptcha để xác minh!");
+                return;
+            }
+
+            const { type, reward } = pendingMission;
+            closeHcaptchaModal();
+
+            const randomBytes = new Uint8Array(16);
+            crypto.getRandomValues(randomBytes);
+            const key = Array.from(randomBytes).map(b => b.toString(16).padStart(2, '0')).join('');
+
+            const redirectUrl = `${window.location.origin}${window.location.pathname}?key=${key}&reward=${reward}&user_id=${currentUser.id}`;
+            let targetUrl = "";
+
+            if (type === 'layma') {
+                targetUrl = `https://api.layma.net/api/admin/shortlink/quicklink?tokenUser=${LAYMA_TOKEN}&url=${encodeURIComponent(redirectUrl)}&link_du_phong=${encodeURIComponent(redirectUrl)}`;
+            } else if (type === 'link4m') {
+                targetUrl = `https://link4m.co/st?api=${LINK4M_API}&url=${encodeURIComponent(redirectUrl)}`;
+            }
+
+            window.location.href = targetUrl;
+        };
+
+        // XỬ LÝ NHẬN COIN KHI CÓ MÃ KEY
+        async function checkUrlClaim() {
             const urlParams = new URLSearchParams(window.location.search);
             const claimKey = urlParams.get('key');
             const rewardCoins = parseInt(urlParams.get('reward') || '0');
             const resultSection = document.getElementById('key-result-section');
 
-            if (claimKey && rewardCoins > 0) {
+            if (claimKey && rewardCoins > 0 && currentUser) {
                 const usedKeys = JSON.parse(localStorage.getItem('used_claim_keys') || '[]');
                 if (usedKeys.includes(claimKey)) {
                     resultSection.innerHTML = `
                         <div class="card-bg border-2 border-red-500/50 rounded-2xl p-6 text-center space-y-3 bg-red-950/20">
                             <div class="text-red-400 font-black text-lg">XÁC THỰC THẤT BẠI</div>
-                            <div class="text-sm text-slate-300">Mã KEY này đã được sử dụng để nhận coin trước đó!</div>
-                            <div class="pt-2">
-                                <a href="/nhanacc/" class="inline-block bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold px-4 py-2 rounded-xl transition">Thử lại</a>
-                            </div>
+                            <div class="text-sm text-slate-300">Mã KEY này đã được sử dụng trước đó!</div>
                         </div>`;
                 } else {
                     usedKeys.push(claimKey);
                     localStorage.setItem('used_claim_keys', JSON.stringify(usedKeys));
-                    
-                    const newBal = getLocalCoins() + rewardCoins;
-                    setLocalCoins(newBal);
+
+                    const newBal = (currentUser.dgc_balance || 0) + rewardCoins;
+                    currentUser.dgc_balance = newBal;
+                    localStorage.setItem('ds_user', JSON.stringify(currentUser));
+
+                    try {
+                        const userRef = doc(db, "users", currentUser.id);
+                        await updateDoc(userRef, { dgc_balance: newBal });
+                    } catch(e){}
+
+                    refreshBalance();
 
                     resultSection.innerHTML = `
                         <div class="card-bg border-2 border-green-500/50 rounded-2xl p-6 text-center space-y-3 bg-green-950/20 shadow-2xl">
                             <div class="text-green-400 font-black text-xl">VƯỢT LINK THÀNH CÔNG!</div>
-                            <div class="text-xs text-slate-300">Nhiệm vụ: <span class="text-sky-400">Vượt link nhận coin</span></div>
                             <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl font-mono text-amber-300 font-bold text-xl">
                                 +${rewardCoins} DGC
                             </div>
                             <div class="text-xs text-slate-400">Số dư mới: <b class="text-amber-300">${newBal} DGC</b></div>
-                            <div class="pt-2">
-                                <a href="/nhanacc/" class="inline-block bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold px-4 py-2 rounded-xl transition">← Quay lại trang chủ</a>
-                            </div>
                         </div>`;
                 }
                 resultSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
 
-        // ---------- TAB NHIỆM VỤ (vượt link nhận coin) ----------
-        async function loadMissions() {
-            const grid = document.getElementById('missions-grid');
-            try {
-                const querySnap = await getDocs(collection(db, "coin_missions"));
-                if (querySnap.empty) {
-                    grid.innerHTML = '<div class="col-span-full text-center py-6 text-slate-500">Chưa có nhiệm vụ nào!</div>';
-                    return;
-                }
-                let html = '';
-                querySnap.forEach(d => {
-                    const data = d.data();
-                    const missionId = d.id;
-                    const title = data.title || 'NHIỆM VỤ';
-                    const image = data.image || 'https://i.ibb.co/M8P23sV/placeholder.png';
-                    const reward = data.reward_coins || 0;
-                    const dailyLimit = data.daily_limit || 1;
-
-                    html += `
-                        <div class="card-bg rounded-2xl p-4 flex flex-col items-center justify-between text-center relative overflow-hidden group hover:border-slate-700 transition">
-                            <span class="absolute top-2 left-2 bg-indigo-600 text-white text-[9px] font-black px-2 py-0.5 rounded uppercase">MIỄN PHÍ</span>
-                            <div class="w-16 h-16 rounded-2xl bg-slate-800 p-2 my-2 flex items-center justify-center">
-                                <img src="${image}" class="w-full h-full object-contain" onerror="this.src='https://i.ibb.co/M8P23sV/placeholder.png';">
-                            </div>
-                            <div class="space-y-1 w-full">
-                                <h3 class="font-extrabold text-sm text-white uppercase">${title}</h3>
-                                <div class="text-[11px] font-bold text-amber-400">+${reward} DGC</div>
-                                <div class="text-[10px] text-slate-400">Giới hạn: <b class="text-amber-400">${dailyLimit} lần/ngày</b></div>
-                            </div>
-                            <button onclick="generateBypassKey('${missionId}', '${title.replace(/'/g, "\\'")}', ${reward})"
-                                class="mt-3 w-full py-2 rounded-xl text-xs font-black transition bg-slate-700 hover:bg-sky-600 text-white cursor-pointer shadow-lg">
-                                VƯỢT LINK
-                            </button>
-                        </div>`;
-                });
-                grid.innerHTML = html;
-            } catch(e) {
-                grid.innerHTML = `<div class="col-span-full text-center py-6 text-red-400">Lỗi tải dữ liệu: ${e.message}</div>`;
-            }
-        }
-
-        window.generateBypassKey = function(missionId, title, rewardCoins) {
-            const processSection = document.getElementById('process-section');
-            const statusBox = document.getElementById('progress-status-box');
-            const actionArea = document.getElementById('bypass-action-area');
-            const directBtn = document.getElementById('layma-direct-btn');
-
-            processSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            
-            const randomBytes = new Uint8Array(16);
-            crypto.getRandomValues(randomBytes);
-            const key = Array.from(randomBytes).map(b => b.toString(16).padStart(2, '0')).join('');
-
-            const redirectUrl = `${window.location.origin}${window.location.pathname}?key=${key}&reward=${rewardCoins}&device_id=${encodeURIComponent(DEVICE_ID)}`;
-            const laymaUrl = `https://api.layma.net/api/admin/shortlink/quicklink?tokenUser=${LAYMA_TOKEN}&url=${encodeURIComponent(redirectUrl)}&link_du_phong=${encodeURIComponent(redirectUrl)}`;
-
-            statusBox.className = "relative overflow-hidden mystic-glow-box bg-slate-900/95 border rounded-xl p-5 text-center space-y-2";
-            statusBox.innerHTML = `
-                <div class="real-dragon-fly">
-                    <svg viewBox="0 0 600 120" class="w-full h-full fill-none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M10,60 C80,10 150,110 230,50 C300,-10 380,110 460,40 C520,0 570,80 590,60"
-                              stroke="url(#dragonGradient)" stroke-width="6" stroke-linecap="round"/>
-                        <path d="M20,60 C90,15 160,105 235,52 C305,-5 385,105 465,42"
-                              stroke="#ffffff" stroke-width="2" stroke-dasharray="8 6"/>
-                        <circle cx="585" cy="58" r="8" fill="#38bdf8"/>
-                        <circle cx="588" cy="56" r="3" fill="#ffffff"/>
-                        <defs>
-                            <linearGradient id="dragonGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" stop-color="#38bdf8" />
-                                <stop offset="50%" stop-color="#a855f7" />
-                                <stop offset="100%" stop-color="#f43f5e" />
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                </div>
-                <div class="text-xs font-black uppercase tracking-widest text-sky-400 animate-pulse">PHONG ẤN BẢO MẬT KEY THÀNH CÔNG</div>
-                <div class="text-[11px] text-slate-300 font-mono flex items-center justify-center gap-2 pt-1">
-                    <span>MÃ ĐỊNH DANH:</span>
-                    <span class="filter blur-[5px] select-none text-sky-300 font-bold tracking-widest bg-sky-950/80 px-3 py-1 rounded border border-sky-500/40">
-                        XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-                    </span>
-                </div>`;
-
-            directBtn.href = laymaUrl;
-            actionArea.classList.remove('hidden');
-            setTimeout(() => actionArea.scrollIntoView({ behavior: 'smooth', block: 'center' }), 200);
-        };
-
-        // ---------- TAB SHOP (đổi coin lấy acc) ----------
+        // LOAD SHOP SẢN PHẨM ACC
         async function loadShop() {
             const grid = document.getElementById('shop-grid');
             try {
@@ -330,89 +436,174 @@
                     const typeId = d.id;
                     const title = data.title || 'ACC';
                     const image = data.image || 'https://i.ibb.co/M8P23sV/placeholder.png';
-                    const coinCost = data.coin_cost ?? 0;
+                    const coinCost = data.coin_cost ?? 500;
                     const accLines = (data.account_data || '').split('\n').map(l => l.trim()).filter(l => l !== '');
                     const stock = accLines.length;
                     const isOutOfStock = stock <= 0;
 
                     html += `
-                        <div class="card-bg rounded-2xl p-4 flex flex-col items-center justify-between text-center relative overflow-hidden group hover:border-slate-700 transition">
+                        <div class="card-bg rounded-2xl p-4 flex flex-col items-center justify-between text-center group hover:border-slate-700 transition">
                             <div class="w-16 h-16 rounded-2xl bg-slate-800 p-2 my-2 flex items-center justify-center">
-                                <img src="${image}" class="w-full h-full object-contain" onerror="this.src='https://i.ibb.co/M8P23sV/placeholder.png';">
+                                <img src="${image}" class="w-full h-full object-contain">
                             </div>
                             <div class="space-y-1 w-full">
-                                <h3 class="font-extrabold text-sm text-white uppercase">${title}</h3>
+                                <h3 class="font-extrabold text-sm text-white uppercase line-clamp-1">${title}</h3>
                                 <div class="text-[11px] font-bold ${isOutOfStock ? 'text-red-400' : 'text-amber-400'}">
-                                    ${isOutOfStock ? 'HẾT ACC' : `KHO CÒN: ${stock} ACC`}
+                                    ${isOutOfStock ? 'HẾT ACC' : `KHO: ${stock} ACC`}
                                 </div>
                                 <div class="text-[11px] font-bold text-amber-300">Giá: ${coinCost} DGC</div>
                             </div>
                             <button onclick="redeemProduct('${typeId}', '${title.replace(/'/g, "\\'")}', ${coinCost}, \`${encodeURIComponent(data.account_data || '')}\`)"
                                 ${isOutOfStock ? 'disabled' : ''}
-                                class="mt-3 w-full py-2 rounded-xl text-xs font-black transition ${isOutOfStock ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-slate-700 hover:bg-purple-600 text-white cursor-pointer shadow-lg'}">
+                                class="mt-3 w-full py-2 rounded-xl text-xs font-black transition ${isOutOfStock ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-orange-600 hover:bg-orange-500 text-white shadow-lg'}">
                                 ${isOutOfStock ? 'HẾT HÀNG' : 'ĐỔI NGAY'}
                             </button>
                         </div>`;
                 });
                 grid.innerHTML = html;
             } catch(e) {
-                grid.innerHTML = `<div class="col-span-full text-center py-6 text-red-400">Lỗi tải dữ liệu: ${e.message}</div>`;
+                grid.innerHTML = `<div class="col-span-full text-center py-6 text-red-400">Lỗi tải shop</div>`;
             }
         }
 
         window.redeemProduct = async function(typeId, title, coinCost, encodedAccData) {
-            const resultBox = document.getElementById('shop-result');
-            const currentCoins = getLocalCoins();
-
+            if (!currentUser) { alert("Vui lòng đăng nhập!"); return; }
+            const currentCoins = currentUser.dgc_balance || 0;
             if (currentCoins < coinCost) {
-                resultBox.classList.remove('hidden');
-                resultBox.className = "card-bg border-2 border-red-500/50 rounded-2xl p-6 text-center bg-red-950/20";
-                resultBox.innerHTML = `<div class="text-red-400 font-black">Không đủ DigitalCoins. Cần ${coinCost} DGC, bạn có ${currentCoins} DGC.</div>`;
-                resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                alert(`Số dư DGC không đủ! Cần ${coinCost} DGC, bạn có ${currentCoins} DGC.`);
                 return;
             }
 
             try {
                 const rawAccData = decodeURIComponent(encodedAccData);
                 let accLines = rawAccData.split('\n').map(l => l.trim()).filter(l => l !== '');
-
-                if (accLines.length === 0) {
-                    resultBox.classList.remove('hidden');
-                    resultBox.className = "card-bg border-2 border-red-500/50 rounded-2xl p-6 text-center bg-red-950/20";
-                    resultBox.innerHTML = `<div class="text-red-400 font-black">Rất tiếc, kho sản phẩm này vừa hết hàng!</div>`;
-                    return;
-                }
+                if (accLines.length === 0) { alert("Sản phẩm hết hàng!"); return; }
 
                 const deliveredAcc = accLines.shift();
                 const newAccDataStr = accLines.join('\n');
 
                 const docRef = doc(db, "free_types", typeId);
-                await updateDoc(docRef, {
-                    account_data: newAccDataStr,
-                    stock: accLines.length
-                });
+                await updateDoc(docRef, { account_data: newAccDataStr, stock: accLines.length });
 
                 const newBal = currentCoins - coinCost;
-                setLocalCoins(newBal);
+                currentUser.dgc_balance = newBal;
+                localStorage.setItem('ds_user', JSON.stringify(currentUser));
 
-                resultBox.classList.remove('hidden');
-                resultBox.className = "card-bg border-2 border-green-500/50 rounded-2xl p-6 text-center space-y-3 bg-green-950/20";
-                resultBox.innerHTML = `
-                    <div class="text-green-400 font-black text-lg">ĐỔI THÀNH CÔNG: ${title}</div>
-                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl font-mono text-yellow-300 font-bold select-all text-base">${deliveredAcc}</div>
-                    <div class="text-xs text-slate-400">Đã trừ ${coinCost} DGC — Số dư còn lại: <b class="text-amber-300">${newBal} DGC</b></div>`;
-                resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                const userRef = doc(db, "users", currentUser.id);
+                await updateDoc(userRef, { dgc_balance: newBal });
+
+                refreshBalance();
+                alert(`ĐỔI THÀNH CÔNG: ${title}\n\nThông tin bàn giao:\n${deliveredAcc}`);
                 loadShop();
-            } catch(e) {
-                alert("Không thể kết nối máy chủ Firestore để đổi hàng!");
-            }
+            } catch(e) { alert("Lỗi khi đổi sản phẩm!"); }
         };
 
+        // --- MINIGAME TÀI XỈU DGC ---
+        let txSelectedDoor = null;
+        let txBetAmount = 0;
+        let txHistory = ['TAI', 'XIU', 'TAI', 'TAI', 'XIU', 'TAI', 'XIU', 'XIU', 'TAI', 'XIU'];
+        let txTimerVal = 15;
+
+        function renderTxHistory() {
+            const container = document.getElementById('tx-history-dots');
+            container.innerHTML = txHistory.slice(-10).map(h => `
+                <div class="history-dot ${h === 'TAI' ? 'dot-tai' : 'dot-xiu'}">${h === 'TAI' ? 'T' : 'X'}</div>
+            `).join('');
+        }
+
+        window.selectTxDoor = function(door) {
+            txSelectedDoor = door;
+            document.getElementById('btn-door-tai').classList.toggle('border-amber-400', door === 'TAI');
+            document.getElementById('btn-door-xiu').classList.toggle('border-amber-400', door === 'XIU');
+            updateBetDisplay();
+        };
+
+        window.addBetAmount = function(amt) {
+            txBetAmount += amt;
+            updateBetDisplay();
+        };
+
+        window.betAllIn = function() {
+            txBetAmount = currentUser ? (currentUser.dgc_balance || 0) : 0;
+            updateBetDisplay();
+        };
+
+        window.resetBet = function() {
+            txBetAmount = 0;
+            txSelectedDoor = null;
+            document.getElementById('btn-door-tai').classList.remove('border-amber-400');
+            document.getElementById('btn-door-xiu').classList.remove('border-amber-400');
+            updateBetDisplay();
+        };
+
+        function updateBetDisplay() {
+            document.getElementById('tx-current-bet-display').innerText = `Đã chọn cửa ${txSelectedDoor || '---'}: ${txBetAmount.toLocaleString('vi-VN')} DGC`;
+            document.getElementById('tai-cuer-val').innerText = `Đã cược: ${txSelectedDoor === 'TAI' ? txBetAmount : 0} DGC`;
+            document.getElementById('xiu-cuer-val').innerText = `Đã cược: ${txSelectedDoor === 'XIU' ? txBetAmount : 0} DGC`;
+        }
+
+        function startTxTimer() {
+            setInterval(() => {
+                txTimerVal--;
+                if (txTimerVal < 0) {
+                    rollDiceAndSettle();
+                    txTimerVal = 15;
+                }
+                document.getElementById('tx-timer').innerText = `⏱️ Đặt Cược: ${txTimerVal}s`;
+            }, 1000);
+        }
+
+        async function rollDiceAndSettle() {
+            const d1 = Math.floor(Math.random() * 6) + 1;
+            const d2 = Math.floor(Math.random() * 6) + 1;
+            const d3 = Math.floor(Math.random() * 6) + 1;
+            const sum = d1 + d2 + d3;
+            const result = sum >= 11 ? 'TAI' : 'XIU';
+
+            document.getElementById('dice-container').innerHTML = `
+                <div class="dice">${d1}</div>
+                <div class="dice">${d2}</div>
+                <div class="dice">${d3}</div>
+            `;
+
+            document.getElementById('tx-result-text').innerText = `Kết quả: ${sum} điểm - ${result}`;
+            txHistory.push(result);
+            renderTxHistory();
+
+            if (txSelectedDoor && txBetAmount > 0 && currentUser) {
+                const currentBal = currentUser.dgc_balance || 0;
+                if (txBetAmount > currentBal) {
+                    alert("Cược thất bại: Số dư DGC không đủ!");
+                    resetBet();
+                    return;
+                }
+
+                let newBal = currentBal;
+                if (txSelectedDoor === result) {
+                    newBal += txBetAmount;
+                    alert(`CHÚC MỪNG! Bạn đoán đúng ${result} và thắng +${txBetAmount} DGC.`);
+                } else {
+                    newBal -= txBetAmount;
+                    alert(`RẤT TIẾC! Kết quả ra ${result}, bạn bị trừ -${txBetAmount} DGC.`);
+                }
+
+                currentUser.dgc_balance = newBal;
+                localStorage.setItem('ds_user', JSON.stringify(currentUser));
+                try {
+                    const userRef = doc(db, "users", currentUser.id);
+                    await updateDoc(userRef, { dgc_balance: newBal });
+                } catch(e){}
+                refreshBalance();
+                resetBet();
+            }
+        }
+
         window.onload = function() {
-            loadMissions();
+            syncUserBalance();
             loadShop();
-            refreshBalance();
             checkUrlClaim();
+            renderTxHistory();
+            startTxTimer();
         };
     </script>
 </body>
