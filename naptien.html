@@ -252,7 +252,7 @@
             &#8592; Trang Chủ
         </a>
 
-        <div class="brand-title"> GATESMOD</div>
+        <div class="brand-title">DIGITALSMOD</div>
         <div class="sub-title">CỔNG THANH TOÁN TỰ ĐỘNG</div>
 
         <div class="balance-box">
@@ -280,7 +280,7 @@
 
         <div class="info-text" style="margin-top:10px;">
             Nội dung chuyển khoản:<br>
-            <span class="highlight" id="transferContent">NAP ...</span>
+            <span class="highlight" id="transferContent">SEVQR NAP ...</span>
         </div>
     </div>
 
@@ -338,7 +338,9 @@
         
         currentUser = currentUser.toUpperCase().trim();
         document.getElementById('displayUser').innerText = currentUser;
-        const transferContentText = `NAP ${currentUser}`;
+        
+        // CÚ PHÁP CHUẨN KẾT HỢP SEVQR CỦA VIETINBANK / SEPAY
+        const transferContentText = `SEVQR NAP ${currentUser}`;
         document.getElementById('transferContent').innerText = transferContentText;
 
         // --- 2. CANVAS PARTICLES ENGINE (TỤ KHÍ BÙNG NỔ & KHÓI TRẮNG) ---
@@ -463,6 +465,7 @@
             isGathering = true;
             particles.forEach(p => { p.targetX = 0; p.targetY = 0; });
 
+            // TẠO MÃ VIETQR VỚI CÚ PHÁP SEVQR CHUẨN
             currentQRUrl = `https://img.vietqr.io/image/VietinBank-999939213333-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(transferContentText)}&accountName=NGUYEN%20DAI%20QUOC%20DAT`;
 
             // 2. Sau 800ms khi hạt lấp đầy -> Nổ trắng phát sáng cực đại
@@ -513,7 +516,7 @@
         // Tự động ghi nhận đơn nạp vào kho Deposits của index.html
         async function saveDepositHistory(amount, currentUserId) {
             let depositId = 'dep_' + Date.now();
-            let memo = "NAP" + Math.floor(1000 + Math.random() * 9000);
+            let memo = "SEVQR" + Math.floor(1000 + Math.random() * 9000);
             try {
                 await fetch(`${BASE_URL}/deposits/${depositId}`, {
                     method: 'PATCH',
@@ -525,7 +528,7 @@
                             username: { stringValue: currentUser },
                             trans_id: { stringValue: memo },
                             amount: { doubleValue: parseFloat(amount) },
-                            payment_method: { stringValue: 'VietinBank (Auto)' },
+                            payment_method: { stringValue: 'VietinBank (SePay SEVQR)' },
                             status: { stringValue: 'success' },
                             created_at: { stringValue: new Date().toISOString() }
                         }
