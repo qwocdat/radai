@@ -1,5 +1,3 @@
-// Cloudflare Pages Function: Xử lý Webhook cộng tiền theo Tên Tài Khoản
-// Lưu trữ biến động số dư theo dạng: { "USERNAME": số_tiền_tích_lũy }
 let userBalances = {};
 
 export async function onRequest(context) {
@@ -16,12 +14,16 @@ export async function onRequest(context) {
         return new Response(null, { headers: corsHeaders });
     }
 
-    // 1. FRONT-END GỌI LẤY SỐ DƯ THEO TÊN USER (GET /api/webhook?user=USERNAME)
+    // 1. FRONT-END GỌI LẤY SỐ DƯ TẢI TRANG
     if (request.method === 'GET') {
         const username = (url.searchParams.get('user') || '').toUpperCase().trim();
         
+        // Nếu gõ thử trên trình duyệt không có param user
         if (!username) {
-            return new Response(JSON.stringify({ status: 'error', message: 'Thiếu tên tài khoản' }), {
+            return new Response(JSON.stringify({ 
+                status: 'online', 
+                message: 'Webhook API DigitalsMod đang hoạt động bình thường!' 
+            }), {
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' }
             });
         }
@@ -37,7 +39,7 @@ export async function onRequest(context) {
         });
     }
 
-    // 2. SEPAY BẮN DỮ LIỆU VỀ (POST /api/webhook)
+    // 2. SEPAY BẮN DỮ LIỆU VỀ
     if (request.method === 'POST') {
         try {
             const data = await request.json();
@@ -45,11 +47,6 @@ export async function onRequest(context) {
             const content = (data.content || '').toUpperCase();
 
             if (transferAmount > 0 && content) {
-                // Tách lấy Tên tài khoản từ nội dung chuyển khoản
-                // Cú pháp ngân hàng: "NAP <TENTAIKHOAN>" hoặc chứa tên user trực tiếp
-                // Ví dụ: "NAP DIGITALSMOD", "SEQR NAP DIGITALSMOD TKPDGS"
-                
-                // Thuật toán bóc tách tên user: tìm từ đứng sau chữ "NAP" hoặc lấy từ khóa phù hợp
                 let extractedUser = "";
                 const match = content.match(/NAP\s+([A-Z0-9_]+)/);
 
@@ -60,9 +57,7 @@ export async function onRequest(context) {
                 }
 
                 if (extractedUser) {
-                    // Cộng tiền vào tài khoản tương ứng
                     userBalances[extractedUser] = (userBalances[extractedUser] || 0) + transferAmount;
-                    console.log(`[SEPAY] Cộng thành công +${transferAmount} VNĐ cho tài khoản: ${extractedUser}`);
                 }
             }
 
