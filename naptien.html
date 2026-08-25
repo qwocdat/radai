@@ -2,89 +2,201 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DigitalsMod - Nạp Tiền Cyberpunk</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>DigitalsMod - Gate</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
-        body { background: #060709; color: #fff; overflow-x: hidden; display: flex; justify-content: center; align-items: center; min-height: 100vh; position: relative; }
+        :root {
+            --primary-neon: #00ffcc;
+            --secondary-neon: #ff007f;
+            --blue-neon: #00bfff;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(0, 255, 204, 0.3);
+            --glass-shadow: rgba(0, 255, 204, 0.15);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            background: #030408;
+            color: #fff;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            perspective: 1000px;
+        }
+
+        /* Ambient Neon Background Gradient Move */
+        .neon-bg {
+            position: fixed;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle at 50% 50%, rgba(0, 255, 204, 0.12), rgba(255, 0, 127, 0.08), rgba(3, 4, 8, 1) 70%);
+            animation: bgRotate 20s linear infinite;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        @keyframes bgRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         #canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
-        
-        .card {
-            position: relative; z-index: 2; width: 92%; max-width: 440px;
-            background: rgba(15, 18, 28, 0.75); backdrop-filter: blur(20px);
-            border: 1px solid rgba(0, 255, 204, 0.25); border-radius: 24px;
-            padding: 28px 24px; box-shadow: 0 0 35px rgba(0, 255, 204, 0.15); text-align: center;
-        }
-        
-        .brand-title { color: #00ffcc; text-transform: uppercase; letter-spacing: 3px; font-size: 24px; font-weight: 800; text-shadow: 0 0 12px rgba(0, 255, 204, 0.6); }
-        .sub-title { font-size: 11px; color: #7a829e; letter-spacing: 1px; margin-bottom: 18px; }
-        
-        .balance-box { background: rgba(0, 255, 204, 0.04); border: 1px dashed rgba(0, 255, 204, 0.4); border-radius: 14px; padding: 10px; margin-bottom: 18px; }
-        .balance-val { font-size: 22px; font-weight: bold; color: #00ffcc; }
 
-        /* Method Tabs */
-        .method-group { display: flex; gap: 10px; margin-bottom: 16px; }
+        /* Liquid Glass Container Card */
+        .glass-card {
+            position: relative; z-index: 2; width: 90%; max-width: 420px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border-radius: 28px;
+            border: 1px solid var(--glass-border);
+            padding: 28px 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 30px var(--glass-shadow), inset 0 0 15px rgba(255,255,255,0.05);
+            text-align: center;
+            transform-style: preserve-3d;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s;
+            will-change: transform;
+            touch-action: none; /* Disable native scroll when dragging card */
+        }
+
+        /* Specular Light Reflection Follower */
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 28px;
+            background: radial-gradient(circle at var(--pointer-x, 50%) var(--pointer-y, 50%), rgba(255, 255, 255, 0.25) 0%, rgba(0, 255, 204, 0.05) 40%, transparent 70%);
+            pointer-events: none;
+            mix-blend-mode: overlay;
+        }
+
+        .brand-title {
+            color: var(--primary-neon);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-size: 26px;
+            font-weight: 900;
+            text-shadow: 0 0 15px rgba(0, 255, 204, 0.6);
+            transform: translateZ(20px);
+        }
+
+        .sub-title { font-size: 11px; color: #8a8a9e; letter-spacing: 1.5px; margin-bottom: 20px; transform: translateZ(15px); }
+
+        .balance-box {
+            background: rgba(0, 255, 204, 0.03);
+            border: 1px dashed rgba(0, 255, 204, 0.35);
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 18px;
+            backdrop-filter: blur(10px);
+            transform: translateZ(15px);
+        }
+
+        .balance-val { font-size: 24px; font-weight: bold; color: var(--primary-neon); text-shadow: 0 0 10px rgba(0,255,204,0.4); }
+
+        /* Liquid Tabs */
+        .method-group { display: flex; gap: 10px; margin-bottom: 18px; transform: translateZ(15px); }
         .method-btn {
-            flex: 1; padding: 10px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
-            background: rgba(255,255,255,0.03); color: #aaa; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.3s;
+            flex: 1; padding: 12px; border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.02);
+            color: #aaa; font-size: 13px; font-weight: 700; cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(5px);
         }
-        .method-btn.active { background: rgba(0, 255, 204, 0.15); border-color: #00ffcc; color: #00ffcc; box-shadow: 0 0 10px rgba(0, 255, 204, 0.2); }
 
-        /* Input Amount */
-        .input-box { margin-bottom: 16px; text-align: left; }
-        .input-box label { font-size: 12px; color: #8a8a9e; display: block; margin-bottom: 6px; }
+        .method-btn.active {
+            background: rgba(0, 255, 204, 0.12);
+            border-color: var(--primary-neon);
+            color: var(--primary-neon);
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.25), inset 0 0 10px rgba(0, 255, 204, 0.1);
+        }
+
+        /* Glow Input */
+        .input-box { margin-bottom: 18px; text-align: left; transform: translateZ(15px); }
+        .input-box label { font-size: 12px; color: #8a8a9e; display: block; margin-bottom: 6px; margin-left: 4px; }
         .input-box input {
-            width: 100%; padding: 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(0, 255, 204, 0.3);
-            border-radius: 10px; color: #fff; font-size: 15px; outline: none; transition: 0.3s;
+            width: 100%; padding: 14px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 255, 204, 0.25);
+            border-radius: 14px; color: #fff; font-size: 16px; outline: none;
+            transition: all 0.3s;
         }
-        .input-box input:focus { border-color: #00ffcc; box-shadow: 0 0 8px rgba(0, 255, 204, 0.4); }
 
-        /* Action Button */
+        .input-box input:focus {
+            border-color: var(--primary-neon);
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+        }
+
+        /* Reactive Metallic Button */
         .btn-action {
-            width: 100%; padding: 13px; background: linear-gradient(135deg, #00ffcc, #0088cc);
-            border: none; border-radius: 10px; color: #000; font-weight: 800; font-size: 14px;
-            cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; margin-bottom: 16px;
+            width: 100%; padding: 15px;
+            background: linear-gradient(135deg, var(--primary-neon), #0099ff);
+            border: none; border-radius: 14px;
+            color: #030408; font-weight: 900; font-size: 15px;
+            cursor: pointer; text-transform: uppercase; letter-spacing: 1.5px;
+            transition: all 0.3s; margin-bottom: 18px;
+            box-shadow: 0 5px 20px rgba(0, 255, 204, 0.3);
+            transform: translateZ(20px);
         }
-        .btn-action:hover { opacity: 0.9; box-shadow: 0 0 15px rgba(0, 255, 204, 0.5); }
 
-        /* Custom QR Display Box */
+        .btn-action:active { transform: translateZ(10px) scale(0.98); }
+
+        /* Liquid Glass QR Container */
         .qr-wrapper {
             position: relative; width: 210px; height: 210px; margin: 0 auto 15px;
-            background: #fff; padding: 10px; border-radius: 16px; display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 0 20px rgba(0, 255, 204, 0.25); overflow: hidden; opacity: 0; transform: scale(0.8); transition: 0.5s ease;
+            background: #ffffff; padding: 10px; border-radius: 20px;
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 0 25px rgba(0, 255, 204, 0.3);
+            overflow: hidden; opacity: 0; transform: translateZ(25px) scale(0.8);
+            transition: opacity 0.5s, transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .qr-wrapper.show { opacity: 1; transform: scale(1); }
+
+        .qr-wrapper.show { opacity: 1; transform: translateZ(25px) scale(1); }
         .qr-wrapper img { width: 100%; height: 100%; object-fit: contain; }
         
-        /* Custom Brand Badge over QR */
         .brand-badge {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: #060709; color: #00ffcc; padding: 4px 8px; border-radius: 6px;
-            font-size: 10px; font-weight: 900; border: 1px solid #00ffcc; box-shadow: 0 0 8px #000;
+            background: #030408; color: var(--primary-neon); padding: 5px 10px; border-radius: 8px;
+            font-size: 10px; font-weight: 900; border: 1px solid var(--primary-neon);
+            box-shadow: 0 0 12px #000; letter-spacing: 1px;
         }
 
-        .info-text { font-size: 12px; color: #8a8a9e; line-height: 1.5; }
-        .highlight { color: #00ffcc; font-weight: bold; }
+        .info-text { font-size: 12px; color: #8a8a9e; line-height: 1.6; transform: translateZ(10px); }
+        .highlight { color: var(--primary-neon); font-weight: bold; text-shadow: 0 0 8px rgba(0,255,204,0.5); }
 
-        /* Modal Pop-up Thẻ cào */
+        /* Liquid Glass Modal */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px); z-index: 10;
-            display: none; justify-content: center; align-items: center;
+            background: rgba(3, 4, 8, 0.6); backdrop-filter: blur(20px);
+            z-index: 10; display: none; justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 0.3s;
         }
+
+        .modal-overlay.show { opacity: 1; }
+
         .modal-content {
-            background: #0f121c; border: 1px solid #00ffcc; border-radius: 20px;
-            padding: 24px; width: 90%; max-width: 380px; position: relative; box-shadow: 0 0 25px rgba(0,255,204,0.3);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px; padding: 28px; width: 90%; max-width: 380px;
+            position: relative; box-shadow: 0 0 35px rgba(0, 255, 204, 0.2);
+            backdrop-filter: blur(25px);
+            transform: scale(0.8); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .close-btn { position: absolute; top: 12px; right: 16px; color: #aaa; font-size: 20px; cursor: pointer; }
-        .close-btn:hover { color: #fff; }
-        .card-select { width: 100%; padding: 10px; background: #060709; border: 1px solid rgba(0, 255, 204, 0.3); border-radius: 8px; color: #fff; margin-bottom: 12px; }
+
+        .modal-overlay.show .modal-content { transform: scale(1); }
+        .close-btn { position: absolute; top: 16px; right: 20px; color: #aaa; font-size: 22px; cursor: pointer; }
+        .card-select { width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid rgba(0,255,204,0.3); border-radius: 12px; color: #fff; margin-bottom: 14px; outline: none; }
     </style>
 </head>
 <body>
+    <div class="neon-bg"></div>
     <canvas id="canvas"></canvas>
 
-    <div class="card">
+    <!-- Liquid Glass Interactive Card -->
+    <div class="glass-card" id="glassCard">
         <div class="brand-title">DIGITALSMOD</div>
         <div class="sub-title">CỔNG THANH TOÁN TỰ ĐỘNG</div>
 
@@ -93,21 +205,18 @@
             <div class="balance-val" id="userBalance">0 VNĐ</div>
         </div>
 
-        <!-- Chọn phương thức -->
         <div class="method-group">
             <button class="method-btn active" id="btnMethodQr" onclick="switchMethod('qr')">Quét Mã QR</button>
             <button class="method-btn" id="btnMethodCard" onclick="openCardModal()">Thẻ Cào</button>
         </div>
 
-        <!-- Nhập số tiền -->
         <div class="input-box" id="amountBox">
-            <label>Nhập số tiền cần nạp (VNĐ):</label>
+            <label>Nhập số tiền nạp (VNĐ):</label>
             <input type="number" id="inputAmount" value="50000" min="10000" step="10000">
         </div>
 
         <button class="btn-action" onclick="generateQR()">Tạo Mã Thanh Toán</button>
 
-        <!-- Khung QR hiển thị logo DigitalsMod -->
         <div class="qr-wrapper" id="qrWrapper">
             <img id="qrImage" src="" alt="VietQR">
             <div class="brand-badge">DIGITALSMOD</div>
@@ -119,11 +228,11 @@
         </div>
     </div>
 
-    <!-- Pop-up Thẻ Cào -->
+    <!-- Liquid Glass Card Modal -->
     <div class="modal-overlay" id="cardModal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeCardModal()">&times;</span>
-            <h3 style="color:#00ffcc; margin-bottom:15px; font-size: 18px;">NẠP THẺ CÀO</h3>
+            <h3 style="color:var(--primary-neon); margin-bottom:18px; font-size: 20px;">NẠP THẺ CÀO</h3>
             <select class="card-select" id="cardType">
                 <option value="VIETTEL">Viettel</option>
                 <option value="VINAPHONE">Vinaphone</option>
@@ -140,17 +249,16 @@
     </div>
 
     <script>
-        // 1. Cấu hình hiệu ứng Hạt bụi tụ lại kết thành mã QR
+        // --- 1. PARTICLES & GATHERING EFFECT ---
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
         let isGathering = false;
-        let particles = Array.from({length: 120}, () => ({
+        let particles = Array.from({length: 100}, () => ({
             x: Math.random() * canvas.width,
             y: Math.random() * canvas.height,
-            origX: 0, origY: 0,
             size: Math.random() * 2 + 1,
             vx: (Math.random() - 0.5) * 1.2,
             vy: (Math.random() - 0.5) * 1.2,
@@ -170,14 +278,12 @@
                 ctx.fill();
 
                 if (isGathering) {
-                    // Xoay tròn và hút về tâm màn hình
                     p.angle += 0.08;
-                    const radius = Math.max(0, (p.dist || 200) - 4);
+                    const radius = Math.max(0, (p.dist || 200) - 5);
                     p.dist = radius;
                     p.x = centerX + Math.cos(p.angle) * radius;
                     p.y = centerY + Math.sin(p.angle) * radius;
                 } else {
-                    // Bay tự do lơ lửng
                     p.x += p.vx; p.y += p.vy;
                     if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
                     if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
@@ -187,7 +293,63 @@
         }
         drawParticles();
 
-        // 2. Xử lý Tạo Mã QR & Hiệu ứng
+        // --- 2. 3D TILT, DRAG & LIQUID REBOUND PHYSICS ---
+        const card = document.getElementById('glassCard');
+        let startX = 0, startY = 0;
+        let currentX = 0, currentY = 0;
+        let isDragging = false;
+
+        // Mouse Movement (PC)
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) return;
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            card.style.setProperty('--pointer-x', `${(x / rect.width) * 100}%`);
+            card.style.setProperty('--pointer-y', `${(y / rect.height) * 100}%`);
+
+            const rotateX = ((e.clientY - window.innerHeight / 2) / 20) * -1;
+            const rotateY = (e.clientX - window.innerWidth / 2) / 20;
+
+            card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        });
+
+        // Touch Swipe & Drag Physics (Mobile)
+        card.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            startX = e.touches[0].clientX - currentX;
+            startY = e.touches[0].clientY - currentY;
+            card.style.transition = 'none'; // Instant response when dragging
+        });
+
+        card.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            currentX = e.touches[0].clientX - startX;
+            currentY = e.touches[0].clientY - startY;
+
+            const rect = card.getBoundingClientRect();
+            const x = e.touches[0].clientX - rect.left;
+            const y = e.touches[0].clientY - rect.top;
+
+            card.style.setProperty('--pointer-x', `${(x / rect.width) * 100}%`);
+            card.style.setProperty('--pointer-y', `${(y / rect.height) * 100}%`);
+
+            const rotateX = (currentY / 10) * -1;
+            const rotateY = currentX / 10;
+
+            card.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        });
+
+        card.addEventListener('touchend', () => {
+            isDragging = false;
+            currentX = 0; currentY = 0;
+            // Spring Rebound Effect
+            card.style.transition = 'transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            card.style.transform = `translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg)`;
+        });
+
+        // --- 3. QR GENERATION LOGIC ---
         function generateQR() {
             const amount = document.getElementById('inputAmount').value || 0;
             const qrWrapper = document.getElementById('qrWrapper');
@@ -196,32 +358,38 @@
             qrWrapper.classList.remove('show');
             isGathering = true;
 
-            // Khởi tạo bán kính tụ hạt
             particles.forEach(p => {
                 const dx = p.x - window.innerWidth / 2;
                 const dy = p.y - window.innerHeight / 2;
                 p.dist = Math.sqrt(dx * dx + dy * dy);
             });
 
-            // Sử dụng API VietQR chuẩn Napas (loại bỏ logo SePay)
             const qrUrl = `https://img.vietqr.io/image/VietinBank-999939213333-compact2.png?amount=${amount}&addInfo=SEQR%20TKPDGS&accountName=DIGITALSMOD`;
 
             setTimeout(() => {
                 qrImage.src = qrUrl;
                 qrWrapper.classList.add('show');
                 isGathering = false;
-            }, 1200);
+            }, 1000);
         }
 
-        // 3. Quản lý Pop-up Thẻ Cào
+        // --- 4. MODAL CONTROL ---
         function openCardModal() {
-            document.getElementById('cardModal').style.display = 'flex';
+            const modal = document.getElementById('cardModal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('show'), 10);
         }
+
         function closeCardModal() {
-            document.getElementById('cardModal').style.display = 'none';
-            document.getElementById('btnMethodCard').classList.remove('active');
-            document.getElementById('btnMethodQr').classList.add('active');
+            const modal = document.getElementById('cardModal');
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.getElementById('btnMethodCard').classList.remove('active');
+                document.getElementById('btnMethodQr').classList.add('active');
+            }, 300);
         }
+
         function submitCard() {
             alert('Đã gửi thông tin thẻ cào lên hệ thống chờ duyệt!');
             closeCardModal();
@@ -234,7 +402,7 @@
             }
         }
 
-        // Tạo mã mặc định lần đầu
+        // Auto Initial Call
         generateQR();
     </script>
 </body>
