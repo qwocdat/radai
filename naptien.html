@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>DigitalsMod - Gate</title>
+    <title>DigitalsMod - Liquid Glass Gate</title>
     <style>
         :root {
             --primary-neon: #00ffcc;
@@ -27,7 +27,7 @@
             perspective: 1000px;
         }
 
-        /* Ambient Neon Background Gradient Move */
+        /* Background Gradient Xoay Ngầm */
         .neon-bg {
             position: fixed;
             top: -50%; left: -50%; width: 200%; height: 200%;
@@ -35,6 +35,7 @@
             animation: bgRotate 20s linear infinite;
             z-index: 0;
             pointer-events: none;
+            will-change: transform;
         }
 
         @keyframes bgRotate {
@@ -42,7 +43,13 @@
             100% { transform: rotate(360deg); }
         }
 
-        #canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+        /* Canvas hạt bụi bay phủ trên toàn màn hình & vượt lên trên giao diện */
+        #canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 99; /* Đặt Z-Index cao hơn card để hạt bay đè lên cả khung */
+            pointer-events: none;
+            will-change: transform;
+        }
 
         /* Liquid Glass Container Card */
         .glass-card {
@@ -58,7 +65,7 @@
             transform-style: preserve-3d;
             transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s;
             will-change: transform;
-            touch-action: none; /* Disable native scroll when dragging card */
+            touch-action: none;
         }
 
         /* Specular Light Reflection Follower */
@@ -152,6 +159,7 @@
             box-shadow: 0 0 25px rgba(0, 255, 204, 0.3);
             overflow: hidden; opacity: 0; transform: translateZ(25px) scale(0.8);
             transition: opacity 0.5s, transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            will-change: transform, opacity;
         }
 
         .qr-wrapper.show { opacity: 1; transform: translateZ(25px) scale(1); }
@@ -171,7 +179,7 @@
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(3, 4, 8, 0.6); backdrop-filter: blur(20px);
-            z-index: 10; display: none; justify-content: center; align-items: center;
+            z-index: 100; display: none; justify-content: center; align-items: center;
             opacity: 0; transition: opacity 0.3s;
         }
 
@@ -224,7 +232,7 @@
 
         <div class="info-text">
             Nội dung chuyển khoản:<br>
-            <span class="highlight">SEQR TKPDGS</span>
+            <span class="highlight">NAP DIGITALSMOD</span>
         </div>
     </div>
 
@@ -249,57 +257,72 @@
     </div>
 
     <script>
-        // --- 1. PARTICLES & GATHERING EFFECT ---
+        // --- 1. HIGH-PERFORMANCE HIGH-FPS PARTICLES ENGINE ---
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
 
         let isGathering = false;
-        let particles = Array.from({length: 100}, () => ({
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
-            size: Math.random() * 2 + 1,
-            vx: (Math.random() - 0.5) * 1.2,
-            vy: (Math.random() - 0.5) * 1.2,
-            angle: Math.random() * Math.PI * 2
+        const particleCount = 120;
+        let particles = Array.from({length: particleCount}, () => ({
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            size: Math.random() * 2 + 0.8,
+            vx: (Math.random() - 0.5) * 1.5,
+            vy: (Math.random() - 0.5) * 1.5,
+            angle: Math.random() * Math.PI * 2,
+            alpha: Math.random() * 0.6 + 0.4
         }));
 
-        function drawParticles() {
+        let lastTime = performance.now();
+
+        function drawParticles(currentTime) {
+            // Tính delta-time để chuyển động luôn mượt mà trên mọi màn hình Hz
+            const dt = Math.min((currentTime - lastTime) / 1000, 0.1);
+            lastTime = currentTime;
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#00ffcc';
 
-            const centerX = window.innerWidth / 2;
-            const centerY = window.innerHeight / 2;
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
 
-            particles.forEach(p => {
+            for (let i = 0; i < particleCount; i++) {
+                const p = particles[i];
+                ctx.fillStyle = `rgba(0, 255, 204, ${p.alpha})`;
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
                 ctx.fill();
 
                 if (isGathering) {
-                    p.angle += 0.08;
-                    const radius = Math.max(0, (p.dist || 200) - 5);
+                    p.angle += 4.0 * dt;
+                    const radius = Math.max(0, (p.dist || 250) - 200 * dt);
                     p.dist = radius;
                     p.x = centerX + Math.cos(p.angle) * radius;
                     p.y = centerY + Math.sin(p.angle) * radius;
                 } else {
-                    p.x += p.vx; p.y += p.vy;
+                    p.x += p.vx * 60 * dt;
+                    p.y += p.vy * 60 * dt;
+
                     if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
                     if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
                 }
-            });
+            }
             requestAnimationFrame(drawParticles);
         }
-        drawParticles();
+        requestAnimationFrame(drawParticles);
 
-        // --- 2. 3D TILT, DRAG & LIQUID REBOUND PHYSICS ---
+        // --- 2. 3D TILT, DRAG & REBOUND PHYSICS ---
         const card = document.getElementById('glassCard');
         let startX = 0, startY = 0;
         let currentX = 0, currentY = 0;
         let isDragging = false;
 
-        // Mouse Movement (PC)
         document.addEventListener('mousemove', (e) => {
             if (isDragging) return;
             const rect = card.getBoundingClientRect();
@@ -309,19 +332,18 @@
             card.style.setProperty('--pointer-x', `${(x / rect.width) * 100}%`);
             card.style.setProperty('--pointer-y', `${(y / rect.height) * 100}%`);
 
-            const rotateX = ((e.clientY - window.innerHeight / 2) / 20) * -1;
-            const rotateY = (e.clientX - window.innerWidth / 2) / 20;
+            const rotateX = ((e.clientY - window.innerHeight / 2) / 25) * -1;
+            const rotateY = (e.clientX - window.innerWidth / 2) / 25;
 
             card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
         });
 
-        // Touch Swipe & Drag Physics (Mobile)
         card.addEventListener('touchstart', (e) => {
             isDragging = true;
             startX = e.touches[0].clientX - currentX;
             startY = e.touches[0].clientY - currentY;
-            card.style.transition = 'none'; // Instant response when dragging
-        });
+            card.style.transition = 'none';
+        }, { passive: true });
 
         card.addEventListener('touchmove', (e) => {
             if (!isDragging) return;
@@ -335,21 +357,20 @@
             card.style.setProperty('--pointer-x', `${(x / rect.width) * 100}%`);
             card.style.setProperty('--pointer-y', `${(y / rect.height) * 100}%`);
 
-            const rotateX = (currentY / 10) * -1;
-            const rotateY = currentX / 10;
+            const rotateX = (currentY / 12) * -1;
+            const rotateY = currentX / 12;
 
             card.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-        });
+        }, { passive: true });
 
         card.addEventListener('touchend', () => {
             isDragging = false;
             currentX = 0; currentY = 0;
-            // Spring Rebound Effect
             card.style.transition = 'transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
             card.style.transform = `translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg)`;
         });
 
-        // --- 3. QR GENERATION LOGIC ---
+        // --- 3. QR GENERATION & PARTICLES ASSEMBLY ---
         function generateQR() {
             const amount = document.getElementById('inputAmount').value || 0;
             const qrWrapper = document.getElementById('qrWrapper');
@@ -364,7 +385,8 @@
                 p.dist = Math.sqrt(dx * dx + dy * dy);
             });
 
-            const qrUrl = `https://img.vietqr.io/image/VietinBank-999939213333-compact2.png?amount=${amount}&addInfo=SEQR%20TKPDGS&accountName=DIGITALSMOD`;
+            // Sử dụng mã QR kèm nội dung chuẩn: NAP DIGITALSMOD
+            const qrUrl = `https://img.vietqr.io/image/VietinBank-999939213333-compact2.png?amount=${amount}&addInfo=NAP%20DIGITALSMOD&accountName=DIGITALSMOD`;
 
             setTimeout(() => {
                 qrImage.src = qrUrl;
@@ -373,7 +395,24 @@
             }, 1000);
         }
 
-        // --- 4. MODAL CONTROL ---
+        // --- 4. INTEGRATED REALTIME WEBHOOK BALANCE FETCHING ---
+        const USERNAME = "DIGITALSMOD";
+
+        async function fetchBalance() {
+            try {
+                const res = await fetch(`https://digitalsmod.site/api/webhook?user=${USERNAME}`);
+                const data = await res.json();
+                if(data.status === 'success') {
+                    document.getElementById('userBalance').innerText = new Intl.NumberFormat('vi-VN').format(data.balance) + ' VNĐ';
+                }
+            } catch(e) {}
+        }
+
+        // Quét số dư tự động mỗi 3 giây
+        setInterval(fetchBalance, 3000);
+        fetchBalance();
+
+        // --- 5. MODAL CONTROL ---
         function openCardModal() {
             const modal = document.getElementById('cardModal');
             modal.style.display = 'flex';
@@ -402,7 +441,7 @@
             }
         }
 
-        // Auto Initial Call
+        // Tạo mã QR khởi chạy ban đầu
         generateQR();
     </script>
 </body>
