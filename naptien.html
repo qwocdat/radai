@@ -27,7 +27,6 @@
             perspective: 1000px;
         }
 
-        /* Background Gradient Xoay Ngầm */
         .neon-bg {
             position: fixed;
             top: -50%; left: -50%; width: 200%; height: 200%;
@@ -43,15 +42,22 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Canvas hạt bụi bay phủ trên toàn màn hình & vượt lên trên giao diện */
         #canvas {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 99; /* Đặt Z-Index cao hơn card để hạt bay đè lên cả khung */
+            z-index: 99;
             pointer-events: none;
             will-change: transform;
         }
 
-        /* Liquid Glass Container Card */
+        /* Lớp Phủ Bùng Sáng Màn Hình Khi Tụ Khí */
+        .flash-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(0, 255, 204, 0.8), rgba(255, 255, 255, 0.9), transparent);
+            z-index: 98; opacity: 0; pointer-events: none;
+            transition: opacity 0.4s ease-out;
+        }
+        .flash-overlay.active { opacity: 1; }
+
         .glass-card {
             position: relative; z-index: 2; width: 90%; max-width: 420px;
             background: var(--glass-bg);
@@ -68,7 +74,6 @@
             touch-action: none;
         }
 
-        /* Specular Light Reflection Follower */
         .glass-card::before {
             content: '';
             position: absolute;
@@ -103,7 +108,6 @@
 
         .balance-val { font-size: 24px; font-weight: bold; color: var(--primary-neon); text-shadow: 0 0 10px rgba(0,255,204,0.4); }
 
-        /* Liquid Tabs */
         .method-group { display: flex; gap: 10px; margin-bottom: 18px; transform: translateZ(15px); }
         .method-btn {
             flex: 1; padding: 12px; border-radius: 14px;
@@ -121,7 +125,6 @@
             box-shadow: 0 0 15px rgba(0, 255, 204, 0.25), inset 0 0 10px rgba(0, 255, 204, 0.1);
         }
 
-        /* Glow Input */
         .input-box { margin-bottom: 18px; text-align: left; transform: translateZ(15px); }
         .input-box label { font-size: 12px; color: #8a8a9e; display: block; margin-bottom: 6px; margin-left: 4px; }
         .input-box input {
@@ -137,7 +140,6 @@
             box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
         }
 
-        /* Reactive Metallic Button */
         .btn-action {
             width: 100%; padding: 15px;
             background: linear-gradient(135deg, var(--primary-neon), #0099ff);
@@ -149,33 +151,40 @@
             transform: translateZ(20px);
         }
 
-        .btn-action:active { transform: translateZ(10px) scale(0.98); }
+        .btn-download {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--primary-neon);
+            color: var(--primary-neon);
+            padding: 8px 16px; font-size: 12px; font-weight: bold;
+            border-radius: 10px; cursor: pointer; margin-top: 8px;
+            display: inline-block; transition: all 0.3s;
+        }
+        .btn-download:hover { background: var(--primary-neon); color: #000; }
 
-        /* Liquid Glass QR Container */
         .qr-wrapper {
-            position: relative; width: 210px; height: 210px; margin: 0 auto 15px;
+            position: relative; width: 210px; height: 210px; margin: 0 auto 10px;
             background: #ffffff; padding: 10px; border-radius: 20px;
-            display: flex; justify-content: center; align-items: center;
+            display: none; justify-content: center; align-items: center;
             box-shadow: 0 0 25px rgba(0, 255, 204, 0.3);
             overflow: hidden; opacity: 0; transform: translateZ(25px) scale(0.8);
             transition: opacity 0.5s, transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             will-change: transform, opacity;
         }
 
-        .qr-wrapper.show { opacity: 1; transform: translateZ(25px) scale(1); }
+        .qr-wrapper.show { display: flex; opacity: 1; transform: translateZ(25px) scale(1); }
         .qr-wrapper img { width: 100%; height: 100%; object-fit: contain; }
         
+        /* Logo Thu Nhỏ Chuẩn */
         .brand-badge {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: #030408; color: var(--primary-neon); padding: 5px 10px; border-radius: 8px;
-            font-size: 10px; font-weight: 900; border: 1px solid var(--primary-neon);
-            box-shadow: 0 0 12px #000; letter-spacing: 1px;
+            background: #030408; color: var(--primary-neon); padding: 2px 6px; border-radius: 4px;
+            font-size: 8px; font-weight: 900; border: 1px solid var(--primary-neon);
+            box-shadow: 0 0 8px #000; letter-spacing: 0.5px;
         }
 
         .info-text { font-size: 12px; color: #8a8a9e; line-height: 1.6; transform: translateZ(10px); }
         .highlight { color: var(--primary-neon); font-weight: bold; text-shadow: 0 0 8px rgba(0,255,204,0.5); }
 
-        /* Liquid Glass Modal */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(3, 4, 8, 0.6); backdrop-filter: blur(20px);
@@ -201,15 +210,15 @@
 </head>
 <body>
     <div class="neon-bg"></div>
+    <div class="flash-overlay" id="flashOverlay"></div>
     <canvas id="canvas"></canvas>
 
-    <!-- Liquid Glass Interactive Card -->
     <div class="glass-card" id="glassCard">
         <div class="brand-title">DIGITALSMOD</div>
         <div class="sub-title">CỔNG THANH TOÁN TỰ ĐỘNG</div>
 
         <div class="balance-box">
-            <div style="font-size: 11px; color: #8a8a9e;">SỐ DƯ HIỆN TẠI</div>
+            <div style="font-size: 11px; color: #8a8a9e;">TÀI KHOẢN: <span id="displayUser" style="color:#fff; font-weight:bold;">...</span></div>
             <div class="balance-val" id="userBalance">0 VNĐ</div>
         </div>
 
@@ -229,10 +238,11 @@
             <img id="qrImage" src="" alt="VietQR">
             <div class="brand-badge">DIGITALSMOD</div>
         </div>
+        <button class="btn-download" id="dlBtn" style="display:none;" onclick="downloadQR()">Tải Mã QR Về Máy</button>
 
-        <div class="info-text">
+        <div class="info-text" style="margin-top:10px;">
             Nội dung chuyển khoản:<br>
-            <span class="highlight">NAP DIGITALSMOD</span>
+            <span class="highlight" id="transferContent">NAP ...</span>
         </div>
     </div>
 
@@ -257,9 +267,18 @@
     </div>
 
     <script>
-        // --- 1. HIGH-PERFORMANCE HIGH-FPS PARTICLES ENGINE ---
+        // --- 1. LẤY TÀI KHOẢN TỪ INDEX & KHỞI TẠO NỘI DUNG ---
+        const urlParams = new URLSearchParams(window.location.search);
+        let currentUser = urlParams.get('user') || localStorage.getItem('DGS_USERNAME') || 'DIGITALSMOD';
+        currentUser = currentUser.toUpperCase().trim();
+        
+        document.getElementById('displayUser').innerText = currentUser;
+        const transferContentText = `NAP ${currentUser}`;
+        document.getElementById('transferContent').innerText = transferContentText;
+
+        // --- 2. PARTICLES ENGINE ("TU KHÍ LUYỆN ĐAN" EFFECT) ---
         const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { alpha: true });
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
@@ -269,7 +288,7 @@
         window.addEventListener('resize', resizeCanvas);
 
         let isGathering = false;
-        const particleCount = 120;
+        const particleCount = 150;
         let particles = Array.from({length: particleCount}, () => ({
             x: Math.random() * window.innerWidth,
             y: Math.random() * window.innerHeight,
@@ -277,38 +296,38 @@
             vx: (Math.random() - 0.5) * 1.5,
             vy: (Math.random() - 0.5) * 1.5,
             angle: Math.random() * Math.PI * 2,
-            alpha: Math.random() * 0.6 + 0.4
+            alpha: Math.random() * 0.6 + 0.4,
+            dist: 0
         }));
 
         let lastTime = performance.now();
 
         function drawParticles(currentTime) {
-            // Tính delta-time để chuyển động luôn mượt mà trên mọi màn hình Hz
             const dt = Math.min((currentTime - lastTime) / 1000, 0.1);
             lastTime = currentTime;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
 
             for (let i = 0; i < particleCount; i++) {
                 const p = particles[i];
-                ctx.fillStyle = `rgba(0, 255, 204, ${p.alpha})`;
+                
+                // Đổi màu hạt khi gom khí
+                ctx.fillStyle = isGathering ? `rgba(255, 255, 200, ${p.alpha})` : `rgba(0, 255, 204, ${p.alpha})`;
                 ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.arc(p.x, p.y, isGathering ? p.size * 1.5 : p.size, 0, Math.PI * 2);
                 ctx.fill();
 
                 if (isGathering) {
-                    p.angle += 4.0 * dt;
-                    const radius = Math.max(0, (p.dist || 250) - 200 * dt);
-                    p.dist = radius;
-                    p.x = centerX + Math.cos(p.angle) * radius;
-                    p.y = centerY + Math.sin(p.angle) * radius;
+                    // Xoay bão xoáy tăng tốc gom về tâm
+                    p.angle += 12.0 * dt;
+                    p.dist = Math.max(0, p.dist - 400 * dt);
+                    p.x = centerX + Math.cos(p.angle) * p.dist;
+                    p.y = centerY + Math.sin(p.angle) * p.dist;
                 } else {
                     p.x += p.vx * 60 * dt;
                     p.y += p.vy * 60 * dt;
-
                     if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
                     if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
                 }
@@ -317,24 +336,18 @@
         }
         requestAnimationFrame(drawParticles);
 
-        // --- 2. 3D TILT, DRAG & REBOUND PHYSICS ---
+        // --- 3. 3D TILT & PHYSICAL DRAG ---
         const card = document.getElementById('glassCard');
-        let startX = 0, startY = 0;
-        let currentX = 0, currentY = 0;
-        let isDragging = false;
+        let startX = 0, startY = 0, currentX = 0, currentY = 0, isDragging = false;
 
         document.addEventListener('mousemove', (e) => {
             if (isDragging) return;
             const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            card.style.setProperty('--pointer-x', `${(x / rect.width) * 100}%`);
-            card.style.setProperty('--pointer-y', `${(y / rect.height) * 100}%`);
+            card.style.setProperty('--pointer-x', `${((e.clientX - rect.left) / rect.width) * 100}%`);
+            card.style.setProperty('--pointer-y', `${((e.clientY - rect.top) / rect.height) * 100}%`);
 
             const rotateX = ((e.clientY - window.innerHeight / 2) / 25) * -1;
             const rotateY = (e.clientX - window.innerWidth / 2) / 25;
-
             card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
         });
 
@@ -351,16 +364,10 @@
             currentY = e.touches[0].clientY - startY;
 
             const rect = card.getBoundingClientRect();
-            const x = e.touches[0].clientX - rect.left;
-            const y = e.touches[0].clientY - rect.top;
+            card.style.setProperty('--pointer-x', `${((e.touches[0].clientX - rect.left) / rect.width) * 100}%`);
+            card.style.setProperty('--pointer-y', `${((e.touches[0].clientY - rect.top) / rect.height) * 100}%`);
 
-            card.style.setProperty('--pointer-x', `${(x / rect.width) * 100}%`);
-            card.style.setProperty('--pointer-y', `${(y / rect.height) * 100}%`);
-
-            const rotateX = (currentY / 12) * -1;
-            const rotateY = currentX / 12;
-
-            card.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            card.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) rotateX(${(currentY / 12) * -1}deg) rotateY(${currentX / 12}deg)`;
         }, { passive: true });
 
         card.addEventListener('touchend', () => {
@@ -370,49 +377,67 @@
             card.style.transform = `translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg)`;
         });
 
-        // --- 3. QR GENERATION & PARTICLES ASSEMBLY ---
+        // --- 4. TẠO MÃ QR VỚI HIỆU ỨNG LUYỆN ĐAN & FLASH BÙNG SÁNG ---
+        let currentQRUrl = "";
+
         function generateQR() {
             const amount = document.getElementById('inputAmount').value || 0;
             const qrWrapper = document.getElementById('qrWrapper');
             const qrImage = document.getElementById('qrImage');
+            const flash = document.getElementById('flashOverlay');
+            const dlBtn = document.getElementById('dlBtn');
 
             qrWrapper.classList.remove('show');
-            isGathering = true;
+            dlBtn.style.display = 'none';
 
+            // Kích hoạt tụ khí
+            isGathering = true;
             particles.forEach(p => {
                 const dx = p.x - window.innerWidth / 2;
                 const dy = p.y - window.innerHeight / 2;
                 p.dist = Math.sqrt(dx * dx + dy * dy);
             });
 
-            // Sử dụng mã QR kèm nội dung chuẩn: NAP DIGITALSMOD
-            const qrUrl = `https://img.vietqr.io/image/VietinBank-999939213333-compact2.png?amount=${amount}&addInfo=NAP%20DIGITALSMOD&accountName=DIGITALSMOD`;
+            currentQRUrl = `https://img.vietqr.io/image/VietinBank-999939213333-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(transferContentText)}&accountName=DIGITALSMOD`;
 
+            // Bùng sáng màn hình khi tụ khí xong
             setTimeout(() => {
-                qrImage.src = qrUrl;
-                qrWrapper.classList.add('show');
-                isGathering = false;
-            }, 1000);
+                flash.classList.add('active');
+                
+                setTimeout(() => {
+                    qrImage.src = currentQRUrl;
+                    qrWrapper.classList.add('show');
+                    dlBtn.style.display = 'inline-block';
+                    flash.classList.remove('active');
+                    isGathering = false;
+                }, 300);
+            }, 800);
         }
 
-        // --- 4. INTEGRATED REALTIME WEBHOOK BALANCE FETCHING ---
-        const USERNAME = "DIGITALSMOD";
+        function downloadQR() {
+            if(!currentQRUrl) return;
+            const a = document.createElement('a');
+            a.href = currentQRUrl;
+            a.download = `VietQR_${currentUser}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
 
+        // --- 5. WEBHOOK REALTIME SYNC ---
         async function fetchBalance() {
             try {
-                const res = await fetch(`https://digitalsmod.site/api/webhook?user=${USERNAME}`);
+                const res = await fetch(`https://digitalsmod.site/api/webhook?user=${currentUser}`);
                 const data = await res.json();
                 if(data.status === 'success') {
                     document.getElementById('userBalance').innerText = new Intl.NumberFormat('vi-VN').format(data.balance) + ' VNĐ';
                 }
             } catch(e) {}
         }
-
-        // Quét số dư tự động mỗi 3 giây
         setInterval(fetchBalance, 3000);
         fetchBalance();
 
-        // --- 5. MODAL CONTROL ---
+        // --- 6. MODAL CONTROL ---
         function openCardModal() {
             const modal = document.getElementById('cardModal');
             modal.style.display = 'flex';
@@ -440,9 +465,6 @@
                 document.getElementById('btnMethodCard').classList.remove('active');
             }
         }
-
-        // Tạo mã QR khởi chạy ban đầu
-        generateQR();
     </script>
 </body>
 </html>
