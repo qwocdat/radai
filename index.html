@@ -362,41 +362,6 @@
         </div>
     </div>
 
-    <!-- DEPOSIT MODAL -->
-    <div id="modal-deposit" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden">
-        <div class="glass-modal border border-slate-800 rounded-2xl max-w-md w-full p-5 sm:p-6 space-y-5">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="text-lg font-bold text-white"><i class="fa-solid fa-circle-dollar-to-slot text-green-500 mr-2"></i>Nạp Tiền Vào Tài Khoản</h3>
-                <button onclick="closeModal('modal-deposit')" class="text-slate-400 hover:text-white text-xl">&times;</button>
-            </div>
-            <form onsubmit="submitDeposit(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Phương thức</label>
-                    <select class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:border-orange-500 focus:outline-none">
-                        <option value="VietinBank">Chuyển Khoản Ngân Hàng QR (VietinBank)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Số tiền (VNĐ)</label>
-                    <input type="number" id="dep-amount" min="10000" step="10000" placeholder="VD: 50000" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:border-orange-500 focus:outline-none">
-                </div>
-                <button type="submit" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl transition text-sm">
-                    Tạo Mã QR Chuyển Khoản
-                </button>
-            </form>
-            <div id="deposit-qr-result" class="hidden space-y-3 pt-3 border-t border-slate-800 text-center">
-                <p class="text-xs text-amber-400 font-semibold">Quét mã QR để hoàn tất thanh toán:</p>
-                <img id="qr-img" src="" alt="VietQR" class="mx-auto rounded-xl max-w-[200px] border border-slate-700 shadow-lg">
-                <div class="text-xs text-slate-300 space-y-1 bg-slate-900/80 p-3 rounded-xl text-left font-mono">
-                    <p>Ngân hàng: <span id="qr-bank" class="text-blue-400 font-bold"></span></p>
-                    <p>Số tài khoản: <span id="qr-acc" class="text-green-400 font-bold"></span></p>
-                    <p>Chủ tài khoản: <span id="qr-name" class="text-white font-bold"></span></p>
-                    <p>Nội dung CK: <span id="qr-memo" class="text-yellow-400 font-bold select-all"></span></p>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- DEPOSIT HISTORY MODAL -->
     <div id="modal-deposit-history" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden">
         <div class="glass-modal border border-slate-800 rounded-2xl max-w-4xl w-full p-4 sm:p-6 space-y-4">
@@ -474,6 +439,22 @@
         const FIREBASE_PROJECT_ID = "quocdat-396fe";
         const BASE_URL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
 
+        // HÀM CHUYỂN SANG TRANG NAPTIEN.HTML (CÓ ĐỒNG BỘ DỮ LIỆU TÀI KHOẢN)
+        function goToNapTien() {
+            if (!currentUser) {
+                showToast('Vui lòng đăng nhập trước khi nạp!', 'error');
+                openModal('modal-login');
+                return;
+            }
+            // Lưu dữ liệu vào các key để naptien.html đọc
+            const uname = currentUser.username || currentUser.email || 'DIGITALSMOD';
+            localStorage.setItem('user', uname);
+            localStorage.setItem('username', uname);
+            localStorage.setItem('DGS_USERNAME', uname);
+            
+            window.location.href = `naptien.html?user=${encodeURIComponent(uname)}`;
+        }
+
         // TỰ ĐỘNG ẨN MÀN HÌNH LOADING KHI FIREBASE TẢI XONG 100%
         function hidePreloader() {
             const preloader = document.getElementById('preloader');
@@ -530,7 +511,7 @@
             if (currentUser) {
                 container.innerHTML = `
                     <div class="flex items-center gap-2 sm:gap-3">
-                        <div onclick="openModal('modal-deposit')" class="cursor-pointer bg-amber-950/60 hover:bg-amber-900/60 border border-amber-800/50 text-amber-300 px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 shadow-inner transition">
+                        <div onclick="goToNapTien()" class="cursor-pointer bg-amber-950/60 hover:bg-amber-900/60 border border-amber-800/50 text-amber-300 px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 shadow-inner transition">
                             <i class="fa-solid fa-wallet text-amber-400"></i>
                             <span id="user-balance-val">${Number(currentUser.balance || 0).toLocaleString('vi-VN')}</span> <span class="text-[10px] sm:text-xs">đ</span>
                             <i class="fa-solid fa-plus-circle text-[10px] sm:text-xs text-amber-400"></i>
@@ -546,7 +527,7 @@
                                     <p class="text-[10px] sm:text-xs text-slate-400">Tài khoản</p>
                                     <p class="text-xs sm:text-sm font-bold text-white truncate">${escapeHtml(currentUser.email || '')}</p>
                                 </div>
-                                <button onclick="openModal('modal-deposit')" class="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-green-400 hover:bg-slate-800 flex items-center gap-2 font-semibold">
+                                <button onclick="goToNapTien()" class="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-green-400 hover:bg-slate-800 flex items-center gap-2 font-semibold">
                                     <i class="fa-solid fa-circle-dollar-to-slot"></i> Nạp tiền
                                 </button>
                                 <button onclick="openDepositHistory()" class="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-amber-400 hover:bg-slate-800 flex items-center gap-2 font-semibold">
@@ -850,7 +831,6 @@
             }
         }
 
-        // HÀM LẤY RESPONSE HCAPTCHA TỪ ĐÚNG CONTAINER
         function getHCaptchaToken(containerId) {
             if (!window.hcaptcha) return null;
             const container = document.getElementById(containerId);
@@ -866,7 +846,6 @@
         async function submitLogin(e) {
             e.preventDefault();
             
-            // XÁC MINH HCAPTCHA LOGIN
             const hcaptchaVal = getHCaptchaToken('hcaptcha-login');
             if (!hcaptchaVal) {
                 showToast('Vui lòng hoàn thành xác minh hCaptcha!', 'error');
@@ -891,10 +870,17 @@
 
                 if (matched) {
                     if (is90Days) {
-                        matched.expire_at = Date.now() + (90 * 24 * 60 * 60 * 1000); // Lưu 90 ngày
+                        matched.expire_at = Date.now() + (90 * 24 * 60 * 60 * 1000);
                     }
                     currentUser = matched;
                     localStorage.setItem('ds_user', JSON.stringify(matched));
+                    
+                    // Lưu luôn cho naptien.html đọc
+                    const uname = matched.username || matched.email || 'DIGITALSMOD';
+                    localStorage.setItem('user', uname);
+                    localStorage.setItem('username', uname);
+                    localStorage.setItem('DGS_USERNAME', uname);
+
                     showToast('Đăng nhập thành công!', 'success');
                     closeModal('modal-login');
                     renderHeaderAuth();
@@ -912,7 +898,6 @@
         async function submitRegister(e) {
             e.preventDefault();
 
-            // XÁC MINH HCAPTCHA REGISTER
             const hcaptchaVal = getHCaptchaToken('hcaptcha-register');
             if (!hcaptchaVal) {
                 showToast('Vui lòng hoàn thành xác minh hCaptcha!', 'error');
@@ -962,52 +947,6 @@
             } catch (err) {
                 showToast('Đăng ký thất bại!', 'error');
                 hcaptcha.reset();
-            }
-        }
-
-        async function submitDeposit(e) {
-            e.preventDefault();
-            if (!currentUser) {
-                showToast('Vui lòng đăng nhập trước khi nạp!', 'error');
-                openModal('modal-login');
-                return;
-            }
-
-            const amount = parseFloat(document.getElementById('dep-amount').value);
-            const memo = "NAP" + Math.floor(1000 + Math.random() * 9000);
-            const bankId = "VietinBank";
-            const accountNo = "999939213333";
-            const accountName = "NGUYEN DAI QUOC DAT";
-            const qrUrl = `https://img.vietqr.io/image/${bankId}-${accountNo}-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(memo)}&accountName=${encodeURIComponent(accountName)}`;
-
-            let depositId = 'dep_' + Date.now();
-            try {
-                await fetch(`${BASE_URL}/deposits/${depositId}`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        fields: {
-                            id: { stringValue: depositId },
-                            user_id: { stringValue: currentUser.id },
-                            username: { stringValue: currentUser.username || 'Khách' },
-                            trans_id: { stringValue: memo },
-                            amount: { doubleValue: amount },
-                            payment_method: { stringValue: bankId },
-                            status: { stringValue: 'pending' },
-                            created_at: { stringValue: new Date().toISOString() }
-                        }
-                    })
-                });
-
-                document.getElementById('qr-img').src = qrUrl;
-                document.getElementById('qr-bank').innerText = bankId;
-                document.getElementById('qr-acc').innerText = accountNo;
-                document.getElementById('qr-name').innerText = accountName;
-                document.getElementById('qr-memo').innerText = memo;
-                document.getElementById('deposit-qr-result').classList.remove('hidden');
-                showToast('Đã tạo mã QR nạp tiền thành công!', 'success');
-            } catch (err) {
-                showToast('Lỗi khi tạo đơn nạp tiền trên hệ thống!', 'error');
             }
         }
 
@@ -1068,6 +1007,9 @@
 
         function handleLogout() {
             localStorage.removeItem('ds_user');
+            localStorage.removeItem('user');
+            localStorage.removeItem('username');
+            localStorage.removeItem('DGS_USERNAME');
             currentUser = null;
             renderHeaderAuth();
             showToast('Đã đăng xuất thành công!', 'info');
