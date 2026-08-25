@@ -52,6 +52,22 @@
             will-change: transform;
         }
 
+        /* Nút Về Trang Chủ */
+        .btn-home {
+            position: absolute; top: 18px; left: 20px;
+            background: rgba(0, 255, 204, 0.08);
+            border: 1px solid var(--primary-neon);
+            color: var(--primary-neon);
+            padding: 8px 14px; border-radius: 12px;
+            font-size: 12px; font-weight: bold;
+            cursor: pointer; text-decoration: none;
+            display: flex; items-center: center; gap: 6px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s; z-index: 10;
+            transform: translateZ(25px);
+        }
+        .btn-home:hover { background: var(--primary-neon); color: #000; box-shadow: 0 0 15px rgba(0,255,204,0.5); }
+
         .glass-card {
             position: relative; z-index: 2; width: 90%; max-width: 420px;
             background: var(--glass-bg);
@@ -86,6 +102,7 @@
             font-weight: 900;
             text-shadow: 0 0 15px rgba(0, 255, 204, 0.6);
             transform: translateZ(20px);
+            margin-top: 10px;
         }
 
         .sub-title { font-size: 11px; color: #8a8a9e; letter-spacing: 1.5px; margin-bottom: 20px; transform: translateZ(15px); }
@@ -154,14 +171,14 @@
             display: inline-block; transition: all 0.3s;
         }
 
-        /* Khung QR Phát Sáng Khi Tụ Khí Lấp Đầy */
+        /* Khung QR Phát Sáng Khi Tụ Khí Lấp Đầy & Flash Nổ Trắng */
         .qr-wrapper {
             position: relative; width: 210px; height: 210px; margin: 0 auto 10px;
             background: #ffffff; padding: 10px; border-radius: 20px;
             display: flex; justify-content: center; align-items: center;
             box-shadow: 0 0 25px rgba(0, 255, 204, 0.3);
             overflow: hidden; opacity: 0; transform: translateZ(25px) scale(0.8);
-            transition: opacity 0.4s, transform 0.4s, box-shadow 0.4s;
+            transition: opacity 0.4s, transform 0.4s, box-shadow 0.4s, background-color 0.4s;
             will-change: transform, opacity, box-shadow;
             visibility: hidden;
         }
@@ -171,7 +188,8 @@
         }
 
         .qr-wrapper.glow-super {
-            box-shadow: 0 0 50px #00ffcc, 0 0 100px #00ffcc, inset 0 0 20px #ffffff;
+            box-shadow: 0 0 60px #ffffff, 0 0 120px #00ffcc, inset 0 0 30px #ffffff;
+            background-color: #ffffff;
         }
 
         .qr-wrapper img { width: 100%; height: 100%; object-fit: contain; }
@@ -186,27 +204,43 @@
         .info-text { font-size: 12px; color: #8a8a9e; line-height: 1.6; transform: translateZ(10px); }
         .highlight { color: var(--primary-neon); font-weight: bold; text-shadow: 0 0 8px rgba(0,255,204,0.5); }
 
+        /* Liquid Glass Modal */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(3, 4, 8, 0.6); backdrop-filter: blur(20px);
+            background: rgba(3, 4, 8, 0.7); backdrop-filter: blur(20px);
             z-index: 100; display: none; justify-content: center; align-items: center;
             opacity: 0; transition: opacity 0.3s;
         }
 
-        .modal-overlay.show { opacity: 1; }
+        .modal-overlay.show { opacity: 1; display: flex; }
 
         .modal-content {
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid var(--glass-border);
             border-radius: 24px; padding: 28px; width: 90%; max-width: 380px;
             position: relative; box-shadow: 0 0 35px rgba(0, 255, 204, 0.2);
-            backdrop-filter: blur(25px);
+            backdrop-filter: blur(25px); text-align: center;
             transform: scale(0.8); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .modal-overlay.show .modal-content { transform: scale(1); }
         .close-btn { position: absolute; top: 16px; right: 20px; color: #aaa; font-size: 22px; cursor: pointer; }
         .card-select { width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid rgba(0,255,204,0.3); border-radius: 12px; color: #fff; margin-bottom: 14px; outline: none; }
+
+        /* Pop-up Nạp Tiền Thành Công Cyberpunk */
+        .success-icon-box {
+            width: 70px; height: 70px; margin: 0 auto 15px;
+            background: rgba(0, 255, 204, 0.1);
+            border: 2px solid var(--primary-neon);
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            font-size: 32px; color: var(--primary-neon);
+            box-shadow: 0 0 25px rgba(0, 255, 204, 0.5);
+            animation: pulseGlow 1.5s infinite ease-in-out;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 255, 204, 0.5); }
+            50% { transform: scale(1.08); box-shadow: 0 0 40px rgba(0, 255, 204, 0.9); }
+        }
     </style>
 </head>
 <body>
@@ -214,7 +248,11 @@
     <canvas id="canvas"></canvas>
 
     <div class="glass-card" id="glassCard">
-        <div class="brand-title">DIGITALSMOD</div>
+        <a href="index.html" class="btn-home">
+            &#8592; Trang Chủ
+        </a>
+
+        <div class="brand-title"> GATESMOD</div>
         <div class="sub-title">CỔNG THANH TOÁN TỰ ĐỘNG</div>
 
         <div class="balance-box">
@@ -246,7 +284,7 @@
         </div>
     </div>
 
-    <!-- Liquid Glass Card Modal -->
+    <!-- Liquid Glass Card Modal (Nạp Thẻ) -->
     <div class="modal-overlay" id="cardModal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeCardModal()">&times;</span>
@@ -266,10 +304,33 @@
         </div>
     </div>
 
+    <!-- POP-UP THÔNG BÁO CỘNG TIỀN THÀNH CÔNG REALTIME -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-content">
+            <div class="success-icon-box">&#10004;</div>
+            <h3 style="color:var(--primary-neon); font-size: 22px; font-weight: 900; margin-bottom: 8px;">NẠP TIỀN THÀNH CÔNG!</h3>
+            <p style="font-size: 13px; color: #8a8a9e; margin-bottom: 15px;">Hệ thống đã tự động ghi nhận giao dịch của bạn.</p>
+            
+            <div style="background: rgba(0, 255, 204, 0.05); border: 1px border-slate-700; border-radius: 14px; padding: 12px; margin-bottom: 20px; font-size: 14px;">
+                <p style="color: #aaa; font-size: 11px;">Số tiền cộng thêm:</p>
+                <p style="color: var(--primary-neon); font-size: 22px; font-weight: bold;" id="addedAmountText">+0 VNĐ</p>
+            </div>
+
+            <button class="btn-action" style="margin-bottom:0;" onclick="closeSuccessModal()">ĐÃ HIỂU & ĐÓNG</button>
+        </div>
+    </div>
+
     <script>
-        // --- 1. LẤY TÀI KHOẢN CHUẨN TỪ INDEX.HTML (LOCALSTORAGE/URL) ---
+        // --- 1. LẤY TÀI KHOẢN CHUẨN ĐỒNG BỘ VỚI INDEX.HTML ---
         const urlParams = new URLSearchParams(window.location.search);
+        
+        let storedUserObj = null;
+        try {
+            storedUserObj = JSON.parse(localStorage.getItem('ds_user'));
+        } catch(e) {}
+
         let currentUser = urlParams.get('user') || 
+                          (storedUserObj ? (storedUserObj.username || storedUserObj.email) : null) ||
                           localStorage.getItem('user') || 
                           localStorage.getItem('username') || 
                           localStorage.getItem('DGS_USERNAME') || 
@@ -280,7 +341,7 @@
         const transferContentText = `NAP ${currentUser}`;
         document.getElementById('transferContent').innerText = transferContentText;
 
-        // --- 2. CANVAS HIỆU ỨNG TỤ KHÍ LẤP ĐẦY Ô QR ---
+        // --- 2. CANVAS PARTICLES ENGINE (TỤ KHÍ BÙNG NỔ & KHÓI TRẮNG) ---
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d', { alpha: true });
 
@@ -292,7 +353,10 @@
         window.addEventListener('resize', resizeCanvas);
 
         let isGathering = false;
+        let isSmoking = false;
         const particleCount = 200;
+        const smokeCount = 30;
+
         let particles = Array.from({length: particleCount}, () => ({
             x: Math.random() * window.innerWidth,
             y: Math.random() * window.innerHeight,
@@ -303,6 +367,8 @@
             targetY: 0,
             alpha: Math.random() * 0.6 + 0.4
         }));
+
+        let smokeParticles = [];
 
         let lastTime = performance.now();
 
@@ -315,26 +381,24 @@
             const qrWrapper = document.getElementById('qrWrapper');
             const rect = qrWrapper.getBoundingClientRect();
 
+            // Vẽ các hạt bụi tụ khí / bay tự do
             for (let i = 0; i < particleCount; i++) {
                 const p = particles[i];
                 
-                ctx.fillStyle = isGathering ? `rgba(0, 255, 204, ${p.alpha})` : `rgba(0, 255, 204, ${p.alpha * 0.7})`;
+                ctx.fillStyle = isGathering ? `rgba(255, 255, 255, ${p.alpha})` : `rgba(0, 255, 204, ${p.alpha * 0.7})`;
                 ctx.beginPath();
-                ctx.arc(p.x, p.y, isGathering ? p.size * 1.4 : p.size, 0, Math.PI * 2);
+                ctx.arc(p.x, p.y, isGathering ? p.size * 1.6 : p.size, 0, Math.PI * 2);
                 ctx.fill();
 
                 if (isGathering) {
-                    // Tạo vị trí ngẫu nhiên lấp đầy bên trong ô QR
                     if (!p.targetX) {
                         p.targetX = rect.left + Math.random() * rect.width;
                         p.targetY = rect.top + Math.random() * rect.height;
                     }
-
-                    // Hạt bụi lao thẳng lấp đầy ô QR
                     const dx = p.targetX - p.x;
                     const dy = p.targetY - p.y;
-                    p.x += dx * 8 * dt;
-                    p.y += dy * 8 * dt;
+                    p.x += dx * 9 * dt;
+                    p.y += dy * 9 * dt;
                 } else {
                     p.targetX = 0; p.targetY = 0;
                     p.x += p.vx * 60 * dt;
@@ -344,11 +408,43 @@
                     if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
                 }
             }
+
+            // Hiệu ứng khói trắng bốc lên từ ô QR sau khi tạo xong mã
+            if (isSmoking) {
+                if (smokeParticles.length < smokeCount && Math.random() < 0.3) {
+                    smokeParticles.push({
+                        x: rect.left + Math.random() * rect.width,
+                        y: rect.bottom - Math.random() * 20,
+                        size: Math.random() * 6 + 4,
+                        vx: (Math.random() - 0.5) * 0.8,
+                        vy: -(Math.random() * 1.5 + 1),
+                        alpha: 0.6
+                    });
+                }
+
+                for (let j = smokeParticles.length - 1; j >= 0; j--) {
+                    const s = smokeParticles[j];
+                    ctx.fillStyle = `rgba(240, 240, 255, ${s.alpha})`;
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    s.x += s.vx * 60 * dt;
+                    s.y += s.vy * 60 * dt;
+                    s.size += 8 * dt;
+                    s.alpha -= 0.4 * dt;
+
+                    if (s.alpha <= 0) {
+                        smokeParticles.splice(j, 1);
+                    }
+                }
+            }
+
             requestAnimationFrame(drawParticles);
         }
         requestAnimationFrame(drawParticles);
 
-        // --- 3. TẢI MÃ QR VỚI HIỆU ỨNG LUYỆN ĐAN LẤP ĐẦY KHUNG ---
+        // --- 3. TẢI MÃ QR VỚI HIỆU ỨNG LUYỆN ĐAN NỔ TRẮNG & BỐC KHÓI ---
         let currentQRUrl = "";
 
         function generateQR() {
@@ -361,22 +457,27 @@
             dlBtn.style.display = 'none';
             qrWrapper.classList.add('show');
             qrWrapper.classList.remove('glow-super');
+            isSmoking = false;
 
-            // Bắt đầu tụ khí hạt bụi bay lấp đầy ô QR
+            // 1. Tụ khí lấp đầy ô QR
             isGathering = true;
             particles.forEach(p => { p.targetX = 0; p.targetY = 0; });
 
             currentQRUrl = `https://img.vietqr.io/image/VietinBank-999939213333-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(transferContentText)}&accountName=DIGITALSMOD`;
 
-            // Sau 800ms khi hạt lấp đầy ô -> Khung QR phát sáng cực mạnh -> Hiện hình mã QR
+            // 2. Sau 800ms khi hạt lấp đầy -> Nổ trắng phát sáng cực đại
             setTimeout(() => {
                 qrWrapper.classList.add('glow-super');
                 qrImage.src = currentQRUrl;
                 
+                // 3. Khói trắng bốc lên & Hiện hình ảnh QR
                 setTimeout(() => {
                     qrImage.style.opacity = '1';
                     dlBtn.style.display = 'inline-block';
                     isGathering = false;
+                    isSmoking = true;
+                    
+                    setTimeout(() => { isSmoking = false; }, 4000);
                 }, 300);
             }, 800);
         }
@@ -391,27 +492,97 @@
             document.body.removeChild(a);
         }
 
-        // --- 4. TÍCH HỢP FIREBASE REALTIME LISTENER ---
-        const firebaseConfig = {
-            apiKey: "AIzaSy...",
-            authDomain: "TÊN-PROJECT.firebaseapp.com",
-            databaseURL: "https://TÊN-PROJECT-CỦA-BẠN-default-rtdb.firebaseio.com",
-            projectId: "TÊN-PROJECT",
-            storageBucket: "TÊN-PROJECT.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:abcdef"
-        };
+        // --- 4. FIREBASE FIRESTORE REALTIME SYNC & POP-UP CỘNG TIỀN + TỰ ĐỘNG LƯU LỊCH SỬ ---
+        const FIREBASE_PROJECT_ID = "quocdat-396fe";
+        const BASE_URL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
 
-        try {
-            firebase.initializeApp(firebaseConfig);
-            const database = firebase.database();
+        let previousBalance = null; // Biến kiểm tra biến động số dư
 
-            // Lắng nghe biến động số dư Realtime theo tài khoản
-            database.ref(`users/${currentUser}/balance`).on('value', (snapshot) => {
-                const balance = snapshot.val() || 0;
-                document.getElementById('userBalance').innerText = new Intl.NumberFormat('vi-VN').format(balance) + ' VNĐ';
-            });
-        } catch(e) {}
+        function parseFirestoreFields(fields) {
+            let res = {};
+            for (let k in fields) {
+                let obj = fields[k];
+                if (obj.stringValue !== undefined) res[k] = obj.stringValue;
+                else if (obj.doubleValue !== undefined) res[k] = parseFloat(obj.doubleValue);
+                else if (obj.integerValue !== undefined) res[k] = parseInt(obj.integerValue);
+                else if (obj.booleanValue !== undefined) res[k] = obj.booleanValue;
+            }
+            return res;
+        }
+
+        // Tự động ghi nhận đơn nạp vào kho Deposits của index.html
+        async function saveDepositHistory(amount, currentUserId) {
+            let depositId = 'dep_' + Date.now();
+            let memo = "NAP" + Math.floor(1000 + Math.random() * 9000);
+            try {
+                await fetch(`${BASE_URL}/deposits/${depositId}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        fields: {
+                            id: { stringValue: depositId },
+                            user_id: { stringValue: currentUserId || 'usr_unknown' },
+                            username: { stringValue: currentUser },
+                            trans_id: { stringValue: memo },
+                            amount: { doubleValue: parseFloat(amount) },
+                            payment_method: { stringValue: 'VietinBank (Auto)' },
+                            status: { stringValue: 'success' },
+                            created_at: { stringValue: new Date().toISOString() }
+                        }
+                    })
+                });
+            } catch (err) {}
+        }
+
+        async function syncFirebaseBalance() {
+            try {
+                let res = await fetch(`${BASE_URL}/users?pageSize=300`);
+                if (res.ok) {
+                    let data = await res.json();
+                    (data.documents || []).forEach(doc => {
+                        let fields = parseFirestoreFields(doc.fields || {});
+                        if ((fields.username && fields.username.toUpperCase() === currentUser) || 
+                            (fields.email && fields.email.toUpperCase() === currentUser)) {
+                            
+                            const currentBalance = fields.balance || 0;
+                            document.getElementById('userBalance').innerText = new Intl.NumberFormat('vi-VN').format(currentBalance) + ' VNĐ';
+
+                            // Phát hiện số dư TĂNG LÊN -> Hiện Pop-up ngay và tự lưu Lịch sử!
+                            if (previousBalance !== null && currentBalance > previousBalance) {
+                                const addedAmount = currentBalance - previousBalance;
+                                showSuccessPopup(addedAmount);
+                                saveDepositHistory(addedAmount, fields.id || (storedUserObj ? storedUserObj.id : null));
+                            }
+
+                            previousBalance = currentBalance;
+                            
+                            // Cập nhật lại LocalStorage đồng bộ với index.html
+                            if(storedUserObj) {
+                                storedUserObj.balance = currentBalance;
+                                localStorage.setItem('ds_user', JSON.stringify(storedUserObj));
+                            }
+                        }
+                    });
+                }
+            } catch(e) {}
+        }
+
+        function showSuccessPopup(amount) {
+            document.getElementById('addedAmountText').innerText = '+' + new Intl.NumberFormat('vi-VN').format(amount) + ' VNĐ';
+            const modal = document.getElementById('successModal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('show'), 10);
+        }
+
+        function closeSuccessModal() {
+            const modal = document.getElementById('successModal');
+            modal.classList.remove('show');
+            setTimeout(() => { modal.style.display = 'none'; }, 300);
+        }
+
+        // Quét số dư tự động mỗi 2.5 giây
+        setInterval(syncFirebaseBalance, 2500);
+        syncFirebaseBalance();
 
         // --- 5. 3D TILT & PHYSICAL DRAG ---
         const card = document.getElementById('glassCard');
@@ -472,7 +643,7 @@
         }
 
         function submitCard() {
-            alert('Đã gửi thông tin thẻ cào!');
+            alert('Đã gửi thông tin thẻ cào lên hệ thống chờ duyệt!');
             closeCardModal();
         }
 
