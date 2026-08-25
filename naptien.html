@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>DigitalsMod - Liquid Glass Gate</title>
+    <!-- Firebase SDK Compat -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
         :root {
             --primary-neon: #00ffcc;
@@ -48,15 +51,6 @@
             pointer-events: none;
             will-change: transform;
         }
-
-        /* Lớp Phủ Bùng Sáng Màn Hình Khi Tụ Khí */
-        .flash-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 50%, rgba(0, 255, 204, 0.8), rgba(255, 255, 255, 0.9), transparent);
-            z-index: 98; opacity: 0; pointer-events: none;
-            transition: opacity 0.4s ease-out;
-        }
-        .flash-overlay.active { opacity: 1; }
 
         .glass-card {
             position: relative; z-index: 2; width: 90%; max-width: 420px;
@@ -159,22 +153,29 @@
             border-radius: 10px; cursor: pointer; margin-top: 8px;
             display: inline-block; transition: all 0.3s;
         }
-        .btn-download:hover { background: var(--primary-neon); color: #000; }
 
+        /* Khung QR Phát Sáng Khi Tụ Khí Lấp Đầy */
         .qr-wrapper {
             position: relative; width: 210px; height: 210px; margin: 0 auto 10px;
             background: #ffffff; padding: 10px; border-radius: 20px;
-            display: none; justify-content: center; align-items: center;
+            display: flex; justify-content: center; align-items: center;
             box-shadow: 0 0 25px rgba(0, 255, 204, 0.3);
             overflow: hidden; opacity: 0; transform: translateZ(25px) scale(0.8);
-            transition: opacity 0.5s, transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            will-change: transform, opacity;
+            transition: opacity 0.4s, transform 0.4s, box-shadow 0.4s;
+            will-change: transform, opacity, box-shadow;
+            visibility: hidden;
         }
 
-        .qr-wrapper.show { display: flex; opacity: 1; transform: translateZ(25px) scale(1); }
+        .qr-wrapper.show {
+            visibility: visible; opacity: 1; transform: translateZ(25px) scale(1);
+        }
+
+        .qr-wrapper.glow-super {
+            box-shadow: 0 0 50px #00ffcc, 0 0 100px #00ffcc, inset 0 0 20px #ffffff;
+        }
+
         .qr-wrapper img { width: 100%; height: 100%; object-fit: contain; }
         
-        /* Logo Thu Nhỏ Chuẩn */
         .brand-badge {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             background: #030408; color: var(--primary-neon); padding: 2px 6px; border-radius: 4px;
@@ -210,7 +211,6 @@
 </head>
 <body>
     <div class="neon-bg"></div>
-    <div class="flash-overlay" id="flashOverlay"></div>
     <canvas id="canvas"></canvas>
 
     <div class="glass-card" id="glassCard">
@@ -235,7 +235,7 @@
         <button class="btn-action" onclick="generateQR()">Tạo Mã Thanh Toán</button>
 
         <div class="qr-wrapper" id="qrWrapper">
-            <img id="qrImage" src="" alt="VietQR">
+            <img id="qrImage" src="" alt="VietQR" style="opacity: 0; transition: opacity 0.3s;">
             <div class="brand-badge">DIGITALSMOD</div>
         </div>
         <button class="btn-download" id="dlBtn" style="display:none;" onclick="downloadQR()">Tải Mã QR Về Máy</button>
@@ -267,16 +267,20 @@
     </div>
 
     <script>
-        // --- 1. LẤY TÀI KHOẢN TỪ INDEX & KHỞI TẠO NỘI DUNG ---
+        // --- 1. LẤY TÀI KHOẢN CHUẨN TỪ INDEX.HTML (LOCALSTORAGE/URL) ---
         const urlParams = new URLSearchParams(window.location.search);
-        let currentUser = urlParams.get('user') || localStorage.getItem('DGS_USERNAME') || 'DIGITALSMOD';
-        currentUser = currentUser.toUpperCase().trim();
+        let currentUser = urlParams.get('user') || 
+                          localStorage.getItem('user') || 
+                          localStorage.getItem('username') || 
+                          localStorage.getItem('DGS_USERNAME') || 
+                          'DIGITALSMOD';
         
+        currentUser = currentUser.toUpperCase().trim();
         document.getElementById('displayUser').innerText = currentUser;
         const transferContentText = `NAP ${currentUser}`;
         document.getElementById('transferContent').innerText = transferContentText;
 
-        // --- 2. PARTICLES ENGINE ("TU KHÍ LUYỆN ĐAN" EFFECT) ---
+        // --- 2. CANVAS HIỆU ỨNG TỤ KHÍ LẤP ĐẦY Ô QR ---
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d', { alpha: true });
 
@@ -288,16 +292,16 @@
         window.addEventListener('resize', resizeCanvas);
 
         let isGathering = false;
-        const particleCount = 150;
+        const particleCount = 200;
         let particles = Array.from({length: particleCount}, () => ({
             x: Math.random() * window.innerWidth,
             y: Math.random() * window.innerHeight,
-            size: Math.random() * 2 + 0.8,
+            size: Math.random() * 2 + 1,
             vx: (Math.random() - 0.5) * 1.5,
             vy: (Math.random() - 0.5) * 1.5,
-            angle: Math.random() * Math.PI * 2,
-            alpha: Math.random() * 0.6 + 0.4,
-            dist: 0
+            targetX: 0,
+            targetY: 0,
+            alpha: Math.random() * 0.6 + 0.4
         }));
 
         let lastTime = performance.now();
@@ -307,27 +311,35 @@
             lastTime = currentTime;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
+
+            const qrWrapper = document.getElementById('qrWrapper');
+            const rect = qrWrapper.getBoundingClientRect();
 
             for (let i = 0; i < particleCount; i++) {
                 const p = particles[i];
                 
-                // Đổi màu hạt khi gom khí
-                ctx.fillStyle = isGathering ? `rgba(255, 255, 200, ${p.alpha})` : `rgba(0, 255, 204, ${p.alpha})`;
+                ctx.fillStyle = isGathering ? `rgba(0, 255, 204, ${p.alpha})` : `rgba(0, 255, 204, ${p.alpha * 0.7})`;
                 ctx.beginPath();
-                ctx.arc(p.x, p.y, isGathering ? p.size * 1.5 : p.size, 0, Math.PI * 2);
+                ctx.arc(p.x, p.y, isGathering ? p.size * 1.4 : p.size, 0, Math.PI * 2);
                 ctx.fill();
 
                 if (isGathering) {
-                    // Xoay bão xoáy tăng tốc gom về tâm
-                    p.angle += 12.0 * dt;
-                    p.dist = Math.max(0, p.dist - 400 * dt);
-                    p.x = centerX + Math.cos(p.angle) * p.dist;
-                    p.y = centerY + Math.sin(p.angle) * p.dist;
+                    // Tạo vị trí ngẫu nhiên lấp đầy bên trong ô QR
+                    if (!p.targetX) {
+                        p.targetX = rect.left + Math.random() * rect.width;
+                        p.targetY = rect.top + Math.random() * rect.height;
+                    }
+
+                    // Hạt bụi lao thẳng lấp đầy ô QR
+                    const dx = p.targetX - p.x;
+                    const dy = p.targetY - p.y;
+                    p.x += dx * 8 * dt;
+                    p.y += dy * 8 * dt;
                 } else {
+                    p.targetX = 0; p.targetY = 0;
                     p.x += p.vx * 60 * dt;
                     p.y += p.vy * 60 * dt;
+
                     if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
                     if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
                 }
@@ -336,7 +348,72 @@
         }
         requestAnimationFrame(drawParticles);
 
-        // --- 3. 3D TILT & PHYSICAL DRAG ---
+        // --- 3. TẢI MÃ QR VỚI HIỆU ỨNG LUYỆN ĐAN LẤP ĐẦY KHUNG ---
+        let currentQRUrl = "";
+
+        function generateQR() {
+            const amount = document.getElementById('inputAmount').value || 0;
+            const qrWrapper = document.getElementById('qrWrapper');
+            const qrImage = document.getElementById('qrImage');
+            const dlBtn = document.getElementById('dlBtn');
+
+            qrImage.style.opacity = '0';
+            dlBtn.style.display = 'none';
+            qrWrapper.classList.add('show');
+            qrWrapper.classList.remove('glow-super');
+
+            // Bắt đầu tụ khí hạt bụi bay lấp đầy ô QR
+            isGathering = true;
+            particles.forEach(p => { p.targetX = 0; p.targetY = 0; });
+
+            currentQRUrl = `https://img.vietqr.io/image/VietinBank-999939213333-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(transferContentText)}&accountName=DIGITALSMOD`;
+
+            // Sau 800ms khi hạt lấp đầy ô -> Khung QR phát sáng cực mạnh -> Hiện hình mã QR
+            setTimeout(() => {
+                qrWrapper.classList.add('glow-super');
+                qrImage.src = currentQRUrl;
+                
+                setTimeout(() => {
+                    qrImage.style.opacity = '1';
+                    dlBtn.style.display = 'inline-block';
+                    isGathering = false;
+                }, 300);
+            }, 800);
+        }
+
+        function downloadQR() {
+            if(!currentQRUrl) return;
+            const a = document.createElement('a');
+            a.href = currentQRUrl;
+            a.download = `VietQR_${currentUser}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // --- 4. TÍCH HỢP FIREBASE REALTIME LISTENER ---
+        const firebaseConfig = {
+            apiKey: "AIzaSy...",
+            authDomain: "TÊN-PROJECT.firebaseapp.com",
+            databaseURL: "https://TÊN-PROJECT-CỦA-BẠN-default-rtdb.firebaseio.com",
+            projectId: "TÊN-PROJECT",
+            storageBucket: "TÊN-PROJECT.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef"
+        };
+
+        try {
+            firebase.initializeApp(firebaseConfig);
+            const database = firebase.database();
+
+            // Lắng nghe biến động số dư Realtime theo tài khoản
+            database.ref(`users/${currentUser}/balance`).on('value', (snapshot) => {
+                const balance = snapshot.val() || 0;
+                document.getElementById('userBalance').innerText = new Intl.NumberFormat('vi-VN').format(balance) + ' VNĐ';
+            });
+        } catch(e) {}
+
+        // --- 5. 3D TILT & PHYSICAL DRAG ---
         const card = document.getElementById('glassCard');
         let startX = 0, startY = 0, currentX = 0, currentY = 0, isDragging = false;
 
@@ -377,67 +454,7 @@
             card.style.transform = `translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg)`;
         });
 
-        // --- 4. TẠO MÃ QR VỚI HIỆU ỨNG LUYỆN ĐAN & FLASH BÙNG SÁNG ---
-        let currentQRUrl = "";
-
-        function generateQR() {
-            const amount = document.getElementById('inputAmount').value || 0;
-            const qrWrapper = document.getElementById('qrWrapper');
-            const qrImage = document.getElementById('qrImage');
-            const flash = document.getElementById('flashOverlay');
-            const dlBtn = document.getElementById('dlBtn');
-
-            qrWrapper.classList.remove('show');
-            dlBtn.style.display = 'none';
-
-            // Kích hoạt tụ khí
-            isGathering = true;
-            particles.forEach(p => {
-                const dx = p.x - window.innerWidth / 2;
-                const dy = p.y - window.innerHeight / 2;
-                p.dist = Math.sqrt(dx * dx + dy * dy);
-            });
-
-            currentQRUrl = `https://img.vietqr.io/image/VietinBank-999939213333-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(transferContentText)}&accountName=DIGITALSMOD`;
-
-            // Bùng sáng màn hình khi tụ khí xong
-            setTimeout(() => {
-                flash.classList.add('active');
-                
-                setTimeout(() => {
-                    qrImage.src = currentQRUrl;
-                    qrWrapper.classList.add('show');
-                    dlBtn.style.display = 'inline-block';
-                    flash.classList.remove('active');
-                    isGathering = false;
-                }, 300);
-            }, 800);
-        }
-
-        function downloadQR() {
-            if(!currentQRUrl) return;
-            const a = document.createElement('a');
-            a.href = currentQRUrl;
-            a.download = `VietQR_${currentUser}.png`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        // --- 5. WEBHOOK REALTIME SYNC ---
-        async function fetchBalance() {
-            try {
-                const res = await fetch(`https://digitalsmod.site/api/webhook?user=${currentUser}`);
-                const data = await res.json();
-                if(data.status === 'success') {
-                    document.getElementById('userBalance').innerText = new Intl.NumberFormat('vi-VN').format(data.balance) + ' VNĐ';
-                }
-            } catch(e) {}
-        }
-        setInterval(fetchBalance, 3000);
-        fetchBalance();
-
-        // --- 6. MODAL CONTROL ---
+        // MODAL CONTROL
         function openCardModal() {
             const modal = document.getElementById('cardModal');
             modal.style.display = 'flex';
@@ -455,7 +472,7 @@
         }
 
         function submitCard() {
-            alert('Đã gửi thông tin thẻ cào lên hệ thống chờ duyệt!');
+            alert('Đã gửi thông tin thẻ cào!');
             closeCardModal();
         }
 
