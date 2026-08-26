@@ -623,36 +623,61 @@
             }
         }
 
+        // --- BỔ SUNG CƠ CHẾ ĐỒNG BỘ THÔNG BÁO TỪ DASHBOARD REALTIME ---
+        let displayedNoticeIds = new Set();
+
         async function fetchSystemPopups() {
             try {
                 let res = await fetch(`${BASE_URL}/notifications?pageSize=100`);
+                if (!res.ok) return;
                 let data = await res.json();
-                let popups = (data.documents || []).map(doc => {
+                let notices = (data.documents || []).map(doc => {
                     let fields = parseFirestoreFields(doc.fields || {});
                     fields.id = doc.name.split('/').pop();
                     return fields;
-                }).filter(n => n.status === 'active' && n.type === 'popup' && (n.target_page === 'all' || n.target_page === 'index'));
+                }).filter(n => n.status === 'active' && (n.target_page === 'all' || n.target_page === 'index'));
 
-                if (popups.length > 0) {
-                    let p = popups[0];
-                    if (!localStorage.getItem('popup_closed_' + p.id)) {
-                        document.getElementById('popup-title').innerText = p.title || 'Thông Báo Hệ Thống';
-                        document.getElementById('popup-body').innerText = p.content || '';
-                        let modal = document.getElementById('modal-system-popup');
-                        let box = document.getElementById('popup-content-box');
-                        modal.classList.remove('hidden');
-                        setTimeout(() => { box.classList.remove('scale-95', 'opacity-0'); box.classList.add('scale-100', 'opacity-100'); }, 10);
+                notices.forEach(p => {
+                    // 1. Dạng Toast Nổi Góc Màn Hình từ Dashboard
+                    if (p.type === 'toast' || p.type === 'toast_info') {
+                        if (!displayedNoticeIds.has(p.id)) {
+                            showToast((p.title ? `[${p.title}] ` : '') + (p.content || ''), p.toast_style || 'info');
+                            displayedNoticeIds.add(p.id);
+                        }
+                    } 
+                    // 2. Dạng Popup Chính Giữa Màn Hình từ Dashboard
+                    else if (p.type === 'popup' || !p.type) {
+                        if (!localStorage.getItem('popup_closed_' + p.id) && !displayedNoticeIds.has(p.id)) {
+                            document.getElementById('popup-title').innerText = p.title || 'Thông Báo Hệ Thống';
+                            document.getElementById('popup-body').innerText = p.content || '';
+                            let modal = document.getElementById('modal-system-popup');
+                            let box = document.getElementById('popup-content-box');
+                            
+                            // Lưu ID popup hiện tại để đóng
+                            modal.setAttribute('data-current-popup-id', p.id);
+                            
+                            modal.classList.remove('hidden');
+                            setTimeout(() => { box.classList.remove('scale-95', 'opacity-0'); box.classList.add('scale-100', 'opacity-100'); }, 10);
+                            displayedNoticeIds.add(p.id);
+                        }
                     }
-                }
+                });
             } catch (e) {}
         }
 
         function closeSystemPopup() {
             let modal = document.getElementById('modal-system-popup');
             let box = document.getElementById('popup-content-box');
+            let currentId = modal.getAttribute('data-current-popup-id');
+            if (currentId) {
+                localStorage.setItem('popup_closed_' + currentId, 'true');
+            }
             box.classList.remove('scale-100', 'opacity-100'); box.classList.add('scale-95', 'opacity-0');
             setTimeout(() => modal.classList.add('hidden'), 300);
         }
+
+        // Tự động kiểm tra thông báo mới từ Dashboard mỗi 4 giây
+        setInterval(fetchSystemPopups, 4000);
 
         function renderCategories(categories) {
             const grid = document.getElementById('categories-grid');
