@@ -289,17 +289,21 @@
             </div>
             <div class="space-y-4">
                 <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1">ID Telegram / Chat ID của bạn</label>
+                    <input type="text" id="telegram-chat-id-input" required placeholder="Nhập Telegram Chat ID (ví dụ: 123456789)..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:border-orange-500 focus:outline-none">
+                </div>
+                <div>
                     <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Tài khoản / Email khôi phục</label>
                     <input type="text" id="forgot-account-input" required placeholder="Nhập tên tài khoản hoặc email..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:border-orange-500 focus:outline-none">
                 </div>
                 <button type="button" onclick="generateTelegramOtpLink()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 rounded-xl transition text-sm flex items-center justify-center gap-2 shadow-lg shadow-sky-600/30">
-                    <i class="fa-brands fa-telegram text-lg"></i> Lấy Mã OTP Qua Telegram Bot
+                    <i class="fa-brands fa-telegram text-lg"></i> Gửi Mã OTP 16 Số Qua Telegram
                 </button>
 
                 <!-- KHU VỰC NHẬP OTP XÁC MINH -->
                 <div id="otp-verify-section" class="hidden space-y-3 pt-3 border-t border-slate-800">
-                    <p class="text-xs text-amber-300"><i class="fa-solid fa-circle-info mr-1"></i> Bấm START trong Telegram để nhận mã, sau đó nhập mã OTP 6 số bên dưới:</p>
-                    <input type="text" id="otp-code-input" maxlength="6" placeholder="Nhập mã OTP 6 số..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-center font-mono font-bold tracking-widest text-amber-400 focus:border-orange-500 focus:outline-none">
+                    <p class="text-xs text-amber-300"><i class="fa-solid fa-circle-info mr-1"></i> Bot đã gửi mã OTP 16 số tới Telegram của bạn, vui lòng kiểm tra và nhập mã bên dưới:</p>
+                    <input type="text" id="otp-code-input" maxlength="16" placeholder="Nhập mã OTP 16 số..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-center font-mono font-bold tracking-wider text-amber-400 focus:border-orange-500 focus:outline-none">
                     <input type="password" id="new-password-input" placeholder="Nhập mật khẩu mới..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:border-orange-500 focus:outline-none">
                     <button type="button" onclick="verifyOtpAndResetPassword()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-2.5 rounded-xl transition text-sm shadow-lg shadow-green-600/30">
                         Xác Nhận Đổi Mật Khẩu
@@ -494,7 +498,9 @@
     <script>
         const FIREBASE_PROJECT_ID = "quocdat-396fe";
         const BASE_URL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
-        const TELEGRAM_BOT_USERNAME = "DigitalShopAdminBot"; // Thay Tên Username Bot Telegram của bạn tại đây
+        
+        // THAY TOKEN BOT TELEGRAM CỦA BẠN TẠI ĐÂY
+        const TELEGRAM_BOT_TOKEN = "7961957297:AAH0p1mB4yQ3kM_1J4_example_token_here"; 
 
         function goToNapTien() {
             if (!currentUser) {
@@ -691,9 +697,26 @@
             }
         }
 
-        // LOGIC TẠO MÃ OTP VÀ CHUYỂN HƯỚNG SANG TELEGRAM BOT
+        // TẠO MÃ OTP 16 KÝ TỰ NGẪU NHIÊN
+        function generate16DigitOtp() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 16; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        // LOGIC TẠO MÃ OTP 16 SỐ VÀ TỰ ĐỘNG GỬI QUA TELEGRAM BOT API
         async function generateTelegramOtpLink() {
+            const chatIdInput = document.getElementById('telegram-chat-id-input').value.trim();
             const accInput = document.getElementById('forgot-account-input').value.trim();
+
+            if (!chatIdInput) {
+                showToast('Vui lòng nhập ID Telegram / Chat ID!', 'error');
+                return;
+            }
+
             if (!accInput) {
                 showToast('Vui lòng nhập Tên tài khoản hoặc Email!', 'error');
                 return;
@@ -717,8 +740,8 @@
                     return;
                 }
 
-                // Tạo ngẫu nhiên mã OTP 6 số
-                const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+                // Tạo mã OTP ngẫu nhiên 16 ký tự
+                const otpCode = generate16DigitOtp();
                 currentOtpData = {
                     userId: matched.id,
                     username: matched.username,
@@ -735,27 +758,42 @@
                             code: { stringValue: otpCode },
                             user_id: { stringValue: matched.id },
                             username: { stringValue: matched.username },
+                            chat_id: { stringValue: chatIdInput },
                             created_at: { stringValue: new Date().toISOString() }
                         }
                     })
                 });
 
-                document.getElementById('otp-verify-section').classList.remove('hidden');
-                showToast('Mã OTP đã tạo! Đang chuyển hướng sang Telegram Bot...', 'success');
+                // Gửi tin nhắn chứa mã OTP 16 số qua Telegram Bot API
+                const messageText = `🔑 [DIGITALSHOP] Mã OTP khôi phục mật khẩu của bạn là:\n\n👉 *${otpCode}*\n\nMã có hiệu lực trong 5 phút. Vui lòng không chia sẻ mã này cho ai khác!`;
+                
+                const telegramRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: chatIdInput,
+                        text: messageText,
+                        parse_mode: 'Markdown'
+                    })
+                });
 
-                // Mở ứng dụng Telegram tự động điền lệnh /start <mã_otp>
-                setTimeout(() => {
-                    window.open(`https://t.me/${TELEGRAM_BOT_USERNAME}?start=${otpCode}`, '_blank');
-                }, 1000);
+                const tgResult = await telegramRes.json();
+
+                if (tgResult.ok) {
+                    document.getElementById('otp-verify-section').classList.remove('hidden');
+                    showToast('Mã OTP 16 số đã được gửi thành công qua Telegram Bot!', 'success');
+                } else {
+                    showToast(`Không thể gửi tới Telegram ID này! (${tgResult.description || 'Lỗi gửi tin'})`, 'error');
+                }
 
             } catch (err) {
-                showToast('Lỗi khởi tạo mã OTP!', 'error');
+                showToast('Lỗi khi khởi tạo và gửi mã OTP qua Telegram!', 'error');
             }
         }
 
         // XÁC MINH OTP VÀ CẬP NHẬT MẬT KHẨU MỚI
         async function verifyOtpAndResetPassword() {
-            const inputOtp = document.getElementById('otp-code-input').value.trim();
+            const inputOtp = document.getElementById('otp-code-input').value.trim().toUpperCase();
             const newPass = document.getElementById('new-password-input').value;
 
             if (!inputOtp || !newPass) {
@@ -844,7 +882,7 @@
 
             } catch (e) {
                 showToast('Lỗi khi nạp dữ liệu từ Firebase!', 'error');
-            } finally {
+            } font-semibold {
                 hidePreloader();
             }
         }
