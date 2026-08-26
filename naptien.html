@@ -22,7 +22,7 @@
         body {
             background: #030408;
             color: #fff;
-            overflow: hidden;
+            overflow-x: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -45,29 +45,7 @@
             100% { transform: rotate(360deg); }
         }
 
-        #canvas {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 99;
-            pointer-events: none;
-            will-change: transform;
-        }
-
-        /* Nút Về Trang Chủ */
-        .btn-home {
-            position: absolute; top: 18px; left: 20px;
-            background: rgba(0, 255, 204, 0.08);
-            border: 1px solid var(--primary-neon);
-            color: var(--primary-neon);
-            padding: 8px 14px; border-radius: 12px;
-            font-size: 12px; font-weight: bold;
-            cursor: pointer; text-decoration: none;
-            display: flex; items-center: center; gap: 6px;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s; z-index: 10;
-            transform: translateZ(25px);
-        }
-        .btn-home:hover { background: var(--primary-neon); color: #000; box-shadow: 0 0 15px rgba(0,255,204,0.5); }
-
+        /* --- 1. FIX LAYOUT HEADER & CARD (CHỐNG CHE CHỮ) --- */
         .glass-card {
             position: relative; z-index: 2; width: 90%; max-width: 420px;
             background: var(--glass-bg);
@@ -75,7 +53,7 @@
             -webkit-backdrop-filter: blur(25px) saturate(180%);
             border-radius: 28px;
             border: 1px solid var(--glass-border);
-            padding: 28px 24px;
+            padding: 24px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 30px var(--glass-shadow), inset 0 0 15px rgba(255,255,255,0.05);
             text-align: center;
             transform-style: preserve-3d;
@@ -84,25 +62,35 @@
             touch-action: none;
         }
 
-        .glass-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            border-radius: 28px;
-            background: radial-gradient(circle at var(--pointer-x, 50%) var(--pointer-y, 50%), rgba(255, 255, 255, 0.25) 0%, rgba(0, 255, 204, 0.05) 40%, transparent 70%);
-            pointer-events: none;
-            mix-blend-mode: overlay;
+        .header-nav {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 12px;
+            transform: translateZ(25px);
         }
+
+        .btn-home {
+            background: rgba(0, 255, 204, 0.08);
+            border: 1px solid var(--primary-neon);
+            color: var(--primary-neon);
+            padding: 6px 14px; border-radius: 12px;
+            font-size: 11px; font-weight: bold;
+            cursor: pointer; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 6px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+        .btn-home:hover { background: var(--primary-neon); color: #000; box-shadow: 0 0 15px rgba(0,255,204,0.5); }
 
         .brand-title {
             color: var(--primary-neon);
             text-transform: uppercase;
-            letter-spacing: 4px;
-            font-size: 26px;
+            letter-spacing: 2px;
+            font-size: 22px;
             font-weight: 900;
             text-shadow: 0 0 15px rgba(0, 255, 204, 0.6);
             transform: translateZ(20px);
-            margin-top: 10px;
+            margin-top: 4px;
         }
 
         .sub-title { font-size: 11px; color: #8a8a9e; letter-spacing: 1.5px; margin-bottom: 20px; transform: translateZ(15px); }
@@ -171,25 +159,19 @@
             display: inline-block; transition: all 0.3s;
         }
 
-        /* Khung QR Phát Sáng Khi Tụ Khí Lấp Đầy & Flash Nổ Trắng */
+        /* Khung VietQR Clean Cyberpunk */
         .qr-wrapper {
             position: relative; width: 210px; height: 210px; margin: 0 auto 10px;
             background: #ffffff; padding: 10px; border-radius: 20px;
             display: flex; justify-content: center; align-items: center;
             box-shadow: 0 0 25px rgba(0, 255, 204, 0.3);
-            overflow: hidden; opacity: 0; transform: translateZ(25px) scale(0.8);
-            transition: opacity 0.4s, transform 0.4s, box-shadow 0.4s, background-color 0.4s;
-            will-change: transform, opacity, box-shadow;
+            overflow: hidden; opacity: 0; transform: translateZ(25px) scale(0.95);
+            transition: opacity 0.3s, transform 0.3s;
             visibility: hidden;
         }
 
         .qr-wrapper.show {
             visibility: visible; opacity: 1; transform: translateZ(25px) scale(1);
-        }
-
-        .qr-wrapper.glow-super {
-            box-shadow: 0 0 60px #ffffff, 0 0 120px #00ffcc, inset 0 0 30px #ffffff;
-            background-color: #ffffff;
         }
 
         .qr-wrapper img { width: 100%; height: 100%; object-fit: contain; }
@@ -204,7 +186,46 @@
         .info-text { font-size: 12px; color: #8a8a9e; line-height: 1.6; transform: translateZ(10px); }
         .highlight { color: var(--primary-neon); font-weight: bold; text-shadow: 0 0 8px rgba(0,255,204,0.5); }
 
-        /* Liquid Glass Modal */
+        /* --- 2. HIỆU ỨNG LOADING MỜ WEB GIỐNG INDEX.HTML --- */
+        .page-loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(3, 4, 8, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            z-index: 999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+
+        .page-loader.active {
+            opacity: 1; pointer-events: all;
+        }
+
+        .cyber-spinner {
+            width: 60px; height: 60px; border-radius: 50%;
+            border: 3px solid transparent;
+            border-top-color: var(--primary-neon);
+            border-bottom-color: var(--secondary-neon);
+            animation: spin 1s linear infinite;
+            box-shadow: 0 0 25px var(--primary-neon);
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader-text {
+            color: var(--primary-neon);
+            font-size: 13px; font-weight: bold; letter-spacing: 2px;
+            text-transform: uppercase; text-shadow: 0 0 10px var(--primary-neon);
+            animation: blink 1s infinite alternate;
+        }
+
+        @keyframes blink { 0% { opacity: 0.4; } 100% { opacity: 1; } }
+
+        /* Liquid Glass Modal & Pop-up */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(3, 4, 8, 0.7); backdrop-filter: blur(20px);
@@ -227,7 +248,6 @@
         .close-btn { position: absolute; top: 16px; right: 20px; color: #aaa; font-size: 22px; cursor: pointer; }
         .card-select { width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid rgba(0,255,204,0.3); border-radius: 12px; color: #fff; margin-bottom: 14px; outline: none; }
 
-        /* Pop-up Nạp Tiền Thành Công Cyberpunk */
         .success-icon-box {
             width: 70px; height: 70px; margin: 0 auto 15px;
             background: rgba(0, 255, 204, 0.1);
@@ -245,12 +265,20 @@
 </head>
 <body>
     <div class="neon-bg"></div>
-    <canvas id="canvas"></canvas>
+
+    <!-- OVERLAY LOADING GIỐNG INDEX.HTML -->
+    <div class="page-loader" id="pageLoader">
+        <div class="cyber-spinner"></div>
+        <div class="loader-text">ĐANG TẠO MÃ THANH TOÁN...</div>
+    </div>
 
     <div class="glass-card" id="glassCard">
-        <a href="index.html" class="btn-home">
-            &#8592; Trang Chủ
-        </a>
+        <!-- Đưa nút về trang chủ lên hàng riêng -->
+        <div class="header-nav">
+            <a href="index.html" class="btn-home">
+                &#8592; Trang Chủ
+            </a>
+        </div>
 
         <div class="brand-title">DIGITALSMOD</div>
         <div class="sub-title">CỔNG THANH TOÁN TỰ ĐỘNG</div>
@@ -273,7 +301,7 @@
         <button class="btn-action" onclick="generateQR()">Tạo Mã Thanh Toán</button>
 
         <div class="qr-wrapper" id="qrWrapper">
-            <img id="qrImage" src="" alt="VietQR" style="opacity: 0; transition: opacity 0.3s;">
+            <img id="qrImage" src="" alt="VietQR">
             <div class="brand-badge">DIGITALSMOD</div>
         </div>
         <button class="btn-download" id="dlBtn" style="display:none;" onclick="downloadQR()">Tải Mã QR Về Máy</button>
@@ -339,114 +367,10 @@
         currentUser = currentUser.toUpperCase().trim();
         document.getElementById('displayUser').innerText = currentUser;
         
-        // CÚ PHÁP CHUẨN KẾT HỢP SEVQR CỦA VIETINBANK / SEPAY
         const transferContentText = `SEVQR NAP ${currentUser}`;
         document.getElementById('transferContent').innerText = transferContentText;
 
-        // --- 2. CANVAS PARTICLES ENGINE (TỤ KHÍ BÙNG NỔ & KHÓI TRẮNG) ---
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d', { alpha: true });
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
-
-        let isGathering = false;
-        let isSmoking = false;
-        const particleCount = 200;
-        const smokeCount = 30;
-
-        let particles = Array.from({length: particleCount}, () => ({
-            x: Math.random() * window.innerWidth,
-            y: Math.random() * window.innerHeight,
-            size: Math.random() * 2 + 1,
-            vx: (Math.random() - 0.5) * 1.5,
-            vy: (Math.random() - 0.5) * 1.5,
-            targetX: 0,
-            targetY: 0,
-            alpha: Math.random() * 0.6 + 0.4
-        }));
-
-        let smokeParticles = [];
-
-        let lastTime = performance.now();
-
-        function drawParticles(currentTime) {
-            const dt = Math.min((currentTime - lastTime) / 1000, 0.1);
-            lastTime = currentTime;
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            const qrWrapper = document.getElementById('qrWrapper');
-            const rect = qrWrapper.getBoundingClientRect();
-
-            // Vẽ các hạt bụi tụ khí / bay tự do
-            for (let i = 0; i < particleCount; i++) {
-                const p = particles[i];
-                
-                ctx.fillStyle = isGathering ? `rgba(255, 255, 255, ${p.alpha})` : `rgba(0, 255, 204, ${p.alpha * 0.7})`;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, isGathering ? p.size * 1.6 : p.size, 0, Math.PI * 2);
-                ctx.fill();
-
-                if (isGathering) {
-                    if (!p.targetX) {
-                        p.targetX = rect.left + Math.random() * rect.width;
-                        p.targetY = rect.top + Math.random() * rect.height;
-                    }
-                    const dx = p.targetX - p.x;
-                    const dy = p.targetY - p.y;
-                    p.x += dx * 9 * dt;
-                    p.y += dy * 9 * dt;
-                } else {
-                    p.targetX = 0; p.targetY = 0;
-                    p.x += p.vx * 60 * dt;
-                    p.y += p.vy * 60 * dt;
-
-                    if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-                    if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-                }
-            }
-
-            // Hiệu ứng khói trắng bốc lên từ ô QR sau khi tạo xong mã
-            if (isSmoking) {
-                if (smokeParticles.length < smokeCount && Math.random() < 0.3) {
-                    smokeParticles.push({
-                        x: rect.left + Math.random() * rect.width,
-                        y: rect.bottom - Math.random() * 20,
-                        size: Math.random() * 6 + 4,
-                        vx: (Math.random() - 0.5) * 0.8,
-                        vy: -(Math.random() * 1.5 + 1),
-                        alpha: 0.6
-                    });
-                }
-
-                for (let j = smokeParticles.length - 1; j >= 0; j--) {
-                    const s = smokeParticles[j];
-                    ctx.fillStyle = `rgba(240, 240, 255, ${s.alpha})`;
-                    ctx.beginPath();
-                    ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    s.x += s.vx * 60 * dt;
-                    s.y += s.vy * 60 * dt;
-                    s.size += 8 * dt;
-                    s.alpha -= 0.4 * dt;
-
-                    if (s.alpha <= 0) {
-                        smokeParticles.splice(j, 1);
-                    }
-                }
-            }
-
-            requestAnimationFrame(drawParticles);
-        }
-        requestAnimationFrame(drawParticles);
-
-        // --- 3. TẢI MÃ QR VỚI HIỆU ỨNG LUYỆN ĐAN NỔ TRẮNG & BỐC KHÓI ---
+        // --- 2. HIỆU ỨNG TẠO MÃ QR VỚI OVERLAY MỜ TRANG GIỐNG INDEX ---
         let currentQRUrl = "";
 
         function generateQR() {
@@ -454,35 +378,26 @@
             const qrWrapper = document.getElementById('qrWrapper');
             const qrImage = document.getElementById('qrImage');
             const dlBtn = document.getElementById('dlBtn');
+            const loader = document.getElementById('pageLoader');
 
-            qrImage.style.opacity = '0';
-            dlBtn.style.display = 'none';
-            qrWrapper.classList.add('show');
-            qrWrapper.classList.remove('glow-super');
-            isSmoking = false;
+            // 1. Bật Mờ Trang Loading Cyberpunk
+            loader.classList.add('active');
 
-            // 1. Tụ khí lấp đầy ô QR
-            isGathering = true;
-            particles.forEach(p => { p.targetX = 0; p.targetY = 0; });
-
-            // TẠO MÃ VIETQR VỚI CÚ PHÁP SEVQR CHUẨN
             currentQRUrl = `https://img.vietqr.io/image/VietinBank-999939213333-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(transferContentText)}&accountName=NGUYEN%20DAI%20QUOC%20DAT`;
 
-            // 2. Sau 800ms khi hạt lấp đầy -> Nổ trắng phát sáng cực đại
-            setTimeout(() => {
-                qrWrapper.classList.add('glow-super');
-                qrImage.src = currentQRUrl;
-                
-                // 3. Khói trắng bốc lên & Hiện hình ảnh QR
+            // Preload ảnh QR ngầm
+            const tempImg = new Image();
+            tempImg.src = currentQRUrl;
+            tempImg.onload = function() {
                 setTimeout(() => {
-                    qrImage.style.opacity = '1';
+                    qrImage.src = currentQRUrl;
+                    qrWrapper.classList.add('show');
                     dlBtn.style.display = 'inline-block';
-                    isGathering = false;
-                    isSmoking = true;
                     
-                    setTimeout(() => { isSmoking = false; }, 4000);
-                }, 300);
-            }, 800);
+                    // Tắt Loading
+                    loader.classList.remove('active');
+                }, 600); // Tạo độ trễ mượt mà
+            };
         }
 
         function downloadQR() {
@@ -495,11 +410,11 @@
             document.body.removeChild(a);
         }
 
-        // --- 4. FIREBASE FIRESTORE REALTIME SYNC & POP-UP CỘNG TIỀN + TỰ ĐỘNG LƯU LỊCH SỬ ---
+        // --- 3. FIREBASE FIRESTORE REALTIME SYNC & POP-UP CỘNG TIỀN ---
         const FIREBASE_PROJECT_ID = "quocdat-396fe";
         const BASE_URL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
 
-        let previousBalance = null; // Biến kiểm tra biến động số dư
+        let previousBalance = null;
 
         function parseFirestoreFields(fields) {
             let res = {};
@@ -513,7 +428,6 @@
             return res;
         }
 
-        // Tự động ghi nhận đơn nạp vào kho Deposits của index.html
         async function saveDepositHistory(amount, currentUserId) {
             let depositId = 'dep_' + Date.now();
             let memo = "SEVQR" + Math.floor(1000 + Math.random() * 9000);
@@ -550,7 +464,6 @@
                             const currentBalance = fields.balance || 0;
                             document.getElementById('userBalance').innerText = new Intl.NumberFormat('vi-VN').format(currentBalance) + ' VNĐ';
 
-                            // Phát hiện số dư TĂNG LÊN -> Hiện Pop-up ngay và tự lưu Lịch sử!
                             if (previousBalance !== null && currentBalance > previousBalance) {
                                 const addedAmount = currentBalance - previousBalance;
                                 showSuccessPopup(addedAmount);
@@ -559,7 +472,6 @@
 
                             previousBalance = currentBalance;
                             
-                            // Cập nhật lại LocalStorage đồng bộ với index.html
                             if(storedUserObj) {
                                 storedUserObj.balance = currentBalance;
                                 localStorage.setItem('ds_user', JSON.stringify(storedUserObj));
@@ -583,11 +495,10 @@
             setTimeout(() => { modal.style.display = 'none'; }, 300);
         }
 
-        // Quét số dư tự động mỗi 2.5 giây
         setInterval(syncFirebaseBalance, 2500);
         syncFirebaseBalance();
 
-        // --- 5. 3D TILT & PHYSICAL DRAG ---
+        // --- 4. 3D TILT & PHYSICAL DRAG ---
         const card = document.getElementById('glassCard');
         let startX = 0, startY = 0, currentX = 0, currentY = 0, isDragging = false;
 
