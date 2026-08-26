@@ -228,13 +228,11 @@
                 <div>
                     <div class="flex justify-between items-center mb-1">
                         <label class="block text-xs font-bold text-slate-400 uppercase">Mật khẩu</label>
-                        <!-- NÚT QUÊN MẬT KHẨU -->
                         <a href="javascript:void(0)" onclick="closeModal('modal-login'); openModal('modal-forgot-password');" class="text-xs text-orange-400 hover:underline font-semibold">Quên mật khẩu?</a>
                     </div>
                     <input type="password" id="login-password" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:border-orange-500 focus:outline-none">
                 </div>
 
-                <!-- LƯU DỮ LIỆU 90 NGÀY & ĐIỀU KHOẢN -->
                 <div class="space-y-2 text-xs text-slate-300 bg-slate-900/60 p-3 rounded-xl border border-slate-800">
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="checkbox" id="remember-90-days" class="w-4 h-4 rounded border-slate-700 text-orange-600 focus:ring-0 bg-slate-800">
@@ -246,7 +244,6 @@
                     </label>
                 </div>
 
-                <!-- XÁC MINH HCAPTCHA LOGIN -->
                 <div class="flex justify-center">
                     <div class="h-captcha" id="hcaptcha-login" data-sitekey="a474f7be-8ce0-4940-8830-b3ee33a26abc"></div>
                 </div>
@@ -261,7 +258,6 @@
                 <div class="relative flex justify-center text-xs uppercase"><span class="bg-slate-900 px-2 text-slate-500">Hoặc</span></div>
             </div>
 
-            <!-- NÚT GOOGLE SIGN-IN CHÍNH THỨC VỚI CLIENT ID CỦA BẠN -->
             <div class="flex justify-center">
                 <div id="g_id_onload"
                      data-client_id="685476439350-2msgbc249cb6e18vt9iigtmgh5ifohnj.apps.googleusercontent.com"
@@ -280,7 +276,7 @@
         </div>
     </div>
 
-    <!-- MODAL QUÊN MẬT KHẨU QUA TELEGRAM BOT -->
+    <!-- MODAL QUÊN MẬT KHẨU -->
     <div id="modal-forgot-password" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden">
         <div class="glass-modal border border-slate-800 rounded-2xl max-w-md w-full p-5 sm:p-6 space-y-5">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -300,7 +296,6 @@
                     <i class="fa-brands fa-telegram text-lg"></i> Gửi Mã OTP 16 Số Qua Telegram
                 </button>
 
-                <!-- KHU VỰC NHẬP OTP XÁC MINH -->
                 <div id="otp-verify-section" class="hidden space-y-3 pt-3 border-t border-slate-800">
                     <p class="text-xs text-amber-300"><i class="fa-solid fa-circle-info mr-1"></i> Bot đã gửi mã OTP 16 số tới Telegram của bạn, vui lòng kiểm tra và nhập mã bên dưới:</p>
                     <input type="text" id="otp-code-input" maxlength="16" placeholder="Nhập mã OTP 16 số..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-center font-mono font-bold tracking-wider text-amber-400 focus:border-orange-500 focus:outline-none">
@@ -334,7 +329,6 @@
                     <input type="password" id="reg-password" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:border-orange-500 focus:outline-none">
                 </div>
 
-                <!-- ĐIỀU KHOẢN ĐĂNG KÝ -->
                 <div class="text-xs text-slate-300 bg-slate-900/60 p-3 rounded-xl border border-slate-800">
                     <label class="flex items-start gap-2 cursor-pointer">
                         <input type="checkbox" id="agree-terms-reg" required class="w-4 h-4 rounded border-slate-700 text-green-600 focus:ring-0 bg-slate-800 mt-0.5">
@@ -342,7 +336,6 @@
                     </label>
                 </div>
 
-                <!-- XÁC MINH HCAPTCHA REGISTER -->
                 <div class="flex justify-center">
                     <div class="h-captcha" id="hcaptcha-register" data-sitekey="a474f7be-8ce0-4940-8830-b3ee33a26abc"></div>
                 </div>
@@ -371,16 +364,16 @@
                     <h4 class="font-black text-amber-400 uppercase mb-1">1. Quy định chung & Tuân thủ Pháp luật</h4>
                     <ul class="list-disc pl-5 space-y-1 text-slate-400">
                         <li>Khách hàng phải tự chịu trách nhiệm trước pháp luật về mục đích sử dụng các dịch vụ/tài khoản mua từ hệ thống.</li>
-                        <li>Nghiêm cấm sử dụng dịch vụ vào các hoạt động vi phạm pháp luật Việt Nam (lừa đảo, phát tán thông tin độc hại, hack/crack vi phạm an ninh mạng...).</li>
-                        <li>Tài khoản vi phạm sẽ bị khóa vĩnh viễn mà không cần báo trước và không hoàn tiền.</li>
+                        <li>Nghiêm cấm sử dụng dịch vụ vào các hoạt động vi phạm pháp luật Việt Nam.</li>
+                        <li>Tài khoản vi phạm sẽ bị khóa vĩnh viễn mà không cần báo trước.</li>
                     </ul>
                 </div>
 
                 <div>
                     <h4 class="font-black text-amber-400 uppercase mb-1">2. Chính sách Nạp tiền & Thanh toán</h4>
                     <ul class="list-disc pl-5 space-y-1 text-slate-400">
-                        <li>Hệ thống nạp tiền xử lý tự động qua mã QR và nội dung chuyển khoản. Khách hàng phải điền đúng nội dung được cung cấp.</li>
-                        <li>Số dư sau khi nạp thành công sẽ không thể quy đổi ngược lại ra tiền mặt dưới bất kỳ hình thức nào.</li>
+                        <li>Hệ thống nạp tiền xử lý tự động qua mã QR và nội dung chuyển khoản.</li>
+                        <li>Số dư sau khi nạp thành công sẽ không thể quy đổi ngược lại ra tiền mặt.</li>
                     </ul>
                 </div>
 
@@ -388,15 +381,7 @@
                     <h4 class="font-black text-amber-400 uppercase mb-1">3. Chính sách Bảo hành & Mua bán Tài khoản</h4>
                     <ul class="list-disc pl-5 space-y-1 text-slate-400">
                         <li>Sau khi nhận được thông tin tài khoản, khách hàng có trách nhiệm **đổi mật khẩu và thông tin bảo mật ngay lập tức**.</li>
-                        <li>Bảo hành 1 đổi 1 trong vòng 24h đối với lỗi sai mật khẩu hoặc tài khoản bị khóa từ trước khi giao dịch.</li>
-                        <li>Hệ thống không bảo hành nếu tài khoản bị khóa do khách hàng sử dụng phần mềm thứ 3 (Hack/Mod) hoặc để rò rỉ thông tin đăng nhập cho người khác.</li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h4 class="font-black text-amber-400 uppercase mb-1">4. Miễn trừ trách nhiệm</h4>
-                    <ul class="list-disc pl-5 space-y-1 text-slate-400">
-                        <li>DIGITALSHOP có quyền từ chối phục vụ đối với các tài khoản có dấu hiệu gian lận hoặc trục lợi hệ thống.</li>
+                        <li>Bảo hành 1 đổi 1 trong vòng 24h đối với lỗi sai mật khẩu hoặc tài khoản bị khóa từ trước.</li>
                     </ul>
                 </div>
             </div>
@@ -494,12 +479,10 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT DIRECT FIREBASE ENGINE -->
+    <!-- JAVASCRIPT FIXED ENGINE -->
     <script>
         const FIREBASE_PROJECT_ID = "quocdat-396fe";
         const BASE_URL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
-        
-        // THAY TOKEN BOT TELEGRAM CỦA BẠN TẠI ĐÂY
         const TELEGRAM_BOT_TOKEN = "8997842751:AAHje_VZ_sjw5ffnw64RJNz3bxqxehRlMwo"; 
 
         function goToNapTien() {
@@ -512,7 +495,6 @@
             localStorage.setItem('user', uname);
             localStorage.setItem('username', uname);
             localStorage.setItem('DGS_USERNAME', uname);
-            
             window.location.href = `naptien.html?user=${encodeURIComponent(uname)}`;
         }
 
@@ -548,11 +530,12 @@
 
         function escapeHtml(str) {
             if (!str) return '';
-            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace/>/g, '&gt;').replace(/"/g, '&quot;');
         }
 
         function showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');
+            if (!container) return;
             const toast = document.createElement('div');
             const bgClass = type === 'success' ? 'bg-green-950/95 border-green-700 text-green-200' 
                           : type === 'error' ? 'bg-red-950/95 border-red-700 text-red-200' 
@@ -563,11 +546,19 @@
             setTimeout(() => toast.remove(), 4000);
         }
 
-        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        function openModal(id) { 
+            const el = document.getElementById(id);
+            if (el) el.classList.remove('hidden'); 
+        }
+        
+        function closeModal(id) { 
+            const el = document.getElementById(id);
+            if (el) el.classList.add('hidden'); 
+        }
 
         function renderHeaderAuth() {
             const container = document.getElementById('nav-auth-container');
+            if (!container) return;
             if (currentUser) {
                 container.innerHTML = `
                     <div class="flex items-center gap-2 sm:gap-3">
@@ -622,7 +613,6 @@
             return res;
         }
 
-        // GIẢI MÃ GOOGLE JWT TOKEN
         function parseJwt(token) {
             var base64Url = token.split('.')[1];
             var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -632,7 +622,6 @@
             return JSON.parse(jsonPayload);
         }
 
-        // XỬ LÝ ĐĂNG NHẬP GOOGLE VÀ LƯU VÀO FIRESTORE
         async function handleGoogleLoginResponse(response) {
             try {
                 const payload = parseJwt(response.credential);
@@ -658,7 +647,7 @@
                         username: googleName.replace(/\s+/g, '').toUpperCase(),
                         email: googleEmail,
                         password: 'GOOGLE_AUTH_USER',
-                        balance: 0.0,
+                        balance: 0,
                         role: 'user',
                         expire_at: Date.now() + (90 * 24 * 60 * 60 * 1000)
                     };
@@ -697,7 +686,6 @@
             }
         }
 
-        // TẠO MÃ OTP 16 KÝ TỰ NGẪU NHIÊN
         function generate16DigitOtp() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let result = '';
@@ -707,18 +695,12 @@
             return result;
         }
 
-        // LOGIC TẠO MÃ OTP 16 SỐ VÀ TỰ ĐỘNG GỬI QUA TELEGRAM BOT API
         async function generateTelegramOtpLink() {
             const chatIdInput = document.getElementById('telegram-chat-id-input').value.trim();
             const accInput = document.getElementById('forgot-account-input').value.trim();
 
-            if (!chatIdInput) {
-                showToast('Vui lòng nhập ID Telegram / Chat ID!', 'error');
-                return;
-            }
-
-            if (!accInput) {
-                showToast('Vui lòng nhập Tên tài khoản hoặc Email!', 'error');
+            if (!chatIdInput || !accInput) {
+                showToast('Vui lòng nhập đầy đủ thông tin!', 'error');
                 return;
             }
 
@@ -736,20 +718,18 @@
                 });
 
                 if (!matched) {
-                    showToast('Tài khoản hoặc Email không tồn tại trên hệ thống!', 'error');
+                    showToast('Tài khoản hoặc Email không tồn tại!', 'error');
                     return;
                 }
 
-                // Tạo mã OTP ngẫu nhiên 16 ký tự
                 const otpCode = generate16DigitOtp();
                 currentOtpData = {
                     userId: matched.id,
                     username: matched.username,
                     code: otpCode,
-                    expireAt: Date.now() + (5 * 60 * 1000) // Hạn dùng 5 phút
+                    expireAt: Date.now() + (5 * 60 * 1000)
                 };
 
-                // Lưu dữ liệu OTP vào Firestore
                 await fetch(`${BASE_URL}/otps/${otpCode}`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
@@ -764,7 +744,6 @@
                     })
                 });
 
-                // Gửi tin nhắn chứa mã OTP 16 số qua Telegram Bot API
                 const messageText = `🔑 [DIGITALSHOP] Mã OTP khôi phục mật khẩu của bạn là:\n\n👉 *${otpCode}*\n\nMã có hiệu lực trong 5 phút. Vui lòng không chia sẻ mã này cho ai khác!`;
                 
                 const telegramRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
@@ -778,26 +757,23 @@
                 });
 
                 const tgResult = await telegramRes.json();
-
                 if (tgResult.ok) {
                     document.getElementById('otp-verify-section').classList.remove('hidden');
-                    showToast('Mã OTP 16 số đã được gửi thành công qua Telegram Bot!', 'success');
+                    showToast('Mã OTP đã gửi thành công qua Telegram!', 'success');
                 } else {
-                    showToast(`Không thể gửi tới Telegram ID này! (${tgResult.description || 'Lỗi gửi tin'})`, 'error');
+                    showToast(`Lỗi gửi Telegram: ${tgResult.description || ''}`, 'error');
                 }
-
             } catch (err) {
-                showToast('Lỗi khi khởi tạo và gửi mã OTP qua Telegram!', 'error');
+                showToast('Lỗi khi khởi tạo mã OTP!', 'error');
             }
         }
 
-        // XÁC MINH OTP VÀ CẬP NHẬT MẬT KHẨU MỚI
         async function verifyOtpAndResetPassword() {
             const inputOtp = document.getElementById('otp-code-input').value.trim().toUpperCase();
             const newPass = document.getElementById('new-password-input').value;
 
             if (!inputOtp || !newPass) {
-                showToast('Vui lòng nhập đầy đủ Mã OTP và Mật khẩu mới!', 'error');
+                showToast('Vui lòng nhập OTP và Mật khẩu mới!', 'error');
                 return;
             }
 
@@ -807,12 +783,11 @@
             }
 
             if (Date.now() > currentOtpData.expireAt) {
-                showToast('Mã OTP đã hết hạn! Vui lòng lấy mã mới.', 'error');
+                showToast('Mã OTP đã hết hạn!', 'error');
                 return;
             }
 
             try {
-                // Cập nhật mật khẩu mới vào Firestore
                 await fetch(`${BASE_URL}/users/${currentOtpData.userId}?updateMask.fieldPaths=password`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
@@ -821,12 +796,12 @@
                     })
                 });
 
-                showToast('Đổi mật khẩu thành công! Bạn có thể đăng nhập ngay.', 'success');
+                showToast('Đổi mật khẩu thành công! Vui lòng đăng nhập.', 'success');
                 closeModal('modal-forgot-password');
                 document.getElementById('otp-verify-section').classList.add('hidden');
                 openModal('modal-login');
             } catch (err) {
-                showToast('Không thể cập nhật mật khẩu mới!', 'error');
+                showToast('Không thể cập nhật mật khẩu!', 'error');
             }
         }
 
@@ -843,7 +818,6 @@
                             let storedData = JSON.parse(localStorage.getItem('ds_user')) || {};
                             storedData.balance = currentUser.balance;
                             localStorage.setItem('ds_user', JSON.stringify(storedData));
-                            
                             renderHeaderAuth();
                         }
                     } catch(e) {}
@@ -874,15 +848,17 @@
                 renderCategories(storeCategories);
 
                 const catFilter = document.getElementById('category-filter');
-                catFilter.innerHTML = '<option value="all">Tất cả danh mục</option>' + 
-                    storeCategories.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+                if (catFilter) {
+                    catFilter.innerHTML = '<option value="all">Tất cả danh mục</option>' + 
+                        storeCategories.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+                }
 
                 filterProducts();
                 await fetchSystemPopups();
 
             } catch (e) {
-                showToast('Lỗi khi nạp dữ liệu từ Firebase!', 'error');
-            } font-semibold {
+                showToast('Lỗi khi nạp dữ liệu từ hệ thống!', 'error');
+            } finally {
                 hidePreloader();
             }
         }
@@ -937,6 +913,7 @@
 
         function renderCategories(categories) {
             const grid = document.getElementById('categories-grid');
+            if (!grid) return;
             if (!categories || categories.length === 0) {
                 grid.innerHTML = '<div class="col-span-full text-center py-6 text-slate-500">Chưa có danh mục nào</div>';
                 return;
@@ -954,13 +931,14 @@
 
         function selectCategory(catId) {
             currentSelectedCategory = String(catId);
-            document.getElementById('category-filter').value = catId;
+            const catFilter = document.getElementById('category-filter');
+            if (catFilter) catFilter.value = catId;
             const btnBack = document.getElementById('btn-back-all-cats');
             if (catId === 'all') {
-                btnBack.classList.add('hidden');
+                if (btnBack) btnBack.classList.add('hidden');
                 document.getElementById('products-title').innerHTML = `<i class="fa-solid fa-fire-flame-curved text-orange-500"></i> Tất Cả Sản Phẩm`;
             } else {
-                btnBack.classList.remove('hidden');
+                if (btnBack) btnBack.classList.remove('hidden');
                 let catObj = storeCategories.find(c => String(c.id) === String(catId));
                 let catName = catObj ? catObj.name : 'Danh Mục Selected';
                 document.getElementById('products-title').innerHTML = `<i class="fa-solid fa-layer-group text-orange-500"></i> Danh Mục: ${escapeHtml(catName)}`;
@@ -969,7 +947,8 @@
         }
 
         function filterProducts() {
-            const search = document.getElementById('search-input').value.toLowerCase();
+            const searchInput = document.getElementById('search-input');
+            const search = searchInput ? searchInput.value.toLowerCase() : '';
             const filtered = storeProducts.filter(p => {
                 const matchSearch = (p.title || '').toLowerCase().includes(search);
                 const matchCat = (currentSelectedCategory === 'all') || (String(p.category_id) === String(currentSelectedCategory));
@@ -980,6 +959,7 @@
 
         function renderProducts(products) {
             const grid = document.getElementById('products-grid');
+            if (!grid) return;
             if (!products || products.length === 0) {
                 grid.innerHTML = '<div class="col-span-full text-center py-12 text-slate-500">Không tìm thấy sản phẩm nào</div>';
                 return;
@@ -1160,14 +1140,14 @@
                     showToast('Đăng nhập thành công!', 'success');
                     closeModal('modal-login');
                     renderHeaderAuth();
-                    hcaptcha.reset();
+                    if (window.hcaptcha) hcaptcha.reset();
                 } else {
                     showToast('Tài khoản hoặc mật khẩu không chính xác!', 'error');
-                    hcaptcha.reset();
+                    if (window.hcaptcha) hcaptcha.reset();
                 }
             } catch (err) {
                 showToast('Không thể kết nối cơ sở dữ liệu!', 'error');
-                hcaptcha.reset();
+                if (window.hcaptcha) hcaptcha.reset();
             }
         }
 
@@ -1194,7 +1174,7 @@
 
                 if (isExist) {
                     showToast('Tài khoản hoặc Email này đã tồn tại!', 'error');
-                    hcaptcha.reset();
+                    if (window.hcaptcha) hcaptcha.reset();
                     return;
                 }
             } catch (err) {}
@@ -1219,10 +1199,10 @@
                 });
                 showToast('Đăng ký tài khoản thành công! Bạn có thể đăng nhập ngay.', 'success');
                 closeModal('modal-register');
-                hcaptcha.reset();
+                if (window.hcaptcha) hcaptcha.reset();
             } catch (err) {
                 showToast('Đăng ký thất bại!', 'error');
-                hcaptcha.reset();
+                if (window.hcaptcha) hcaptcha.reset();
             }
         }
 
