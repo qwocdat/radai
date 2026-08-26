@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- hCaptcha SDK -->
     <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+    <!-- Google Identity Services SDK -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -190,7 +192,7 @@
                 </div>
                 <div class="flex flex-col sm:flex-row items-center gap-3">
                     <input type="text" id="search-input" oninput="filterProducts()" placeholder="Tìm tên tài khoản..." class="bg-slate-900 border border-slate-800 text-slate-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-orange-500 w-full sm:w-64">
-                    <select id="category-filter" onchange="selectCategory(this.value)" class="bg-slate-900 border border-slate-800 text-slate-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-orange-500 w-full sm:w-auto">
+                    <select id="category-filter" onchange="selectCategory(this.value)" class="bg-slate-900 border border-slate-800 text-slate-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-orange-500 w-full sm:auto">
                         <option value="all">Tất cả danh mục</option>
                     </select>
                 </div>
@@ -206,7 +208,6 @@
     <footer class="bg-slate-900/50 border-t border-slate-800 mt-16 py-8">
         <div class="max-w-7xl mx-auto px-4 text-center text-slate-500 text-xs sm:text-sm space-y-2">
             <p>© 2026 DIGITALSHOP. Hệ thống bán tài khoản game tự động 24/7.</p>
-
             <button onclick="openModal('modal-terms')" class="text-orange-400 hover:underline text-xs"><i class="fa-solid fa-file-contract mr-1"></i>Điều khoản Dịch vụ & Chính sách Mua bán</button>
         </div>
     </footer>
@@ -225,7 +226,11 @@
                     <input type="text" id="login-account" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:border-orange-500 focus:outline-none">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Mật khẩu</label>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-bold text-slate-400 uppercase">Mật khẩu</label>
+                        <!-- NÚT QUÊN MẬT KHẨU -->
+                        <a href="javascript:void(0)" onclick="closeModal('modal-login'); openModal('modal-forgot-password');" class="text-xs text-orange-400 hover:underline font-semibold">Quên mật khẩu?</a>
+                    </div>
                     <input type="password" id="login-password" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:border-orange-500 focus:outline-none">
                 </div>
 
@@ -250,6 +255,57 @@
                     Đăng Nhập Ngay
                 </button>
             </form>
+
+            <div class="relative my-4">
+                <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-800"></div></div>
+                <div class="relative flex justify-center text-xs uppercase"><span class="bg-slate-900 px-2 text-slate-500">Hoặc</span></div>
+            </div>
+
+            <!-- NÚT GOOGLE SIGN-IN CHÍNH THỨC VỚI CLIENT ID CỦA BẠN -->
+            <div class="flex justify-center">
+                <div id="g_id_onload"
+                     data-client_id="685476439350-2msgbc249cb6e18vt9iigtmgh5ifohnj.apps.googleusercontent.com"
+                     data-callback="handleGoogleLoginResponse"
+                     data-auto_prompt="false">
+                </div>
+                <div class="g_id_signin"
+                     data-type="standard"
+                     data-size="large"
+                     data-theme="outline"
+                     data-text="sign_in_with"
+                     data-shape="rectangular"
+                     data-logo_alignment="left">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL QUÊN MẬT KHẨU QUA TELEGRAM BOT -->
+    <div id="modal-forgot-password" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden">
+        <div class="glass-modal border border-slate-800 rounded-2xl max-w-md w-full p-5 sm:p-6 space-y-5">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="text-lg font-bold text-white"><i class="fa-solid fa-key text-amber-400 mr-2"></i>Khôi Phục Mật Khẩu</h3>
+                <button onclick="closeModal('modal-forgot-password')" class="text-slate-400 hover:text-white text-xl">&times;</button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Tài khoản / Email khôi phục</label>
+                    <input type="text" id="forgot-account-input" required placeholder="Nhập tên tài khoản hoặc email..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:border-orange-500 focus:outline-none">
+                </div>
+                <button type="button" onclick="generateTelegramOtpLink()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 rounded-xl transition text-sm flex items-center justify-center gap-2 shadow-lg shadow-sky-600/30">
+                    <i class="fa-brands fa-telegram text-lg"></i> Lấy Mã OTP Qua Telegram Bot
+                </button>
+
+                <!-- KHU VỰC NHẬP OTP XÁC MINH -->
+                <div id="otp-verify-section" class="hidden space-y-3 pt-3 border-t border-slate-800">
+                    <p class="text-xs text-amber-300"><i class="fa-solid fa-circle-info mr-1"></i> Bấm START trong Telegram để nhận mã, sau đó nhập mã OTP 6 số bên dưới:</p>
+                    <input type="text" id="otp-code-input" maxlength="6" placeholder="Nhập mã OTP 6 số..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-center font-mono font-bold tracking-widest text-amber-400 focus:border-orange-500 focus:outline-none">
+                    <input type="password" id="new-password-input" placeholder="Nhập mật khẩu mới..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:border-orange-500 focus:outline-none">
+                    <button type="button" onclick="verifyOtpAndResetPassword()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-2.5 rounded-xl transition text-sm shadow-lg shadow-green-600/30">
+                        Xác Nhận Đổi Mật Khẩu
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -438,15 +494,14 @@
     <script>
         const FIREBASE_PROJECT_ID = "quocdat-396fe";
         const BASE_URL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
+        const TELEGRAM_BOT_USERNAME = "DigitalShopAdminBot"; // Thay Tên Username Bot Telegram của bạn tại đây
 
-        // HÀM CHUYỂN SANG TRANG NAPTIEN.HTML (CÓ ĐỒNG BỘ DỮ LIỆU TÀI KHOẢN)
         function goToNapTien() {
             if (!currentUser) {
                 showToast('Vui lòng đăng nhập trước khi nạp!', 'error');
                 openModal('modal-login');
                 return;
             }
-            // Lưu dữ liệu vào các key để naptien.html đọc
             const uname = currentUser.username || currentUser.email || 'DIGITALSMOD';
             localStorage.setItem('user', uname);
             localStorage.setItem('username', uname);
@@ -455,7 +510,6 @@
             window.location.href = `naptien.html?user=${encodeURIComponent(uname)}`;
         }
 
-        // TỰ ĐỘNG ẨN MÀN HÌNH LOADING KHI FIREBASE TẢI XONG 100%
         function hidePreloader() {
             const preloader = document.getElementById('preloader');
             if (preloader) {
@@ -465,7 +519,6 @@
             }
         }
 
-        // KIỂM TRA ĐĂNG NHẬP (HỖ TRỢ LƯU 90 NGÀY HOẶC COOKIE HẾT HẠN)
         function getStoredUser() {
             const stored = localStorage.getItem('ds_user');
             if (!stored) return null;
@@ -485,6 +538,7 @@
         let storeProducts = [];
         let storeCategories = [];
         let currentSelectedCategory = 'all';
+        let currentOtpData = null;
 
         function escapeHtml(str) {
             if (!str) return '';
@@ -562,9 +616,184 @@
             return res;
         }
 
+        // GIẢI MÃ GOOGLE JWT TOKEN
+        function parseJwt(token) {
+            var base64Url = token.split('.')[1];
+            var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(jsonPayload);
+        }
+
+        // XỬ LÝ ĐĂNG NHẬP GOOGLE VÀ LƯU VÀO FIRESTORE
+        async function handleGoogleLoginResponse(response) {
+            try {
+                const payload = parseJwt(response.credential);
+                const googleEmail = payload.email;
+                const googleName = payload.name || googleEmail.split('@')[0];
+
+                let res = await fetch(`${BASE_URL}/users?pageSize=300`);
+                let data = await res.json();
+                let matched = null;
+
+                (data.documents || []).forEach(doc => {
+                    let fields = parseFirestoreFields(doc.fields || {});
+                    if (fields.email && fields.email.toLowerCase() === googleEmail.toLowerCase()) {
+                        matched = fields;
+                        matched.id = doc.name.split('/').pop();
+                    }
+                });
+
+                if (!matched) {
+                    let userId = 'usr_' + Date.now();
+                    matched = {
+                        id: userId,
+                        username: googleName.replace(/\s+/g, '').toUpperCase(),
+                        email: googleEmail,
+                        password: 'GOOGLE_AUTH_USER',
+                        balance: 0.0,
+                        role: 'user',
+                        expire_at: Date.now() + (90 * 24 * 60 * 60 * 1000)
+                    };
+
+                    await fetch(`${BASE_URL}/users/${userId}`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            fields: {
+                                id: { stringValue: matched.id },
+                                username: { stringValue: matched.username },
+                                email: { stringValue: matched.email },
+                                password: { stringValue: matched.password },
+                                balance: { doubleValue: 0.0 },
+                                role: { stringValue: matched.role }
+                            }
+                        })
+                    });
+                } else {
+                    matched.expire_at = Date.now() + (90 * 24 * 60 * 60 * 1000);
+                }
+
+                currentUser = matched;
+                localStorage.setItem('ds_user', JSON.stringify(matched));
+
+                const uname = matched.username || matched.email;
+                localStorage.setItem('user', uname);
+                localStorage.setItem('username', uname);
+                localStorage.setItem('DGS_USERNAME', uname);
+
+                showToast(`Chào mừng ${googleName}! Đăng nhập thành công.`, 'success');
+                closeModal('modal-login');
+                renderHeaderAuth();
+            } catch (err) {
+                showToast('Lỗi xử lý đăng nhập bằng Google!', 'error');
+            }
+        }
+
+        // LOGIC TẠO MÃ OTP VÀ CHUYỂN HƯỚNG SANG TELEGRAM BOT
+        async function generateTelegramOtpLink() {
+            const accInput = document.getElementById('forgot-account-input').value.trim();
+            if (!accInput) {
+                showToast('Vui lòng nhập Tên tài khoản hoặc Email!', 'error');
+                return;
+            }
+
+            try {
+                let res = await fetch(`${BASE_URL}/users?pageSize=300`);
+                let data = await res.json();
+                let matched = null;
+
+                (data.documents || []).forEach(doc => {
+                    let fields = parseFirestoreFields(doc.fields || {});
+                    if (fields.username === accInput || fields.email === accInput) {
+                        matched = fields;
+                        matched.id = doc.name.split('/').pop();
+                    }
+                });
+
+                if (!matched) {
+                    showToast('Tài khoản hoặc Email không tồn tại trên hệ thống!', 'error');
+                    return;
+                }
+
+                // Tạo ngẫu nhiên mã OTP 6 số
+                const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+                currentOtpData = {
+                    userId: matched.id,
+                    username: matched.username,
+                    code: otpCode,
+                    expireAt: Date.now() + (5 * 60 * 1000) // Hạn dùng 5 phút
+                };
+
+                // Lưu dữ liệu OTP vào Firestore
+                await fetch(`${BASE_URL}/otps/${otpCode}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        fields: {
+                            code: { stringValue: otpCode },
+                            user_id: { stringValue: matched.id },
+                            username: { stringValue: matched.username },
+                            created_at: { stringValue: new Date().toISOString() }
+                        }
+                    })
+                });
+
+                document.getElementById('otp-verify-section').classList.remove('hidden');
+                showToast('Mã OTP đã tạo! Đang chuyển hướng sang Telegram Bot...', 'success');
+
+                // Mở ứng dụng Telegram tự động điền lệnh /start <mã_otp>
+                setTimeout(() => {
+                    window.open(`https://t.me/${TELEGRAM_BOT_USERNAME}?start=${otpCode}`, '_blank');
+                }, 1000);
+
+            } catch (err) {
+                showToast('Lỗi khởi tạo mã OTP!', 'error');
+            }
+        }
+
+        // XÁC MINH OTP VÀ CẬP NHẬT MẬT KHẨU MỚI
+        async function verifyOtpAndResetPassword() {
+            const inputOtp = document.getElementById('otp-code-input').value.trim();
+            const newPass = document.getElementById('new-password-input').value;
+
+            if (!inputOtp || !newPass) {
+                showToast('Vui lòng nhập đầy đủ Mã OTP và Mật khẩu mới!', 'error');
+                return;
+            }
+
+            if (!currentOtpData || currentOtpData.code !== inputOtp) {
+                showToast('Mã OTP không chính xác!', 'error');
+                return;
+            }
+
+            if (Date.now() > currentOtpData.expireAt) {
+                showToast('Mã OTP đã hết hạn! Vui lòng lấy mã mới.', 'error');
+                return;
+            }
+
+            try {
+                // Cập nhật mật khẩu mới vào Firestore
+                await fetch(`${BASE_URL}/users/${currentOtpData.userId}?updateMask.fieldPaths=password`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        fields: { password: { stringValue: newPass } }
+                    })
+                });
+
+                showToast('Đổi mật khẩu thành công! Bạn có thể đăng nhập ngay.', 'success');
+                closeModal('modal-forgot-password');
+                document.getElementById('otp-verify-section').classList.add('hidden');
+                openModal('modal-login');
+            } catch (err) {
+                showToast('Không thể cập nhật mật khẩu mới!', 'error');
+            }
+        }
+
         async function fetchStoreData() {
             try {
-                // TỰ ĐỘNG ĐỒNG BỘ SỐ DƯ MỚI NHẤT TỪ FIREBASE TỪ USER ID
                 if (currentUser && currentUser.id) {
                     try {
                         let userRes = await fetch(`${BASE_URL}/users/${currentUser.id}`);
@@ -582,7 +811,6 @@
                     } catch(e) {}
                 }
 
-                // Tải danh mục
                 let catRes = await fetch(`${BASE_URL}/categories?pageSize=100`);
                 let catData = await catRes.json();
                 storeCategories = (catData.documents || []).map(doc => {
@@ -594,7 +822,6 @@
                 let categoriesKeyed = {};
                 storeCategories.forEach(c => categoriesKeyed[String(c.id)] = c.name);
 
-                // Tải sản phẩm
                 let prodRes = await fetch(`${BASE_URL}/products?pageSize=100`);
                 let prodData = await prodRes.json();
                 storeProducts = (prodData.documents || []).map(doc => {
@@ -618,12 +845,10 @@
             } catch (e) {
                 showToast('Lỗi khi nạp dữ liệu từ Firebase!', 'error');
             } finally {
-                // ĐÃ TẢI XONG TOÀN BỘ FIREBASE -> ẨN MÀN HÌNH CHỜ LOADING
                 hidePreloader();
             }
         }
 
-        // --- BỔ SUNG CƠ CHẾ ĐỒNG BỘ THÔNG BÁO TỪ DASHBOARD REALTIME ---
         let displayedNoticeIds = new Set();
 
         async function fetchSystemPopups() {
@@ -638,24 +863,18 @@
                 }).filter(n => n.status === 'active' && (n.target_page === 'all' || n.target_page === 'index'));
 
                 notices.forEach(p => {
-                    // 1. Dạng Toast Nổi Góc Màn Hình từ Dashboard
                     if (p.type === 'toast' || p.type === 'toast_info') {
                         if (!displayedNoticeIds.has(p.id)) {
                             showToast((p.title ? `[${p.title}] ` : '') + (p.content || ''), p.toast_style || 'info');
                             displayedNoticeIds.add(p.id);
                         }
-                    } 
-                    // 2. Dạng Popup Chính Giữa Màn Hình từ Dashboard
-                    else if (p.type === 'popup' || !p.type) {
+                    } else if (p.type === 'popup' || !p.type) {
                         if (!localStorage.getItem('popup_closed_' + p.id) && !displayedNoticeIds.has(p.id)) {
                             document.getElementById('popup-title').innerText = p.title || 'Thông Báo Hệ Thống';
                             document.getElementById('popup-body').innerText = p.content || '';
                             let modal = document.getElementById('modal-system-popup');
                             let box = document.getElementById('popup-content-box');
-                            
-                            // Lưu ID popup hiện tại để đóng
                             modal.setAttribute('data-current-popup-id', p.id);
-                            
                             modal.classList.remove('hidden');
                             setTimeout(() => { box.classList.remove('scale-95', 'opacity-0'); box.classList.add('scale-100', 'opacity-100'); }, 10);
                             displayedNoticeIds.add(p.id);
@@ -676,7 +895,6 @@
             setTimeout(() => modal.classList.add('hidden'), 300);
         }
 
-        // Tự động kiểm tra thông báo mới từ Dashboard mỗi 4 giây
         setInterval(fetchSystemPopups, 4000);
 
         function renderCategories(categories) {
@@ -801,7 +1019,6 @@
                 let remainingAccs = accLines.join('\n');
                 let newStock = accLines.length;
 
-                // Cập nhật kho sản phẩm
                 await fetch(`${BASE_URL}/products/${id}?updateMask.fieldPaths=account_data&updateMask.fieldPaths=stock`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
@@ -813,11 +1030,9 @@
                     })
                 });
 
-                // Cập nhật số dư người dùng
                 let newBalance = currentUser.balance - fields.price;
                 currentUser.balance = newBalance;
                 
-                // Cập nhật LocalStorage
                 let storedData = JSON.parse(localStorage.getItem('ds_user')) || {};
                 storedData.balance = newBalance;
                 localStorage.setItem('ds_user', JSON.stringify(storedData));
@@ -830,7 +1045,6 @@
                     })
                 });
 
-                // Lưu đơn hàng
                 let orderId = 'ord_' + Date.now();
                 await fetch(`${BASE_URL}/orders/${orderId}`, {
                     method: 'PATCH',
@@ -900,7 +1114,6 @@
                     currentUser = matched;
                     localStorage.setItem('ds_user', JSON.stringify(matched));
                     
-                    // Lưu luôn cho naptien.html đọc
                     const uname = matched.username || matched.email || 'DIGITALSMOD';
                     localStorage.setItem('user', uname);
                     localStorage.setItem('username', uname);
