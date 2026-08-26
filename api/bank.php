@@ -4,16 +4,28 @@ header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Content-Type: application/json; charset=UTF-8");
 
+// Xử lý phương thức GET (Khi mở trực tiếp trên trình duyệt)
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    http_response_code(200);
+    echo json_encode([
+        "status" => "success",
+        "message" => "Webhook API đang hoạt động bình thường!",
+        "time" => date('Y-m-d H:i:s')
+    ]);
+    exit();
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
 }
 
+// --- PHẦN XỬ LÝ DỮ LIỆU POST TỪ SEPAY BÊN DƯỚI ---
 $inputData = file_get_contents("php://input");
 $data = json_decode($inputData, true);
 
 if (!$data) {
-    echo json_encode(["status" => "active", "message" => "Vercel PHP Webhook Ready!"]);
+    echo json_encode(["status" => "error", "message" => "Empty data"]);
     exit();
 }
 
