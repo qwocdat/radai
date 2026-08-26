@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hệ Thống Xác Thực Nhiệm Vụ SEO</title>
+    <title>Xác Thực Nhiệm Vụ Tìm Kiếm SEO</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -20,18 +20,14 @@
         }
 
         * {
-            box-sizing: border-box;
-            margin: 0; padding: 0;
+            box-sizing: border-box; margin: 0; padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
+            -webkit-tap-highlight-color: transparent; user-select: none;
         }
 
         body {
-            background-color: var(--ios27-bg);
-            color: var(--ios27-text);
-            min-height: 100vh;
-            display: flex; justify-content: center; align-items: center;
+            background-color: var(--ios27-bg); color: var(--ios27-text);
+            min-height: 100vh; display: flex; justify-content: center; align-items: center;
             overflow-x: hidden;
             background-image: 
                 radial-gradient(circle at 15% 15%, rgba(0, 240, 255, 0.12) 0%, transparent 45%),
@@ -62,22 +58,23 @@
 
         .screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            padding: 20px; display: flex; flex-direction: column; gap: 16px;
+            padding: 20px; display: flex; flex-direction: column; gap: 14px;
             opacity: 0; pointer-events: none;
             transform: scale(0.95) translateY(10px);
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-y: auto;
         }
 
         .screen.active { opacity: 1; pointer-events: auto; transform: scale(1) translateY(0); }
 
         .glass-card {
             background: var(--ios27-card); backdrop-filter: var(--blur-val);
-            border: 1px solid var(--ios27-card-border); border-radius: 20px; padding: 20px;
+            border: 1px solid var(--ios27-card-border); border-radius: 20px; padding: 18px;
         }
 
         .ios-btn {
             background: linear-gradient(135deg, var(--ios27-accent), var(--ios27-neon-purple));
-            color: white; border: none; border-radius: 14px; padding: 15px;
+            color: white; border: none; border-radius: 14px; padding: 14px;
             font-size: 15px; font-weight: 600; cursor: pointer; width: 100%;
             display: flex; align-items: center; justify-content: center; gap: 8px;
             box-shadow: 0 4px 20px rgba(112, 0, 255, 0.3); transition: transform 0.2s;
@@ -89,19 +86,18 @@
             border: 1px solid var(--ios27-card-border); border-radius: 12px;
             padding: 14px; color: #fff; font-size: 15px; outline: none; margin-top: 10px;
         }
-        .ios-input:focus { border-color: var(--ios27-neon-blue); }
 
-        .scanner-loader {
-            width: 45px; height: 45px; border: 3px solid rgba(0, 240, 255, 0.1);
-            border-radius: 50%; border-top-color: var(--ios27-neon-blue);
-            animation: spin 0.8s linear infinite; margin: 10px auto;
+        .keyword-box {
+            background: rgba(0, 240, 255, 0.1); border: 1px dashed var(--ios27-neon-blue);
+            color: var(--ios27-neon-blue); padding: 12px; border-radius: 12px;
+            font-weight: bold; font-size: 16px; text-align: center; margin: 10px 0;
+            display: flex; align-items: center; justify-content: space-between;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .badge-tag {
-            background: rgba(0, 240, 255, 0.1); color: var(--ios27-neon-blue);
-            padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 600;
-            display: inline-block; margin-bottom: 8px;
+        .step-number {
+            background: var(--ios27-accent); color: white; width: 22px; height: 22px;
+            border-radius: 50%; display: inline-flex; align-items: center;
+            justify-content: center; font-size: 12px; font-weight: bold; margin-right: 6px;
         }
     </style>
 </head>
@@ -109,51 +105,55 @@
 
 <div class="app-container">
     <div class="nav-bar">
-        <div style="font-size: 16px; font-weight: 600;" id="navTitle">Hệ Thống Nhiệm Vụ</div>
-        <i class="fa-solid fa-shield-halved" style="color: var(--ios27-neon-blue);"></i>
+        <div style="font-size: 16px; font-weight: 600;" id="navTitle">Nhiệm Vụ SEO Google</div>
+        <i class="fa-brands fa-google" style="color: var(--ios27-neon-blue);"></i>
     </div>
 
     <div class="screen-container">
         
-        <!-- MÀN HÌNH 1: ĐANG LẤY NHIỆM VỤ (ẨN HẾT LOG BOT) -->
-        <div class="screen active" id="screen1">
-            <div class="glass-card" style="text-align: center; padding: 40px 20px;">
-                <div class="scanner-loader"></div>
-                <h3 style="margin-top: 15px; font-size: 17px;" id="statusText">Đang lấy nhiệm vụ...</h3>
-                <p style="color: var(--ios27-subtext); font-size: 13px; margin-top: 8px;">
-                    Hệ thống đang kết nối máy chủ đối tác để nhận link khả dụng.
-                </p>
-            </div>
-        </div>
-
-        <!-- MÀN HÌNH 2: GIAO NHIỆM VỤ CHUYÊN NGHIỆP -->
-        <div class="screen" id="screen2">
+        <!-- MÀN HÌNH NHIỆM VỤ (TẢI TỨC THÌ TỪ LÚC MỞ WEB) -->
+        <div class="screen active" id="screenTask">
             <div class="glass-card">
-                <span class="badge-tag" id="categoryTag">BẤT ĐỘNG SẢN / ĐIỆN TỬ</span>
-                <h3 style="margin-bottom: 8px; font-size: 18px;" id="taskTitle">Nhiệm vụ Xác Thực Traffic</h3>
-                <p style="font-size: 13px; color: var(--ios27-subtext); line-height: 1.5;" id="taskDesc">
-                    Nhấn vào nút bên dưới để mở trang đối tác, tìm **Mã Xác Nhận / Hotline** hiển thị trên trang và dán vào đây.
+                <div style="font-size: 12px; color: var(--ios27-neon-blue); font-weight: bold; margin-bottom: 5px;" id="priorityBadge">
+                    ⚡ NHIỆM VỤ ĐÃ SẴN SÀNG
+                </div>
+
+                <p style="font-size: 13px; color: var(--ios27-subtext); margin-bottom: 8px;">
+                    <span class="step-number">1</span> Copy từ khóa và tìm trên Google:
                 </p>
-                <button class="ios-btn" style="margin-top: 15px; background: rgba(255,255,255,0.08);" onclick="openTargetWeb()">
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Mở Trang Web Nhiệm Vụ
+                <div class="keyword-box">
+                    <span id="targetKeyword">bất động sản sài gòn</span>
+                    <i class="fa-regular fa-copy" style="cursor: pointer;" onclick="copyKeyword()"></i>
+                </div>
+
+                <p style="font-size: 13px; color: var(--ios27-subtext); margin-top: 12px;">
+                    <span class="step-number">2</span> Tìm kết quả trang web: <b id="targetDomainDisplay" style="color: #fff;">batdongsan.com.vn</b>
+                </p>
+
+                <p style="font-size: 13px; color: var(--ios27-subtext); margin-top: 10px;">
+                    <span class="step-number">3</span> Vào trang, cuộn xuống chân trang để lấy <b id="codeTypeLabel" style="color: var(--ios27-success);">Số Hotline / Mã Zip</b>.
+                </p>
+
+                <button class="ios-btn" style="margin-top: 15px; background: rgba(255,255,255,0.08);" onclick="openGoogleSearch()">
+                    <i class="fa-solid fa-magnifying-glass"></i> Mở Google Tìm Kiếm
                 </button>
             </div>
 
             <div class="glass-card">
                 <h4 style="font-size: 14px; color: var(--ios27-subtext);">Nhập Mã Xác Nhận</h4>
-                <input type="text" id="userInputCode" class="ios-input" placeholder="Ví dụ: 098xxxxxxx hoặc Mã Zip...">
+                <input type="text" id="userInputCode" class="ios-input" placeholder="Dán Mã Zip hoặc SĐT vào đây...">
                 <button class="ios-btn" style="margin-top: 12px; background: linear-gradient(135deg, #007AFF, #00F0FF);" onclick="verifyCode()">
                     <i class="fa-solid fa-key"></i> Xác Nhận Lấy Key
                 </button>
             </div>
         </div>
 
-        <!-- MÀN HÌNH 3: NHẬN KEY THÀNH CÔNG -->
-        <div class="screen" id="screen3">
+        <!-- MÀN HÌNH KEY THÀNH CÔNG -->
+        <div class="screen" id="screenSuccess">
             <div class="glass-card" style="text-align: center; padding: 30px 20px;">
                 <i class="fa-solid fa-circle-check" style="font-size: 48px; color: var(--ios27-success); margin-bottom: 12px;"></i>
                 <h3 style="margin-bottom: 5px;">Xác Thực Thành Công!</h3>
-                <p style="color: var(--ios27-subtext); font-size: 13px;">Key kích hoạt của bạn:</p>
+                <p style="color: var(--ios27-subtext); font-size: 13px;">Key của bạn đã được kích hoạt:</p>
                 <div class="ios-input" id="finalKey" style="font-family: monospace; font-size: 18px; color: #30D158; margin: 15px 0; text-align: center; font-weight: bold;">
                     KEY-SUCCESS
                 </div>
@@ -167,114 +167,68 @@
 </div>
 
 <script>
-    // Danh sách web Việt Nam thuộc ngành Bất Động Sản, Laptop, Đồ điện tử
-    const vnWebList = [
-        { url: "https://cellphones.com.vn", category: "ĐIỆN THOẠI - LAPTOP" },
-        { url: "https://phongvu.vn", category: "MÁY TÍNH - LINH KIỆN" },
-        { url: "https://batdongsan.com.vn", category: "BẤT ĐỘNG SẢN VIỆT NAM" },
-        { url: "https://chotot.com", category: "MUA BÁN ĐIỆN TỬ" },
-        { url: "https://nguyenkim.com", category: "ĐIỆN MÁY TỔNG HỢP" }
+    // Cơ sở dữ liệu Web Việt Nam chuẩn SEO
+    const seoDatabase = [
+        { domain: "cellphones.com.vn", keyword: "cellphones laptop gia re", code: "18002097", type: "Số Hotline Tổng Đài" },
+        { domain: "phongvu.vn", keyword: "phong vu may tinh may ban", code: "18006867", type: "Số Hotline CSKH" },
+        { domain: "batdongsan.com.vn", keyword: "bat dong san gia re ha noi", code: "19001881", type: "Số Hotline Bất Động Sản" },
+        { domain: "chotot.com", keyword: "cho tot do dien tu cu", code: "19003003", type: "Mã Tổng Đài Chợ Tốt" }
     ];
 
-    let currentTargetUrl = null;
-    let validCode = null;
+    let currentTask = null;
 
-    document.addEventListener("DOMContentLoaded", () => {
-        fetchTask();
-    });
-
-    // Hàm chạy ngầm lấy nhiệm vụ mà không lộ log kỹ thuật
-    async function fetchTask() {
-        // Tráo ngẫu nhiên danh sách web Việt Nam
-        const shuffledList = vnWebList.sort(() => 0.5 - Math.random());
-
-        for (let item of shuffledList) {
-            try {
-                // Đọc ngầm HTML thông qua Proxy
-                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(item.url)}`;
-                const res = await fetch(proxyUrl);
-                const data = await res.json();
-                const html = data.contents;
-
-                // Nếu dính Cloudflare hoặc lỗi, silently bỏ qua để sang web khác
-                if (!html || isBlocked(html)) continue;
-
-                // Tự động quét lấy SĐT Hotline Việt Nam hoặc Mã Zip/Mã SP
-                const extracted = extractVNData(html);
-                if (extracted) {
-                    currentTargetUrl = item.url;
-                    validCode = extracted.code;
-
-                    // Cập nhật giao diện nhiệm vụ
-                    document.getElementById('categoryTag').innerText = item.category;
-                    document.getElementById('taskTitle').innerText = `Tìm ${extracted.label}`;
-                    document.getElementById('taskDesc').innerText = `Truy cập trang web bên dưới, cuộn xuống chân trang (Footer) hoặc mục Liên Hệ để lấy ${extracted.label} và dán vào đây.`;
-
-                    // Chuyển sang giao diện nhận nhiệm vụ sau 1.5 giây
-                    setTimeout(() => {
-                        switchScreen('screen2', 'Nhiệm Vụ Đang Làm');
-                    }, 1500);
-                    return;
-                }
-            } catch (e) {
-                // Bỏ qua lỗi ngầm
-            }
+    // Chạy NGAY LẬP TỨC khi nạp script
+    (function instantInit() {
+        // 1. Lấy danh sách web đã từng làm thành công từ LocalStorage
+        const historyData = JSON.parse(localStorage.getItem('user_completed_tasks') || '[]');
+        
+        if (historyData.length > 0) {
+            // ƯU TIÊN LẤY WEB ĐÃ TỪNG VƯỢT THÀNH CÔNG
+            const lastDomain = historyData[historyData.length - 1];
+            currentTask = seoDatabase.find(item => item.domain === lastDomain) || seoDatabase[0];
+            document.getElementById('priorityBadge').innerText = "🔥 ƯU TIÊN WEB ĐÃ LÀM THƯỜNG XUYÊN";
+        } else {
+            // Lấy ngẫu nhiên web lần đầu
+            currentTask = seoDatabase[Math.floor(Math.random() * seoDatabase.length)];
         }
 
-        // Backup dự phòng nếu tất cả web chính đều bị chặn
-        currentTargetUrl = "https://cellphones.com.vn";
-        validCode = "18002097"; // Hotline tổng đài CellphoneS
-        document.getElementById('categoryTag').innerText = "THIẾT BỊ ĐIỆN TỬ";
-        document.getElementById('taskTitle').innerText = "Tìm Số Hotline Tổng Đài";
-        document.getElementById('taskDesc').innerText = "Vào trang web bên dưới, lấy Số Tổng Đài Điện Thoại (1800xxxx) dán vào đây.";
+        // Đổ dữ liệu lên UI lập tức trong 0 giây
+        document.getElementById('targetKeyword').innerText = currentTask.keyword;
+        document.getElementById('targetDomainDisplay').innerText = currentTask.domain;
+        document.getElementById('codeTypeLabel').innerText = currentTask.type;
+    })();
 
-        setTimeout(() => {
-            switchScreen('screen2', 'Nhiệm Vụ Đang Làm');
-        }, 1500);
+    function copyKeyword() {
+        navigator.clipboard.writeText(currentTask.keyword);
+        alert("Đã copy từ khóa: " + currentTask.keyword);
     }
 
-    // Nhận biết nhanh xem web đó có bị chặn không
-    function isBlocked(html) {
-        const lower = html.toLowerCase();
-        return lower.includes("just a moment") || lower.includes("cloudflare") || lower.includes("access denied");
-    }
-
-    // Bóc tách SĐT hotline Việt Nam (09x, 03x, 08x, 1800, 1900) hoặc Mã Bưu Chính
-    function extractVNData(html) {
-        const hotlineRegex = /(1800|1900|0[3|5|7|8|9])([0-9]{6,8})\b/;
-        const zipRegex = /\b[0-9]{5,6}\b/;
-
-        const hotlineMatch = html.match(hotlineRegex);
-        const zipMatch = html.match(zipRegex);
-
-        if (hotlineMatch) {
-            return { label: "Số Hotline Liên Hệ", code: hotlineMatch[0] };
-        } else if (zipMatch) {
-            return { label: "Mã Bưu Chính / Mã Zip", code: zipMatch[0] };
-        }
-        return null;
-    }
-
-    function openTargetWeb() {
-        if (currentTargetUrl) window.open(currentTargetUrl, '_blank');
+    function openGoogleSearch() {
+        copyKeyword();
+        // Mở thẳng trang tìm kiếm Google với từ khóa đã điền sẵn
+        const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(currentTask.keyword)}`;
+        window.open(googleUrl, '_blank');
     }
 
     function verifyCode() {
         const input = document.getElementById('userInputCode').value.trim();
-        // Kiểm tra mã người dùng nhập có khớp không (hoặc dùng master key 8899)
-        if (input === validCode || input === "8899") {
-            const key = "KEY-" + Math.random().toString(36).substring(2, 8).toUpperCase() + "-VN";
-            document.getElementById('finalKey').innerText = key;
-            switchScreen('screen3', 'Hoàn Thành');
-        } else {
-            alert("Mã không chính xác! Vui lòng kiểm tra lại trên trang web.");
-        }
-    }
+        
+        // Kiểm tra khớp mã hoặc dùng Master Pass 8899
+        if (input === currentTask.code || input === "8899") {
+            // LƯU LẠI WEB NÀY VÀO LỊCH SỬ ĐỂ LẦN SAU ƯU TIÊN
+            let historyData = JSON.parse(localStorage.getItem('user_completed_tasks') || '[]');
+            if (!historyData.includes(currentTask.domain)) {
+                historyData.push(currentTask.domain);
+                localStorage.setItem('user_completed_tasks', JSON.stringify(historyData));
+            }
 
-    function switchScreen(id, title) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        document.getElementById('navTitle').innerText = title;
+            // Tạo Key & chuyển màn hình
+            document.getElementById('finalKey').innerText = "KEY-" + Math.random().toString(36).substring(2, 8).toUpperCase() + "-SEO";
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('screenSuccess').classList.add('active');
+        } else {
+            alert("Mã xác nhận chưa chính xác! Vui lòng tìm đúng trên web đối tác.");
+        }
     }
 </script>
 </body>
