@@ -398,11 +398,9 @@
             resizeCanvas();
             window.addEventListener('resize', resizeCanvas);
 
-            // Tự đọc cấu hình máy (Hardware Concurrency & Độ phân giải)
             const cpuCores = navigator.hardwareConcurrency || 4;
             const screenArea = window.innerWidth * window.innerHeight;
             
-            // Tính số lượng hạt trong khoảng từ 50 đến 300
             let particleCount = Math.floor((cpuCores * 25) + (screenArea / 15000));
             particleCount = Math.max(50, Math.min(300, particleCount));
 
@@ -478,25 +476,21 @@
             const dlBtn = document.getElementById('dlBtn');
             const loader = document.getElementById('pageLoader');
 
-            // Bật Mờ Trang Loading Cyberpunk
             loader.classList.add('active');
             qrWrapper.classList.remove('scanning');
 
             currentQRUrl = `https://img.vietqr.io/image/VietinBank-999939213333-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(transferContentText)}&accountName=NGUYEN%20DAI%20QUOC%20DAT`;
 
-            // Preload ảnh QR ngầm
             const tempImg = new Image();
             tempImg.src = currentQRUrl;
             tempImg.onload = function() {
                 setTimeout(() => {
                     qrImage.src = currentQRUrl;
                     qrWrapper.classList.add('show');
-                    qrWrapper.classList.add('scanning'); // Kích hoạt tia Laser quét mã
+                    qrWrapper.classList.add('scanning');
                     dlBtn.style.display = 'inline-block';
-                    
-                    // Tắt Loading
                     loader.classList.remove('active');
-                }, 600); // Tạo độ trễ mượt mà
+                }, 600);
             };
         }
 
@@ -598,7 +592,82 @@
         setInterval(syncFirebaseBalance, 2500);
         syncFirebaseBalance();
 
-        // --- 4. 3D TILT & PHYSICAL DRAG ---
+        // --- 4. SEPAY API ENGINE QUÉT GIAO DỊCH VÀ TỰ CỘNG TIỀN FIRESTORE ---
+        const SEPAY_API_KEY = "47ATOLT2I6JZDHNR1QSICF7MYJLPDSEH5AENWWPYBVNE3MYZUQUVWODZGIKXVLC2";
+        const SEPAY_ACCOUNT_NO = "999939213333";
+
+        async function checkSepayTransactions() {
+            try {
+                let response = await fetch(`https://my.sepay.vn/userapi/transactions/list?account_number=${SEPAY_ACCOUNT_NO}&limit=20`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${SEPAY_API_KEY}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) return;
+                let data = await response.json();
+                let transactions = data.messages || data.transactions || [];
+
+                for (let tx of transactions) {
+                    let content = (tx.transaction_content || tx.content || '').toUpperCase();
+                    let amountin = parseFloat(tx.amount_in || tx.amount || 0);
+
+                    if (content.includes(`SEVQR NAP ${currentUser}`) && amountin > 0) {
+                        let transId = tx.id || tx.reference_number;
+
+                        let checkOrder = await fetch(`${BASE_URL}/deposits/sepay_${transId}`);
+                        if (!checkOrder.ok) {
+                            let userRes = await fetch(`${BASE_URL}/users?pageSize=300`);
+                            let userData = await userRes.json();
+                            let targetUserDoc = null;
+
+                            (userData.documents || []).forEach(doc => {
+                                let fields = parseFirestoreFields(doc.fields || {});
+                                if ((fields.username && fields.username.toUpperCase() === currentUser) ||
+                                    (fields.email && fields.email.toUpperCase() === currentUser)) {
+                                    targetUserDoc = { id: doc.name.split('/').pop(), balance: fields.balance || 0 };
+                                }
+                            });
+
+                            if (targetUserDoc) {
+                                let newBalance = targetUserDoc.balance + amountin;
+                                await fetch(`${BASE_URL}/users/${targetUserDoc.id}?updateMask.fieldPaths=balance`, {
+                                    method: 'PATCH',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ fields: { balance: { doubleValue: newBalance } } })
+                                });
+
+                                await fetch(`${BASE_URL}/deposits/sepay_${transId}`, {
+                                    method: 'PATCH',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        fields: {
+                                            id: { stringValue: `sepay_${transId}` },
+                                            user_id: { stringValue: targetUserDoc.id },
+                                            username: { stringValue: currentUser },
+                                            amount: { doubleValue: amountin },
+                                            payment_method: { stringValue: 'SePay VietinBank' },
+                                            status: { stringValue: 'success' },
+                                            created_at: { stringValue: new Date().toISOString() }
+                                        }
+                                    })
+                                });
+
+                                showSuccessPopup(amountin);
+                                syncFirebaseBalance();
+                            }
+                        }
+                    }
+                }
+            } catch (e) {}
+        }
+
+        setInterval(checkSepayTransactions, 3000);
+        checkSepayTransactions();
+
+        // --- 5. 3D TILT & PHYSICAL DRAG ---
         const card = document.getElementById('glassCard');
         let startX = 0, startY = 0, currentX = 0, currentY = 0, isDragging = false;
 
