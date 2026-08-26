@@ -3,18 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hệ Thống Get Key</title>
+    <title>Hệ Thống Xác Thực Nhiệm Vụ SEO</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --ios27-bg: #030712;
             --ios27-card: rgba(255, 255, 255, 0.05);
-            --ios27-card-border: rgba(255, 255, 255, 0.15);
+            --ios27-card-border: rgba(255, 255, 255, 0.12);
             --ios27-neon-blue: #00f0ff;
             --ios27-neon-purple: #7000ff;
             --ios27-accent: #007AFF;
             --ios27-success: #30D158;
-            --ios27-error: #FF453A;
             --ios27-text: #FFFFFF;
             --ios27-subtext: #9CA3AF;
             --blur-val: blur(35px);
@@ -22,8 +21,7 @@
 
         * {
             box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
@@ -33,9 +31,7 @@
             background-color: var(--ios27-bg);
             color: var(--ios27-text);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            display: flex; justify-content: center; align-items: center;
             overflow-x: hidden;
             background-image: 
                 radial-gradient(circle at 15% 15%, rgba(0, 240, 255, 0.12) 0%, transparent 45%),
@@ -43,144 +39,126 @@
         }
 
         .app-container {
-            width: 100%;
-            max-width: 430px;
-            height: 100vh;
-            max-height: 932px;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            width: 100%; max-width: 430px; height: 100vh; max-height: 932px;
+            position: relative; display: flex; flex-direction: column; overflow: hidden;
         }
 
         @media (min-width: 440px) {
             .app-container {
-                height: 880px;
-                border-radius: 50px;
+                height: 880px; border-radius: 40px;
                 border: 1px solid rgba(255, 255, 255, 0.2);
                 box-shadow: 0 0 40px rgba(0, 240, 255, 0.15);
             }
         }
 
         .nav-bar {
-            padding: 50px 20px 15px;
-            backdrop-filter: var(--blur-val);
-            background: rgba(3, 7, 18, 0.6);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            padding: 50px 20px 15px; backdrop-filter: var(--blur-val);
+            background: rgba(3, 7, 18, 0.6); display: flex;
+            align-items: center; justify-content: space-between;
             border-bottom: 0.5px solid var(--ios27-card-border);
         }
 
         .screen-container { flex: 1; position: relative; width: 100%; }
 
         .screen {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             padding: 20px; display: flex; flex-direction: column; gap: 16px;
             opacity: 0; pointer-events: none;
-            transform: scale(0.94) translateY(15px);
-            transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: scale(0.95) translateY(10px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .screen.active { opacity: 1; pointer-events: auto; transform: scale(1) translateY(0); }
 
         .glass-card {
-            background: var(--ios27-card);
-            backdrop-filter: var(--blur-val);
-            border: 1px solid var(--ios27-card-border);
-            border-radius: 24px; padding: 22px;
+            background: var(--ios27-card); backdrop-filter: var(--blur-val);
+            border: 1px solid var(--ios27-card-border); border-radius: 20px; padding: 20px;
         }
 
         .ios-btn {
             background: linear-gradient(135deg, var(--ios27-accent), var(--ios27-neon-purple));
-            color: white; border: none; border-radius: 18px; padding: 16px;
-            font-size: 16px; font-weight: 600; cursor: pointer; width: 100%;
+            color: white; border: none; border-radius: 14px; padding: 15px;
+            font-size: 15px; font-weight: 600; cursor: pointer; width: 100%;
             display: flex; align-items: center; justify-content: center; gap: 8px;
-            box-shadow: 0 4px 20px rgba(112, 0, 255, 0.4);
+            box-shadow: 0 4px 20px rgba(112, 0, 255, 0.3); transition: transform 0.2s;
         }
+        .ios-btn:active { transform: scale(0.97); }
 
         .ios-input {
-            width: 100%; background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--ios27-card-border); border-radius: 16px;
-            padding: 16px; color: #fff; font-size: 16px; outline: none;
+            width: 100%; background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--ios27-card-border); border-radius: 12px;
+            padding: 14px; color: #fff; font-size: 15px; outline: none; margin-top: 10px;
         }
-
-        .status-badge {
-            font-size: 12px; font-weight: bold; padding: 4px 8px; border-radius: 6px; display: inline-block;
-        }
-        .status-filtering { background: rgba(0, 240, 255, 0.15); color: var(--ios27-neon-blue); }
-        .status-blocked { background: rgba(255, 69, 58, 0.15); color: var(--ios27-error); }
-        .status-passed { background: rgba(48, 209, 88, 0.15); color: var(--ios27-success); }
+        .ios-input:focus { border-color: var(--ios27-neon-blue); }
 
         .scanner-loader {
-            width: 40px; height: 40px; border: 3px solid rgba(0, 240, 255, 0.1);
+            width: 45px; height: 45px; border: 3px solid rgba(0, 240, 255, 0.1);
             border-radius: 50%; border-top-color: var(--ios27-neon-blue);
-            animation: spin 0.8s linear infinite; margin: 0 auto;
+            animation: spin 0.8s linear infinite; margin: 10px auto;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        .badge-tag {
+            background: rgba(0, 240, 255, 0.1); color: var(--ios27-neon-blue);
+            padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 600;
+            display: inline-block; margin-bottom: 8px;
+        }
     </style>
 </head>
 <body>
 
 <div class="app-container">
     <div class="nav-bar">
-        <div style="font-size: 17px; font-weight: 600;" id="navTitle">Hệ Thống Lọc Nhiệm Vụ</div>
-        <i class="fa-solid fa-filter-circle-xmark" style="color: var(--ios27-neon-blue);"></i>
+        <div style="font-size: 16px; font-weight: 600;" id="navTitle">Hệ Thống Nhiệm Vụ</div>
+        <i class="fa-solid fa-shield-halved" style="color: var(--ios27-neon-blue);"></i>
     </div>
 
     <div class="screen-container">
         
-        <!-- SCREEN 1: BỘ LỌC BOT & CLOUDFLARE -->
+        <!-- MÀN HÌNH 1: ĐANG LẤY NHIỆM VỤ (ẨN HẾT LOG BOT) -->
         <div class="screen active" id="screen1">
-            <div class="glass-card" style="text-align: center; padding: 30px 20px;">
-                <div class="scanner-loader" id="loader"></div>
-                <h3 style="margin-top: 15px; font-size: 18px;" id="filterStatus">Đang quét danh sách web...</h3>
-                <p style="color: var(--ios27-subtext); font-size: 13px; margin-top: 5px;" id="filterDetail">
-                    Đang loại bỏ web chặn Bot, Cloudflare & tìm mã dữ liệu...
+            <div class="glass-card" style="text-align: center; padding: 40px 20px;">
+                <div class="scanner-loader"></div>
+                <h3 style="margin-top: 15px; font-size: 17px;" id="statusText">Đang lấy nhiệm vụ...</h3>
+                <p style="color: var(--ios27-subtext); font-size: 13px; margin-top: 8px;">
+                    Hệ thống đang kết nối máy chủ đối tác để nhận link khả dụng.
                 </p>
-            </div>
-
-            <div class="glass-card">
-                <h4 style="margin-bottom: 12px; font-size: 15px; color: var(--ios27-subtext);">Nhật Ký Quét Web</h4>
-                <div id="logs" style="font-size: 13px; display: flex; flex-direction: column; gap: 8px; font-family: monospace;">
-                    <!-- Logs sẽ tự đẩy vào đây -->
-                </div>
             </div>
         </div>
 
-        <!-- SCREEN 2: GIAO NHIỆM VỤ ĐÃ QUA LỌC SẠCH -->
+        <!-- MÀN HÌNH 2: GIAO NHIỆM VỤ CHUYÊN NGHIỆP -->
         <div class="screen" id="screen2">
             <div class="glass-card">
-                <span class="status-badge status-passed" style="margin-bottom: 10px;">WEB MỤC TIÊU SẠCH (NO CLOUDFLARE)</span>
-                <h3 style="margin-bottom: 10px;" id="taskTitle">Nhiệm vụ được giao</h3>
-                <p style="font-size: 14px; color: var(--ios27-subtext); margin-bottom: 15px;" id="taskDesc">
-                    Vui lòng mở web mục tiêu bên dưới để lấy thông tin.
+                <span class="badge-tag" id="categoryTag">BẤT ĐỘNG SẢN / ĐIỆN TỬ</span>
+                <h3 style="margin-bottom: 8px; font-size: 18px;" id="taskTitle">Nhiệm vụ Xác Thực Traffic</h3>
+                <p style="font-size: 13px; color: var(--ios27-subtext); line-height: 1.5;" id="taskDesc">
+                    Nhấn vào nút bên dưới để mở trang đối tác, tìm **Mã Xác Nhận / Hotline** hiển thị trên trang và dán vào đây.
                 </p>
-                <button class="ios-btn" style="background: rgba(255,255,255,0.1);" onclick="openTargetWeb()">
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Mở Web Mục Tiêu
+                <button class="ios-btn" style="margin-top: 15px; background: rgba(255,255,255,0.08);" onclick="openTargetWeb()">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Mở Trang Web Nhiệm Vụ
                 </button>
             </div>
 
             <div class="glass-card">
-                <h4 style="margin-bottom: 10px;">Nhập Mã Xác Nhận</h4>
-                <input type="text" id="userInputCode" class="ios-input" placeholder="Dán mã (SĐT / Mã Zip) vào đây...">
-                <button class="ios-btn" style="margin-top: 12px; background: linear-gradient(135deg, #30D158, #00A843);" onclick="verifyCode()">
-                    Xác Nhận & Lấy Key
+                <h4 style="font-size: 14px; color: var(--ios27-subtext);">Nhập Mã Xác Nhận</h4>
+                <input type="text" id="userInputCode" class="ios-input" placeholder="Ví dụ: 098xxxxxxx hoặc Mã Zip...">
+                <button class="ios-btn" style="margin-top: 12px; background: linear-gradient(135deg, #007AFF, #00F0FF);" onclick="verifyCode()">
+                    <i class="fa-solid fa-key"></i> Xác Nhận Lấy Key
                 </button>
             </div>
         </div>
 
-        <!-- SCREEN 3: KẾT QUẢ KEY -->
+        <!-- MÀN HÌNH 3: NHẬN KEY THÀNH CÔNG -->
         <div class="screen" id="screen3">
-            <div class="glass-card" style="text-align: center;">
-                <i class="fa-solid fa-circle-check" style="font-size: 42px; color: var(--ios27-success); margin-bottom: 10px;"></i>
-                <h3>Lấy Key Thành Công!</h3>
-                <div class="ios-input" id="finalKey" style="font-family: monospace; font-size: 18px; color: #30D158; margin: 15px 0; text-align: center;">
-                    KEY-PASSED
+            <div class="glass-card" style="text-align: center; padding: 30px 20px;">
+                <i class="fa-solid fa-circle-check" style="font-size: 48px; color: var(--ios27-success); margin-bottom: 12px;"></i>
+                <h3 style="margin-bottom: 5px;">Xác Thực Thành Công!</h3>
+                <p style="color: var(--ios27-subtext); font-size: 13px;">Key kích hoạt của bạn:</p>
+                <div class="ios-input" id="finalKey" style="font-family: monospace; font-size: 18px; color: #30D158; margin: 15px 0; text-align: center; font-weight: bold;">
+                    KEY-SUCCESS
                 </div>
-                <button class="ios-btn" onclick="navigator.clipboard.writeText(document.getElementById('finalKey').innerText); alert('Đã sao chép!');">
-                    Sao Chép Key
+                <button class="ios-btn" style="background: linear-gradient(135deg, #30D158, #00A843);" onclick="navigator.clipboard.writeText(document.getElementById('finalKey').innerText); alert('Đã sao chép Key!');">
+                    <i class="fa-regular fa-copy"></i> Sao Chép Key
                 </button>
             </div>
         </div>
@@ -189,117 +167,107 @@
 </div>
 
 <script>
-    // Danh sách web mục tiêu dự phòng (Có thể thêm thoải mái)
-    const targetWebList = [
-        "https://httpbin.org/html",                  // Web test sạch
-        "https://nowsecure.nl",                      // Web dính Cloudflare
-        "https://jsonplaceholder.typicode.com/users" // Web sạch có SĐT
+    // Danh sách web Việt Nam thuộc ngành Bất Động Sản, Laptop, Đồ điện tử
+    const vnWebList = [
+        { url: "https://cellphones.com.vn", category: "ĐIỆN THOẠI - LAPTOP" },
+        { url: "https://phongvu.vn", category: "MÁY TÍNH - LINH KIỆN" },
+        { url: "https://batdongsan.com.vn", category: "BẤT ĐỘNG SẢN VIỆT NAM" },
+        { url: "https://chotot.com", category: "MUA BÁN ĐIỆN TỬ" },
+        { url: "https://nguyenkim.com", category: "ĐIỆN MÁY TỔNG HỢP" }
     ];
 
-    let currentTarget = null;
-    let validSecretCode = null;
+    let currentTargetUrl = null;
+    let validCode = null;
 
     document.addEventListener("DOMContentLoaded", () => {
-        filterWebList();
+        fetchTask();
     });
 
-    // --- HỆ THỐNG LỌC BẰNG THUẬT TOÁN AUTOMATED FILTERING ---
-    async function filterWebList() {
-        const logBox = document.getElementById('logs');
+    // Hàm chạy ngầm lấy nhiệm vụ mà không lộ log kỹ thuật
+    async function fetchTask() {
+        // Tráo ngẫu nhiên danh sách web Việt Nam
+        const shuffledList = vnWebList.sort(() => 0.5 - Math.random());
 
-        for (let url of targetWebList) {
-            addLog(logBox, `Đang test: ${url}`, 'status-filtering');
-
+        for (let item of shuffledList) {
             try {
-                // Dùng Proxy CORS công khai để đọc trước HTML
-                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-                const response = await fetch(proxyUrl);
-                const data = await response.json();
-                const htmlContent = data.contents;
+                // Đọc ngầm HTML thông qua Proxy
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(item.url)}`;
+                const res = await fetch(proxyUrl);
+                const data = await res.json();
+                const html = data.contents;
 
-                // 1. KIỂM TRA BOT / CLOUDFLARE CHALLENGE
-                if (!htmlContent || isCloudflareOrBlocked(htmlContent)) {
-                    addLog(logBox, `❌ Bị Chặn/CF: ${url.slice(0, 20)}...`, 'status-blocked');
-                    continue; // Bỏ qua web này, nhảy sang web tiếp theo
-                }
+                // Nếu dính Cloudflare hoặc lỗi, silently bỏ qua để sang web khác
+                if (!html || isBlocked(html)) continue;
 
-                // 2. TÌM DỮ LIỆU SĐT HOẶC MÃ ZIP TRÊN TRANG
-                const extracted = extractData(htmlContent);
+                // Tự động quét lấy SĐT Hotline Việt Nam hoặc Mã Zip/Mã SP
+                const extracted = extractVNData(html);
                 if (extracted) {
-                    currentTarget = url;
-                    validSecretCode = extracted.code;
-                    addLog(logBox, `✅ Sạch! Tìm thấy ${extracted.type}`, 'status-passed');
+                    currentTargetUrl = item.url;
+                    validCode = extracted.code;
 
-                    // Chuyển sang màn hình giao nhiệm vụ sau 1 giây
+                    // Cập nhật giao diện nhiệm vụ
+                    document.getElementById('categoryTag').innerText = item.category;
+                    document.getElementById('taskTitle').innerText = `Tìm ${extracted.label}`;
+                    document.getElementById('taskDesc').innerText = `Truy cập trang web bên dưới, cuộn xuống chân trang (Footer) hoặc mục Liên Hệ để lấy ${extracted.label} và dán vào đây.`;
+
+                    // Chuyển sang giao diện nhận nhiệm vụ sau 1.5 giây
                     setTimeout(() => {
-                        setupTaskUI(url, extracted.type);
-                        switchScreen('screen2', 'Nhiệm Vụ Nhận Key');
-                    }, 1200);
-                    return; // Đã tìm thấy web hợp lệ, dừng vòng lặp
-                } else {
-                    addLog(logBox, `⚠️ Không có SĐT/Zip: Bỏ qua`, 'status-blocked');
+                        switchScreen('screen2', 'Nhiệm Vụ Đang Làm');
+                    }, 1500);
+                    return;
                 }
-
-            } catch (err) {
-                addLog(logBox, `❌ Lỗi kết nối: Bỏ qua`, 'status-blocked');
+            } catch (e) {
+                // Bỏ qua lỗi ngầm
             }
         }
 
-        // Nếu duyệt hết danh sách vẫn không có web hợp lệ
-        document.getElementById('filterStatus').innerText = "Thất bại!";
-        document.getElementById('filterDetail').innerText = "Không tìm thấy web phù hợp không bị chặn.";
+        // Backup dự phòng nếu tất cả web chính đều bị chặn
+        currentTargetUrl = "https://cellphones.com.vn";
+        validCode = "18002097"; // Hotline tổng đài CellphoneS
+        document.getElementById('categoryTag').innerText = "THIẾT BỊ ĐIỆN TỬ";
+        document.getElementById('taskTitle').innerText = "Tìm Số Hotline Tổng Đài";
+        document.getElementById('taskDesc').innerText = "Vào trang web bên dưới, lấy Số Tổng Đài Điện Thoại (1800xxxx) dán vào đây.";
+
+        setTimeout(() => {
+            switchScreen('screen2', 'Nhiệm Vụ Đang Làm');
+        }, 1500);
     }
 
-    // --- HÀM NHẬN BIẾT CLOUDFLARE & CHẶN BOT ---
-    function isCloudflareOrBlocked(html) {
-        const cfSignatures = [
-            "just a moment",
-            "cloudflare",
-            "enable javascript and cookies to continue",
-            "attention required!",
-            "cf-browser-verification",
-            "ray id:",
-            "access denied"
-        ];
-        const lowerHTML = html.toLowerCase();
-        return cfSignatures.some(sig => lowerHTML.includes(sig));
+    // Nhận biết nhanh xem web đó có bị chặn không
+    function isBlocked(html) {
+        const lower = html.toLowerCase();
+        return lower.includes("just a moment") || lower.includes("cloudflare") || lower.includes("access denied");
     }
 
-    // --- HÀM BÓC TÁCH MÃ SĐT HOẶC MÃ ZIP ---
-    function extractData(html) {
-        // Regex tìm SĐT
-        const phoneRegex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/;
-        // Regex tìm Mã Zip (5-6 số)
+    // Bóc tách SĐT hotline Việt Nam (09x, 03x, 08x, 1800, 1900) hoặc Mã Bưu Chính
+    function extractVNData(html) {
+        const hotlineRegex = /(1800|1900|0[3|5|7|8|9])([0-9]{6,8})\b/;
         const zipRegex = /\b[0-9]{5,6}\b/;
 
-        const phoneMatch = html.match(phoneRegex);
+        const hotlineMatch = html.match(hotlineRegex);
         const zipMatch = html.match(zipRegex);
 
-        if (phoneMatch) {
-            return { type: "Số Điện Thoại", code: phoneMatch[0] };
+        if (hotlineMatch) {
+            return { label: "Số Hotline Liên Hệ", code: hotlineMatch[0] };
         } else if (zipMatch) {
-            return { type: "Mã Zip/Postcode", code: zipMatch[0] };
+            return { label: "Mã Bưu Chính / Mã Zip", code: zipMatch[0] };
         }
         return null;
     }
 
-    // --- GIAO DIỆN & XỬ LÝ ---
-    function setupTaskUI(url, dataType) {
-        document.getElementById('taskTitle').innerText = `Tìm ${dataType}`;
-        document.getElementById('taskDesc').innerText = `Mở web bên dưới, tìm đúng ${dataType} hiển thị trên trang và dán vào ô xác nhận.`;
-    }
-
     function openTargetWeb() {
-        if (currentTarget) window.open(currentTarget, '_blank');
+        if (currentTargetUrl) window.open(currentTargetUrl, '_blank');
     }
 
     function verifyCode() {
         const input = document.getElementById('userInputCode').value.trim();
-        if (input === validSecretCode || input === "123456") { // Hỗ trợ master pass
-            document.getElementById('finalKey').innerText = "KEY-" + Math.random().toString(36).substring(2, 8).toUpperCase() + "-PASS";
+        // Kiểm tra mã người dùng nhập có khớp không (hoặc dùng master key 8899)
+        if (input === validCode || input === "8899") {
+            const key = "KEY-" + Math.random().toString(36).substring(2, 8).toUpperCase() + "-VN";
+            document.getElementById('finalKey').innerText = key;
             switchScreen('screen3', 'Hoàn Thành');
         } else {
-            alert("Mã không đúng! Vui lòng kiểm tra lại trên web mục tiêu.");
+            alert("Mã không chính xác! Vui lòng kiểm tra lại trên trang web.");
         }
     }
 
@@ -307,12 +275,6 @@
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         document.getElementById('navTitle').innerText = title;
-    }
-
-    function addLog(box, text, className) {
-        const item = document.createElement('div');
-        item.innerHTML = `<span class="status-badge ${className}">${text}</span>`;
-        box.appendChild(item);
     }
 </script>
 </body>
