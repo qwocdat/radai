@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hệ Thống Tự Động Lấy Key</title>
-    <!-- Font SF Pro & FontAwesome Icons -->
+    <title>Hệ Thống Get Key</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -15,6 +14,7 @@
             --ios27-neon-purple: #7000ff;
             --ios27-accent: #007AFF;
             --ios27-success: #30D158;
+            --ios27-error: #FF453A;
             --ios27-text: #FFFFFF;
             --ios27-subtext: #9CA3AF;
             --blur-val: blur(35px);
@@ -24,7 +24,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
         }
@@ -37,14 +37,11 @@
             justify-content: center;
             align-items: center;
             overflow-x: hidden;
-            /* iOS 27 Holographic Dynamic Ambient Gradient */
             background-image: 
                 radial-gradient(circle at 15% 15%, rgba(0, 240, 255, 0.12) 0%, transparent 45%),
-                radial-gradient(circle at 85% 85%, rgba(112, 0, 255, 0.15) 0%, transparent 45%),
-                radial-gradient(circle at 50% 50%, rgba(48, 209, 88, 0.08) 0%, transparent 60%);
+                radial-gradient(circle at 85% 85%, rgba(112, 0, 255, 0.15) 0%, transparent 45%);
         }
 
-        /* App Layout Container */
         .app-container {
             width: 100%;
             max-width: 430px;
@@ -61,315 +58,129 @@
                 height: 880px;
                 border-radius: 50px;
                 border: 1px solid rgba(255, 255, 255, 0.2);
-                box-shadow: 0 0 40px rgba(0, 240, 255, 0.15), 0 25px 50px -12px rgba(0, 0, 0, 0.9);
+                box-shadow: 0 0 40px rgba(0, 240, 255, 0.15);
             }
         }
 
-        /* Navigation Bar (iOS 27 Dynamic Island Style Integration) */
         .nav-bar {
             padding: 50px 20px 15px;
             backdrop-filter: var(--blur-val);
-            -webkit-backdrop-filter: var(--blur-val);
             background: rgba(3, 7, 18, 0.6);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            z-index: 10;
             border-bottom: 0.5px solid var(--ios27-card-border);
         }
 
-        .nav-title {
-            font-size: 17px;
-            font-weight: 600;
-            letter-spacing: -0.4px;
-            background: linear-gradient(135deg, #fff 0%, var(--ios27-subtext) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* Screen Wrapper & iOS Smooth Transitions */
-        .screen-container {
-            flex: 1;
-            position: relative;
-            width: 100%;
-            overflow: hidden;
-        }
+        .screen-container { flex: 1; position: relative; width: 100%; }
 
         .screen {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            overflow-y: auto;
-            opacity: 0;
-            pointer-events: none;
+            top: 0; left: 0; width: 100%; height: 100%;
+            padding: 20px; display: flex; flex-direction: column; gap: 16px;
+            opacity: 0; pointer-events: none;
             transform: scale(0.94) translateY(15px);
             transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .screen.active {
-            opacity: 1;
-            pointer-events: auto;
-            transform: scale(1) translateY(0);
-        }
+        .screen.active { opacity: 1; pointer-events: auto; transform: scale(1) translateY(0); }
 
-        /* iOS 27 Floating Glass Cards */
         .glass-card {
             background: var(--ios27-card);
             backdrop-filter: var(--blur-val);
-            -webkit-backdrop-filter: var(--blur-val);
             border: 1px solid var(--ios27-card-border);
-            border-radius: 24px;
-            padding: 22px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .glass-card:active {
-            transform: scale(0.98);
-        }
-
-        .info-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-        }
-
-        .info-label { color: var(--ios27-subtext); }
-        .info-value { font-family: monospace; color: var(--ios27-neon-blue); font-weight: 600; }
-
-        /* Step List */
-        .step-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 15px;
-            margin-bottom: 14px;
-        }
-
-        .step-num {
-            background: linear-gradient(135deg, var(--ios27-neon-blue), var(--ios27-neon-purple));
-            color: white;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-            font-weight: 700;
-            flex-shrink: 0;
-            box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
-        }
-
-        /* Form Inputs & Animated Buttons */
-        .ios-input {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--ios27-card-border);
-            border-radius: 16px;
-            padding: 16px;
-            color: #fff;
-            font-size: 16px;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        .ios-input:focus {
-            border-color: var(--ios27-neon-blue);
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
-            background: rgba(255, 255, 255, 0.08);
+            border-radius: 24px; padding: 22px;
         }
 
         .ios-btn {
             background: linear-gradient(135deg, var(--ios27-accent), var(--ios27-neon-purple));
-            color: white;
-            border: none;
-            border-radius: 18px;
-            padding: 16px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            color: white; border: none; border-radius: 18px; padding: 16px;
+            font-size: 16px; font-weight: 600; cursor: pointer; width: 100%;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
             box-shadow: 0 4px 20px rgba(112, 0, 255, 0.4);
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative;
-            overflow: hidden;
         }
 
-        .ios-btn:active {
-            transform: scale(0.96);
-            opacity: 0.9;
+        .ios-input {
+            width: 100%; background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--ios27-card-border); border-radius: 16px;
+            padding: 16px; color: #fff; font-size: 16px; outline: none;
         }
 
-        .ios-btn-secondary {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid var(--ios27-card-border);
-            box-shadow: none;
+        .status-badge {
+            font-size: 12px; font-weight: bold; padding: 4px 8px; border-radius: 6px; display: inline-block;
         }
+        .status-filtering { background: rgba(0, 240, 255, 0.15); color: var(--ios27-neon-blue); }
+        .status-blocked { background: rgba(255, 69, 58, 0.15); color: var(--ios27-error); }
+        .status-passed { background: rgba(48, 209, 88, 0.15); color: var(--ios27-success); }
 
-        .ios-btn-success {
-            background: linear-gradient(135deg, #30D158, #00A843);
-            box-shadow: 0 4px 20px rgba(48, 209, 88, 0.4);
-        }
-
-        /* Quantum Ripple Effect */
-        .ripple {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.35);
-            border-radius: 50%;
-            transform: scale(0);
-            animation: ripple-anim 0.6s linear;
-            pointer-events: none;
-        }
-
-        @keyframes ripple-anim {
-            to {
-                transform: scale(4);
-                opacity: 0;
-            }
-        }
-
-        /* Pulsing Glow Scanner Loading */
         .scanner-loader {
-            width: 48px;
-            height: 48px;
-            border: 3px solid rgba(0, 240, 255, 0.1);
-            border-radius: 50%;
-            border-top-color: var(--ios27-neon-blue);
-            animation: spin 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
-            margin: 0 auto;
+            width: 40px; height: 40px; border: 3px solid rgba(0, 240, 255, 0.1);
+            border-radius: 50%; border-top-color: var(--ios27-neon-blue);
+            animation: spin 0.8s linear infinite; margin: 0 auto;
         }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .search-keyword {
-            background: rgba(0, 240, 255, 0.15);
-            color: var(--ios27-neon-blue);
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-family: monospace;
-            border: 1px solid rgba(0, 240, 255, 0.3);
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <!-- Top Navigation Bar -->
     <div class="nav-bar">
-        <div class="nav-title" id="navTitle">Xác Thực Hệ Thống</div>
-        <i class="fa-solid fa-atom" style="color: var(--ios27-neon-blue); font-size: 18px;"></i>
+        <div style="font-size: 17px; font-weight: 600;" id="navTitle">Hệ Thống Lọc Nhiệm Vụ</div>
+        <i class="fa-solid fa-filter-circle-xmark" style="color: var(--ios27-neon-blue);"></i>
     </div>
 
-    <!-- Screen Container -->
     <div class="screen-container">
         
-        <!-- SCREEN 1: AUTOMATIC INITIALIZATION (Auto-passes) -->
+        <!-- SCREEN 1: BỘ LỌC BOT & CLOUDFLARE -->
         <div class="screen active" id="screen1">
-            <div class="glass-card" style="text-align: center; padding: 35px 20px;">
-                <div class="scanner-loader" id="mainLoader"></div>
-                <h3 style="margin-top: 20px; font-size: 20px;" id="statusText">Đang Khởi Tạo Đội Hình...</h3>
-                <p style="color: var(--ios27-subtext); font-size: 13px; margin-top: 8px;">
-                    Đang tự động xác thực IP, cấp Cookie và tạo nhiệm vụ...
+            <div class="glass-card" style="text-align: center; padding: 30px 20px;">
+                <div class="scanner-loader" id="loader"></div>
+                <h3 style="margin-top: 15px; font-size: 18px;" id="filterStatus">Đang quét danh sách web...</h3>
+                <p style="color: var(--ios27-subtext); font-size: 13px; margin-top: 5px;" id="filterDetail">
+                    Đang loại bỏ web chặn Bot, Cloudflare & tìm mã dữ liệu...
                 </p>
             </div>
 
             <div class="glass-card">
-                <h4 style="margin-bottom: 12px; font-size: 16px; color: var(--ios27-subtext);">Thông Số Thiết Bị</h4>
-                <div class="info-group">
-                    <div class="info-row">
-                        <span class="info-label">IP Mạng:</span>
-                        <span class="info-value" id="displayIP">Đang kiểm tra...</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">HWID Tự Động:</span>
-                        <span class="info-value" id="displayHWID">Đang sinh mã...</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Trạng Thái Cookie:</span>
-                        <span class="info-value" id="displayCookie">Đang khởi tạo</span>
-                    </div>
+                <h4 style="margin-bottom: 12px; font-size: 15px; color: var(--ios27-subtext);">Nhật Ký Quét Web</h4>
+                <div id="logs" style="font-size: 13px; display: flex; flex-direction: column; gap: 8px; font-family: monospace;">
+                    <!-- Logs sẽ tự đẩy vào đây -->
                 </div>
             </div>
         </div>
 
-        <!-- SCREEN 2: AUTO TASK INSTRUCTIONS (Nhiệm Vụ Tự Động Giao) -->
+        <!-- SCREEN 2: GIAO NHIỆM VỤ ĐÃ QUA LỌC SẠCH -->
         <div class="screen" id="screen2">
             <div class="glass-card">
-                <h3 style="margin-bottom: 15px; color: var(--ios27-neon-blue); display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-bolt"></i> Nhiệm Vụ Được Giao
-                </h3>
-                
-                <div class="step-item">
-                    <div class="step-num">1</div>
-                    <div style="font-size: 14px; line-height: 1.4;">
-                        Mở Google Search và tìm kiếm từ khóa: <br><span class="search-keyword">dịch vụ seo uy tín</span>
-                    </div>
-                </div>
-                
-                <div class="step-item">
-                    <div class="step-num">2</div>
-                    <div style="font-size: 14px; line-height: 1.4;">
-                        Tìm trang web có tên miền <b style="color:var(--ios27-neon-blue);">site-doi-tac.com</b> và truy cập.
-                    </div>
-                </div>
-
-                <div class="step-item">
-                    <div class="step-num">3</div>
-                    <div style="font-size: 14px; line-height: 1.4;">
-                        Cuộn xuống cuối trang, chờ đếm ngược <b>60 giây</b> để nhận Mã OTP Xác Thực.
-                    </div>
-                </div>
+                <span class="status-badge status-passed" style="margin-bottom: 10px;">WEB MỤC TIÊU SẠCH (NO CLOUDFLARE)</span>
+                <h3 style="margin-bottom: 10px;" id="taskTitle">Nhiệm vụ được giao</h3>
+                <p style="font-size: 14px; color: var(--ios27-subtext); margin-bottom: 15px;" id="taskDesc">
+                    Vui lòng mở web mục tiêu bên dưới để lấy thông tin.
+                </p>
+                <button class="ios-btn" style="background: rgba(255,255,255,0.1);" onclick="openTargetWeb()">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Mở Web Mục Tiêu
+                </button>
             </div>
 
-            <button class="ios-btn ios-btn-secondary" onclick="window.open('https://google.com', '_blank')">
-                <i class="fa-brands fa-google"></i> Mở Trang Tìm Kiếm Google
-            </button>
-
-            <button class="ios-btn" onclick="goToScreen('screen3', 'Nhập OTP Xác Nhận', event)">
-                <span>Tôi Đã Lấy Được Mã OTP</span>
-            </button>
+            <div class="glass-card">
+                <h4 style="margin-bottom: 10px;">Nhập Mã Xác Nhận</h4>
+                <input type="text" id="userInputCode" class="ios-input" placeholder="Dán mã (SĐT / Mã Zip) vào đây...">
+                <button class="ios-btn" style="margin-top: 12px; background: linear-gradient(135deg, #30D158, #00A843);" onclick="verifyCode()">
+                    Xác Nhận & Lấy Key
+                </button>
+            </div>
         </div>
 
-        <!-- SCREEN 3: VERIFY OTP & GET FINAL KEY -->
+        <!-- SCREEN 3: KẾT QUẢ KEY -->
         <div class="screen" id="screen3">
-            <div class="glass-card">
-                <h3 style="margin-bottom: 10px;">Nhập Mã OTP Xác Nhận</h3>
-                <p style="color: var(--ios27-subtext); font-size: 13px; margin-bottom: 15px;">Dán mã OTP bạn lấy từ trang web đối tác vào bên dưới.</p>
-                <input type="text" id="otpInput" class="ios-input" placeholder="Dán mã OTP tại đây..." maxlength="10">
-            </div>
-
-            <button class="ios-btn ios-btn-success" onclick="verifyOTP(event)">
-                <span>Xác Nhận & Lấy Key</span>
-            </button>
-
-            <!-- Final Key Result Box -->
-            <div class="glass-card" id="keyResult" style="display: none; text-align: center; border-color: var(--ios27-success);">
-                <i class="fa-solid fa-circle-check" style="font-size: 38px; color: var(--ios27-success); margin-bottom: 10px;"></i>
-                <h4 style="margin-bottom: 5px;">Mã Key Của Bạn:</h4>
-                <div class="ios-input" id="finalKeyText" style="font-family: monospace; font-size: 18px; font-weight: bold; color: #30D158; margin: 10px 0; text-align: center; background: rgba(48,209,88,0.1);">
-                    KEY-88X9-IOS27-PASS
+            <div class="glass-card" style="text-align: center;">
+                <i class="fa-solid fa-circle-check" style="font-size: 42px; color: var(--ios27-success); margin-bottom: 10px;"></i>
+                <h3>Lấy Key Thành Công!</h3>
+                <div class="ios-input" id="finalKey" style="font-family: monospace; font-size: 18px; color: #30D158; margin: 15px 0; text-align: center;">
+                    KEY-PASSED
                 </div>
-                <button class="ios-btn" onclick="copyKey(event)">
-                    <i class="fa-regular fa-copy"></i> Sao Chép Key
+                <button class="ios-btn" onclick="navigator.clipboard.writeText(document.getElementById('finalKey').innerText); alert('Đã sao chép!');">
+                    Sao Chép Key
                 </button>
             </div>
         </div>
@@ -378,97 +189,130 @@
 </div>
 
 <script>
-    // --- 1. CORE LOGIC: IP, HWID, COOKIES & AUTO-REDIRECT TASK ---
-    document.addEventListener("DOMContentLoaded", async () => {
-        // Tự động kiểm tra / Lấy IP từ API Public
-        try {
-            const res = await fetch('https://api.ipify.org?format=json');
-            const data = await res.json();
-            document.getElementById('displayIP').innerText = data.ip;
-        } catch {
-            document.getElementById('displayIP').innerText = "127.0.0.1";
-        }
+    // Danh sách web mục tiêu dự phòng (Có thể thêm thoải mái)
+    const targetWebList = [
+        "https://httpbin.org/html",                  // Web test sạch
+        "https://nowsecure.nl",                      // Web dính Cloudflare
+        "https://jsonplaceholder.typicode.com/users" // Web sạch có SĐT
+    ];
 
-        // Tự động tạo Cookie / HWID định danh thiết bị
-        let hwid = getCookie("_app_hwid");
-        if (!hwid) {
-            hwid = "HWID27-" + Math.random().toString(36).substring(2, 9).toUpperCase() + "-" + Date.now().toString().slice(-4);
-            setCookie("_app_hwid", hwid, 1);
-            document.getElementById('displayCookie').innerText = "Cấp thành công";
-        } else {
-            document.getElementById('displayCookie').innerText = "Hợp lệ (Đã cấp)";
-        }
-        document.getElementById('displayHWID').innerText = hwid;
+    let currentTarget = null;
+    let validSecretCode = null;
 
-        // TỰ ĐỘNG CHUYỂN TRANG SANG NHẬN NHIỆM VỤ SẠCH SẼ MÀ KHÔNG CẦN BẤM NÚT (Sau 1.5 giây)
-        setTimeout(() => {
-            document.getElementById('statusText').innerText = "Khởi Tạo Hoàn Tất!";
-            goToScreen('screen2', 'Nhiệm Vụ Tự Động');
-        }, 1500);
+    document.addEventListener("DOMContentLoaded", () => {
+        filterWebList();
     });
 
-    // --- 2. SCREEN TRANSITIONS & ANIMATIONS ---
-    function goToScreen(screenId, titleText, event) {
-        if(event) createRipple(event);
+    // --- HỆ THỐNG LỌC BẰNG THUẬT TOÁN AUTOMATED FILTERING ---
+    async function filterWebList() {
+        const logBox = document.getElementById('logs');
 
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(screenId).classList.add('active');
-        document.getElementById('navTitle').innerText = titleText;
-    }
+        for (let url of targetWebList) {
+            addLog(logBox, `Đang test: ${url}`, 'status-filtering');
 
-    function verifyOTP(event) {
-        createRipple(event);
-        const otp = document.getElementById('otpInput').value.trim();
-        
-        if (!otp) {
-            alert("Vui lòng nhập mã OTP!");
-            return;
+            try {
+                // Dùng Proxy CORS công khai để đọc trước HTML
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+                const response = await fetch(proxyUrl);
+                const data = await response.json();
+                const htmlContent = data.contents;
+
+                // 1. KIỂM TRA BOT / CLOUDFLARE CHALLENGE
+                if (!htmlContent || isCloudflareOrBlocked(htmlContent)) {
+                    addLog(logBox, `❌ Bị Chặn/CF: ${url.slice(0, 20)}...`, 'status-blocked');
+                    continue; // Bỏ qua web này, nhảy sang web tiếp theo
+                }
+
+                // 2. TÌM DỮ LIỆU SĐT HOẶC MÃ ZIP TRÊN TRANG
+                const extracted = extractData(htmlContent);
+                if (extracted) {
+                    currentTarget = url;
+                    validSecretCode = extracted.code;
+                    addLog(logBox, `✅ Sạch! Tìm thấy ${extracted.type}`, 'status-passed');
+
+                    // Chuyển sang màn hình giao nhiệm vụ sau 1 giây
+                    setTimeout(() => {
+                        setupTaskUI(url, extracted.type);
+                        switchScreen('screen2', 'Nhiệm Vụ Nhận Key');
+                    }, 1200);
+                    return; // Đã tìm thấy web hợp lệ, dừng vòng lặp
+                } else {
+                    addLog(logBox, `⚠️ Không có SĐT/Zip: Bỏ qua`, 'status-blocked');
+                }
+
+            } catch (err) {
+                addLog(logBox, `❌ Lỗi kết nối: Bỏ qua`, 'status-blocked');
+            }
         }
 
-        // Kiểm tra OTP & Hiển thị Key
-        document.getElementById('keyResult').style.display = 'block';
-        const hwid = getCookie("_app_hwid") || "DEVICE";
-        document.getElementById('finalKeyText').innerText = "KEY-" + hwid.slice(-6) + "-PASSED";
+        // Nếu duyệt hết danh sách vẫn không có web hợp lệ
+        document.getElementById('filterStatus').innerText = "Thất bại!";
+        document.getElementById('filterDetail').innerText = "Không tìm thấy web phù hợp không bị chặn.";
     }
 
-    function copyKey(event) {
-        createRipple(event);
-        const keyText = document.getElementById('finalKeyText').innerText;
-        navigator.clipboard.writeText(keyText);
-        alert("Đã sao chép Key thành công!");
+    // --- HÀM NHẬN BIẾT CLOUDFLARE & CHẶN BOT ---
+    function isCloudflareOrBlocked(html) {
+        const cfSignatures = [
+            "just a moment",
+            "cloudflare",
+            "enable javascript and cookies to continue",
+            "attention required!",
+            "cf-browser-verification",
+            "ray id:",
+            "access denied"
+        ];
+        const lowerHTML = html.toLowerCase();
+        return cfSignatures.some(sig => lowerHTML.includes(sig));
     }
 
-    // --- 3. HELPER FUNCTIONS ---
-    function setCookie(name, value, days) {
-        const d = new Date();
-        d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
-        document.cookie = `${name}=${value};expires=${d.toUTCString()};path=/;SameSite=Lax`;
-    }
+    // --- HÀM BÓC TÁCH MÃ SĐT HOẶC MÃ ZIP ---
+    function extractData(html) {
+        // Regex tìm SĐT
+        const phoneRegex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/;
+        // Regex tìm Mã Zip (5-6 số)
+        const zipRegex = /\b[0-9]{5,6}\b/;
 
-    function getCookie(name) {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop().split(';').shift();
+        const phoneMatch = html.match(phoneRegex);
+        const zipMatch = html.match(zipRegex);
+
+        if (phoneMatch) {
+            return { type: "Số Điện Thoại", code: phoneMatch[0] };
+        } else if (zipMatch) {
+            return { type: "Mã Zip/Postcode", code: zipMatch[0] };
+        }
         return null;
     }
 
-    function createRipple(event) {
-        const btn = event.currentTarget;
-        const circle = document.createElement("span");
-        const diameter = Math.max(btn.clientWidth, btn.clientHeight);
-        const radius = diameter / 2;
+    // --- GIAO DIỆN & XỬ LÝ ---
+    function setupTaskUI(url, dataType) {
+        document.getElementById('taskTitle').innerText = `Tìm ${dataType}`;
+        document.getElementById('taskDesc').innerText = `Mở web bên dưới, tìm đúng ${dataType} hiển thị trên trang và dán vào ô xác nhận.`;
+    }
 
-        const rect = btn.getBoundingClientRect();
-        circle.style.width = circle.style.height = `${diameter}px`;
-        circle.style.left = `${event.clientX - rect.left - radius}px`;
-        circle.style.top = `${event.clientY - rect.top - radius}px`;
-        circle.classList.add("ripple");
+    function openTargetWeb() {
+        if (currentTarget) window.open(currentTarget, '_blank');
+    }
 
-        const ripple = btn.getElementsByClassName("ripple")[0];
-        if (ripple) {
-            ripple.remove();
+    function verifyCode() {
+        const input = document.getElementById('userInputCode').value.trim();
+        if (input === validSecretCode || input === "123456") { // Hỗ trợ master pass
+            document.getElementById('finalKey').innerText = "KEY-" + Math.random().toString(36).substring(2, 8).toUpperCase() + "-PASS";
+            switchScreen('screen3', 'Hoàn Thành');
+        } else {
+            alert("Mã không đúng! Vui lòng kiểm tra lại trên web mục tiêu.");
         }
-        btn.appendChild(circle);
+    }
+
+    function switchScreen(id, title) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.getElementById('navTitle').innerText = title;
+    }
+
+    function addLog(box, text, className) {
+        const item = document.createElement('div');
+        item.innerHTML = `<span class="status-badge ${className}">${text}</span>`;
+        box.appendChild(item);
     }
 </script>
 </body>
