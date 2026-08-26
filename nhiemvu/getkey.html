@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Xác Thực Nhiệm Vụ Tìm Kiếm SEO</title>
+    <title>Hệ Thống Nhiệm Vụ</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -14,6 +14,7 @@
             --ios27-neon-purple: #7000ff;
             --ios27-accent: #007AFF;
             --ios27-success: #30D158;
+            --ios27-warning: #FF9F0A;
             --ios27-text: #FFFFFF;
             --ios27-subtext: #9CA3AF;
             --blur-val: blur(35px);
@@ -54,7 +55,7 @@
             border-bottom: 0.5px solid var(--ios27-card-border);
         }
 
-        .screen-container { flex: 1; position: relative; width: 100%; }
+        .screen-container { flex: 1; position: relative; width: 100%; overflow-y: auto; }
 
         .screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -81,6 +82,12 @@
         }
         .ios-btn:active { transform: scale(0.97); }
 
+        .ios-btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: none;
+            border: 1px solid var(--ios27-card-border);
+        }
+
         .ios-input {
             width: 100%; background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--ios27-card-border); border-radius: 12px;
@@ -90,7 +97,7 @@
         .keyword-box {
             background: rgba(0, 240, 255, 0.1); border: 1px dashed var(--ios27-neon-blue);
             color: var(--ios27-neon-blue); padding: 12px; border-radius: 12px;
-            font-weight: bold; font-size: 16px; text-align: center; margin: 10px 0;
+            font-weight: bold; font-size: 15px; text-align: center; margin: 10px 0;
             display: flex; align-items: center; justify-content: space-between;
         }
 
@@ -105,55 +112,66 @@
 
 <div class="app-container">
     <div class="nav-bar">
-        <div style="font-size: 16px; font-weight: 600;" id="navTitle">Nhiệm Vụ SEO Google</div>
-        <i class="fa-brands fa-google" style="color: var(--ios27-neon-blue);"></i>
+        <div style="font-size: 16px; font-weight: 600;" id="navTitle">Hệ Thống Nhiệm Vụ SEO</div>
+        <i class="fa-solid fa-compass" style="color: var(--ios27-neon-blue);"></i>
     </div>
 
     <div class="screen-container">
         
-        <!-- MÀN HÌNH NHIỆM VỤ (TẢI TỨC THÌ TỪ LÚC MỞ WEB) -->
+        <!-- MÀN HÌNH NHIỆM VỤ CHÍNH -->
         <div class="screen active" id="screenTask">
             <div class="glass-card">
-                <div style="font-size: 12px; color: var(--ios27-neon-blue); font-weight: bold; margin-bottom: 5px;" id="priorityBadge">
-                    ⚡ NHIỆM VỤ ĐÃ SẴN SÀNG
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span style="font-size: 12px; color: var(--ios27-neon-blue); font-weight: bold;" id="taskCategory">
+                        🌐 NHIỆM VỤ ĐA LĨNH VỰC
+                    </span>
+                    <span style="font-size: 11px; color: var(--ios27-warning);" id="footerTipIndicator">
+                        <i class="fa-solid fa-shoe-prints"></i> Có mã ở chân trang
+                    </span>
                 </div>
 
-                <p style="font-size: 13px; color: var(--ios27-subtext); margin-bottom: 8px;">
+                <p style="font-size: 13px; color: var(--ios27-subtext); margin-bottom: 6px;">
                     <span class="step-number">1</span> Copy từ khóa và tìm trên Google:
                 </p>
                 <div class="keyword-box">
-                    <span id="targetKeyword">bất động sản sài gòn</span>
+                    <span id="targetKeyword">đang tải...</span>
                     <i class="fa-regular fa-copy" style="cursor: pointer;" onclick="copyKeyword()"></i>
                 </div>
 
-                <p style="font-size: 13px; color: var(--ios27-subtext); margin-top: 12px;">
-                    <span class="step-number">2</span> Tìm kết quả trang web: <b id="targetDomainDisplay" style="color: #fff;">batdongsan.com.vn</b>
-                </p>
-
                 <p style="font-size: 13px; color: var(--ios27-subtext); margin-top: 10px;">
-                    <span class="step-number">3</span> Vào trang, cuộn xuống chân trang để lấy <b id="codeTypeLabel" style="color: var(--ios27-success);">Số Hotline / Mã Zip</b>.
+                    <span class="step-number">2</span> Vào đúng website: <b id="targetDomainDisplay" style="color: #fff;">...</b>
                 </p>
 
-                <button class="ios-btn" style="margin-top: 15px; background: rgba(255,255,255,0.08);" onclick="openGoogleSearch()">
+                <p style="font-size: 13px; color: var(--ios27-subtext); margin-top: 8px;">
+                    <span class="step-number">3</span> Kéo xuống <b>cuối trang (Footer/Giới thiệu)</b> để lấy <b id="codeTypeLabel" style="color: var(--ios27-success);">Mã</b>.
+                </p>
+
+                <button class="ios-btn" style="margin-top: 12px; background: rgba(255,255,255,0.08);" onclick="openGoogleSearch()">
                     <i class="fa-solid fa-magnifying-glass"></i> Mở Google Tìm Kiếm
                 </button>
             </div>
 
             <div class="glass-card">
                 <h4 style="font-size: 14px; color: var(--ios27-subtext);">Nhập Mã Xác Nhận</h4>
-                <input type="text" id="userInputCode" class="ios-input" placeholder="Dán Mã Zip hoặc SĐT vào đây...">
-                <button class="ios-btn" style="margin-top: 12px; background: linear-gradient(135deg, #007AFF, #00F0FF);" onclick="verifyCode()">
-                    <i class="fa-solid fa-key"></i> Xác Nhận Lấy Key
-                </button>
+                <input type="text" id="userInputCode" class="ios-input" placeholder="Dán mã lấy được vào đây...">
+                
+                <div style="display: flex; gap: 10px; margin-top: 12px;">
+                    <button class="ios-btn ios-btn-secondary" style="flex: 1; padding: 12px; font-size: 14px;" onclick="loadNewTask()">
+                        <i class="fa-solid fa-rotate"></i> Đổi Web Khác
+                    </button>
+                    <button class="ios-btn" style="flex: 1.5; padding: 12px; font-size: 14px; background: linear-gradient(135deg, #007AFF, #00F0FF);" onclick="verifyCode()">
+                        <i class="fa-solid fa-key"></i> Xác Nhận
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- MÀN HÌNH KEY THÀNH CÔNG -->
+        <!-- MÀN HÌNH THÀNH CÔNG -->
         <div class="screen" id="screenSuccess">
             <div class="glass-card" style="text-align: center; padding: 30px 20px;">
                 <i class="fa-solid fa-circle-check" style="font-size: 48px; color: var(--ios27-success); margin-bottom: 12px;"></i>
                 <h3 style="margin-bottom: 5px;">Xác Thực Thành Công!</h3>
-                <p style="color: var(--ios27-subtext); font-size: 13px;">Key của bạn đã được kích hoạt:</p>
+                <p style="color: var(--ios27-subtext); font-size: 13px;">Key của bạn:</p>
                 <div class="ios-input" id="finalKey" style="font-family: monospace; font-size: 18px; color: #30D158; margin: 15px 0; text-align: center; font-weight: bold;">
                     KEY-SUCCESS
                 </div>
@@ -167,36 +185,54 @@
 </div>
 
 <script>
-    // Cơ sở dữ liệu Web Việt Nam chuẩn SEO
-    const seoDatabase = [
-        { domain: "cellphones.com.vn", keyword: "cellphones laptop gia re", code: "18002097", type: "Số Hotline Tổng Đài" },
-        { domain: "phongvu.vn", keyword: "phong vu may tinh may ban", code: "18006867", type: "Số Hotline CSKH" },
-        { domain: "batdongsan.com.vn", keyword: "bat dong san gia re ha noi", code: "19001881", type: "Số Hotline Bất Động Sản" },
-        { domain: "chotot.com", keyword: "cho tot do dien tu cu", code: "19003003", type: "Mã Tổng Đài Chợ Tốt" }
+    // Kho dữ liệu phong phú: Đồ điện tử, Bất động sản, Gia dụng, Thời trang, Dịch vụ...
+    const masterDatabase = [
+        { id: "cellphones", domain: "cellphones.com.vn", category: "ĐIỆN TỬ - CÔNG NGHỆ", keyword: "cellphones hệ thống cửa hàng", code: "18002097", type: "Số Hotline Tổng Đài" },
+        { id: "batdongsan", domain: "batdongsan.com.vn", category: "BẤT ĐỘNG SẢN", keyword: "batdongsan cskh lien he", code: "19001881", type: "Số Tổng Đài Hỗ Trợ" },
+        { id: "phongvu", domain: "phongvu.vn", category: "MÁY TÍNH - LINH KIỆN", keyword: "phong vu thông tin giới thiệu", code: "18006867", type: "Hotline Chăm Sóc Khách Hàng" },
+        { id: "dienmayxanh", domain: "dienmayxanh.com", category: "ĐIỆN MÁY GIA DỤNG", keyword: "dien may xanh gioi thiệu công ty", code: "18001061", type: "Mã Tổng Đài Ở Cuối Trang" },
+        { id: "tgdd", domain: "thegioididong.com", category: "THIẾT BỊ DI ĐỘNG", keyword: "thế giới di động hệ thống siêu thị", code: "18001060", type: "Số Hotline Ở Footer" },
+        { id: "fptshop", domain: "fptshop.com.vn", category: "ĐIỆN TỬ - LAPTOP", keyword: "fpt shop thông tin liên hệ", code: "18006601", type: "Mã Hotline Giới Thiệu" }
     ];
 
     let currentTask = null;
 
-    // Chạy NGAY LẬP TỨC khi nạp script
-    (function instantInit() {
-        // 1. Lấy danh sách web đã từng làm thành công từ LocalStorage
-        const historyData = JSON.parse(localStorage.getItem('user_completed_tasks') || '[]');
+    // Khởi tạo hệ thống chọn nhiệm vụ thông minh
+    function loadNewTask() {
+        // Lấy lịch sử các web đã làm trong ngày từ localStorage
+        const todayStr = new Date().toDateString();
+        let history = JSON.parse(localStorage.getItem('completed_tasks_history') || '{}');
         
-        if (historyData.length > 0) {
-            // ƯU TIÊN LẤY WEB ĐÃ TỪNG VƯỢT THÀNH CÔNG
-            const lastDomain = historyData[historyData.length - 1];
-            currentTask = seoDatabase.find(item => item.domain === lastDomain) || seoDatabase[0];
-            document.getElementById('priorityBadge').innerText = "🔥 ƯU TIÊN WEB ĐÃ LÀM THƯỜNG XUYÊN";
-        } else {
-            // Lấy ngẫu nhiên web lần đầu
-            currentTask = seoDatabase[Math.floor(Math.random() * seoDatabase.length)];
+        // Nếu sang ngày mới, reset lịch sử
+        if (history.date !== todayStr) {
+            history = { date: todayStr, domains: [] };
         }
 
-        // Đổ dữ liệu lên UI lập tức trong 0 giây
+        // Lọc ra các web CHƯA làm trong ngày hôm nay
+        let availableTasks = masterDatabase.filter(item => !history.domains.includes(item.id));
+
+        // Nếu đã làm hết sạch tất cả các web trong ngày, cho phép làm lại vòng mới
+        if (availableTasks.length === 0) {
+            history.domains = [];
+            localStorage.setItem('completed_tasks_history', JSON.stringify(history));
+            availableTasks = masterDatabase;
+        }
+
+        // Random chọn 1 web chưa làm
+        currentTask = availableTasks[Math.floor(Math.random() * availableTasks.length)];
+
+        // Đổ dữ liệu ra màn hình
+        document.getElementById('taskCategory').innerText = `🌐 ${currentTask.category}`;
         document.getElementById('targetKeyword').innerText = currentTask.keyword;
         document.getElementById('targetDomainDisplay').innerText = currentTask.domain;
         document.getElementById('codeTypeLabel').innerText = currentTask.type;
-    })();
+        document.getElementById('userInputCode').value = '';
+    }
+
+    // Chạy ngay khi mở web
+    document.addEventListener("DOMContentLoaded", () => {
+        loadNewTask();
+    });
 
     function copyKeyword() {
         navigator.clipboard.writeText(currentTask.keyword);
@@ -205,7 +241,6 @@
 
     function openGoogleSearch() {
         copyKeyword();
-        // Mở thẳng trang tìm kiếm Google với từ khóa đã điền sẵn
         const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(currentTask.keyword)}`;
         window.open(googleUrl, '_blank');
     }
@@ -213,21 +248,25 @@
     function verifyCode() {
         const input = document.getElementById('userInputCode').value.trim();
         
-        // Kiểm tra khớp mã hoặc dùng Master Pass 8899
+        // Kiểm tra đúng mã hoặc Master Key 8899
         if (input === currentTask.code || input === "8899") {
-            // LƯU LẠI WEB NÀY VÀO LỊCH SỬ ĐỂ LẦN SAU ƯU TIÊN
-            let historyData = JSON.parse(localStorage.getItem('user_completed_tasks') || '[]');
-            if (!historyData.includes(currentTask.domain)) {
-                historyData.push(currentTask.domain);
-                localStorage.setItem('user_completed_tasks', JSON.stringify(historyData));
+            // Lưu lại web này đã làm vào lịch sử (khóa lại trong ngày)
+            const todayStr = new Date().toDateString();
+            let history = JSON.parse(localStorage.getItem('completed_tasks_history') || '{}');
+            if (history.date !== todayStr) {
+                history = { date: todayStr, domains: [] };
+            }
+            if (!history.domains.includes(currentTask.id)) {
+                history.domains.push(currentTask.id);
+                localStorage.setItem('completed_tasks_history', JSON.stringify(history));
             }
 
-            // Tạo Key & chuyển màn hình
-            document.getElementById('finalKey').innerText = "KEY-" + Math.random().toString(36).substring(2, 8).toUpperCase() + "-SEO";
+            // Chuyển màn hình thành công
+            document.getElementById('finalKey').innerText = "KEY-" + Math.random().toString(36).substring(2, 8).toUpperCase() + "-PASS";
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('screenSuccess').classList.add('active');
         } else {
-            alert("Mã xác nhận chưa chính xác! Vui lòng tìm đúng trên web đối tác.");
+            alert("Mã xác nhận chưa chính xác! Hãy kiểm tra kỹ phần cuối trang (Footer) của website.");
         }
     }
 </script>
