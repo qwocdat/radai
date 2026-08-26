@@ -7,7 +7,6 @@ export default async function handler(req, res) {
         return res.status(200).end();
     }
 
-    // Mở trực tiếp trên trình duyệt (GET) để test xem API sống hay chết
     if (req.method === 'GET') {
         return res.status(200).json({
             status: "success",
@@ -47,12 +46,20 @@ export default async function handler(req, res) {
         const userData = await userRes.json();
         const documents = userData.documents || [];
 
+        // Sắp xếp danh sách user theo độ dài tên giảm dần (Ưu tiên tên dài như QUOCDATDV5 trước, tránh nhầm DAT)
+        documents.sort((a, b) => {
+            let nameA = (a.fields?.username?.stringValue || '').length;
+            let nameB = (b.fields?.username?.stringValue || '').length;
+            return nameB - nameA;
+        });
+
         let targetUser = null;
         for (let doc of documents) {
             const fields = doc.fields || {};
             const username = fields.username ? fields.username.stringValue.toUpperCase().trim() : '';
             const email = fields.email ? fields.email.stringValue.toUpperCase().trim() : '';
 
+            // Kiểm tra nội dung chuyển khoản có chứa username hoặc email không
             if ((username && content.includes(username)) || (email && content.includes(email))) {
                 const docId = doc.name.split('/').pop();
                 let currentBalance = 0;
