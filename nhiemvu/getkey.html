@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hệ Thống Nhiệm Vụ</title>
+    <title>Hệ Thống Nhiệm Vụ SEO Google</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -113,7 +113,7 @@
 <div class="app-container">
     <div class="nav-bar">
         <div style="font-size: 16px; font-weight: 600;" id="navTitle">Hệ Thống Nhiệm Vụ SEO</div>
-        <i class="fa-solid fa-compass" style="color: var(--ios27-neon-blue);"></i>
+        <i class="fa-solid fa-bolt" style="color: var(--ios27-neon-blue);"></i>
     </div>
 
     <div class="screen-container">
@@ -123,10 +123,10 @@
             <div class="glass-card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                     <span style="font-size: 12px; color: var(--ios27-neon-blue); font-weight: bold;" id="taskCategory">
-                        🌐 NHIỆM VỤ ĐA LĨNH VỰC
+                        🌐 NHIỆM VỤ ĐÃ SẴN SÀNG
                     </span>
                     <span style="font-size: 11px; color: var(--ios27-warning);" id="footerTipIndicator">
-                        <i class="fa-solid fa-shoe-prints"></i> Có mã ở chân trang
+                        <i class="fa-solid fa-shoe-prints"></i> Mã ở phần giới thiệu / footer
                     </span>
                 </div>
 
@@ -134,16 +134,16 @@
                     <span class="step-number">1</span> Copy từ khóa và tìm trên Google:
                 </p>
                 <div class="keyword-box">
-                    <span id="targetKeyword">đang tải...</span>
+                    <span id="targetKeyword">Đang tải...</span>
                     <i class="fa-regular fa-copy" style="cursor: pointer;" onclick="copyKeyword()"></i>
                 </div>
 
                 <p style="font-size: 13px; color: var(--ios27-subtext); margin-top: 10px;">
-                    <span class="step-number">2</span> Vào đúng website: <b id="targetDomainDisplay" style="color: #fff;">...</b>
+                    <span class="step-number">2</span> Tìm đúng web: <b id="targetDomainDisplay" style="color: #fff;">...</b>
                 </p>
 
                 <p style="font-size: 13px; color: var(--ios27-subtext); margin-top: 8px;">
-                    <span class="step-number">3</span> Kéo xuống <b>cuối trang (Footer/Giới thiệu)</b> để lấy <b id="codeTypeLabel" style="color: var(--ios27-success);">Mã</b>.
+                    <span class="step-number">3</span> Vào web, kéo xuống <b>cuối trang (Footer/Giới thiệu)</b> lấy <b id="codeTypeLabel" style="color: var(--ios27-success);">Mã</b>.
                 </p>
 
                 <button class="ios-btn" style="margin-top: 12px; background: rgba(255,255,255,0.08);" onclick="openGoogleSearch()">
@@ -153,7 +153,7 @@
 
             <div class="glass-card">
                 <h4 style="font-size: 14px; color: var(--ios27-subtext);">Nhập Mã Xác Nhận</h4>
-                <input type="text" id="userInputCode" class="ios-input" placeholder="Dán mã lấy được vào đây...">
+                <input type="text" id="userInputCode" class="ios-input" placeholder="Dán mã lấy từ web vào đây...">
                 
                 <div style="display: flex; gap: 10px; margin-top: 12px;">
                     <button class="ios-btn ios-btn-secondary" style="flex: 1; padding: 12px; font-size: 14px;" onclick="loadNewTask()">
@@ -185,43 +185,43 @@
 </div>
 
 <script>
-    // Kho dữ liệu phong phú: Đồ điện tử, Bất động sản, Gia dụng, Thời trang, Dịch vụ...
+    // BẠN CÓ THỂ THÊM VÔ SỐ WEB VÀO DANH SÁCH NÀY (KHÔNG GIỚI HẠN)
     const masterDatabase = [
-        { id: "cellphones", domain: "cellphones.com.vn", category: "ĐIỆN TỬ - CÔNG NGHỆ", keyword: "cellphones hệ thống cửa hàng", code: "18002097", type: "Số Hotline Tổng Đài" },
+        { id: "sunwin", domain: "sunwin.org", category: "SUNWIN", keyword: "sunwin cong game bai doi thuong", code: "8888", type: "Mã Xác Nhận Cuối Trang" },
+        { id: "laucua", domain: "laucua.com", category: "LAU CUA", keyword: "lau cua ngon sai gon gia re", code: "6789", type: "Hotline Giới Thiệu Chân Trang" },
+        { id: "fly88", domain: "fly88.club", category: "FLY88", keyword: "fly88 game bai uy tin", code: "9999", type: "Mã Code VIP Chân Trang" },
+        { id: "cellphones", domain: "cellphones.com.vn", category: "ĐIỆN TỬ - CÔNG NGHỆ", keyword: "cellphones he thong cua hang", code: "18002097", type: "Số Hotline Tổng Đài" },
         { id: "batdongsan", domain: "batdongsan.com.vn", category: "BẤT ĐỘNG SẢN", keyword: "batdongsan cskh lien he", code: "19001881", type: "Số Tổng Đài Hỗ Trợ" },
-        { id: "phongvu", domain: "phongvu.vn", category: "MÁY TÍNH - LINH KIỆN", keyword: "phong vu thông tin giới thiệu", code: "18006867", type: "Hotline Chăm Sóc Khách Hàng" },
-        { id: "dienmayxanh", domain: "dienmayxanh.com", category: "ĐIỆN MÁY GIA DỤNG", keyword: "dien may xanh gioi thiệu công ty", code: "18001061", type: "Mã Tổng Đài Ở Cuối Trang" },
-        { id: "tgdd", domain: "thegioididong.com", category: "THIẾT BỊ DI ĐỘNG", keyword: "thế giới di động hệ thống siêu thị", code: "18001060", type: "Số Hotline Ở Footer" },
-        { id: "fptshop", domain: "fptshop.com.vn", category: "ĐIỆN TỬ - LAPTOP", keyword: "fpt shop thông tin liên hệ", code: "18006601", type: "Mã Hotline Giới Thiệu" }
+        { id: "phongvu", domain: "phongvu.vn", category: "MÁY TÍNH", keyword: "phong vu thong tin gioi thieu", code: "18006867", type: "Hotline CSKH" },
+        { id: "dienmayxanh", domain: "dienmayxanh.com", category: "ĐIỆN MÁY", keyword: "dien may xanh gioi thieu cong ty", code: "18001061", type: "Mã Tổng Đài Chân Trang" }
     ];
 
     let currentTask = null;
 
-    // Khởi tạo hệ thống chọn nhiệm vụ thông minh
+    // Chọn nhiệm vụ thông minh (Mỗi thiết bị 1 web/ngày)
     function loadNewTask() {
-        // Lấy lịch sử các web đã làm trong ngày từ localStorage
         const todayStr = new Date().toDateString();
         let history = JSON.parse(localStorage.getItem('completed_tasks_history') || '{}');
         
-        // Nếu sang ngày mới, reset lịch sử
+        // Nếu qua ngày mới thì làm mới lại danh sách
         if (history.date !== todayStr) {
             history = { date: todayStr, domains: [] };
         }
 
-        // Lọc ra các web CHƯA làm trong ngày hôm nay
+        // Lọc ra các web chưa làm hôm nay
         let availableTasks = masterDatabase.filter(item => !history.domains.includes(item.id));
 
-        // Nếu đã làm hết sạch tất cả các web trong ngày, cho phép làm lại vòng mới
+        // Nếu đã làm hết sạch các web trong ngày, tự động cho làm lại lượt mới
         if (availableTasks.length === 0) {
             history.domains = [];
             localStorage.setItem('completed_tasks_history', JSON.stringify(history));
             availableTasks = masterDatabase;
         }
 
-        // Random chọn 1 web chưa làm
+        // Random chọn 1 web trong số các web chưa làm
         currentTask = availableTasks[Math.floor(Math.random() * availableTasks.length)];
 
-        // Đổ dữ liệu ra màn hình
+        // Cập nhật lên giao diện
         document.getElementById('taskCategory').innerText = `🌐 ${currentTask.category}`;
         document.getElementById('targetKeyword').innerText = currentTask.keyword;
         document.getElementById('targetDomainDisplay').innerText = currentTask.domain;
@@ -229,7 +229,7 @@
         document.getElementById('userInputCode').value = '';
     }
 
-    // Chạy ngay khi mở web
+    // Tự động chạy ngay từ millisecond đầu tiên khi load web
     document.addEventListener("DOMContentLoaded", () => {
         loadNewTask();
     });
@@ -248,9 +248,9 @@
     function verifyCode() {
         const input = document.getElementById('userInputCode').value.trim();
         
-        // Kiểm tra đúng mã hoặc Master Key 8899
+        // Kiểm tra đúng mã web hoặc dùng Master Code 8899
         if (input === currentTask.code || input === "8899") {
-            // Lưu lại web này đã làm vào lịch sử (khóa lại trong ngày)
+            // Lưu lại web đã làm để khóa web này trong ngày trên thiết bị này
             const todayStr = new Date().toDateString();
             let history = JSON.parse(localStorage.getItem('completed_tasks_history') || '{}');
             if (history.date !== todayStr) {
@@ -261,12 +261,12 @@
                 localStorage.setItem('completed_tasks_history', JSON.stringify(history));
             }
 
-            // Chuyển màn hình thành công
-            document.getElementById('finalKey').innerText = "KEY-" + Math.random().toString(36).substring(2, 8).toUpperCase() + "-PASS";
+            // Xuất Key thành công
+            document.getElementById('finalKey').innerText = "KEY-" + Math.random().toString(36).substring(2, 8).toUpperCase() + "-OK";
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('screenSuccess').classList.add('active');
         } else {
-            alert("Mã xác nhận chưa chính xác! Hãy kiểm tra kỹ phần cuối trang (Footer) của website.");
+            alert("Mã chưa chính xác! Vui lòng cuộn xuống cuối trang (Footer) để lấy đúng mã.");
         }
     }
 </script>
