@@ -498,13 +498,24 @@
             window.location.href = `naptien.html?user=${encodeURIComponent(uname)}`;
         }
 
+        let isPreloaderHidden = false;
         function hidePreloader() {
+            if (isPreloaderHidden) return;
+            isPreloaderHidden = true;
             const preloader = document.getElementById('preloader');
             if (preloader) {
                 preloader.style.opacity = '0';
                 preloader.style.visibility = 'hidden';
                 setTimeout(() => preloader.style.display = 'none', 500);
             }
+        }
+
+        // Wrapper bọc timeout cho các API Fetch để tránh nghẽn
+        function fetchWithTimeout(promise, ms = 2500) {
+            const timeout = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Request Timeout')), ms)
+            );
+            return Promise.race([promise, timeout]);
         }
 
         function getStoredUser() {
@@ -530,7 +541,7 @@
 
         function escapeHtml(str) {
             if (!str) return '';
-            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace/>/g, '&gt;').replace(/"/g, '&quot;');
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
 
         function showToast(message, type = 'info') {
@@ -628,7 +639,7 @@
                 const googleEmail = payload.email;
                 const googleName = payload.name || googleEmail.split('@')[0];
 
-                let res = await fetch(`${BASE_URL}/users?pageSize=300`);
+                let res = await fetchWithTimeout(fetch(`${BASE_URL}/users?pageSize=300`));
                 let data = await res.json();
                 let matched = null;
 
@@ -705,7 +716,7 @@
             }
 
             try {
-                let res = await fetch(`${BASE_URL}/users?pageSize=300`);
+                let res = await fetchWithTimeout(fetch(`${BASE_URL}/users?pageSize=300`));
                 let data = await res.json();
                 let matched = null;
 
@@ -806,10 +817,15 @@
         }
 
         async function fetchStoreData() {
+            // TIMEOUT TOÀN CỤC DỰ PHÒNG: Ép buộc tắt preloader sau tối đa 2.5s bất kể lỗi/treo API
+            const forceHideTimeout = setTimeout(() => {
+                hidePreloader();
+            }, 2500);
+
             try {
                 if (currentUser && currentUser.id) {
                     try {
-                        let userRes = await fetch(`${BASE_URL}/users/${currentUser.id}`);
+                        let userRes = await fetchWithTimeout(fetch(`${BASE_URL}/users/${currentUser.id}`), 2000);
                         if (userRes.ok) {
                             let userData = await userRes.json();
                             let updatedFields = parseFirestoreFields(userData.fields || {});
@@ -823,43 +839,51 @@
                     } catch(e) {}
                 }
 
-                let catRes = await fetch(`${BASE_URL}/categories?pageSize=100`);
-                let catData = await catRes.json();
-                storeCategories = (catData.documents || []).map(doc => {
-                    let fields = parseFirestoreFields(doc.fields || {});
-                    fields.id = doc.name.split('/').pop();
-                    return fields;
-                }).filter(c => c.status !== 'inactive');
+                // Tải danh mục và sản phẩm đồng thời bằng Promise.allSettled để tránh nghẽn
+                const [catResult, prodResult] = await Promise.allSettled([
+                    fetchWithTimeout(fetch(`${BASE_URL}/categories?pageSize=100`), 2000),
+                    fetchWithTimeout(fetch(`${BASE_URL}/products?pageSize=100`), 2000)
+                ]);
+
+                if (catResult.status === 'fulfilled' && catResult.value.ok) {
+                    let catData = await catResult.value.json();
+                    storeCategories = (catData.documents || []).map(doc => {
+                        let fields = parseFirestoreFields(doc.fields || {});
+                        fields.id = doc.name.split('/').pop();
+                        return fields;
+                    }).filter(c => c.status !== 'inactive');
+                    renderCategories(storeCategories);
+
+                    const catFilter = document.getElementById('category-filter');
+                    if (catFilter) {
+                        catFilter.innerHTML = '<option value="all">Tất cả danh mục</option>' + 
+                            storeCategories.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+                    }
+                }
 
                 let categoriesKeyed = {};
                 storeCategories.forEach(c => categoriesKeyed[String(c.id)] = c.name);
 
-                let prodRes = await fetch(`${BASE_URL}/products?pageSize=100`);
-                let prodData = await prodRes.json();
-                storeProducts = (prodData.documents || []).map(doc => {
-                    let fields = parseFirestoreFields(doc.fields || {});
-                    fields.id = doc.name.split('/').pop();
-                    let accLines = (fields.account_data || '').split('\n').filter(l => l.trim().length > 0);
-                    fields.stock = accLines.length;
-                    fields.category_name = categoriesKeyed[String(fields.category_id)] || 'Tài Khoản Game';
-                    return fields;
-                });
-
-                renderCategories(storeCategories);
-
-                const catFilter = document.getElementById('category-filter');
-                if (catFilter) {
-                    catFilter.innerHTML = '<option value="all">Tất cả danh mục</option>' + 
-                        storeCategories.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+                if (prodResult.status === 'fulfilled' && prodResult.value.ok) {
+                    let prodData = await prodResult.value.json();
+                    storeProducts = (prodData.documents || []).map(doc => {
+                        let fields = parseFirestoreFields(doc.fields || {});
+                        fields.id = doc.name.split('/').pop();
+                        let accLines = (fields.account_data || '').split('\n').filter(l => l.trim().length > 0);
+                        fields.stock = accLines.length;
+                        fields.category_name = categoriesKeyed[String(fields.category_id)] || 'Tài Khoản Game';
+                        return fields;
+                    });
+                    filterProducts();
                 }
 
-                filterProducts();
-                await fetchSystemPopups();
-
             } catch (e) {
-                showToast('Lỗi khi nạp dữ liệu từ hệ thống!', 'error');
+                showToast('Không thể đồng bộ nhanh từ hệ thống, đang hiển thị chế độ offline.', 'error');
             } finally {
-                hidePreloader();
+                clearTimeout(forceHideTimeout);
+                hidePreloader(); // Đảm bảo preloader luôn luôn ẩn đi
+                // Tải Popups ở background không chặn giao diện
+                fetchSystemPopups().catch(() => {});
             }
         }
 
@@ -867,7 +891,7 @@
 
         async function fetchSystemPopups() {
             try {
-                let res = await fetch(`${BASE_URL}/notifications?pageSize=100`);
+                let res = await fetchWithTimeout(fetch(`${BASE_URL}/notifications?pageSize=100`), 2500);
                 if (!res.ok) return;
                 let data = await res.json();
                 let notices = (data.documents || []).map(doc => {
@@ -909,7 +933,7 @@
             setTimeout(() => modal.classList.add('hidden'), 300);
         }
 
-        setInterval(fetchSystemPopups, 4000);
+        setInterval(fetchSystemPopups, 5000);
 
         function renderCategories(categories) {
             const grid = document.getElementById('categories-grid');
@@ -1013,7 +1037,7 @@
 
         async function executeBuyProduct(id) {
             try {
-                let latestProdRes = await fetch(`${BASE_URL}/products/${id}`);
+                let latestProdRes = await fetchWithTimeout(fetch(`${BASE_URL}/products/${id}`));
                 if (!latestProdRes.ok) {
                     showToast('Sản phẩm không còn tồn tại trên hệ thống!', 'error');
                     return;
@@ -1114,7 +1138,7 @@
             const is90Days = document.getElementById('remember-90-days').checked;
 
             try {
-                let res = await fetch(`${BASE_URL}/users?pageSize=300`);
+                let res = await fetchWithTimeout(fetch(`${BASE_URL}/users?pageSize=300`));
                 let data = await res.json();
                 let matched = null;
                 (data.documents || []).forEach(doc => {
@@ -1165,7 +1189,7 @@
             const pass = document.getElementById('reg-password').value;
 
             try {
-                let res = await fetch(`${BASE_URL}/users?pageSize=300`);
+                let res = await fetchWithTimeout(fetch(`${BASE_URL}/users?pageSize=300`));
                 let data = await res.json();
                 let isExist = (data.documents || []).some(doc => {
                     let fields = parseFirestoreFields(doc.fields || {});
@@ -1211,7 +1235,7 @@
             openModal('modal-deposit-history');
             const list = document.getElementById('deposit-history-list');
             try {
-                let res = await fetch(`${BASE_URL}/deposits?pageSize=300`);
+                let res = await fetchWithTimeout(fetch(`${BASE_URL}/deposits?pageSize=300`));
                 let data = await res.json();
                 let history = (data.documents || []).map(doc => parseFirestoreFields(doc.fields || {}))
                                 .filter(d => String(d.user_id) === String(currentUser.id));
@@ -1239,7 +1263,7 @@
             openModal('modal-order-history');
             const list = document.getElementById('order-history-list');
             try {
-                let res = await fetch(`${BASE_URL}/orders?pageSize=300`);
+                let res = await fetchWithTimeout(fetch(`${BASE_URL}/orders?pageSize=300`));
                 let data = await res.json();
                 let orders = (data.documents || []).map(doc => parseFirestoreFields(doc.fields || {}))
                                 .filter(o => String(o.user_id) === String(currentUser.id));
@@ -1271,10 +1295,15 @@
             showToast('Đã đăng xuất thành công!', 'info');
         }
 
-        window.onload = function() {
+        // Tự động giải phóng Preloader dự phòng cuối cùng từ Event Listener
+        document.addEventListener('DOMContentLoaded', () => {
             renderHeaderAuth();
             fetchStoreData();
-        };
+        });
+
+        window.addEventListener('load', () => {
+            setTimeout(hidePreloader, 1500);
+        });
     </script>
 </body>
 </html>
