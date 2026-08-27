@@ -362,7 +362,7 @@
 
             <!-- EXPLORE VIEW -->
             <div class="view" id="view-explore">
-                <div class="section-header">Khám phá AI Tools</div>
+                <div class="section-header">Khám phá AI Tool</div>
                 <div class="explore-grid">
                     <div class="explore-card" onclick="app.quickPrompt('Viết một bài văn ngắn sáng tạo về tương lai công nghệ.')">
                         <div class="explore-icon">✍️</div>
@@ -574,7 +574,7 @@
                 this.showToast("Digital HyperAI sẵn sàng!");
             }
 
-            // AI Backend Processing Module (Unified API Gateway)
+            // AI Backend Processing Module (Unified API Gateway - FIXED)
             async callAI(userPrompt, base64Img = null) {
                 const apiKey = document.getElementById('cfgApiKey').value.trim();
                 const apiUrl = document.getElementById('cfgApiUrl').value.trim();
@@ -582,14 +582,31 @@
                 // 1. If Gemini Official API Key is available
                 if (apiKey) {
                     try {
-                        const url = apiUrl || `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+                        const defaultModel = "gemini-1.5-flash";
+                        const url = apiUrl || `https://generativelanguage.googleapis.com/v1beta/models/${defaultModel}:generateContent?key=${apiKey}`;
+                        
+                        // Chuẩn hóa danh sách parts cho Prompt & Hình ảnh
+                        const parts = [];
+                        if (userPrompt) {
+                            parts.push({ text: userPrompt });
+                        }
+                        
+                        if (base64Img) {
+                            const base64Data = base64Img.split(',')[1];
+                            const mimeType = base64Img.split(';')[0].split(':')[1] || "image/jpeg";
+                            parts.push({
+                                inline_data: {
+                                    mime_type: mimeType,
+                                    data: base64Data
+                                }
+                            });
+                        }
+
                         const payload = {
                             system_instruction: {
                                 parts: [{ text: "Bạn là Digital HyperAI - trợ lý AI cao cấp kết hợp giao diện Liquid Glass. Trả lời mượt mà, chính xác bằng Tiếng Việt." }]
                             },
-                            contents: [{
-                                parts: [{ text: userPrompt }]
-                            }]
+                            contents: [{ parts: parts }]
                         };
 
                         const res = await fetch(url, {
@@ -597,16 +614,22 @@
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(payload)
                         });
+
                         const data = await res.json();
-                        return data.candidates?.[0]?.content?.parts?.[0]?.text || "Lỗi phản hồi dữ liệu AI.";
+
+                        if (!res.ok) {
+                            return `⚠️ Lỗi từ API (${res.status}): ${data.error?.message || "Không thể tải dữ liệu"}`;
+                        }
+
+                        return data.candidates?.[0]?.content?.parts?.[0]?.text || "Không nhận được nội dung từ AI.";
                     } catch (err) {
-                        return "Lỗi kết nối API: " + err.message;
+                        return "⚠️ Lỗi kết nối API/Mạng: " + err.message;
                     }
                 }
 
                 // 2. Demo Mock Response System (No API Key Required)
                 await new Promise(r => setTimeout(r, 1200));
-                return `[Demo Mode] Bạn vừa hỏi: "${userPrompt}". \n\nĐể kích hoạt AI thật, hãy nhập Gemini API Key trong menu **Settings**!`;
+                return `[Demo Mode] Bạn vừa hỏi: "${userPrompt || 'Tải ảnh lên'}". \n\nĐể kích hoạt AI thật, hãy nhập Gemini API Key trong menu **Settings**!`;
             }
 
             // Send & Receive Message Workflow
@@ -635,7 +658,9 @@
                 const aiReply = await this.callAI(text, currentImg);
 
                 // Update AI Message
-                document.getElementById(loadingId).remove();
+                const loadingElem = document.getElementById(loadingId);
+                if (loadingElem) loadingElem.remove();
+                
                 this.renderBubble(aiReply, 'ai');
 
                 this.orbWrapper.classList.remove('thinking');
