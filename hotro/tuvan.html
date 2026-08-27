@@ -362,7 +362,7 @@
 
             <!-- EXPLORE VIEW -->
             <div class="view" id="view-explore">
-                <div class="section-header">Khám phá AI Tool</div>
+                <div class="section-header">Khám phá AI Tools</div>
                 <div class="explore-grid">
                     <div class="explore-card" onclick="app.quickPrompt('Viết một bài văn ngắn sáng tạo về tương lai công nghệ.')">
                         <div class="explore-icon">✍️</div>
@@ -582,7 +582,7 @@
                 // 1. If Gemini Official API Key is available
                 if (apiKey) {
                     try {
-                        const defaultModel = "gemini-1.5-flash";
+                        const defaultModel = "gemini-2.5-flash";
                         const url = apiUrl || `https://generativelanguage.googleapis.com/v1beta/models/${defaultModel}:generateContent?key=${apiKey}`;
                         
                         // Chuẩn hóa danh sách parts cho Prompt & Hình ảnh
