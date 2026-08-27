@@ -582,7 +582,7 @@
                 // 1. If Gemini Official API Key is available
                 if (apiKey) {
                     try {
-                        const defaultModel = "gemini-2.5-flash";
+                        const defaultModel = "gemini-3.6-flash";
                         const url = apiUrl || `https://generativelanguage.googleapis.com/v1beta/models/${defaultModel}:generateContent?key=${apiKey}`;
                         
                         // Chuẩn hóa danh sách parts cho Prompt & Hình ảnh
