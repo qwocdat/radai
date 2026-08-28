@@ -43,7 +43,7 @@
         }
 
         /* ==========================================================================
-           2. RESET & BASE STYLES (GPU Tối ưu)
+           2. RESET & BASE STYLES
            ========================================================================== */
         * { 
             box-sizing: border-box; margin: 0; padding: 0; 
@@ -57,7 +57,6 @@
             display: flex; justify-content: center; align-items: center;
         }
         
-        /* Dynamic Ambient Aura - Tối ưu FPS bằng hardware acceleration */
         .ambient-bg {
             position: fixed; inset: 0; z-index: 0; pointer-events: none;
             background: radial-gradient(circle at 50% 30%, var(--bg-gradient-3), transparent 70%);
@@ -71,7 +70,6 @@
             100% { transform: scale(1.15) translateY(-30px) translateZ(0); opacity: 0.35; }
         }
 
-        /* Main Container */
         .app-shell {
             position: relative; z-index: 1;
             width: 100%; max-width: 480px; height: 100%;
@@ -81,7 +79,7 @@
         }
 
         /* ==========================================================================
-           3. HEADER (Liquid Glass Bar)
+           3. HEADER (Thêm nút Sign in chuẩn Video)
            ========================================================================== */
         .header {
             padding: 12px 20px;
@@ -99,7 +97,7 @@
         .brand-status { font-size: 0.75rem; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; }
         .status-dot { width: 6px; height: 6px; background: #10b981; border-radius: 50%; }
         
-        .header-actions { display: flex; gap: 8px; }
+        .header-actions { display: flex; align-items: center; gap: 8px; }
         .icon-btn {
             width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--glass-border);
             background: var(--glass-bg); color: var(--text-primary);
@@ -109,8 +107,28 @@
         }
         .icon-btn:active { transform: scale(0.92) translateZ(0); }
 
+        /* Nút Sign In phong cách iOS Video */
+        .admin-signin-btn {
+            background: rgba(255, 255, 255, 0.18);
+            border: 1px solid var(--glass-border);
+            color: #ffffff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s var(--ease-spring);
+        }
+        .admin-signin-btn:active { transform: scale(0.94); background: rgba(255, 255, 255, 0.28); }
+        .admin-signin-btn.logged-in {
+            background: rgba(16, 185, 129, 0.25);
+            border-color: #10b981;
+            color: #10b981;
+        }
+
         /* ==========================================================================
-           4. VIEW SWITCHER & VIEWS (Chat, Explore, History, Settings)
+           4. VIEW SWITCHER & VIEWS
            ========================================================================== */
         .view-container { flex: 1; position: relative; overflow: hidden; }
         .view {
@@ -123,7 +141,7 @@
         .view.active { opacity: 1; pointer-events: auto; transform: scale(1) translateZ(0); }
 
         /* ==========================================================================
-           5. XIAOMI HYPERAI ORB (Hero State)
+           5. XIAOMI HYPERAI ORB
            ========================================================================== */
         .hero-orb-area {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -160,7 +178,6 @@
         .hero-title { margin-top: 20px; font-size: 1.3rem; font-weight: 600; text-align: center; }
         .hero-subtitle { font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px; }
 
-        /* Mini Orb in Header when active */
         .mini-orb {
             width: 24px; height: 24px; border-radius: 50%;
             background: linear-gradient(135deg, #06b6d4, #3b82f6);
@@ -170,7 +187,7 @@
         }
 
         /* ==========================================================================
-           6. CHAT BUBBLES & MESSAGES
+           6. CHAT BUBBLES
            ========================================================================== */
         .chat-stream { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
         .msg-row { display: flex; flex-direction: column; max-width: 85%; }
@@ -189,16 +206,12 @@
             background: var(--accent-user); color: #fff;
             border-bottom-right-radius: 4px; border: none;
         }
-        .msg-row.ai .bubble {
-            border-bottom-left-radius: 4px;
-        }
+        .msg-row.ai .bubble { border-bottom-left-radius: 4px; }
 
         .img-preview-bubble { max-width: 200px; border-radius: 12px; margin-bottom: 8px; display: block; }
-        
         .bubble-actions { display: flex; gap: 8px; margin-top: 6px; opacity: 0.7; font-size: 0.75rem; }
         .action-link { cursor: pointer; text-decoration: underline; color: var(--text-secondary); }
 
-        /* Code Block Styling */
         pre {
             background: rgba(0, 0, 0, 0.4); padding: 12px; border-radius: 12px;
             overflow-x: auto; font-family: monospace; font-size: 0.85rem; margin: 8px 0;
@@ -209,7 +222,6 @@
             border: none; color: #fff; padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; cursor: pointer;
         }
 
-        /* Typing Dots Animation */
         .typing-dots { display: inline-flex; gap: 4px; padding: 4px 0; }
         .typing-dots span { width: 6px; height: 6px; background: var(--text-primary); border-radius: 50%; opacity: 0.4; animation: dotPulse 1.4s infinite ease-in-out; }
         .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
@@ -217,7 +229,7 @@
         @keyframes dotPulse { 0%, 100% { transform: scale(1); opacity: 0.4; } 50% { transform: scale(1.3); opacity: 1; } }
 
         /* ==========================================================================
-           7. FLOATING INPUT CAPSULE (iOS Glass Floating)
+           7. FLOATING INPUT CAPSULE
            ========================================================================== */
         .input-floating-wrapper {
             position: fixed; bottom: calc(68px + max(16px, var(--safe-area-bottom))); 
@@ -246,7 +258,7 @@
         .remove-thumb { position: absolute; top: 4px; left: 44px; background: red; color: white; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
         /* ==========================================================================
-           8. LIQUID GLASS BOTTOM NAVIGATION (Cố định chuẩn Layout)
+           8. BOTTOM NAVIGATION
            ========================================================================== */
         .bottom-nav {
             position: fixed; bottom: max(12px, var(--safe-area-bottom)); 
@@ -283,7 +295,6 @@
         .explore-title { font-weight: 600; font-size: 0.9rem; }
         .explore-desc { font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px; }
 
-        /* History List */
         .history-list { padding: 0 16px; display: flex; flex-direction: column; gap: 8px; }
         .history-item {
             background: var(--glass-bg); border: 1px solid var(--glass-border);
@@ -295,7 +306,6 @@
         .history-title { font-size: 0.9rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px; }
         .history-date { font-size: 0.75rem; color: var(--text-secondary); }
 
-        /* Settings List */
         .settings-group { padding: 0 16px; margin-bottom: 16px; }
         .settings-label { font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 6px; margin-left: 8px; text-transform: uppercase; }
         .settings-box { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); overflow: hidden; }
@@ -303,17 +313,87 @@
         .setting-row:last-child { border-bottom: none; }
         .setting-input { background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: #fff; padding: 6px 10px; border-radius: 8px; font-size: 0.85rem; outline: none; width: 140px; }
 
-        /* Toggle Switch */
-        .toggle { position: relative; width: 44px; height: 24px; }
-        .toggle input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; inset: 0; background-color: rgba(255,255,255,0.2); border-radius: 24px; cursor: pointer; transition: 0.25s; }
-        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: 0.25s var(--ease-spring); }
-        input:checked + .slider { background-color: #10b981; }
-        input:checked + .slider:before { transform: translateX(20px); }
+        /* ==========================================================================
+           HIỆU ỨNG CÔNG TẮC TOGGLE CHUẨN IOS/HYPEROS TRONG VIDEO
+           ========================================================================== */
+        .toggle {
+            position: relative;
+            display: inline-block;
+            width: 51px;
+            height: 31px;
+        }
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background-color: rgba(120, 120, 128, 0.32);
+            transition: background-color 0.3s cubic-bezier(0.2, 0.8, 0.25, 1);
+            border-radius: 31px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 27px;
+            width: 27px;
+            left: 2px;
+            bottom: 2px;
+            background-color: #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15), 0 3px 1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        input:checked + .slider {
+            background-color: #34c759; /* Màu xanh lá iOS trong Video */
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
 
         /* ==========================================================================
-           10. BOTTOM SHEET & TOASTS (iOS Style)
+           MODAL ĐĂNG NHẬP ADMIN (Glassmorphism)
            ========================================================================== */
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 200;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.25s var(--ease-out);
+        }
+        .modal-overlay.show { opacity: 1; pointer-events: auto; }
+        .modal-card {
+            width: 90%; max-width: 340px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            padding: 24px; box-shadow: var(--glass-shadow);
+            transform: scale(0.9); transition: transform 0.25s var(--ease-spring);
+        }
+        .modal-overlay.show .modal-card { transform: scale(1); }
+        .modal-title { font-size: 1.1rem; font-weight: 700; text-align: center; margin-bottom: 16px; }
+        .modal-field { margin-bottom: 12px; }
+        .modal-field label { font-size: 0.75rem; color: var(--text-secondary); display: block; margin-bottom: 4px; }
+        .modal-input {
+            width: 100%; background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border); border-radius: 12px;
+            padding: 10px 14px; color: #fff; font-size: 0.9rem; outline: none;
+        }
+        .modal-actions { display: flex; gap: 8px; margin-top: 18px; }
+        .modal-btn {
+            flex: 1; padding: 10px; border-radius: 12px; border: none;
+            font-size: 0.85rem; font-weight: 600; cursor: pointer;
+            transition: transform 0.2s var(--ease-spring);
+        }
+        .modal-btn:active { transform: scale(0.95); }
+        .modal-btn.cancel { background: rgba(255,255,255,0.1); color: var(--text-primary); }
+        .modal-btn.submit { background: var(--accent-glow); color: #fff; }
+
+        /* TOAST NOTIFICATION */
         .toast {
             position: fixed; top: 70px; left: 50%; transform: translateX(-50%) translateY(-20px);
             background: var(--glass-bg); border: 1px solid var(--glass-border);
@@ -330,7 +410,7 @@
     <div class="ambient-bg"></div>
 
     <div class="app-shell">
-        <!-- HEADER -->
+        <!-- HEADER (Thêm nút Sign In Admin) -->
         <header class="header">
             <div class="header-brand">
                 <div class="header-orb-slot" id="headerOrbSlot"></div>
@@ -340,6 +420,7 @@
                 </div>
             </div>
             <div class="header-actions">
+                <button class="admin-signin-btn" id="btnAdminSignIn" onclick="app.openAdminModal()">Sign in</button>
                 <button class="icon-btn" aria-label="New Chat" onclick="app.startNewChat()">
                     <svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
                 </button>
@@ -393,7 +474,7 @@
                 <div class="history-list" id="historyList"></div>
             </div>
 
-            <!-- SETTINGS VIEW -->
+            <!-- SETTINGS VIEW (Áp dụng công tắc Toggle iOS/HyperOS chuẩn như Video) -->
             <div class="view" id="view-settings">
                 <div class="section-header">Cài đặt</div>
                 <div class="settings-group">
@@ -476,11 +557,27 @@
         <div class="toast" id="toast">Thành công</div>
     </div>
 
-    <!-- ==========================================================================
-       11. JAVASCRIPT APPLICATION CORE MODULE
-       ========================================================================== -->
+    <!-- MODAL ĐĂNG NHẬP ADMIN -->
+    <div class="modal-overlay" id="adminModal">
+        <div class="modal-card">
+            <div class="modal-title">Đăng nhập Admin</div>
+            <div class="modal-field">
+                <label>Tài khoản</label>
+                <input type="text" id="adminUser" class="modal-input" placeholder="Nhập Username">
+            </div>
+            <div class="modal-field">
+                <label>Mật khẩu</label>
+                <input type="password" id="adminPass" class="modal-input" placeholder="Nhập Password">
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="app.closeAdminModal()">Hủy</button>
+                <button class="modal-btn submit" onclick="app.submitAdminLogin()">Đăng nhập</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT APPLICATION CORE -->
     <script>
-        // CẤU TRÚC VẬN HÀNH & KỊCH BẢN TƯ VẤN (SYSTEM PROMPT INTEGRATED)
         const SYSTEM_INSTRUCTION_TEXT = `================================================================================
           TỆP CẤU TRÚC VẬN HÀNH, DỮ LIỆU BẠN VÀ KỊCH BẢN TƯ VẤN: SYSTEM_PROMPT.TXT
 ================================================================================
@@ -490,87 +587,15 @@ PHẠM VI HỖ TRỢ : CHỈ XỬ LÝ VẤN ĐỀ VỀ SẢN PHẨM, NẠP TIỀ
 ================================================================================
 
 1. THÔNG TIN NGÂN HÀNG & CỔNG THANH TOÁN (PAYMENT INFO)
---------------------------------------------------------------------------------
-Khi khách hàng hỏi về thông tin chuyển khoản, số tài khoản hoặc cách nạp tiền, 
-AI có nhiệm vụ cung cấp chính xác các thông tin sau:
-
-* Ngân hàng      : VietinBank (Ngân hàng TMCP Công Thương Việt Nam)
+* Ngân hàng      : VietinBank
 * Số tài khoản   : 0989249990
 * Chủ tài khoản  : [Tên chủ tài khoản của shop]
 * Nội dung chuyển khoản (MEMO): [Tên tài khoản hoặc ID người dùng trên shop]
-* Link tạo mã VietQR tự động: 
-  https://img.vietqr.io/image/vietinbank-0989249990-compact2.png?amount={SO_TIEN}&addInfo={NOI_DUNG}
+* Link tạo mã VietQR tự động: https://img.vietqr.io/image/vietinbank-0989249990-compact2.png?amount={SO_TIEN}&addInfo={NOI_DUNG}
 
-(Hướng dẫn khách: Sau khi chuyển khoản đúng nội dung, hệ thống sẽ tự động cộng tiền vào tài khoản trên website từ 1 - 3 phút).
-
-2. CÁC DỊCH VỤ & SẢN PHẨM CUNG CẤP
---------------------------------------------------------------------------------
-* Tài khoản Game VIP (Liên Quân Mobile...)
-* Chia sẻ File APK Mod / Key VIP / Hack Map bảo mật
-* Nhận Acc Free qua link vượt thời gian
-* Nạp tiền tự động 24/7 (Ngân hàng VietinBank & Thẻ cào Viettel, Vinaphone, Mobifone)
-
-3. CHÍNH SÁCH BẢO HÀNH & HỖ TRỢ KHÁCH HÀNG
---------------------------------------------------------------------------------
-* Bảo hành 1 đổi 1 trong vòng 24 giờ đối với tài khoản bị sai mật khẩu hoặc bị khóa từ trước.
-* Khách hàng sau khi nhận tài khoản/key vui lòng kiểm tra và đổi lại mật khẩu ngay lập tức.
-* Tiền đã nạp vào tài khoản trên website không hỗ trợ quy đổi/rút ngược lại thành tiền mặt.
-
-4. PHÂN QUYỀN ADMIN & CẤU HÌNH BẢO MẬT AI (ADMIN ACCESS & PRIVILEGES)
---------------------------------------------------------------------------------
-Hệ thống cho phép AI hoạt động ở cả 2 chế độ (Có tài khoản Admin hoặc Không có vẫn dùng bình thường):
-
-* THÔNG TIN ĐĂNG NHẬP ADMIN BẢO MẬT:
-  - Tài khoản (Username): ame1610
-  - Mật khẩu (Password) : ame1610@
-
-* QUYỀN HẠN ĐẶC BIỆT CỦA ADMIN NÀY:
-  1. Quản lý API Key: Admin có quyền cấp, cập nhật hoặc thay đổi API Key cho AI. Tất cả người dùng/khách hàng khác sẽ dùng chung API Key mặc định do Admin cấu hình (cho đến khi Admin thực hiện thay đổi).
-  2. Điều khiển AI (Command Override): Admin có thể gửi các lệnh trực tiếp để điều chỉnh hành vi, cập nhật cấu hình hệ thống hoặc can thiệp dữ liệu real-time.
-  3. Huấn luyện AI (Fine-tuning / Training): Admin có quyền nạp thêm kịch bản mới, sửa đổi quy tắc ứng xử, cập nhật danh mục sản phẩm hoặc huấn luyện AI xử lý các tình huống phức tạp hơn.
-
-5. CẤU TRÚC DỮ LIỆU FIREBASE (FIRESTORE REST API)
---------------------------------------------------------------------------------
-* Project ID: quocdat-396fe
-* Base REST Endpoint: 
-  https://firestore.googleapis.com/v1/projects/quocdat-396fe/databases/(default)/documents
-
-* Danh sách Collections đang vận hành:
-  - /users/          : Thông tin tài khoản, số dư (balance), lịch sử nạp
-  - /products/       : Danh sách nick game, key VIP bán trực tiếp
-  - /link_products/  : Danh sách file hack, APK, Key VIP dành cho trang Link
-  - /apk_files/      : File ứng dụng APK chia sẻ trực tiếp (name, version, icon, file_url)
-  - /notifications/  : Thông báo chạy chữ (marquee) và Modal Pop-up từ Admin
-  - /settings/       : Cấu hình hệ thống, lưu trữ API Key dùng chung (site_config)
-
-6. DÀN QUY TẮC PHẢN HỒI VÀ TƯ VẤN (SYSTEM RULES)
---------------------------------------------------------------------------------
-* PHONG CÁCH: Lịch sự, vui vẻ, nhiệt tình, tư vấn dễ hiểu như nhân viên chăm sóc khách hàng thật. Không sử dụng thuật ngữ kỹ thuật khô khan với người dùng thông thường.
-* PHẠM VI HỖ TRỢ: Chỉ trả lời các câu hỏi liên quan tới dịch vụ, sản phẩm, mua bán, nạp tiền và hỗ trợ tại DigitalShop / DigitalSMod.
-* TỪ CHỐI NGOÀI PHẠM VI: 
-  "Dạ em là trợ lý hỗ trợ riêng của DigitalShop. Em chỉ có thể hỗ trợ anh/chị các vấn đề liên quan đến nạp tiền, mua tài khoản hoặc dịch vụ của shop thôi ạ. Anh/chị cần em hỗ trợ gì về shop không ạ?"
-
-* 10 QUY TẮC CHI TIẾT DÀNH CHO AI:
-  1. Bảo mật thông tin: Không bao giờ yêu cầu khách cung cấp mật khẩu cá nhân. Nhắc khách đổi mật khẩu ngay sau khi nhận tài khoản/key.
-  2. Nạp tiền chậm: Giải thích hệ thống tự động xử lý từ 1-3 phút. Quá 5 phút chưa nhận được tiền thì nhắc khách gửi mã giao dịch/bill để nhân viên check tay.
-  3. Xử lý khiếu nại & bảo hành: Lắng nghe, hòa nhã. Kiểm tra điều kiện 24h để hỗ trợ đổi tài khoản mới 1:1 nếu hợp lệ.
-  4. Tạo mã VietQR: Khi khách muốn nạp số tiền cụ thể, tạo đúng đường dẫn VietQR tự động kèm số tiền và nội dung cho khách quét.
-  5. Minh bạch giá: Báo đúng giá niêm yết trên hệ thống, không tự ý hứa hẹn giảm giá ngoài chương trình khuyến mại.
-  6. Nguyên tắc nạp thẻ cào: Dặn khách chọn đúng nhà mạng và mệnh giá. Chọn sai mệnh giá sẽ bị phạt/mất thẻ theo quy định nhà mạng.
-  7. Xử lý khi bảo trì: Nếu sản phẩm/cổng nạp ở trạng thái Maintenance, thông báo khéo léo và hẹn khách quay lại sau, không để khách giao dịch lúc này.
-  8. Kiểm soát thái độ: Không tranh cãi, gắt gỏng với khách. Luôn thể hiện thái độ đồng cảm: "Em rất tiếc về trải nghiệm này của anh/chị, em sẽ hỗ trợ ngay ạ."
-  9. Xác nhận trước khi mua: Tóm tắt đơn hàng (tên sản phẩm, loại game, số tiền) trước khi hướng dẫn khách nạp tiền hoặc chốt mua.
-  10. Chuyển cấp hỗ trợ: Các sự cố vượt thẩm quyền (như trừ tiền ngân hàng nhưng balance không đổi mà AI không check được), cung cấp thông tin liên hệ Zalo/Telegram Admin để hỗ trợ trực tiếp.
-
-7. MÔ HÌNH THAO TÁC FIREBASE DÀNH CHO AI (FUNCTION CALLING)
---------------------------------------------------------------------------------
-Để AI có quyền điều khiển hoặc cập nhật dữ liệu tài khoản người dùng (trừ tiền, bàn giao acc, mở khoá), AI bắt buộc phải thông qua Firebase Cloud Functions làm trung gian an toàn.
-
-- Luồng thực thi:
-  1. Khách gửi yêu cầu chat.
-  2. AI nhận diện ý định và trả về yêu cầu gọi hàm (Function Call).
-  3. Firebase Cloud Functions xác thực token, thực thi Atomic Transaction trên Firestore (cộng/trừ số dư, đổi trạng thái sản phẩm).
-  4. Trả kết quả về cho AI phản hồi tới khách hàng.
+2. PHÂN QUYỀN ADMIN & CẤU HÌNH BẢO MẬT AI
+* Tài khoản Admin: ame1610
+* Mật khẩu Admin : ame1610@
 ================================================================================`;
 
         class HyperAIApp {
@@ -579,6 +604,7 @@ Hệ thống cho phép AI hoạt động ở cả 2 chế độ (Có tài khoả
                 this.currentChatId = null;
                 this.base64Image = null;
                 this.isProcessing = false;
+                this.isAdminLoggedIn = false;
 
                 this.initElements();
                 this.loadSettings();
@@ -592,9 +618,10 @@ Hệ thống cho phép AI hoạt động ở cả 2 chế độ (Có tài khoả
                 this.orbWrapper = document.getElementById('orbWrapper');
                 this.headerOrbSlot = document.getElementById('headerOrbSlot');
                 this.inputWrapper = document.getElementById('inputWrapper');
+                this.btnAdminSignIn = document.getElementById('btnAdminSignIn');
+                this.adminModal = document.getElementById('adminModal');
             }
 
-            // Haptic Feedback Simulation
             vibrate() {
                 const hapticOn = document.getElementById('cfgHapticToggle').checked;
                 if (hapticOn && navigator.vibrate) navigator.vibrate(10);
@@ -607,7 +634,41 @@ Hệ thống cho phép AI hoạt động ở cả 2 chế độ (Có tài khoả
                 setTimeout(() => toast.classList.remove('show'), 2500);
             }
 
-            // View Switching & Navigation
+            /* Admin Login Controls */
+            openAdminModal() {
+                this.vibrate();
+                if (this.isAdminLoggedIn) {
+                    this.isAdminLoggedIn = false;
+                    this.btnAdminSignIn.innerText = "Sign in";
+                    this.btnAdminSignIn.classList.remove("logged-in");
+                    this.showToast("Đã đăng xuất Admin!");
+                    return;
+                }
+                this.adminModal.classList.add('show');
+            }
+
+            closeAdminModal() {
+                this.adminModal.classList.remove('show');
+                document.getElementById('adminUser').value = '';
+                document.getElementById('adminPass').value = '';
+            }
+
+            submitAdminLogin() {
+                const user = document.getElementById('adminUser').value.trim();
+                const pass = document.getElementById('adminPass').value.trim();
+
+                if (user === 'ame1610' && pass === 'ame1610@') {
+                    this.isAdminLoggedIn = true;
+                    this.closeAdminModal();
+                    this.btnAdminSignIn.innerText = "Admin Active";
+                    this.btnAdminSignIn.classList.add("logged-in");
+                    this.showToast("Đăng nhập Admin thành công!");
+                } else {
+                    this.vibrate();
+                    alert("Tài khoản hoặc mật khẩu Admin không đúng!");
+                }
+            }
+
             switchView(viewId, targetNav) {
                 this.vibrate();
                 document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -616,7 +677,6 @@ Hệ thống cho phép AI hoạt động ở cả 2 chế độ (Có tài khoả
                 document.getElementById(`view-${viewId}`).classList.add('active');
                 if (targetNav) targetNav.classList.add('active');
 
-                // Toggle Floating Input Bar Visibility
                 if (viewId === 'chat') {
                     this.inputWrapper.style.display = 'block';
                 } else {
@@ -624,7 +684,6 @@ Hệ thống cho phép AI hoạt động ở cả 2 chế độ (Có tài khoả
                 }
             }
 
-            // Chat Input Utilities
             autoResizeInput(el) {
                 el.style.height = 'auto';
                 el.style.height = Math.min(el.scrollHeight, 100) + 'px';
@@ -655,7 +714,6 @@ Hệ thống cho phép AI hoạt động ở cả 2 chế độ (Có tài khoả
                 document.getElementById('fileInput').value = '';
             }
 
-            // Hero AI Orb Animations & Movements
             moveOrbToHeader() {
                 if (this.heroOrbArea.style.display === 'none') return;
                 this.heroOrbArea.style.display = 'none';
@@ -667,38 +725,28 @@ Hệ thống cho phép AI hoạt động ở cả 2 chế độ (Có tài khoả
                 this.showToast("Digital HyperAI sẵn sàng!");
             }
 
-            // AI Backend Processing Module (Unified API Gateway - SYSTEM PROMPT INTEGRATED)
             async callAI(userPrompt, base64Img = null) {
                 const apiKey = document.getElementById('cfgApiKey').value.trim();
                 const apiUrl = document.getElementById('cfgApiUrl').value.trim();
 
-                // 1. If Gemini Official API Key is available
                 if (apiKey) {
                     try {
                         const defaultModel = "gemini-3.6-flash";
                         const url = apiUrl || `https://generativelanguage.googleapis.com/v1beta/models/${defaultModel}:generateContent?key=${apiKey}`;
                         
-                        // Chuẩn hóa danh sách parts cho Prompt & Hình ảnh
                         const parts = [];
-                        if (userPrompt) {
-                            parts.push({ text: userPrompt });
-                        }
+                        if (userPrompt) parts.push({ text: userPrompt });
                         
                         if (base64Img) {
                             const base64Data = base64Img.split(',')[1];
                             const mimeType = base64Img.split(';')[0].split(':')[1] || "image/jpeg";
                             parts.push({
-                                inline_data: {
-                                    mime_type: mimeType,
-                                    data: base64Data
-                                }
+                                inline_data: { mime_type: mimeType, data: base64Data }
                             });
                         }
 
                         const payload = {
-                            system_instruction: {
-                                parts: [{ text: SYSTEM_INSTRUCTION_TEXT }]
-                            },
+                            system_instruction: { parts: [{ text: SYSTEM_INSTRUCTION_TEXT }] },
                             contents: [{ parts: parts }]
                         };
 
@@ -709,23 +757,17 @@ Hệ thống cho phép AI hoạt động ở cả 2 chế độ (Có tài khoả
                         });
 
                         const data = await res.json();
-
-                        if (!res.ok) {
-                            return `⚠️ Lỗi từ API (${res.status}): ${data.error?.message || "Không thể tải dữ liệu"}`;
-                        }
-
+                        if (!res.ok) return `⚠️ Lỗi API (${res.status}): ${data.error?.message || "Không thể tải dữ liệu"}`;
                         return data.candidates?.[0]?.content?.parts?.[0]?.text || "Không nhận được nội dung từ AI.";
                     } catch (err) {
                         return "⚠️ Lỗi kết nối API/Mạng: " + err.message;
                     }
                 }
 
-                // 2. Demo Mock Response System (No API Key Required)
                 await new Promise(r => setTimeout(r, 1200));
                 return `[Demo Mode] Bạn vừa hỏi: "${userPrompt || 'Tải ảnh lên'}". \n\nĐể kích hoạt AI thật, hãy nhập Gemini API Key trong menu **Settings**!`;
             }
 
-            // Send & Receive Message Workflow
             async sendMessage() {
                 const text = this.chatInput.value.trim();
                 if ((!text && !this.base64Image) || this.isProcessing) return;
@@ -735,7 +777,6 @@ Hệ thống cho phép AI hoạt động ở cả 2 chế độ (Có tài khoả
                 this.moveOrbToHeader();
                 this.orbWrapper.classList.add('thinking');
 
-                // Render User Message
                 const currentImg = this.base64Image;
                 this.renderBubble(text, 'user', currentImg);
                 
@@ -743,14 +784,11 @@ Hệ thống cho phép AI hoạt động ở cả 2 chế độ (Có tài khoả
                 this.chatInput.style.height = 'auto';
                 this.clearImage();
 
-                // Render AI Loading Skeleton
                 const loadingId = 'load-' + Date.now();
                 this.renderLoadingBubble(loadingId);
 
-                // API Call
                 const aiReply = await this.callAI(text, currentImg);
 
-                // Update AI Message
                 const loadingElem = document.getElementById(loadingId);
                 if (loadingElem) loadingElem.remove();
                 
@@ -767,7 +805,6 @@ Hệ thống cho phép AI hoạt động ở cả 2 chế độ (Có tài khoả
                 this.sendMessage();
             }
 
-            // UI Render Helpers
             renderBubble(text, sender, imgData = null) {
                 const row = document.createElement('div');
                 row.className = `msg-row ${sender}`;
@@ -829,7 +866,6 @@ Hệ thống cho phép AI hoạt động ở cả 2 chế độ (Có tài khoả
                 this.showToast("Đã tạo cuộc trò chuyện mới!");
             }
 
-            // Storage & History Management
             saveCurrentChat(userMsg, aiMsg) {
                 if (!this.currentChatId) {
                     this.currentChatId = Date.now();
@@ -873,7 +909,6 @@ Hệ thống cho phép AI hoạt động ở cả 2 chế độ (Có tài khoả
                 this.switchView('chat', document.querySelectorAll('.nav-item')[0]);
             }
 
-            // Settings Helpers
             toggleTheme() {
                 const isLight = document.getElementById('cfgThemeToggle').checked;
                 document.documentElement.setAttribute('data-theme', isLight ? 'light' : 'dark');
@@ -886,7 +921,6 @@ Hệ thống cho phép AI hoạt động ở cả 2 chế độ (Có tài khoả
             }
         }
 
-        // Initialize App Instance
         const app = new HyperAIApp();
     </script>
 </body>
