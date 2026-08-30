@@ -1,0 +1,53 @@
+export default async function handler(req, res) {
+    // 1. Chỉ chấp nhận phương thức POST
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method Not Allowed' });
+    }
+
+    // 2. Lấy API Key bí mật từ Vercel Environment Variables
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+
+    if (!GEMINI_API_KEY) {
+        return res.status(500).json({ 
+            error: 'Chưa cấu hình GEMINI_API_KEY trong Cài đặt (Settings > Environment Variables) trên Vercel.' 
+        });
+    }
+
+    try {
+        const { parts } = req.body;
+
+        if (!parts || !Array.isArray(parts) || parts.length === 0) {
+            return res.status(400).json({ error: 'Dữ liệu ảnh gửi lên không hợp lệ.' });
+        }
+
+        // 3. Gọi sang Google Gemini API (sử dụng model gemini-2.5-flash ổn định nhất)
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify({
+                contents: [{ parts: parts }],
+                generationConfig: { 
+                    response_mime_type: "application/json" 
+                }
+            })
+        });
+
+        const data = await response.json();
+
+        // 4. Nếu Google trả về lỗi HTTP
+        if (!response.ok) {
+            return res.status(response.status).json({
+                error: data.error?.message || 'Lỗi xác thực hoặc vượt quá giới hạn API từ Google.'
+            });
+        }
+
+        // 5. Trả kết quả JSON về cho file ai.html
+        return res.status(200).json(data);
+
+    } catch (error) {
+        console.error('Lỗi tại Proxy Backend:', error);
+        return res.status(500).json({ error: 'Lỗi xử lý Serverless Function: ' + error.message });
+    }
+}
