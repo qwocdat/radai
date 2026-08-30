@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-    // Chỉ chấp nhận POST
     if (req.method !== 'POST') {
         return res.status(405).json({
             error: 'Method Not Allowed'
@@ -23,65 +22,55 @@ export default async function handler(req, res) {
             });
         }
 
-        // Gemini 3.6 Flash
-        const GEMINI_URL =
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${GEMINI_API_KEY}`;
-
-        const response = await fetch(GEMINI_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                contents: [
-                    {
-                        parts: parts
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${GEMINI_API_KEY}`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    contents: [
+                        {
+                            parts: parts
+                        }
+                    ],
+                    generationConfig: {
+                        responseMimeType: 'application/json'
                     }
-                ],
-                generationConfig: {
-                    responseMimeType: 'application/json'
-                }
-            })
-        });
+                })
+            }
+        );
 
-        // Đọc dạng text trước để tránh lỗi:
-        // Unexpected token 'T' ... is not valid JSON
-        const rawResponse = await response.text();
+        const text = await response.text();
 
         let data;
 
         try {
-            data = JSON.parse(rawResponse);
+            data = text ? JSON.parse(text) : {};
         } catch {
-            console.error('Gemini trả về dữ liệu không phải JSON:', rawResponse);
-
             return res.status(502).json({
-                error: 'Gemini API không trả về JSON hợp lệ.',
-                details: rawResponse.substring(0, 500)
+                error: 'Gemini trả về dữ liệu không phải JSON.',
+                raw: text.substring(0, 500)
             });
         }
 
-        // Google trả lỗi HTTP
         if (!response.ok) {
-            console.error('Gemini API Error:', data);
-
             return res.status(response.status).json({
                 error:
                     data?.error?.message ||
-                    'Lỗi từ Gemini API.',
-                details: data?.error || null
+                    'Gemini API trả về lỗi.',
+                details: data
             });
         }
 
-        // Trả nguyên response Gemini về frontend
         return res.status(200).json(data);
 
     } catch (error) {
-        console.error('Lỗi tại Proxy Backend:', error);
+        console.error('Lỗi Proxy Backend:', error);
 
         return res.status(500).json({
-            error: 'Lỗi xử lý Serverless Function.',
-            details: error.message
+            error: 'Lỗi Serverless Function: ' + error.message
         });
     }
 }
