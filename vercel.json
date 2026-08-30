@@ -1,13 +1,8 @@
 {
-  "functions": {
-    "hotro/api/*.js": {
-      "runtime": "nodejs18.x"
-    }
-  },
-  "routes": [
+  "rewrites": [
     {
-      "src": "/hotro/api/(.*)",
-      "dest": "/hotro/api/$1"
+      "source": "/api/analyze-face",
+      "destination": "/api/analyze-face.js"
     }
   ]
 }
