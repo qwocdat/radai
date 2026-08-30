@@ -1,5 +1,13 @@
 {
+  "functions": {
+    "hotro/api/*.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1" }
+    {
+      "src": "/hotro/api/(.*)",
+      "dest": "/hotro/api/$1"
+    }
   ]
 }
