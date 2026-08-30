@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Glowmax Looksmax - By DigitalsMod</title>
     <style>
-        /* --- CORE RESET & DESIGN SYSTEM --- */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -47,7 +46,6 @@
             position: relative;
         }
 
-        /* Ambient Background Lighting */
         body::before {
             content: '';
             position: fixed;
@@ -74,7 +72,6 @@
             pointer-events: none;
         }
 
-        /* Noise Texture Overlay */
         .bg-noise {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -83,7 +80,6 @@
             pointer-events: none;
         }
 
-        /* Dynamic Blur Scroll Wrapper */
         .main-wrapper {
             width: 100%;
             max-width: 720px;
@@ -95,7 +91,6 @@
             transform: scale(0.995);
         }
 
-        /* --- LIQUID GLASS COMPONENTS --- */
         .glass-panel {
             background: var(--glass-bg);
             -webkit-backdrop-filter: blur(30px) saturate(190%);
@@ -119,17 +114,11 @@
             transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, border-color 0.2s ease;
         }
 
-        .glass-card:active {
-            transform: scale(0.985);
-            background: rgba(255, 255, 255, 0.05);
-        }
-
         @keyframes panelFadeIn {
             from { opacity: 0; transform: translateY(16px) scale(0.98); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        /* --- HEADER BAR --- */
         .header-bar {
             display: flex;
             justify-content: space-between;
@@ -181,7 +170,6 @@
             text-transform: uppercase;
         }
 
-        /* --- BUTTONS --- */
         button {
             width: 100%;
             padding: 16px 20px;
@@ -229,20 +217,11 @@
             box-shadow: inset 0 1px 1px rgba(255,255,255,0.08);
         }
 
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            box-shadow: inset 0 1px 1px rgba(255,255,255,0.12);
-        }
-
         .btn-danger {
             background: rgba(255, 69, 58, 0.12);
             color: var(--danger-color);
             border: 1px solid rgba(255, 69, 58, 0.2);
             box-shadow: none;
-        }
-
-        .btn-danger:hover {
-            background: rgba(255, 69, 58, 0.22);
         }
 
         .btn-ghost {
@@ -251,11 +230,6 @@
             padding: 10px;
             font-size: 14px;
             box-shadow: none;
-        }
-
-        .btn-ghost:hover {
-            color: #fff;
-            background: rgba(255, 255, 255, 0.04);
         }
 
         .history-capsule-btn {
@@ -273,12 +247,6 @@
             transition: all 0.2s ease;
         }
 
-        .history-capsule-btn:hover {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-
-        /* --- HERO INTRO SCANNER ANIMATION --- */
         .hero-scanner-wrap {
             position: relative;
             width: 180px;
@@ -359,7 +327,6 @@
             box-shadow: 0 0 6px var(--accent-color);
         }
 
-        /* --- WIZARD SCANNER PROGRESS --- */
         .wizard-container { display: none; }
         
         .step-progress-bar {
@@ -441,7 +408,6 @@
 
         .step-node.active .step-node-label { color: var(--text-primary); }
 
-        /* --- CAPTURE SLOT WITH CORNER BRACKETS --- */
         .capture-slot {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--glass-border);
@@ -504,10 +470,8 @@
             backdrop-filter: blur(8px);
         }
 
-        .capture-slot.has-image:hover .img-overlay-actions,
-        .capture-slot.has-image:active .img-overlay-actions { opacity: 1; }
+        .capture-slot.has-image:hover .img-overlay-actions { opacity: 1; }
 
-        /* --- CAMERA MODAL --- */
         #cameraModal {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: #000; z-index: 9999; display: none; flex-direction: column;
@@ -530,7 +494,6 @@
             border-radius: 50%;
             box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.65);
             pointer-events: none;
-            transition: border-color 0.3s;
         }
 
         .camera-instruction {
@@ -559,18 +522,13 @@
             width: 100%; height: 100%;
             background: #FFFFFF;
             border-radius: 50%;
-            transition: transform 0.1s ease;
         }
 
-        .shutter-btn:active .shutter-btn-inner { transform: scale(0.85); }
-
-        /* Flash Animation Frame */
         .camera-flash {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: #fff; z-index: 99; opacity: 0; pointer-events: none;
         }
 
-        /* --- REALTIME SCANNING ANALYSIS SCREEN --- */
         .loading-container {
             display: none;
             text-align: center;
@@ -614,7 +572,6 @@
             100% { top: 100%; opacity: 0.2; }
         }
 
-        /* Landmark Grid Mesh */
         .landmark-dots-svg {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -622,7 +579,6 @@
             pointer-events: none;
         }
 
-        /* Circular Progress Indicator */
         .progress-ring-wrap {
             position: relative;
             width: 100px;
@@ -650,7 +606,6 @@
             stroke-linecap: round;
             fill: transparent;
             transition: stroke-dashoffset 0.3s ease;
-            filter: drop-shadow(0 0 6px var(--accent-color));
         }
 
         .progress-text-percent {
@@ -659,7 +614,6 @@
             transform: translate(-50%, -50%);
             font-size: 22px;
             font-weight: 800;
-            letter-spacing: -0.5px;
         }
 
         .analysis-status-text {
@@ -694,7 +648,6 @@
         .rt-metric-name { color: var(--text-secondary); font-weight: 600; }
         .rt-metric-val { font-weight: 700; color: var(--accent-color); }
 
-        /* --- DASHBOARD RESULT REPORT --- */
         #resultDashboard { display: none; }
 
         .score-hero-wrap {
@@ -711,7 +664,6 @@
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             margin: 0 auto 16px auto;
             box-shadow: 0 0 30px var(--accent-glow), inset 0 1px 2px var(--glass-highlight);
-            position: relative;
         }
 
         .overall-score-circle span {
@@ -731,15 +683,12 @@
             font-size: 14px;
             font-weight: 700;
             color: #FFF;
-            letter-spacing: 0.3px;
         }
 
-        /* Radar Chart Style */
         .chart-container { display: flex; justify-content: center; margin-bottom: 30px; position: relative; }
         svg.radar-chart { width: 100%; max-width: 320px; height: auto; overflow: visible; }
-        .radar-label { font-size: 10px; fill: var(--text-secondary); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+        .radar-label { font-size: 10px; fill: var(--text-secondary); font-weight: 700; text-transform: uppercase; }
 
-        /* Metrics Grid Cards */
         .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
         @media (max-width: 500px) { .metrics-grid { grid-template-columns: 1fr; } }
 
@@ -754,20 +703,17 @@
         .metric-bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
         .metric-bar-fill { height: 100%; background: var(--accent-color); border-radius: 3px; width: 0%; transition: width 1s cubic-bezier(0.16, 1, 0.3, 1); }
 
-        /* Detail List Items */
         .detail-grid { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 24px; }
         .list-items { margin-left: 0; list-style: none; }
         .list-items li { margin-bottom: 10px; font-size: 14px; color: var(--text-secondary); padding-left: 20px; position: relative; line-height: 1.5; }
         .list-items li::before { content: "•"; position: absolute; left: 0; color: var(--accent-color); font-weight: bold; font-size: 16px; }
 
-        /* Timeline Protocol */
         .protocol-phase { margin-bottom: 20px; border-left: 2px solid rgba(255,255,255,0.1); padding-left: 20px; position: relative; }
         .protocol-phase::before {
             content: ""; position: absolute; left: -6px; top: 2px; width: 10px; height: 10px; border-radius: 50%; background: var(--accent-color); box-shadow: 0 0 8px var(--accent-color);
         }
         .protocol-title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 10px; }
 
-        /* History Modal */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(0,0,0,0.85); backdrop-filter: blur(20px);
@@ -779,7 +725,6 @@
         }
         .history-item { padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items: center; }
 
-        /* Compare Section */
         .compare-section { display: none; margin-top: 30px; border-top: 1px solid var(--glass-border); padding-top: 24px; }
         .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
         .delta-positive { color: var(--success-color); }
@@ -794,7 +739,6 @@
 
 <div class="main-wrapper">
     <div class="glass-panel" id="mainPanel">
-        <!-- Header Bar -->
         <div class="header-bar">
             <div class="brand-title">
                 <div class="brand-logo-icon">
@@ -802,18 +746,16 @@
                 </div>
                 <div class="brand-text-wrap">
                     <span class="brand-name">Glowmax</span>
-                    <span class="ai-badge">AI Face Analyzer</span>
+                    <span class="ai-badge" id="aiStatusBadge">Đang kết nối Glowmax AI...</span>
                 </div>
             </div>
             <button class="history-capsule-btn" onclick="openHistory()">Lịch Sử</button>
         </div>
 
-        <!-- Màn Hình Intro / Hero -->
         <div id="introScreen">
             <div class="hero-scanner-wrap">
                 <div class="hero-orb"></div>
                 <div class="scan-beam"></div>
-                <!-- Abstract Mesh Icon -->
                 <svg class="face-scan-svg" viewBox="0 0 100 100" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1">
                     <path d="M50 15 C30 15, 20 35, 20 55 C20 75, 35 90, 50 90 C65 90, 80 75, 80 55 C80 35, 70 15, 50 15 Z" stroke-dasharray="2 2"/>
                     <circle cx="35" cy="45" r="4" fill="var(--accent-color)"/>
@@ -832,10 +774,9 @@
                 <div class="pill-item"><span class="pill-dot"></span>RATIO 1:1.618</div>
             </div>
 
-            <button onclick="startWizard()">BẮT ĐẦU QUÉT</button>
+            <button id="startScanBtn" onclick="startWizard()" disabled>ĐANG TẢI CẤU HÌNH...</button>
         </div>
 
-        <!-- Wizard Step Scanner Flow -->
         <div class="wizard-container" id="wizardScreen">
             <div class="step-progress-bar">
                 <div class="step-progress-line"></div>
@@ -879,13 +820,10 @@
             <input type="file" id="wizFileInput" accept="image/jpeg, image/png, image/webp" style="display: none;" onchange="handleFileSelect(event)">
         </div>
 
-        <!-- Realtime AI Analysis Screen (Loading Experience) -->
         <div class="loading-container" id="loadingUI">
             <div class="scan-frame-container">
                 <img id="scanPreviewTarget" class="scan-frame-img" src="" alt="Face Scan">
                 <div class="scan-frame-overlay-line"></div>
-                
-                <!-- Landmark Mesh Dots -->
                 <svg class="landmark-dots-svg" viewBox="0 0 100 100">
                     <circle cx="35" cy="40" r="1.5" fill="#30D158"/>
                     <circle cx="65" cy="40" r="1.5" fill="#30D158"/>
@@ -919,7 +857,6 @@
         </p>
     </div>
 
-    <!-- Result Dashboard -->
     <div class="glass-panel" id="resultDashboard">
         <h1 style="margin-bottom: 4px; font-size: 22px;">BÁO CÁO PHÂN TÍCH</h1>
         <p style="text-align: center; margin-bottom: 24px; font-size: 12px; color: var(--text-tertiary);" id="analysisTime"></p>
@@ -1001,7 +938,6 @@
     </div>
 </div>
 
-<!-- Camera Modal -->
 <div id="cameraModal">
     <div class="camera-flash" id="cameraFlash"></div>
     <div class="camera-header">
@@ -1021,7 +957,6 @@
     <canvas id="captureCanvas" style="display: none;"></canvas>
 </div>
 
-<!-- History Modal -->
 <div class="modal-overlay" id="historyModal">
     <div class="modal-content">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -1033,8 +968,58 @@
     </div>
 </div>
 
+<!-- Firebase & Main Script SDK Modular CDN -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDummyKeyForInitializationOnly-ReplaceIfCustom",
+        authDomain: "quocdat-396fe.firebaseapp.com",
+        projectId: "quocdat-396fe",
+        storageBucket: "quocdat-396fe.appspot.com",
+        messagingSenderId: "38927491028",
+        appId: "1:38927491028:web:abcdef123456789"
+    };
+
+    let activeApiKey = null;
+    const aiStatusBadge = document.getElementById('aiStatusBadge');
+    const startScanBtn = document.getElementById('startScanBtn');
+
+    try {
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const configRef = doc(db, "glowmax", "config", "api", "keyDoc");
+
+        // Nhận cấu hình real-time từ Firestore
+        onSnapshot(configRef, (docSnap) => {
+            if (docSnap.exists() && docSnap.data().apiKey) {
+                activeApiKey = docSnap.data().apiKey;
+                aiStatusBadge.innerText = "Glowmax AI Ready";
+                startScanBtn.disabled = false;
+                startScanBtn.innerText = "BẮT ĐẦU QUÉT";
+            } else {
+                activeApiKey = null;
+                aiStatusBadge.innerText = "Chưa cấu hình API Key";
+                startScanBtn.disabled = true;
+                startScanBtn.innerText = "CHƯA CẤU HÌNH API KEY TRONG DASHBOARD";
+            }
+        }, (error) => {
+            console.error("Firebase Snapshot Error:", error);
+            aiStatusBadge.innerText = "Lỗi kết nối Firebase";
+            startScanBtn.disabled = true;
+            startScanBtn.innerText = "MẤT KẾT NỐI CƠ SỞ DỮ LIỆU";
+        });
+    } catch (e) {
+        console.error("Firebase Init Error:", e);
+        aiStatusBadge.innerText = "Lỗi khởi tạo hệ thống";
+    }
+
+    // Đính kèm biến toàn cục API Key để các hàm xử lý phân tích sử dụng
+    window.getGlobalApiKey = () => activeApiKey;
+</script>
+
 <script>
-    /* --- MOTION BLUR SCROLL EVENT --- */
     let scrollTimeout;
     window.addEventListener('scroll', () => {
         document.body.classList.add('is-scrolling');
@@ -1044,9 +1029,8 @@
         }, 150); 
     });
 
-    /* --- STATE MANAGEMENT --- */
     const state = {
-        photos: [null, null, null], // [Front, 30deg, Profile]
+        photos: [null, null, null],
         currentStep: 0,
         afterPhoto: null,
         stream: null,
@@ -1061,49 +1045,32 @@
         { title: "PROFILE (Góc 90°)", desc: "Xoay mặt ngang hoàn toàn vuông góc" }
     ];
 
-    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
-    /* --- HELPER: SAFE JSON PARSER FROM AI RESPONSE --- */
     function parseAIJsonResponse(rawText) {
         if (!rawText) throw new Error("Phản hồi từ AI rỗng");
-        
-        // Loại bỏ markdown codeblocks nếu có (```json ... ```)
         let cleaned = rawText.replace(/```(?:json)?/gi, '').replace(/```/g, '').trim();
-        
-        // Trích xuất đoạn JSON bằng Regex
         const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-            cleaned = jsonMatch[0];
-        }
-        
+        if (jsonMatch) cleaned = jsonMatch[0];
         return JSON.parse(cleaned);
     }
 
-    /* --- COMPRESS IMAGE UTILITY --- */
     function compressImage(base64Str, maxWidth = 800, quality = 0.7) {
         return new Promise((resolve) => {
             const img = new Image();
             img.src = base64Str.startsWith('data:') ? base64Str : 'data:image/jpeg;base64,' + base64Str;
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                let width = img.width;
-                let height = img.height;
-
+                let width = img.width, height = img.height;
                 if (width > maxWidth) {
                     height = Math.round((height * maxWidth) / width);
                     width = maxWidth;
                 }
-
-                canvas.width = width;
-                canvas.height = height;
+                canvas.width = width; canvas.height = height;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
-                
                 const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
-                resolve({
-                    base64: compressedDataUrl.split(',')[1],
-                    mime: 'image/jpeg'
-                });
+                resolve({ base64: compressedDataUrl.split(',')[1], mime: 'image/jpeg' });
             };
             img.onerror = () => {
                 resolve({ base64: base64Str.replace(/^data:image\/\w+;base64,/, ''), mime: 'image/jpeg' });
@@ -1111,8 +1078,12 @@
         });
     }
 
-    /* --- WIZARD FLOW --- */
     function startWizard() {
+        const key = window.getGlobalApiKey ? window.getGlobalApiKey() : null;
+        if (!key) {
+            alert("Chưa cấu hình API Key. Vui lòng cấu hình trong Glowmax Dashboard.");
+            return;
+        }
         document.getElementById('introScreen').style.display = 'none';
         document.getElementById('wizardScreen').style.display = 'block';
         updateWizardUI();
@@ -1120,8 +1091,6 @@
 
     function updateWizardUI() {
         const step = state.currentStep;
-        
-        // Progress Fill Line width update
         const progressFill = document.getElementById('stepProgressFill');
         progressFill.style.width = (step * 50) + '%';
 
@@ -1139,12 +1108,9 @@
                 dot.innerText = i + 1;
             }
         }
-
         renderCurrentSlot();
-
         const btnNext = document.getElementById('btnNextStep');
         const btnSkip = document.getElementById('btnSkipStep');
-        
         if (state.photos[step]) {
             btnNext.disabled = false;
             btnNext.innerText = step === 2 ? "BẮT ĐẦU PHÂN TÍCH" : "LƯU & TIẾP TỤC";
@@ -1159,7 +1125,6 @@
     function renderCurrentSlot() {
         const slot = document.getElementById('currentSlot');
         const imgData = state.photos[state.currentStep];
-        
         if (imgData) {
             slot.classList.add('has-image');
             slot.innerHTML = `
@@ -1196,9 +1161,7 @@
         if (state.currentStep < 2) {
             state.currentStep++;
             updateWizardUI();
-            if (!state.photos[state.currentStep]) {
-                openCamera();
-            }
+            if (!state.photos[state.currentStep]) openCamera();
         } else {
             startAnalysis();
         }
@@ -1209,9 +1172,7 @@
             state.photos[state.currentStep] = null;
             state.currentStep++;
             updateWizardUI();
-            if (!state.photos[state.currentStep]) {
-                openCamera();
-            }
+            if (!state.photos[state.currentStep]) openCamera();
         }
     }
 
@@ -1223,8 +1184,7 @@
         const file = event.target.files[0];
         if (!file) return;
         if (!file.type.match('image.*')) { alert("Ảnh không hợp lệ!"); return; }
-        if (file.size > MAX_FILE_SIZE) { alert("Ảnh quá lớn (chọn < 5MB)."); return; }
-
+        if (file.size > MAX_FILE_SIZE) { alert("Ảnh quá lớn (< 5MB)."); return; }
         const reader = new FileReader();
         reader.onload = (e) => {
             const dataUrl = e.target.result;
@@ -1240,7 +1200,6 @@
         event.target.value = '';
     }
 
-    /* --- CAMERA HANDLING --- */
     async function openCamera() {
         const modal = document.getElementById('cameraModal');
         document.getElementById('camInstruction').innerText = STEP_INFO[state.currentStep].desc;
@@ -1251,24 +1210,11 @@
     async function startStream() {
         if (state.stream) state.stream.getTracks().forEach(track => track.stop());
         try {
-            const constraints = {
-                video: { facingMode: state.facingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
-                audio: false
-            };
+            const constraints = { video: { facingMode: state.facingMode, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false };
             state.stream = await navigator.mediaDevices.getUserMedia(constraints);
             const video = document.getElementById('videoElement');
             video.srcObject = state.stream;
-            
-            if (state.facingMode === 'user') {
-                video.style.transform = 'scaleX(-1)';
-            } else {
-                video.style.transform = 'none';
-            }
-            
-            navigator.mediaDevices.enumerateDevices().then(devices => {
-                const videoInputs = devices.filter(device => device.kind === 'videoinput');
-                document.getElementById('switchCamBtn').style.display = videoInputs.length > 1 ? 'block' : 'none';
-            });
+            video.style.transform = state.facingMode === 'user' ? 'scaleX(-1)' : 'none';
         } catch (err) {
             alert("Lỗi truy cập camera: " + err.message);
             closeCamera();
@@ -1289,7 +1235,6 @@
     }
 
     function takeSnapshot() {
-        // Flash animation
         const flash = document.getElementById('cameraFlash');
         flash.style.opacity = '1';
         setTimeout(() => { flash.style.opacity = '0'; }, 120);
@@ -1299,24 +1244,17 @@
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         const ctx = canvas.getContext('2d');
-        
         if (state.facingMode === 'user') {
             ctx.translate(canvas.width, 0);
             ctx.scale(-1, 1);
         }
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.85); 
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
         const base64 = dataUrl.split(',')[1];
-        
         state.photos[state.currentStep] = { base64: base64, mime: 'data:image/jpeg;base64', size: Math.round((base64.length * 3) / 4) };
-        setTimeout(() => {
-            closeCamera();
-            updateWizardUI();
-        }, 150);
+        setTimeout(() => { closeCamera(); updateWizardUI(); }, 150);
     }
 
-    /* --- REALTIME ANALYSIS ANIMATION --- */
     function escapeHTML(str) {
         if (!str) return '';
         return str.toString().replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
@@ -1324,9 +1262,7 @@
 
     function startRealtimeAnalysisUI() {
         const previewImg = document.getElementById('scanPreviewTarget');
-        if (state.photos[0]) {
-            previewImg.src = `${state.photos[0].mime},${state.photos[0].base64}`;
-        }
+        if (state.photos[0]) previewImg.src = `${state.photos[0].mime},${state.photos[0].base64}`;
 
         const ringFill = document.getElementById('progressRingFill');
         const percentText = document.getElementById('progressPercentText');
@@ -1347,19 +1283,15 @@
         state.analysisTimer = setInterval(() => {
             if (currentIdx < steps.length) {
                 const s = steps[currentIdx];
-                
-                // Ring Offset Calculation
                 const circumference = 283;
                 const offset = circumference - (s.pct / 100) * circumference;
                 ringFill.style.strokeDashoffset = offset;
                 percentText.innerText = s.pct + "%";
                 loadingText.innerText = s.text;
-
                 document.getElementById('rtLandmarks').innerText = s.lm;
                 document.getElementById('rtSymmetry').innerText = s.sym;
                 document.getElementById('rtJawline').innerText = s.jaw;
                 document.getElementById('rtRatio').innerText = s.rat;
-
                 currentIdx++;
             } else {
                 clearInterval(state.analysisTimer);
@@ -1368,6 +1300,11 @@
     }
 
     async function startAnalysis() {
+        const apiKey = window.getGlobalApiKey ? window.getGlobalApiKey() : null;
+        if (!apiKey) {
+            alert("API Key chưa sẵn sàng. Vui lòng kiểm tra lại cấu hình Dashboard.");
+            return;
+        }
         if (!state.photos[0]) {
             alert("Cần ít nhất ảnh chính diện để phân tích.");
             return;
@@ -1384,13 +1321,11 @@
             TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (Không dùng markdown, không giải thích thêm):
             {
               "overall_score": 80, "face_shape": "Oval", "symmetry_score": 85, "proportion_score": 80, "skin_score": 75, "eyes_score": 88, "eyebrows_score": 82, "nose_score": 79, "lips_score": 84, "jawline_score": 86, "chin_score": 80, "hair_score": 83,
-              "summary": "Tóm tắt đánh giá", "strengths": ["Mắt sáng", "Góc hàm sắc nét"], "weaknesses": ["Da hơi khô"], "hairstyles": ["Textured Crop", "Undercut"], "grooming_tips": ["Tỉa lông mày"], "skincare_tips": ["Dùng BHA", "Kem chống nắng"],
+              "summary": "Tóm tắt đánh giá cấu trúc mặt", "strengths": ["Mắt sáng", "Góc hàm sắc nét"], "weaknesses": ["Cần chăm sóc da tốt hơn"], "hairstyles": ["Textured Crop", "Undercut"], "grooming_tips": ["Tỉa gọn gàng"], "skincare_tips": ["Dùng kem chống nắng"],
               "looksmax_protocol": [
-                { "phase": "Giai đoạn 1", "title": "Cơ bản", "tasks": ["Mewing", "Uống đủ 2L nước"] },
-                { "phase": "Giai đoạn 2", "title": "Nâng cấp", "tasks": ["Tập cơ cổ", "Skincare chuyên sâu"] }
+                { "phase": "Giai đoạn 1", "title": "Cơ bản", "tasks": ["Mewing đúng cách", "Uống đủ nước"] }
               ]
             }`;
-            
             parts.push({ text: promptInstruction });
 
             const angles = ["FRONT", "30°", "PROFILE"];
@@ -1398,37 +1333,27 @@
                 if (state.photos[i]) {
                     const compressed = await compressImage(state.photos[i].base64);
                     parts.push({ text: `ẢNH ${angles[i]}:` });
-                    parts.push({ 
-                        inline_data: { 
-                            mime_type: compressed.mime, 
-                            data: compressed.base64 
-                        } 
-                    });
+                    parts.push({ inline_data: { mime_type: compressed.mime, data: compressed.base64 } });
                 }
             }
 
-            const response = await fetch('/api/analyze-face', {
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+            const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ parts: parts })
+                body: JSON.stringify({ contents: [{ parts: parts }] })
             });
 
-            const contentType = response.headers.get("content-type");
-            if (!contentType || !contentType.includes("application/json")) {
-                const rawErrorText = await response.text();
-                throw new Error(`Server trả về lỗi (${response.status}): ${rawErrorText.substring(0, 100)}...`);
+            if (!response.ok) {
+                const errJson = await response.json();
+                throw new Error(errJson.error?.message || `Lỗi từ Gemini API (${response.status})`);
             }
 
             const data = await response.json();
-            
-            if (!response.ok) throw new Error(data.error?.message || data.error || "Xác thực API thất bại.");
-            if (!data.candidates || data.candidates.length === 0) throw new Error("AI không phân tích được dữ liệu.");
+            if (!data.candidates || data.candidates.length === 0) throw new Error("AI không phản hồi dữ liệu.");
 
             const rawText = data.candidates[0].content.parts[0].text;
-            
-            // Xử lý Parse JSON An Toàn
             const resultData = parseAIJsonResponse(rawText);
-
             state.currentResult = resultData;
 
             clearInterval(state.analysisTimer);
@@ -1439,7 +1364,6 @@
             setTimeout(() => {
                 renderResults(resultData);
                 saveToHistory(resultData);
-
                 document.getElementById('loadingUI').style.display = 'none';
                 document.getElementById('mainPanel').style.display = 'none';
                 document.getElementById('resultDashboard').style.display = 'block';
@@ -1456,7 +1380,6 @@
         }
     }
 
-    /* --- RENDERING RESULTS --- */
     function renderResults(data) {
         document.getElementById('analysisTime').textContent = new Date().toLocaleString('vi-VN');
         animateCounter('res-overall', 0, data.overall_score || 0, 1000);
@@ -1530,7 +1453,6 @@
         window.requestAnimationFrame(step);
     }
 
-    /* --- RADAR CHART (SVG) --- */
     function drawRadarChart(dataArr, labels) {
         const container = document.getElementById('radarChartContainer');
         const size = 300, center = size / 2, radius = (size / 2) - 40, numSides = dataArr.length, angleStep = (Math.PI * 2) / numSides;
@@ -1548,7 +1470,6 @@
             svg += `<line x1="${center}" y1="${center}" x2="${x}" y2="${y}" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>`;
             let lx = center + (radius + 20) * Math.sin(i * angleStep), ly = center - (radius + 20) * Math.cos(i * angleStep);
             svg += `<text x="${lx}" y="${ly}" text-anchor="${lx < center - 10 ? 'end' : lx > center + 10 ? 'start' : 'middle'}" dominant-baseline="middle" class="radar-label">${escapeHTML(labels[i])}</text>`;
-            
             let dx = center + (radius * (Math.max(0, Math.min(100, dataArr[i])) / 100)) * Math.sin(i * angleStep);
             let dy = center - (radius * (Math.max(0, Math.min(100, dataArr[i])) / 100)) * Math.cos(i * angleStep);
             dataPts += `${dx},${dy} `;
@@ -1558,7 +1479,6 @@
         container.innerHTML = svg;
     }
 
-    /* --- HISTORY, COMPARE & UTILS --- */
     function saveToHistory(res) {
         let history = JSON.parse(localStorage.getItem('gmax_hist')) || [];
         history.unshift({ id: Date.now(), date: new Date().toLocaleString('vi-VN'), overall: res.overall_score, shape: res.face_shape, data: res });
@@ -1580,7 +1500,7 @@
             document.getElementById('mainPanel').style.display = 'none';
             renderResults(item.data);
             document.getElementById('resultDashboard').style.display = 'block';
-            document.getElementById('compareSection').style.display = 'none'; 
+            document.getElementById('compareSection').style.display = 'none';
         }
     }
 
@@ -1599,20 +1519,23 @@
     }
 
     async function runCompareAnalysis() {
-        if (!state.afterPhoto) return;
+        const apiKey = window.getGlobalApiKey ? window.getGlobalApiKey() : null;
+        if (!state.afterPhoto || !apiKey) return;
         const btn = document.getElementById('btnUploadAfter');
         btn.innerText = "Đang phân tích..."; btn.disabled = true;
         try {
             const compressed = await compressImage(state.afterPhoto.base64);
-            
-            const res = await fetch('/api/analyze-face', {
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+            const res = await fetch(endpoint, {
                 method: 'POST', 
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
-                    parts: [
-                        { text: `TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON: { "overall_score": 85 }` }, 
-                        { inline_data: { mime_type: compressed.mime, data: compressed.base64 } }
-                    ] 
+                    contents: [{
+                        parts: [
+                            { text: `TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON: { "overall_score": 85 }` }, 
+                            { inline_data: { mime_type: compressed.mime, data: compressed.base64 } }
+                        ]
+                    }] 
                 })
             });
             const data = await res.json();
