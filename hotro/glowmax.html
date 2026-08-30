@@ -1392,8 +1392,8 @@
                 }
             }
 
-            // SỬA CỐT LÕI: Đổi đường dẫn fetch về /api/analyze-face
-            const response = await fetch('/api/analyze-face', {
+
+            const response = await fetch('hotro/api/analyze-face', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ parts: parts })
@@ -1590,7 +1590,7 @@
         btn.innerText = "Đang phân tích..."; btn.disabled = true;
         try {
             const compressed = await compressImage(state.afterPhoto.base64);
-            const res = await fetch('/api/analyze-face', {
+            const res = await fetch('hotro/api/analyze-face', {
                 method: 'POST', 
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
