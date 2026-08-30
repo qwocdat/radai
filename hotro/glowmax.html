@@ -1380,7 +1380,6 @@
             const angles = ["FRONT", "30°", "PROFILE"];
             for (let i = 0; i < 3; i++) {
                 if (state.photos[i]) {
-                    // TỰ ĐỘNG NÉN ÁNH TRƯỚC KHÍ GỬI (ĐẢM BẢO KHÔNG BỊ TRÀN PAYLOAD VERCEL)
                     const compressed = await compressImage(state.photos[i].base64);
                     parts.push({ text: `ẢNH ${angles[i]}:` });
                     parts.push({ 
@@ -1392,14 +1391,13 @@
                 }
             }
 
-
-            const response = await fetch('hotro/api/analyze-face', {
+            // ĐÚNG ĐƯỜNG DẪN THỰC TẾ: /hotro/api/analyze-face
+            const response = await fetch('/hotro/api/analyze-face', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ parts: parts })
             });
 
-            // KIỂM TRA ĐỊNH DẠNG PHẢN HỒI DỰ PHÒNG
             const contentType = response.headers.get("content-type");
             if (!contentType || !contentType.includes("application/json")) {
                 const rawErrorText = await response.text();
@@ -1416,7 +1414,6 @@
 
             state.currentResult = resultData;
 
-            // Hoàn thành hiệu ứng thanh tiến trình
             clearInterval(state.analysisTimer);
             document.getElementById('progressRingFill').style.strokeDashoffset = '0';
             document.getElementById('progressPercentText').innerText = "100%";
@@ -1590,7 +1587,8 @@
         btn.innerText = "Đang phân tích..."; btn.disabled = true;
         try {
             const compressed = await compressImage(state.afterPhoto.base64);
-            const res = await fetch('hotro/api/analyze-face', {
+            // ĐÚNG ĐƯỜNG DẪN THỰC TẾ: /hotro/api/analyze-face
+            const res = await fetch('/hotro/api/analyze-face', {
                 method: 'POST', 
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
