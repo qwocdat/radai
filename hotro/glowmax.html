@@ -350,9 +350,9 @@
 
 <script>
     // =========================================================
-    // CẤU HÌNH API KEY (Khách hàng không cần nhập, code chạy ngầm)
+    // DÁN GEMINI API KEY CỦA BẠN VÀO ĐÂY
     // =========================================================
-    const GEMINI_API_KEY = "AQ.Ab8RN6IMCc5IdPe-tilsO3KjiTN0iv4XEBeOCxvkEpZBHeXPJA"; // Thay mã API Key của bạn vào đây
+    const GEMINI_API_KEY = "YOUR_API_KEY_HERE"; 
 
     /* --- MOTION BLUR SCROLL EVENT --- */
     let scrollTimeout;
@@ -400,11 +400,7 @@
             if(i === step) dot.classList.add('active');
         }
 
-        // Update Text
-        document.getElementById('wizTitle').innerText = STEP_INFO[step].title;
-        document.getElementById('wizDesc').innerText = STEP_INFO[step].desc;
-        
-        // Render Slot
+        // Render Slot Content
         renderCurrentSlot();
 
         // Update Buttons
@@ -413,12 +409,11 @@
         
         if (state.photos[step]) {
             btnNext.disabled = false;
-            btnNext.innerText = step === 2 ? "PHÂN TÍCH NGAY" : "LƯU & TIẾP TỤC";
+            btnNext.innerText = step === 2 ? "BẮT ĐẦU PHÂN TÍCH" : "LƯU & TIẾP TỤC";
             btnSkip.style.display = 'none';
         } else {
             btnNext.disabled = true;
             btnNext.innerText = "CHỤP TRƯỚC ĐỂ TIẾP TỤC";
-            // Allow skipping for step 1 & 2 (30deg, Profile), step 0 (Front) is mandatory
             btnSkip.style.display = step > 0 ? 'block' : 'none';
         }
     }
@@ -439,8 +434,8 @@
         } else {
             slot.classList.remove('has-image');
             slot.innerHTML = `
-                <div class="capture-title" id="wizTitle">${STEP_INFO[state.currentStep].title}</div>
-                <div class="capture-desc" id="wizDesc">${STEP_INFO[state.currentStep].desc}</div>
+                <div class="capture-title">${STEP_INFO[state.currentStep].title}</div>
+                <div class="capture-desc">${STEP_INFO[state.currentStep].desc}</div>
                 <div style="display: flex; gap: 10px;">
                     <button class="btn-secondary" style="width: auto; padding: 10px 20px;" onclick="triggerFileInput()">Tải Ảnh</button>
                     <button style="width: auto; padding: 10px 20px;" onclick="openCamera()">Mở Camera</button>
@@ -454,10 +449,15 @@
         updateWizardUI();
     }
 
+    // NÂNG CẤP: TỰ ĐỘNG MỞ CAMERA CHO BƯỚC TIẾP THEO
     function nextStep() {
         if (state.currentStep < 2) {
             state.currentStep++;
             updateWizardUI();
+            // Nếu chưa có ảnh ở bước mới, tự động mở Camera ngay lập tức
+            if (!state.photos[state.currentStep]) {
+                openCamera();
+            }
         } else {
             startAnalysis();
         }
@@ -465,9 +465,12 @@
 
     function skipStep() {
         if (state.currentStep < 2) {
-            state.photos[state.currentStep] = null; // Clear if skipped
+            state.photos[state.currentStep] = null;
             state.currentStep++;
             updateWizardUI();
+            if (!state.photos[state.currentStep]) {
+                openCamera();
+            }
         }
     }
 
@@ -515,7 +518,6 @@
             const video = document.getElementById('videoElement');
             video.srcObject = state.stream;
             
-            // XỬ LÝ FIX NGƯỢC CAMERA (Mirror logic)
             if (state.facingMode === 'user') {
                 video.style.transform = 'scaleX(-1)';
             } else {
@@ -552,7 +554,6 @@
         canvas.height = video.videoHeight;
         const ctx = canvas.getContext('2d');
         
-        // Áp dụng lật ngược trên canvas nếu là camera trước để ảnh chụp ra thuận chiều
         if (state.facingMode === 'user') {
             ctx.translate(canvas.width, 0);
             ctx.scale(-1, 1);
@@ -587,12 +588,12 @@
 
     async function startAnalysis() {
         if (GEMINI_API_KEY === "YOUR_API_KEY_HERE" || !GEMINI_API_KEY) {
-            alert("Nhà phát triển chưa cung cấp API Key trong hệ thống.");
+            alert("Chưa cấu hình GEMINI_API_KEY trong file code!");
             return;
         }
         
         if (!state.photos[0]) {
-            alert("Lỗi: Không tìm thấy ảnh chính diện.");
+            alert("Cần ít nhất ảnh chính diện để phân tích.");
             return;
         }
 
@@ -603,7 +604,7 @@
         const parts = [];
         const promptInstruction = `
         Đóng vai chuyên gia thẩm mỹ (Looksmaxxing AI). 
-        TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (Không giải thích, không dùng markdown):
+        TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (Không dùng markdown, không giải thích thêm):
         {
           "overall_score": (số 1-100), "face_shape": "(Dáng mặt)", "symmetry_score": (số), "proportion_score": (số), "skin_score": (số), "eyes_score": (số), "eyebrows_score": (số), "nose_score": (số), "lips_score": (số), "jawline_score": (số), "chin_score": (số), "hair_score": (số),
           "summary": "(3 câu tóm tắt)", "strengths": [".."], "weaknesses": [".."], "hairstyles": [".."], "grooming_tips": [".."], "skincare_tips": [".."],
@@ -629,8 +630,8 @@
         };
 
         try {
-            // Đổi model thành gemini-3.6-flash theo yêu cầu
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            // SỬA ĐỔI QUAN TRỌNG: Dùng endpoint gemini-2.5-flash để hỗ trợ REST API miễn phí từ AI Studio
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestBody)
@@ -638,8 +639,8 @@
 
             const data = await response.json();
             
-            if (!response.ok) throw new Error(data.error?.message || "Lỗi Server API.");
-            if (!data.candidates || data.candidates.length === 0) throw new Error("AI không phân tích được.");
+            if (!response.ok) throw new Error(data.error?.message || "Xác thực API thất bại.");
+            if (!data.candidates || data.candidates.length === 0) throw new Error("AI không phân tích được dữ liệu.");
 
             const rawText = data.candidates[0].content.parts[0].text;
             const resultData = JSON.parse(rawText);
@@ -653,7 +654,7 @@
             document.getElementById('compareSection').style.display = 'block';
 
         } catch (error) {
-            alert("LỖI: " + error.message);
+            alert("LỖI PHÂN TÍCH: " + error.message);
             document.getElementById('loadingUI').style.display = 'none';
             document.getElementById('mainPanel').style.display = 'block';
         }
@@ -752,7 +753,7 @@
         container.innerHTML = svg;
     }
 
-    /* --- HISTORY, COMPARE & UTILS --- (Kept identical to instructions) */
+    /* --- HISTORY, COMPARE & UTILS --- */
     function saveToHistory(res) {
         let history = JSON.parse(localStorage.getItem('gmax_hist')) || [];
         history.unshift({ id: Date.now(), date: new Date().toLocaleString('vi-VN'), overall: res.overall_score, shape: res.face_shape, data: res });
@@ -794,7 +795,7 @@
         const btn = document.getElementById('btnUploadAfter');
         btn.innerText = "Đang phân tích..."; btn.disabled = true;
         try {
-            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contents: [{ parts: [{ text: `JSON: { "overall_score": (số 1-100) }` }, { inline_data: { mime_type: state.afterPhoto.mime.split(';')[0].split(':')[1], data: state.afterPhoto.base64 } }] }], generationConfig: { response_mime_type: "application/json" } })
             });
