@@ -1,4 +1,7 @@
 export default async function handler(req, res) {
+    // Trả về header JSON ngay từ đầu
+    res.setHeader('Content-Type', 'application/json');
+
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method Not Allowed' });
     }
@@ -20,9 +23,7 @@ export default async function handler(req, res) {
 
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json' 
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{ parts: parts }],
                 generationConfig: { 
@@ -32,23 +33,11 @@ export default async function handler(req, res) {
             })
         });
 
-        // Đọc dữ liệu dưới dạng Text để kiểm tra an toàn trước khi Parse
-        const rawTextResponse = await response.text();
-
-        if (!rawTextResponse) {
-            return res.status(500).json({ error: 'Máy chủ Google trả về phản hồi rỗng.' });
-        }
-
-        let data;
-        try {
-            data = JSON.parse(rawTextResponse);
-        } catch (e) {
-            return res.status(500).json({ error: 'Không thể đọc phản hồi từ AI (Phản hồi không đúng định dạng JSON).' });
-        }
+        const data = await response.json();
 
         if (!response.ok) {
             return res.status(response.status).json({
-                error: data.error?.message || 'Lỗi xác thực hoặc vượt quá giới hạn API từ Google.'
+                error: data.error?.message || 'Lỗi từ dịch vụ AI Google.'
             });
         }
 
