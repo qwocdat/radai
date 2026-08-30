@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Glowmax Looksmax - Advanced AI Face Analyzer</title>
+    <title>Glowmax Looksmax - By DigitalsMod</title>
     <style>
         /* --- CORE RESET & DESIGN SYSTEM --- */
         * {
@@ -1063,6 +1063,22 @@
 
     const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
+    /* --- HELPER: SAFE JSON PARSER FROM AI RESPONSE --- */
+    function parseAIJsonResponse(rawText) {
+        if (!rawText) throw new Error("Phản hồi từ AI rỗng");
+        
+        // Loại bỏ markdown codeblocks nếu có (```json ... ```)
+        let cleaned = rawText.replace(/```(?:json)?/gi, '').replace(/```/g, '').trim();
+        
+        // Trích xuất đoạn JSON bằng Regex
+        const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+            cleaned = jsonMatch[0];
+        }
+        
+        return JSON.parse(cleaned);
+    }
+
     /* --- COMPRESS IMAGE UTILITY --- */
     function compressImage(base64Str, maxWidth = 800, quality = 0.7) {
         return new Promise((resolve) => {
@@ -1367,11 +1383,11 @@
             Đóng vai chuyên gia thẩm mỹ (Looksmaxxing AI). 
             TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (Không dùng markdown, không giải thích thêm):
             {
-              "overall_score": (số 1-100), "face_shape": "(Dáng mặt)", "symmetry_score": (số), "proportion_score": (số), "skin_score": (số), "eyes_score": (số), "eyebrows_score": (số), "nose_score": (số), "lips_score": (số), "jawline_score": (số), "chin_score": (số), "hair_score": (số),
-              "summary": "(3 câu tóm tắt)", "strengths": [".."], "weaknesses": [".."], "hairstyles": [".."], "grooming_tips": [".."], "skincare_tips": [".."],
+              "overall_score": 80, "face_shape": "Oval", "symmetry_score": 85, "proportion_score": 80, "skin_score": 75, "eyes_score": 88, "eyebrows_score": 82, "nose_score": 79, "lips_score": 84, "jawline_score": 86, "chin_score": 80, "hair_score": 83,
+              "summary": "Tóm tắt đánh giá", "strengths": ["Mắt sáng", "Góc hàm sắc nét"], "weaknesses": ["Da hơi khô"], "hairstyles": ["Textured Crop", "Undercut"], "grooming_tips": ["Tỉa lông mày"], "skincare_tips": ["Dùng BHA", "Kem chống nắng"],
               "looksmax_protocol": [
-                { "phase": "Giai đoạn 1", "title": "Cơ bản", "tasks": [".."] },
-                { "phase": "Giai đoạn 2", "title": "Nâng cấp", "tasks": [".."] }
+                { "phase": "Giai đoạn 1", "title": "Cơ bản", "tasks": ["Mewing", "Uống đủ 2L nước"] },
+                { "phase": "Giai đoạn 2", "title": "Nâng cấp", "tasks": ["Tập cơ cổ", "Skincare chuyên sâu"] }
               ]
             }`;
             
@@ -1391,7 +1407,6 @@
                 }
             }
 
-            
             const response = await fetch('/api/analyze-face', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -1410,7 +1425,9 @@
             if (!data.candidates || data.candidates.length === 0) throw new Error("AI không phân tích được dữ liệu.");
 
             const rawText = data.candidates[0].content.parts[0].text;
-            const resultData = JSON.parse(rawText);
+            
+            // Xử lý Parse JSON An Toàn
+            const resultData = parseAIJsonResponse(rawText);
 
             state.currentResult = resultData;
 
@@ -1593,13 +1610,14 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     parts: [
-                        { text: `JSON: { "overall_score": (số 1-100) }` }, 
+                        { text: `TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON: { "overall_score": 85 }` }, 
                         { inline_data: { mime_type: compressed.mime, data: compressed.base64 } }
                     ] 
                 })
             });
             const data = await res.json();
-            const scoreAfter = JSON.parse(data.candidates[0].content.parts[0].text).overall_score || 0;
+            const rawText = data.candidates[0].content.parts[0].text;
+            const scoreAfter = parseAIJsonResponse(rawText).overall_score || 0;
             const scoreBefore = state.currentResult.overall_score || 0, delta = scoreAfter - scoreBefore;
             document.getElementById('cmp-before').innerText = scoreBefore;
             document.getElementById('cmp-after').innerText = scoreAfter;
