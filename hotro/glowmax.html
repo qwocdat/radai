@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glowmax Looksmax - AI Face Analyzer</title>
+    <style>
+        /* --- CORE RESET & iOS FONTS --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            /* Nền tối sâu kiểu iOS */
+            background-color: #000000; 
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden; /* Tránh giật lag khi blur mạnh */
+        }
+
+        /* --- EXTREME MOTION BLUR EFFECT (Scroll-driven) --- */
+        /* Hiệu ứng này sẽ làm nhòe toàn bộ container dựa trên tốc độ cuộn */
+        @keyframes dynamicBlur {
+            0%, 100% { filter: blur(0px); transform: scale(1); }
+            10%, 90% { filter: blur(8px); transform: scale(0.99); } /* Blur cực mạnh ở giữa hành trình cuộn */
+        }
+
+        .main-wrapper {
+            width: 100%;
+            max-width: 650px;
+            /* Kích hoạt hiệu ứng nhòe theo cuộn chuột (Chỉ hỗ trợ Chrome/Edge mới) */
+            animation: dynamicBlur linear both;
+            animation-timeline: scroll(root block); 
+        }
+
+        /* Fallback cho trình duyệt không hỗ trợ animation-timeline */
+        @supports not (animation-timeline: scroll()) {
+            body:active .main-wrapper {
+                filter: blur(1px);
+                transition: filter 0.2s;
+            }
+        }
+
+        /* --- iOS LIQUID GLASS CONTAINER --- */
+        .container {
+            width: 100%;
+            /* Nền kính mờ đặc trưng iOS */
+            background: rgba(28, 28, 30, 0.6); 
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 26px; /* Bo góc cực mềm kiểu iOS */
+            padding: 30px;
+            /* Đổ bóng lớp tạo độ nổi lỏng */
+            box-shadow: 
+                0 4px 14px rgba(0, 0, 0, 0.25),
+                0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- UI ELEMENTS (No Emojis, Minimalist) --- */
+        h1 {
+            text-align: center;
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.5px; /* Giãn chữ kiểu SF Pro */
+            color: #ffffff;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 8px;
+            padding-left: 4px;
+        }
+
+        /* Input kiểu Liquid Glass */
+        input[type="password"] {
+            width: 100%;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+            transition: 0.2s;
+        }
+        input[type="password"]:focus {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: #0A84FF; /* Màu xanh iOS */
+        }
+
+        /* Vùng Upload kiểu Liquid Glass */
+        .upload-area {
+            background: rgba(255, 255, 255, 0.02);
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 25px;
+            transition: 0.3s;
+        }
+        .upload-area:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .upload-text {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        #preview {
+            max-width: 100%;
+            max-height: 280px;
+            border-radius: 12px;
+            display: none;
+            margin: 15px auto 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Nút bấm kiểu iOS */
+        button {
+            width: 100%;
+            padding: 16px;
+            background: #0A84FF; /* Xanh đặc trưng iOS */
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1); /* Animation mượt */
+        }
+        button:hover {
+            background: #0076E5;
+            transform: translateY(-1px);
+        }
+        button:active {
+            transform: scale(0.98); /* Hiệu ứng nhấn nút iOS */
+        }
+        button:disabled {
+            background: #3A3A3C;
+            color: rgba(255, 255, 255, 0.3);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* --- RESULT SECTION (Liquid Glass Panels) --- */
+        .result-container {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .score-box {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            padding: 18px;
+            border-radius: 14px;
+            width: 32%;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            text-align: center;
+        }
+
+        .score-num {
+            font-size: 26px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -1px;
+        }
+
+        .score-title {
+            font-size: 11px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        .detail-section {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 20px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 15px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .detail-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-top: 15px;
+            margin-bottom: 6px;
+        }
+        .detail-section h3:first-child { margin-top: 0; }
+
+        .tips-list {
+            margin-left: 18px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .tips-list li { margin-bottom: 4px; }
+
+        .loading {
+            text-align: center;
+            display: none;
+            margin-top: 20px;
+            color: #0A84FF;
+            font-size: 15px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-wrapper">
+    <div class="container">
+        <h1>Glowmax Looksmax</h1>
+
+        <div class="input-group">
+            <span class="label">Gemini API Key</span>
+            <input type="password" id="apiKey" placeholder="Dán API Key để kích hoạt AI...">
+        </div>
+
+        <div class="upload-area" onclick="document.getElementById('imageInput').click()">
+            <p id="uploadText" class="upload-text">Tải lên ảnh selfie rõ mặt</p>
+            <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImage(this)">
+            <img id="preview" alt="Selfie Preview">
+        </div>
+
+        <button id="analyzeBtn" onclick="analyzeFace()" disabled>PHÂN TÍCH KHUÔN MẶT</button>
+
+        <div class="loading" id="loading">AI đang quét các chỉ số, vui lòng đợi...</div>
+
+        <div class="result-container" id="resultContainer">
+            <div class="score-board">
+                <div class="score-box">
+                    <div class="score-num" id="overallScore">0</div>
+                    <div class="score-title">Điểm Tổng Thể</div>
+                </div>
+                <div class="score-box">
+                    <div class="score-num" id="faceShape">-</div>
+                    <div class="score-title">Dáng Mặt</div>
+                </div>
+                <div class="score-box">
+                    <div class="score-num" id="symmetryScore">0</div>
+                    <div class="score-title">Độ Cân Đối</div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h3>Đánh Giá Chi Tiết</h3>
+                <p id="analysisSummary"></p>
+
+                <h3>Looksmax Protocol (Lộ trình cải thiện)</h3>
+                <ul class="tips-list" id="tipsList"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let base64Image = "";
+
+    function handleImage(input) {
+        const file = input.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const preview = document.getElementById('preview');
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                document.getElementById('uploadText').style.display = 'none';
+                
+                base64Image = e.target.result.split(',')[1];
+                document.getElementById('analyzeBtn').disabled = false;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    async function analyzeFace() {
+        const apiKey = document.getElementById('apiKey').value.trim();
+        if (!apiKey) {
+            alert("Vui lòng nhập Gemini API Key!");
+            return;
+        }
+
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const loading = document.getElementById('loading');
+        const resultContainer = document.getElementById('resultContainer');
+
+        analyzeBtn.disabled = true;
+        analyzeBtn.innerText = "ĐANG QUÉT...";
+        loading.style.display = 'block';
+        resultContainer.style.display = 'none';
+
+        const promptText = `
+        Đóng vai chuyên gia thẩm mỹ khuôn mặt (Looksmaxxing AI).
+        Phân tích ảnh và trả về JSON thuần (KHÔNG markdown):
+        {
+          "overall_score": (số 1-100),
+          "face_shape": "(tên dáng mặt)",
+          "symmetry_score": (số 1-100),
+          "summary": "(nhận xét ngắn gọn 3 câu về mắt, góc hàm, da)",
+          "tips": ["(lời khuyên 1)", "(lời khuyên 2)", "(lời khuyên 3)"]
+        }
+        Ngôn ngữ: Tiếng Việt. Không dùng emoji trong phản hồi.
+        `;
+
+        const requestBody = {
+            contents: [{
+                parts: [
+                    { text: promptText },
+                    {
+                        inline_data: {
+                            mime_type: "image/jpeg",
+                            data: base64Image
+                        }
+                    }
+                ]
+            }],
+            generationConfig: {
+                response_mime_type: "application/json"
+            }
+        };
+
+        try {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestBody)
+            });
+
+            const data = await response.json();
+            
+            if (data.error) {
+                throw new Error(data.error.message);
+            }
+
+            const rawText = data.candidates[0].content.parts[0].text;
+            const resultData = JSON.parse(rawText);
+
+            document.getElementById('overallScore').innerText = resultData.overall_score || 0;
+            document.getElementById('faceShape').innerText = resultData.face_shape || "N/A";
+            document.getElementById('symmetryScore').innerText = resultData.symmetry_score || 0;
+            document.getElementById('analysisSummary').innerText = resultData.summary || "";
+
+            const tipsList = document.getElementById('tipsList');
+            tipsList.innerHTML = "";
+            if (resultData.tips) {
+                resultData.tips.forEach(tip => {
+                    const li = document.createElement('li');
+                    li.innerText = tip;
+                    tipsList.appendChild(li);
+                });
+            }
+
+            resultContainer.style.display = 'block';
+
+        } catch (error) {
+            alert("Lỗi AI: " + error.message);
+        } finally {
+            analyzeBtn.disabled = false;
+            analyzeBtn.innerText = "PHÂN TÍCH KHUÔN MẶT";
+            loading.style.display = 'none';
+        }
+    }
+</script>
+
+</body>
+</html>
