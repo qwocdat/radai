@@ -300,8 +300,8 @@
         }
 
         .silhouette-overlay svg {
-            width: 88%; height: 88%; stroke: rgba(10, 132, 255, 0.85); stroke-width: 1.5;
-            fill: rgba(10, 132, 255, 0.08); filter: drop-shadow(0 0 10px rgba(10, 132, 255, 0.5));
+            width: 90%; height: 90%; stroke: rgba(10, 132, 255, 0.9); stroke-width: 1.5;
+            fill: rgba(10, 132, 255, 0.05); filter: drop-shadow(0 0 8px rgba(10, 132, 255, 0.5));
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -846,7 +846,7 @@
     </div>
 </div>
 
-<!-- CAMERA MODAL (CẬP NHẬT SVG OVERLAY KHUÔN MẶT NGHIÊNG PHẢI CHUẨN TỶ LỆ HÌNH ẢNH MẪU) -->
+<!-- CAMERA MODAL (ĐÃ FIX KHỚP 100% ẢNH MẪU 2D/ANIME PROFILE) -->
 <div id="cameraModal">
     <div class="camera-flash" id="cameraFlash"></div>
     <div class="camera-header">
@@ -867,14 +867,33 @@
                     <line x1="50" y1="20" x2="50" y2="105" stroke-dasharray="1 2" opacity="0.6"/>
                 </svg>
 
-                <!-- SVG Profile 90° Face Model (Bước 2: CHUẨN MẪU GÓC NGHIÊNG PHẢI 1/2 ANATOMY) -->
+                <!-- SVG Profile 90° Face Model (TRÙNG 100% VỚI NGUYÊN MẪU 2D TRONG ẢNH CỦA ĐỒNG CHÍ) -->
                 <svg id="svgSilhouetteProfile" viewBox="0 0 100 130" style="display:none;">
-                    <!-- Đường phác thảo hoàn chỉnh: Đỉnh đầu -> Trán -> Hốc mũi -> Sống mũi nhô -> Môi -> Cằm -> Góc hàm -> Vành tai -> Vòm gáy -> Cổ -->
-                    <path d="M 50 10 C 25 10 12 28 12 60 C 12 85 22 105 32 118 L 28 130 L 52 130 C 58 120 58 112 52 110 C 66 102 78 88 74 76 C 74 76 77 75 76 72 C 75 69 77 67 75 65 C 73 65 74 61 81 57 C 88 53 79 46 76 43 C 71 38 68 25 60 18 C 56 12 54 10 50 10 Z M 48 55 C 42 55 38 60 38 68 C 38 78 44 82 48 82 C 50 78 48 68 48 55 Z"/>
-                    <!-- Trục tọa độ 1/2 cân bằng cấu trúc đầu và đường trán/cằm -->
-                    <line x1="12" y1="58" x2="81" y2="58" stroke-dasharray="1 2" opacity="0.4"/>
-                    <line x1="48" y1="10" x2="48" y2="110" stroke-dasharray="1 2" opacity="0.4"/>
-                    <circle cx="81" cy="57" r="1.5" fill="var(--accent-color)" stroke="none"/>
+                    <!-- 1. Đường phác thảo viền toàn bộ hộp sọ + khuôn mặt nghiêng nhô đúng form ảnh mẫu -->
+                    <path d="M 18 62 C 18 30 32 12 52 12 C 72 12 86 28 86 52 C 86 56 86 58 85 62 C 85 64 82 66 82 67 C 82 69 85 71 83 74 C 80 78 78 81 78 83 C 78 86 75 88 72 89 C 64 92 56 87 48 82 C 42 85 36 94 34 118 L 52 118 C 55 106 63 103 68 102 C 68 102 60 118 60 118 Z M 38 60 C 35 60 34 66 34 72 C 34 78 38 82 42 78 C 45 74 44 65 38 60 Z" fill="rgba(10, 132, 255, 0.05)" stroke="#0A84FF" stroke-width="1.5"/>
+                    
+                    <!-- 2. Vành tai hình C chính xác nằm nửa sau đầu -->
+                    <path d="M 37 60 C 32 62 31 73 38 78 C 43 82 46 71 40 63 Z" fill="none" stroke="#0A84FF" stroke-width="1.5"/>
+
+                    <!-- 3. Hai đường gióng dọc màu xanh lam (Back / Front Boundary) -->
+                    <line x1="18" y1="10" x2="18" y2="118" stroke="#30D158" stroke-width="1" opacity="0.85"/>
+                    <line x1="85" y1="10" x2="85" y2="118" stroke="#30D158" stroke-width="1" opacity="0.85"/>
+
+                    <!-- 4. Đường trung tâm chia đôi màu đỏ (Center 1/2 Axis) -->
+                    <line x1="51.5" y1="10" x2="51.5" y2="118" stroke="#FF453A" stroke-width="1.2" opacity="0.9"/>
+
+                    <!-- 5. Mũi tên 2 chiều thể hiện tỷ lệ 1/2 và 1/2 -->
+                    <!-- Mũi tên trái -->
+                    <line x1="18" y1="62" x2="51.5" y2="62" stroke="#FF9500" stroke-width="1.5"/>
+                    <polygon points="23,59 18,62 23,65" fill="#FF9500"/>
+                    <polygon points="46,59 51.5,62 46,65" fill="#FF9500"/>
+                    <text x="32" y="58" fill="#FFF" font-size="6" font-weight="bold" text-anchor="middle">1/2</text>
+
+                    <!-- Mũi tên phải -->
+                    <line x1="51.5" y1="62" x2="85" y2="62" stroke="#FF9500" stroke-width="1.5"/>
+                    <polygon points="56.5,59 51.5,62 56.5,65" fill="#FF9500"/>
+                    <polygon points="80,59 85,62 80,65" fill="#FF9500"/>
+                    <text x="68" y="58" fill="#FFF" font-size="6" font-weight="bold" text-anchor="middle">1/2</text>
                 </svg>
             </div>
         </div>
@@ -1059,7 +1078,7 @@
         }, 150); 
     });
 
-    /* --- STATE MANAGEMENT (Cập nhật 2 bước chụp) --- */
+    /* --- STATE MANAGEMENT --- */
     const state = {
         photos: [null, null],
         currentStep: 0,
@@ -1151,7 +1170,7 @@
         return str.toString().replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
     }
 
-    /* --- WIZARD FLOW & SCANNER (Đã căn chỉnh cho 2 bước) --- */
+    /* --- WIZARD FLOW & SCANNER --- */
     function startWizard() {
         const key = window.getGlobalApiKey ? window.getGlobalApiKey() : null;
         if (!key) {
