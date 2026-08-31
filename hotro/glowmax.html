@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Glowmax Looksmax - By DigitalsMod</title>
+    <title>Glowmax Looksmax - AI Face Improvement Platform</title>
     <style>
+        /* --- CORE RESET & DESIGN SYSTEM --- */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -32,6 +33,7 @@
             --radius-large: 28px;
             --radius-medium: 20px;
             --radius-small: 14px;
+            --bottom-nav-height: 70px;
         }
 
         body {
@@ -41,11 +43,12 @@
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            padding: 20px 16px;
+            padding: 20px 16px calc(var(--bottom-nav-height) + 30px) 16px;
             overflow-x: hidden;
             position: relative;
         }
 
+        /* Ambient Background Lighting */
         body::before {
             content: '';
             position: fixed;
@@ -72,6 +75,7 @@
             pointer-events: none;
         }
 
+        /* Noise Texture Overlay */
         .bg-noise {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -91,6 +95,7 @@
             transform: scale(0.995);
         }
 
+        /* --- LIQUID GLASS COMPONENTS --- */
         .glass-panel {
             background: var(--glass-bg);
             -webkit-backdrop-filter: blur(30px) saturate(190%);
@@ -112,6 +117,12 @@
             padding: 20px;
             box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
             transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, border-color 0.2s ease;
+            margin-bottom: 16px;
+        }
+
+        .glass-card:active {
+            transform: scale(0.985);
+            background: rgba(255, 255, 255, 0.05);
         }
 
         @keyframes panelFadeIn {
@@ -119,11 +130,12 @@
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
+        /* --- HEADER BAR --- */
         .header-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
         }
 
         .brand-title {
@@ -133,10 +145,10 @@
         }
 
         .brand-logo-icon {
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             background: linear-gradient(135deg, var(--accent-color), #5856D6);
-            border-radius: 8px;
+            border-radius: 10px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -144,8 +156,8 @@
         }
 
         .brand-logo-icon svg {
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
             fill: #fff;
         }
 
@@ -170,6 +182,14 @@
             text-transform: uppercase;
         }
 
+        .user-avatar-btn {
+            width: 38px; height: 38px; border-radius: 50%;
+            border: 2px solid var(--accent-color);
+            object-fit: cover; cursor: pointer;
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* --- BUTTONS --- */
         button {
             width: 100%;
             padding: 16px 20px;
@@ -217,11 +237,20 @@
             box-shadow: inset 0 1px 1px rgba(255,255,255,0.08);
         }
 
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.12);
+        }
+
         .btn-danger {
             background: rgba(255, 69, 58, 0.12);
             color: var(--danger-color);
             border: 1px solid rgba(255, 69, 58, 0.2);
             box-shadow: none;
+        }
+
+        .btn-danger:hover {
+            background: rgba(255, 69, 58, 0.22);
         }
 
         .btn-ghost {
@@ -230,6 +259,11 @@
             padding: 10px;
             font-size: 14px;
             box-shadow: none;
+        }
+
+        .btn-ghost:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.04);
         }
 
         .history-capsule-btn {
@@ -247,6 +281,7 @@
             transition: all 0.2s ease;
         }
 
+        /* --- HERO INTRO SCANNER ANIMATION --- */
         .hero-scanner-wrap {
             position: relative;
             width: 180px;
@@ -327,6 +362,7 @@
             box-shadow: 0 0 6px var(--accent-color);
         }
 
+        /* --- WIZARD SCANNER PROGRESS --- */
         .wizard-container { display: none; }
         
         .step-progress-bar {
@@ -408,6 +444,7 @@
 
         .step-node.active .step-node-label { color: var(--text-primary); }
 
+        /* --- CAPTURE SLOT WITH CORNER BRACKETS --- */
         .capture-slot {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--glass-border);
@@ -470,8 +507,10 @@
             backdrop-filter: blur(8px);
         }
 
-        .capture-slot.has-image:hover .img-overlay-actions { opacity: 1; }
+        .capture-slot.has-image:hover .img-overlay-actions,
+        .capture-slot.has-image:active .img-overlay-actions { opacity: 1; }
 
+        /* --- CAMERA MODAL --- */
         #cameraModal {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: #000; z-index: 9999; display: none; flex-direction: column;
@@ -494,6 +533,7 @@
             border-radius: 50%;
             box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.65);
             pointer-events: none;
+            transition: border-color 0.3s;
         }
 
         .camera-instruction {
@@ -522,13 +562,17 @@
             width: 100%; height: 100%;
             background: #FFFFFF;
             border-radius: 50%;
+            transition: transform 0.1s ease;
         }
+
+        .shutter-btn:active .shutter-btn-inner { transform: scale(0.85); }
 
         .camera-flash {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: #fff; z-index: 99; opacity: 0; pointer-events: none;
         }
 
+        /* --- REALTIME SCANNING ANALYSIS SCREEN --- */
         .loading-container {
             display: none;
             text-align: center;
@@ -606,6 +650,7 @@
             stroke-linecap: round;
             fill: transparent;
             transition: stroke-dashoffset 0.3s ease;
+            filter: drop-shadow(0 0 6px var(--accent-color));
         }
 
         .progress-text-percent {
@@ -614,6 +659,7 @@
             transform: translate(-50%, -50%);
             font-size: 22px;
             font-weight: 800;
+            letter-spacing: -0.5px;
         }
 
         .analysis-status-text {
@@ -648,6 +694,7 @@
         .rt-metric-name { color: var(--text-secondary); font-weight: 600; }
         .rt-metric-val { font-weight: 700; color: var(--accent-color); }
 
+        /* --- DASHBOARD RESULT REPORT --- */
         #resultDashboard { display: none; }
 
         .score-hero-wrap {
@@ -664,6 +711,7 @@
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             margin: 0 auto 16px auto;
             box-shadow: 0 0 30px var(--accent-glow), inset 0 1px 2px var(--glass-highlight);
+            position: relative;
         }
 
         .overall-score-circle span {
@@ -683,11 +731,12 @@
             font-size: 14px;
             font-weight: 700;
             color: #FFF;
+            letter-spacing: 0.3px;
         }
 
         .chart-container { display: flex; justify-content: center; margin-bottom: 30px; position: relative; }
         svg.radar-chart { width: 100%; max-width: 320px; height: auto; overflow: visible; }
-        .radar-label { font-size: 10px; fill: var(--text-secondary); font-weight: 700; text-transform: uppercase; }
+        .radar-label { font-size: 10px; fill: var(--text-secondary); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
 
         .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
         @media (max-width: 500px) { .metrics-grid { grid-template-columns: 1fr; } }
@@ -730,6 +779,74 @@
         .delta-positive { color: var(--success-color); }
         .delta-negative { color: var(--danger-color); }
 
+        /* --- BOTTOM NAVIGATION & MULTI-TAB VIEWS --- */
+        .bottom-nav {
+            position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
+            width: calc(100% - 32px); max-width: 500px; height: var(--bottom-nav-height);
+            background: rgba(18, 18, 22, 0.85); backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid var(--glass-border); border-radius: 100px;
+            display: flex; justify-content: space-around; align-items: center;
+            z-index: 1000; box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            color: var(--text-tertiary); font-size: 10px; font-weight: 700; cursor: pointer;
+            transition: all 0.2s ease; width: 20%;
+        }
+
+        .nav-item svg { width: 22px; height: 22px; fill: currentColor; }
+        .nav-item.active { color: var(--accent-color); transform: translateY(-2px); }
+
+        .tab-view { display: none; }
+        .tab-view.active { display: block; animation: tabFadeIn 0.3s ease; }
+        @keyframes tabFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+        .stat-card { background: var(--glass-card); border: 1px solid var(--glass-border); border-radius: var(--radius-medium); padding: 16px; text-align: center; }
+        .stat-val { font-size: 26px; font-weight: 800; color: #fff; margin-top: 4px; }
+        .stat-lbl { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; }
+
+        .task-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 16px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--glass-border);
+            border-radius: var(--radius-small); margin-bottom: 8px; transition: all 0.2s ease;
+        }
+        .task-item.completed { opacity: 0.5; text-decoration: line-through; border-color: var(--success-color); }
+        .task-checkbox { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--glass-border); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .task-item.completed .task-checkbox { background: var(--success-color); border-color: var(--success-color); }
+
+        .floating-coach-btn {
+            position: fixed; bottom: calc(var(--bottom-nav-height) + 24px); right: 20px;
+            width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-color), #5856D6);
+            display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 25px var(--accent-glow);
+            cursor: pointer; z-index: 999; transition: transform 0.2s ease;
+        }
+        .floating-coach-btn:active { transform: scale(0.9); }
+
+        .chat-modal {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); z-index: 2000;
+            display: none; flex-direction: column; justify-content: flex-end;
+        }
+        .chat-container {
+            background: rgba(22, 22, 28, 0.98); border-top: 1px solid var(--glass-border);
+            border-radius: var(--radius-large) var(--radius-large) 0 0;
+            height: 80vh; display: flex; flex-direction: column; padding: 20px;
+        }
+        .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px; }
+        .chat-bubble { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.4; }
+        .chat-bubble.ai { background: rgba(255,255,255,0.08); align-self: flex-start; color: #fff; }
+        .chat-bubble.user { background: var(--accent-color); align-self: flex-end; color: #fff; }
+
+        .auth-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.9); backdrop-filter: blur(20px); z-index: 3000;
+            display: flex; justify-content: center; align-items: center; padding: 20px;
+        }
+        .auth-card { width: 100%; max-width: 400px; background: rgba(22, 22, 28, 0.95); border: 1px solid var(--glass-border); border-radius: var(--radius-large); padding: 28px; }
+        .auth-input { width: 100%; padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: var(--radius-small); color: #fff; margin-bottom: 12px; font-size: 14px; outline: none; }
+
         .privacy-note { font-size: 11px; text-align: center; color: var(--text-tertiary); margin-top: 24px; line-height: 1.4; }
     </style>
 </head>
@@ -737,207 +854,350 @@
 
 <div class="bg-noise"></div>
 
+<!-- AUTH OVERLAY -->
+<div class="auth-overlay" id="authOverlay" style="display: none;">
+    <div class="auth-card">
+        <div style="text-align: center; margin-bottom: 24px;">
+            <div class="brand-logo-icon" style="margin: 0 auto 12px auto; width: 44px; height: 44px;">
+                <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <h2>Chào Mừng Đến Glowmax</h2>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Đăng nhập để lưu tiến trình và nhận AI Coach cá nhân</p>
+        </div>
+        <input type="email" class="auth-input" id="authEmail" placeholder="Email">
+        <input type="password" class="auth-input" id="authPassword" placeholder="Mật khẩu">
+        <button id="btnLoginEmail" style="margin-bottom: 10px;">Đăng Nhập / Đăng Ký</button>
+        <button class="btn-secondary" id="btnLoginGoogle">
+            <svg style="width: 16px; height: 16px; margin-right: 6px;" viewBox="0 0 24 24"><path fill="#FFF" d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.761H12.545z"/></svg>
+            Đăng nhập bằng Google
+        </button>
+    </div>
+</div>
+
 <div class="main-wrapper">
-    <div class="glass-panel" id="mainPanel">
-        <div class="header-bar">
+    <!-- TOP HEADER -->
+    <div class="glass-panel" style="padding: 16px 20px; margin-bottom: 16px;">
+        <div class="header-bar" style="margin-bottom: 0;">
             <div class="brand-title">
                 <div class="brand-logo-icon">
                     <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
                 </div>
                 <div class="brand-text-wrap">
                     <span class="brand-name">Glowmax</span>
-                    <span class="ai-badge" id="aiStatusBadge">Đang kết nối Glowmax AI...</span>
+                    <span class="ai-badge" id="aiStatusBadge">Đang kết nối...</span>
                 </div>
             </div>
-            <button class="history-capsule-btn" onclick="openHistory()">Lịch Sử</button>
-        </div>
-
-        <div id="introScreen">
-            <div class="hero-scanner-wrap">
-                <div class="hero-orb"></div>
-                <div class="scan-beam"></div>
-                <svg class="face-scan-svg" viewBox="0 0 100 100" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1">
-                    <path d="M50 15 C30 15, 20 35, 20 55 C20 75, 35 90, 50 90 C65 90, 80 75, 80 55 C80 35, 70 15, 50 15 Z" stroke-dasharray="2 2"/>
-                    <circle cx="35" cy="45" r="4" fill="var(--accent-color)"/>
-                    <circle cx="65" cy="45" r="4" fill="var(--accent-color)"/>
-                    <path d="M50 48 L50 62 L55 62" stroke="var(--accent-color)" stroke-width="1.5"/>
-                    <path d="M38 72 Q50 80 62 72" stroke="var(--accent-color)" stroke-width="1.5"/>
-                </svg>
-            </div>
-
-            <h1 style="font-size: 24px; margin-bottom: 8px;">Phân Tích Khuôn Mặt AI</h1>
-            <p style="text-align: center; margin-bottom: 24px; font-size: 14px;">Hệ thống trích xuất hình học 3D, đánh giá cấu trúc xương hàm và tỷ lệ khuôn mặt chuyên sâu.</p>
-            
-            <div class="feature-pills">
-                <div class="pill-item"><span class="pill-dot"></span>GEOMETRY</div>
-                <div class="pill-item"><span class="pill-dot"></span>SYMMETRY</div>
-                <div class="pill-item"><span class="pill-dot"></span>RATIO 1:1.618</div>
-            </div>
-
-            <button id="startScanBtn" onclick="startWizard()" disabled>ĐANG TẢI CẤU HÌNH...</button>
-        </div>
-
-        <div class="wizard-container" id="wizardScreen">
-            <div class="step-progress-bar">
-                <div class="step-progress-line"></div>
-                <div class="step-progress-fill" id="stepProgressFill"></div>
-                
-                <div class="step-node active" id="node-0">
-                    <div class="step-node-circle" id="dot-0">1</div>
-                    <span class="step-node-label">FRONT</span>
-                </div>
-                <div class="step-node" id="node-1">
-                    <div class="step-node-circle" id="dot-1">2</div>
-                    <span class="step-node-label">30°</span>
-                </div>
-                <div class="step-node" id="node-2">
-                    <div class="step-node-circle" id="dot-2">3</div>
-                    <span class="step-node-label">PROFILE</span>
-                </div>
-            </div>
-
-            <div class="capture-slot" id="currentSlot">
-                <div class="corner-bracket cb-tl"></div>
-                <div class="corner-bracket cb-tr"></div>
-                <div class="corner-bracket cb-bl"></div>
-                <div class="corner-bracket cb-br"></div>
-
-                <div class="status-badge" id="wizBadge">READY FOR SCAN</div>
-                <div class="capture-title" id="wizTitle">FRONT (Chính diện)</div>
-                <div class="capture-desc" id="wizDesc">Giữ đầu thẳng, nhìn trực tiếp vào camera</div>
-                
-                <div style="display: flex; gap: 10px; width: 100%; max-width: 280px; margin-top: 10px;">
-                    <button class="btn-secondary" style="flex:1; padding: 12px;" onclick="triggerFileInput()">Tải Ảnh</button>
-                    <button style="flex:1; padding: 12px;" onclick="openCamera()">Mở Camera</button>
-                </div>
-            </div>
-
-            <div class="wizard-actions">
-                <button id="btnNextStep" onclick="nextStep()" disabled>CHỤP TRƯỚC ĐỂ TIẾP TỤC</button>
-                <button class="btn-ghost" id="btnSkipStep" onclick="skipStep()" style="display: none;">Bỏ qua góc này</button>
-            </div>
-            
-            <input type="file" id="wizFileInput" accept="image/jpeg, image/png, image/webp" style="display: none;" onchange="handleFileSelect(event)">
-        </div>
-
-        <div class="loading-container" id="loadingUI">
-            <div class="scan-frame-container">
-                <img id="scanPreviewTarget" class="scan-frame-img" src="" alt="Face Scan">
-                <div class="scan-frame-overlay-line"></div>
-                <svg class="landmark-dots-svg" viewBox="0 0 100 100">
-                    <circle cx="35" cy="40" r="1.5" fill="#30D158"/>
-                    <circle cx="65" cy="40" r="1.5" fill="#30D158"/>
-                    <circle cx="50" cy="55" r="1.5" fill="#0A84FF"/>
-                    <circle cx="50" cy="72" r="1.5" fill="#0A84FF"/>
-                    <circle cx="30" cy="68" r="1.5" fill="#FFD60A"/>
-                    <circle cx="70" cy="68" r="1.5" fill="#FFD60A"/>
-                </svg>
-            </div>
-
-            <div class="progress-ring-wrap">
-                <svg class="progress-ring-svg">
-                    <circle class="progress-ring-bg" cx="50" cy="50" r="45"/>
-                    <circle class="progress-ring-fill" id="progressRingFill" cx="50" cy="50" r="45"/>
-                </svg>
-                <span class="progress-text-percent" id="progressPercentText">0%</span>
-            </div>
-
-            <div class="analysis-status-text" id="loadingText">INITIALIZING AI SCANNER...</div>
-
-            <div class="realtime-metrics-list">
-                <div class="rt-metric-card"><span class="rt-metric-name">LANDMARKS</span><span class="rt-metric-val" id="rtLandmarks">DETECTING</span></div>
-                <div class="rt-metric-card"><span class="rt-metric-name">SYMMETRY</span><span class="rt-metric-val" id="rtSymmetry">CALCULATING</span></div>
-                <div class="rt-metric-card"><span class="rt-metric-name">JAWLINE</span><span class="rt-metric-val" id="rtJawline">MAPPING</span></div>
-                <div class="rt-metric-card"><span class="rt-metric-name">RATIO 3D</span><span class="rt-metric-val" id="rtRatio">EVALUATING</span></div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <button class="history-capsule-btn" onclick="openHistory()">Lịch Sử</button>
+                <img src="https://via.placeholder.com/100" class="user-avatar-btn" id="userAvatarBtn" onclick="switchTab('profile')" alt="User">
             </div>
         </div>
-
-        <p class="privacy-note">
-            Dữ liệu xử lý tức thì. Không lưu trữ trên máy chủ công khai.
-        </p>
     </div>
 
-    <div class="glass-panel" id="resultDashboard">
-        <h1 style="margin-bottom: 4px; font-size: 22px;">BÁO CÁO PHÂN TÍCH</h1>
-        <p style="text-align: center; margin-bottom: 24px; font-size: 12px; color: var(--text-tertiary);" id="analysisTime"></p>
-
-        <div class="score-hero-wrap">
-            <div class="overall-score-circle">
-                <span id="res-overall">0</span>
-                <small>OVERALL LOOKS</small>
+    <!-- TAB 1: HOME -->
+    <div class="tab-view active" id="tab-home">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-lbl">Overall Score</div>
+                <div class="stat-val" id="homeScore">--</div>
             </div>
-            <div class="face-shape-capsule" id="res-faceshape">-</div>
-        </div>
-
-        <div class="chart-container" id="radarChartContainer"></div>
-
-        <h3 style="margin-bottom: 12px;">CHỈ SỐ CHI TIẾT</h3>
-        <div class="metrics-grid" id="metricsGrid"></div>
-
-        <div class="detail-grid">
-            <div class="glass-card">
-                <h3>Nhận Xét Tổng Quan</h3>
-                <p id="res-summary" style="margin-top: 8px;"></p>
-            </div>
-            
-            <div class="metrics-grid" style="margin-bottom: 0;">
-                <div class="glass-card">
-                    <h3 style="color: var(--success-color)">Điểm Mạnh</h3>
-                    <ul class="list-items" id="res-strengths" style="margin-top: 8px;"></ul>
-                </div>
-                <div class="glass-card">
-                    <h3 style="color: var(--danger-color)">Cần Cải Thiện</h3>
-                    <ul class="list-items" id="res-weaknesses" style="margin-top: 8px;"></ul>
-                </div>
-            </div>
-
-            <div class="glass-card">
-                <h3>Grooming & Hair</h3>
-                <h4 style="font-size: 12px; color: var(--text-tertiary); margin-top: 10px; text-transform: uppercase;">Kiểu tóc đề xuất:</h4>
-                <ul class="list-items" id="res-hairstyles" style="margin-top: 4px;"></ul>
-                <h4 style="font-size: 12px; color: var(--text-tertiary); margin-top: 10px; text-transform: uppercase;">Grooming Tips:</h4>
-                <ul class="list-items" id="res-grooming" style="margin-top: 4px;"></ul>
-            </div>
-
-            <div class="glass-card">
-                <h3>Skincare Routine</h3>
-                <ul class="list-items" id="res-skincare" style="margin-top: 8px;"></ul>
-            </div>
-
-            <div class="glass-card">
-                <h3>Looksmax Protocol</h3>
-                <div id="res-protocol" style="margin-top: 12px;"></div>
+            <div class="stat-card">
+                <div class="stat-lbl">🔥 Streak</div>
+                <div class="stat-val" id="homeStreak">0 Ngày</div>
             </div>
         </div>
 
-        <div class="compare-section" id="compareSection">
-            <h3>So Sánh (Before / After)</h3>
-            <p style="font-size: 13px; margin-bottom: 15px;">Tải lên ảnh "After" (Chính diện) để xem sự cải thiện.</p>
-            <input type="file" id="file-after" accept="image/jpeg, image/png, image/webp" style="display: none;" onchange="handleAfterUpload(event)">
-            <button class="btn-secondary" onclick="document.getElementById('file-after').click()" id="btnUploadAfter">Tải Ảnh After</button>
-            
-            <div id="compareResult" style="display: none; margin-top: 20px;">
-                <div class="compare-grid">
-                    <div class="glass-card" style="text-align: center;">
-                        <div style="font-size: 11px; color: var(--text-tertiary);">BEFORE</div>
-                        <div style="font-size: 28px; font-weight: 800;" id="cmp-before">0</div>
+        <div class="glass-card">
+            <h3>Mục Tiêu Cá Nhân</h3>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-top: 6px;" id="homeGoalDesc">Tối ưu hóa cấu trúc khuôn mặt và cải thiện sức khỏe làn da.</p>
+            <div style="margin-top: 12px; background: rgba(255,255,255,0.08); height: 8px; border-radius: 4px; overflow: hidden;">
+                <div id="homeProgressFill" style="width: 35%; height: 100%; background: var(--accent-color);"></div>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h3>Hôm Nay Glowmax</h3>
+                <span style="font-size: 12px; color: var(--accent-color); font-weight: bold;" id="homeXpText">+50 XP sẵn sàng</span>
+            </div>
+            <div id="homeDailyPreview">
+                <div class="task-item"><span style="font-size: 13px;">Chin Tuck Posture (3 phút)</span><span>➔</span></div>
+                <div class="task-item"><span style="font-size: 13px;">Skincare Routine Buổi Sáng</span><span>➔</span></div>
+            </div>
+            <button class="btn-secondary" style="margin-top: 8px;" onclick="switchTab('today')">Mở Chi Tiết Nhiệm Vụ</button>
+        </div>
+    </div>
+
+    <!-- TAB 2: ANALYZE -->
+    <div class="tab-view" id="tab-analyze">
+        <div class="glass-panel" id="mainPanel">
+            <div id="introScreen">
+                <div class="hero-scanner-wrap">
+                    <div class="hero-orb"></div>
+                    <div class="scan-beam"></div>
+                    <svg class="face-scan-svg" viewBox="0 0 100 100" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1">
+                        <path d="M50 15 C30 15, 20 35, 20 55 C20 75, 35 90, 50 90 C65 90, 80 75, 80 55 C80 35, 70 15, 50 15 Z" stroke-dasharray="2 2"/>
+                        <circle cx="35" cy="45" r="4" fill="var(--accent-color)"/>
+                        <circle cx="65" cy="45" r="4" fill="var(--accent-color)"/>
+                        <path d="M50 48 L50 62 L55 62" stroke="var(--accent-color)" stroke-width="1.5"/>
+                        <path d="M38 72 Q50 80 62 72" stroke="var(--accent-color)" stroke-width="1.5"/>
+                    </svg>
+                </div>
+
+                <h1 style="font-size: 24px; margin-bottom: 8px; text-align: center;">Phân Tích Khuôn Mặt AI</h1>
+                <p style="text-align: center; margin-bottom: 24px; font-size: 14px; color: var(--text-secondary);">Hệ thống trích xuất hình học 3D, đánh giá cấu trúc xương hàm và tỷ lệ khuôn mặt chuyên sâu.</p>
+                
+                <div class="feature-pills">
+                    <div class="pill-item"><span class="pill-dot"></span>GEOMETRY</div>
+                    <div class="pill-item"><span class="pill-dot"></span>SYMMETRY</div>
+                    <div class="pill-item"><span class="pill-dot"></span>RATIO 1:1.618</div>
+                </div>
+
+                <button id="startScanBtn" onclick="startWizard()">BẮT ĐẦU QUÉT</button>
+            </div>
+
+            <!-- Wizard Flow -->
+            <div class="wizard-container" id="wizardScreen">
+                <div class="step-progress-bar">
+                    <div class="step-progress-line"></div>
+                    <div class="step-progress-fill" id="stepProgressFill"></div>
+                    
+                    <div class="step-node active" id="node-0">
+                        <div class="step-node-circle" id="dot-0">1</div>
+                        <span class="step-node-label">FRONT</span>
                     </div>
-                    <div class="glass-card" style="text-align: center; border-color: var(--accent-color);">
-                        <div style="font-size: 11px; color: var(--accent-color);">AFTER</div>
-                        <div style="font-size: 28px; font-weight: 800;" id="cmp-after">0</div>
+                    <div class="step-node" id="node-1">
+                        <div class="step-node-circle" id="dot-1">2</div>
+                        <span class="step-node-label">30°</span>
+                    </div>
+                    <div class="step-node" id="node-2">
+                        <div class="step-node-circle" id="dot-2">3</div>
+                        <span class="step-node-label">PROFILE</span>
                     </div>
                 </div>
-                <div style="text-align: center; font-size: 16px; font-weight: bold;" id="cmp-delta"></div>
+
+                <div class="capture-slot" id="currentSlot">
+                    <div class="corner-bracket cb-tl"></div>
+                    <div class="corner-bracket cb-tr"></div>
+                    <div class="corner-bracket cb-bl"></div>
+                    <div class="corner-bracket cb-br"></div>
+
+                    <div class="status-badge" id="wizBadge">READY FOR SCAN</div>
+                    <div class="capture-title" id="wizTitle">FRONT (Chính diện)</div>
+                    <div class="capture-desc" id="wizDesc">Giữ đầu thẳng, nhìn trực tiếp vào camera</div>
+                    
+                    <div style="display: flex; gap: 10px; width: 100%; max-width: 280px; margin-top: 10px;">
+                        <button class="btn-secondary" style="flex:1; padding: 12px;" onclick="triggerFileInput()">Tải Ảnh</button>
+                        <button style="flex:1; padding: 12px;" onclick="openCamera()">Mở Camera</button>
+                    </div>
+                </div>
+
+                <div class="wizard-actions">
+                    <button id="btnNextStep" onclick="nextStep()" disabled>CHỤP TRƯỚC ĐỂ TIẾP TỤC</button>
+                    <button class="btn-ghost" id="btnSkipStep" onclick="skipStep()" style="display: none;">Bỏ qua góc này</button>
+                </div>
+                
+                <input type="file" id="wizFileInput" accept="image/jpeg, image/png, image/webp" style="display: none;" onchange="handleFileSelect(event)">
+            </div>
+
+            <!-- Loading Scanner UI -->
+            <div class="loading-container" id="loadingUI">
+                <div class="scan-frame-container">
+                    <img id="scanPreviewTarget" class="scan-frame-img" src="" alt="Face Scan">
+                    <div class="scan-frame-overlay-line"></div>
+                    <svg class="landmark-dots-svg" viewBox="0 0 100 100">
+                        <circle cx="35" cy="40" r="1.5" fill="#30D158"/>
+                        <circle cx="65" cy="40" r="1.5" fill="#30D158"/>
+                        <circle cx="50" cy="55" r="1.5" fill="#0A84FF"/>
+                        <circle cx="50" cy="72" r="1.5" fill="#0A84FF"/>
+                        <circle cx="30" cy="68" r="1.5" fill="#FFD60A"/>
+                        <circle cx="70" cy="68" r="1.5" fill="#FFD60A"/>
+                    </svg>
+                </div>
+
+                <div class="progress-ring-wrap">
+                    <svg class="progress-ring-svg">
+                        <circle class="progress-ring-bg" cx="50" cy="50" r="45"/>
+                        <circle class="progress-ring-fill" id="progressRingFill" cx="50" cy="50" r="45"/>
+                    </svg>
+                    <span class="progress-text-percent" id="progressPercentText">0%</span>
+                </div>
+
+                <div class="analysis-status-text" id="loadingText">INITIALIZING AI SCANNER...</div>
+
+                <div class="realtime-metrics-list">
+                    <div class="rt-metric-card"><span class="rt-metric-name">LANDMARKS</span><span class="rt-metric-val" id="rtLandmarks">DETECTING</span></div>
+                    <div class="rt-metric-card"><span class="rt-metric-name">SYMMETRY</span><span class="rt-metric-val" id="rtSymmetry">CALCULATING</span></div>
+                    <div class="rt-metric-card"><span class="rt-metric-name">JAWLINE</span><span class="rt-metric-val" id="rtJawline">MAPPING</span></div>
+                    <div class="rt-metric-card"><span class="rt-metric-name">RATIO 3D</span><span class="rt-metric-val" id="rtRatio">EVALUATING</span></div>
+                </div>
+            </div>
+
+            <p class="privacy-note">
+                Dữ liệu xử lý tức thì. Không lưu trữ trên máy chủ công khai.
+            </p>
+        </div>
+
+        <!-- Result Dashboard Report -->
+        <div class="glass-panel" id="resultDashboard">
+            <h1 style="margin-bottom: 4px; font-size: 22px;">BÁO CÁO PHÂN TÍCH</h1>
+            <p style="text-align: center; margin-bottom: 24px; font-size: 12px; color: var(--text-tertiary);" id="analysisTime"></p>
+
+            <div class="score-hero-wrap">
+                <div class="overall-score-circle">
+                    <span id="res-overall">0</span>
+                    <small>OVERALL LOOKS</small>
+                </div>
+                <div class="face-shape-capsule" id="res-faceshape">-</div>
+            </div>
+
+            <div class="chart-container" id="radarChartContainer"></div>
+
+            <h3 style="margin-bottom: 12px;">CHỈ SỐ CHI TIẾT</h3>
+            <div class="metrics-grid" id="metricsGrid"></div>
+
+            <div class="detail-grid">
+                <div class="glass-card">
+                    <h3>Nhận Xét Tổng Quan</h3>
+                    <p id="res-summary" style="margin-top: 8px;"></p>
+                </div>
+                
+                <div class="metrics-grid" style="margin-bottom: 0;">
+                    <div class="glass-card">
+                        <h3 style="color: var(--success-color)">Điểm Mạnh</h3>
+                        <ul class="list-items" id="res-strengths" style="margin-top: 8px;"></ul>
+                    </div>
+                    <div class="glass-card">
+                        <h3 style="color: var(--danger-color)">Cần Cải Thiện</h3>
+                        <ul class="list-items" id="res-weaknesses" style="margin-top: 8px;"></ul>
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <h3>Grooming & Hair</h3>
+                    <h4 style="font-size: 12px; color: var(--text-tertiary); margin-top: 10px; text-transform: uppercase;">Kiểu tóc đề xuất:</h4>
+                    <ul class="list-items" id="res-hairstyles" style="margin-top: 4px;"></ul>
+                    <h4 style="font-size: 12px; color: var(--text-tertiary); margin-top: 10px; text-transform: uppercase;">Grooming Tips:</h4>
+                    <ul class="list-items" id="res-grooming" style="margin-top: 4px;"></ul>
+                </div>
+
+                <div class="glass-card">
+                    <h3>Skincare Routine</h3>
+                    <ul class="list-items" id="res-skincare" style="margin-top: 8px;"></ul>
+                </div>
+
+                <div class="glass-card">
+                    <h3>Looksmax Protocol</h3>
+                    <div id="res-protocol" style="margin-top: 12px;"></div>
+                </div>
+            </div>
+
+            <div class="compare-section" id="compareSection">
+                <h3>So Sánh (Before / After)</h3>
+                <p style="font-size: 13px; margin-bottom: 15px;">Tải lên ảnh "After" (Chính diện) để xem sự cải thiện.</p>
+                <input type="file" id="file-after" accept="image/jpeg, image/png, image/webp" style="display: none;" onchange="handleAfterUpload(event)">
+                <button class="btn-secondary" onclick="document.getElementById('file-after').click()" id="btnUploadAfter">Tải Ảnh After</button>
+                
+                <div id="compareResult" style="display: none; margin-top: 20px;">
+                    <div class="compare-grid">
+                        <div class="glass-card" style="text-align: center;">
+                            <div style="font-size: 11px; color: var(--text-tertiary);">BEFORE</div>
+                            <div style="font-size: 28px; font-weight: 800;" id="cmp-before">0</div>
+                        </div>
+                        <div class="glass-card" style="text-align: center; border-color: var(--accent-color);">
+                            <div style="font-size: 11px; color: var(--accent-color);">AFTER</div>
+                            <div style="font-size: 28px; font-weight: 800;" id="cmp-after">0</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; font-size: 16px; font-weight: bold;" id="cmp-delta"></div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 28px;">
+                <button class="btn-secondary" onclick="resetApp()">Phân Tích Lại</button>
+                <button onclick="exportResult()">Lưu Kết Quả</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 3: PLAN -->
+    <div class="tab-view" id="tab-plan">
+        <div class="glass-card">
+            <h3>Lộ Trình Cải Thiện Cá Nhân</h3>
+            <div style="display: flex; gap: 8px; margin-top: 12px;">
+                <button class="btn-secondary" style="flex:1; padding: 8px; font-size: 12px;" onclick="switchPlanSubTab(7)">7 Ngày</button>
+                <button class="btn-secondary" style="flex:1; padding: 8px; font-size: 12px;" onclick="switchPlanSubTab(30)">30 Ngày</button>
+                <button class="btn-secondary" style="flex:1; padding: 8px; font-size: 12px;" onclick="switchPlanSubTab(365)">1 Năm</button>
+            </div>
+        </div>
+        <div id="planContentList"></div>
+    </div>
+
+    <!-- TAB 4: TODAY -->
+    <div class="tab-view" id="tab-today">
+        <div class="glass-card">
+            <h3>Nhiệm Vụ Hôm Nay</h3>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">Hoàn thành để duy trì Streak 🔥</p>
+            <div id="todayTasksList">
+                <div class="task-item" onclick="toggleTask(this)">
+                    <div style="font-size: 13px;">Uống đủ 2L nước mỗi ngày</div>
+                    <div class="task-checkbox">✓</div>
+                </div>
+                <div class="task-item" onclick="toggleTask(this)">
+                    <div style="font-size: 13px;">Chin Tuck Posture Routine (3 phút)</div>
+                    <div class="task-checkbox">✓</div>
+                </div>
+                <div class="task-item" onclick="toggleTask(this)">
+                    <div style="font-size: 13px;">Chăm sóc da cơ bản Sáng / Tối</div>
+                    <div class="task-checkbox">✓</div>
+                </div>
             </div>
         </div>
 
-        <div style="display: flex; gap: 12px; margin-top: 28px;">
-            <button class="btn-secondary" onclick="resetApp()">Phân Tích Lại</button>
-            <button onclick="exportResult()">Lưu Kết Quả</button>
+        <div class="glass-card">
+            <h3>Thư Viện Bài Tập An Toàn</h3>
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+                <div class="task-item" onclick="startExerciseTimer('Chin Tuck Posture', 180)">
+                    <div>
+                        <div style="font-weight: 700; font-size: 14px;">Chin Tuck (Tư thế cổ)</div>
+                        <div style="font-size: 11px; color: var(--text-secondary);">3 phút • Cải thiện góc hàm</div>
+                    </div>
+                    <button style="width: auto; padding: 6px 12px; font-size: 12px;">Tập</button>
+                </div>
+                <div class="task-item" onclick="startExerciseTimer('Neck & Shoulder Stretch', 300)">
+                    <div>
+                        <div style="font-weight: 700; font-size: 14px;">Giãn Cơ Cổ & Vai</div>
+                        <div style="font-size: 11px; color: var(--text-secondary);">5 phút • Giảm căng cơ mặt</div>
+                    </div>
+                    <button style="width: auto; padding: 6px 12px; font-size: 12px;">Tập</button>
+                </div>
+            </div>
         </div>
+    </div>
+
+    <!-- TAB 5: PROFILE -->
+    <div class="tab-view" id="tab-profile">
+        <div class="glass-card" style="text-align: center;">
+            <img src="https://via.placeholder.com/100" id="profileAvatar" style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--accent-color); margin-bottom: 8px;">
+            <h3 id="profileName">Tên Người Dùng</h3>
+            <p style="font-size: 12px; color: var(--text-secondary);" id="profileEmail">user@example.com</p>
+            <div style="display: flex; justify-content: center; gap: 12px; margin-top: 16px;">
+                <span class="pill-item"><span class="pill-dot"></span>LVL <span id="profileLvl">1</span></span>
+                <span class="pill-item"><span class="pill-dot"></span>XP: <span id="profileXp">0</span></span>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h3>Quyền Riêng Tư & Dữ Liệu</h3>
+            <p style="font-size: 12px; color: var(--text-secondary); margin: 6px 0 12px 0;">Ảnh khuôn mặt xử lý tức thì, chỉ lưu kết quả đánh giá cá nhân.</p>
+            <button class="btn-danger" style="padding: 10px; font-size: 13px;" onclick="clearUserData()">Xóa Lịch Sử & Dữ Liệu AI</button>
+        </div>
+
+        <button class="btn-secondary" id="btnLogout" style="margin-top: 12px;">Đăng Xuất</button>
     </div>
 </div>
 
+<!-- CAMERA MODAL -->
 <div id="cameraModal">
     <div class="camera-flash" id="cameraFlash"></div>
     <div class="camera-header">
@@ -957,6 +1217,7 @@
     <canvas id="captureCanvas" style="display: none;"></canvas>
 </div>
 
+<!-- HISTORY MODAL -->
 <div class="modal-overlay" id="historyModal">
     <div class="modal-content">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -968,10 +1229,57 @@
     </div>
 </div>
 
-<!-- Firebase & Main Script SDK Modular CDN -->
+<!-- FLOATING COACH BUTTON -->
+<div class="floating-coach-btn" onclick="openCoachChat()">
+    <svg style="width: 26px; height: 26px; fill: #fff;" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
+</div>
+
+<!-- COACH CHAT MODAL -->
+<div class="chat-modal" id="coachModal">
+    <div class="chat-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--glass-border);">
+            <h3>Glowmax AI Coach</h3>
+            <button class="btn-ghost" style="width: auto; padding: 4px 8px;" onclick="closeCoachChat()">Đóng</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-bubble ai">Chào bạn! Tôi là AI Coach của Glowmax. Bạn cần tư vấn bài tập hay quy trình chăm sóc hôm nay?</div>
+        </div>
+        <div style="display: flex; gap: 8px;">
+            <input type="text" id="chatInput" style="flex:1; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: var(--radius-small); color: #fff; outline: none;" placeholder="Nhập câu hỏi...">
+            <button style="width: auto; padding: 12px 18px;" onclick="sendCoachMessage()">Gửi</button>
+        </div>
+    </div>
+</div>
+
+<!-- BOTTOM NAVIGATION -->
+<div class="bottom-nav">
+    <div class="nav-item active" onclick="switchTab('home')">
+        <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span>Home</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('analyze')">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        <span>Analyze</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('plan')">
+        <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+        <span>Plan</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('today')">
+        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+        <span>Today</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('profile')">
+        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        <span>Profile</span>
+    </div>
+</div>
+
+<!-- FIREBASE SDK MODULAR -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDummyKeyForInitializationOnly-ReplaceIfCustom",
@@ -982,44 +1290,77 @@
         appId: "1:38927491028:web:abcdef123456789"
     };
 
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentUser = null;
     let activeApiKey = null;
-    const aiStatusBadge = document.getElementById('aiStatusBadge');
-    const startScanBtn = document.getElementById('startScanBtn');
 
-    try {
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const configRef = doc(db, "glowmax", "config", "api", "keyDoc");
-
-        // Nhận cấu hình real-time từ Firestore
-        onSnapshot(configRef, (docSnap) => {
-            if (docSnap.exists() && docSnap.data().apiKey) {
-                activeApiKey = docSnap.data().apiKey;
-                aiStatusBadge.innerText = "Glowmax AI Ready";
-                startScanBtn.disabled = false;
-                startScanBtn.innerText = "BẮT ĐẦU QUÉT";
-            } else {
-                activeApiKey = null;
-                aiStatusBadge.innerText = "Chưa cấu hình API Key";
-                startScanBtn.disabled = true;
-                startScanBtn.innerText = "CHƯA CẤU HÌNH API KEY TRONG DASHBOARD";
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            currentUser = user;
+            document.getElementById('authOverlay').style.display = 'none';
+            document.getElementById('profileName').innerText = user.displayName || "Glowmax Member";
+            document.getElementById('profileEmail').innerText = user.email;
+            if(user.photoURL) {
+                document.getElementById('userAvatarBtn').src = user.photoURL;
+                document.getElementById('profileAvatar').src = user.photoURL;
             }
-        }, (error) => {
-            console.error("Firebase Snapshot Error:", error);
-            aiStatusBadge.innerText = "Lỗi kết nối Firebase";
-            startScanBtn.disabled = true;
-            startScanBtn.innerText = "MẤT KẾT NỐI CƠ SỞ DỮ LIỆU";
+            loadUserData(user.uid);
+        } else {
+            currentUser = null;
+            document.getElementById('authOverlay').style.display = 'flex';
+        }
+    });
+
+    document.getElementById('btnLoginGoogle').addEventListener('click', () => {
+        signInWithPopup(auth, new GoogleAuthProvider()).catch(err => alert("Lỗi Google Auth: " + err.message));
+    });
+
+    document.getElementById('btnLoginEmail').addEventListener('click', () => {
+        const email = document.getElementById('authEmail').value.trim();
+        const pass = document.getElementById('authPassword').value.trim();
+        if(!email || !pass) return alert("Vui lòng nhập Email và Mật khẩu");
+        signInWithEmailAndPassword(auth, email, pass).catch(() => {
+            createUserWithEmailAndPassword(auth, email, pass).catch(err => alert("Lỗi Auth: " + err.message));
         });
-    } catch (e) {
-        console.error("Firebase Init Error:", e);
-        aiStatusBadge.innerText = "Lỗi khởi tạo hệ thống";
+    });
+
+    document.getElementById('btnLogout').addEventListener('click', () => signOut(auth));
+
+    const configRef = doc(db, "glowmax", "config", "api", "keyDoc");
+    onSnapshot(configRef, (snap) => {
+        if (snap.exists() && snap.data().apiKey) {
+            activeApiKey = snap.data().apiKey;
+            document.getElementById('aiStatusBadge').innerText = "Glowmax AI Ready";
+        } else {
+            activeApiKey = null;
+            document.getElementById('aiStatusBadge').innerText = "Chưa cấu hình API Key";
+        }
+    });
+
+    async function loadUserData(uid) {
+        const userRef = doc(db, "users", uid);
+        const snap = await getDoc(userRef);
+        if (snap.exists()) {
+            const data = snap.data();
+            document.getElementById('homeScore').innerText = data.overallScore || "--";
+            document.getElementById('homeStreak').innerText = (data.streak || 0) + " Ngày";
+            document.getElementById('profileLvl').innerText = data.level || 1;
+            document.getElementById('profileXp').innerText = data.xp || 0;
+        } else {
+            await setDoc(userRef, { overallScore: 0, streak: 1, xp: 0, level: 1 }, { merge: true });
+        }
     }
 
-    // Đính kèm biến toàn cục API Key để các hàm xử lý phân tích sử dụng
     window.getGlobalApiKey = () => activeApiKey;
+    window.getCurrentUser = () => currentUser;
+    window.getDb = () => db;
 </script>
 
 <script>
+    /* --- MOTION BLUR SCROLL --- */
     let scrollTimeout;
     window.addEventListener('scroll', () => {
         document.body.classList.add('is-scrolling');
@@ -1029,6 +1370,7 @@
         }, 150); 
     });
 
+    /* --- STATE MANAGEMENT --- */
     const state = {
         photos: [null, null, null],
         currentStep: 0,
@@ -1047,6 +1389,43 @@
 
     const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
+    /* --- TAB NAVIGATION --- */
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-view').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        
+        const targetTab = document.getElementById(`tab-${tabId}`);
+        if(targetTab) targetTab.classList.add('active');
+
+        const navIndex = ['home', 'analyze', 'plan', 'today', 'profile'].indexOf(tabId);
+        if(navIndex !== -1) {
+            document.querySelectorAll('.nav-item')[navIndex].classList.add('active');
+        }
+    }
+
+    function switchPlanSubTab(days) {
+        const list = document.getElementById('planContentList');
+        if(days === 7) {
+            list.innerHTML = `
+                <div class="glass-card"><h4>Tuần 1: Thiết Lập Nền Tảng</h4><p style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Chin Tuck Posture + Skincare Sáng/Tối cơ bản.</p></div>
+            `;
+        } else if(days === 30) {
+            list.innerHTML = `
+                <div class="glass-card"><h4>Tháng 1: Định Hình Cấu Trúc Mặt & Da</h4><p style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Tăng cường bài tập giãn cơ cổ và Grooming chân mày.</p></div>
+            `;
+        } else {
+            list.innerHTML = `
+                <div class="glass-card"><h4>Chương Trình 1 Năm Glow Up</h4><p style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Theo dõi sự thay đổi qua các đợt Checkpoint hàng tháng.</p></div>
+            `;
+        }
+    }
+    switchPlanSubTab(7);
+
+    function toggleTask(elem) {
+        elem.classList.toggle('completed');
+    }
+
+    /* --- HELPER FUNCTIONS --- */
     function parseAIJsonResponse(rawText) {
         if (!rawText) throw new Error("Phản hồi từ AI rỗng");
         let cleaned = rawText.replace(/```(?:json)?/gi, '').replace(/```/g, '').trim();
@@ -1078,6 +1457,12 @@
         });
     }
 
+    function escapeHTML(str) {
+        if (!str) return '';
+        return str.toString().replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+    }
+
+    /* --- WIZARD FLOW & SCANNER --- */
     function startWizard() {
         const key = window.getGlobalApiKey ? window.getGlobalApiKey() : null;
         if (!key) {
@@ -1108,9 +1493,12 @@
                 dot.innerText = i + 1;
             }
         }
+
         renderCurrentSlot();
+
         const btnNext = document.getElementById('btnNextStep');
         const btnSkip = document.getElementById('btnSkipStep');
+        
         if (state.photos[step]) {
             btnNext.disabled = false;
             btnNext.innerText = step === 2 ? "BẮT ĐẦU PHÂN TÍCH" : "LƯU & TIẾP TỤC";
@@ -1125,6 +1513,7 @@
     function renderCurrentSlot() {
         const slot = document.getElementById('currentSlot');
         const imgData = state.photos[state.currentStep];
+        
         if (imgData) {
             slot.classList.add('has-image');
             slot.innerHTML = `
@@ -1200,6 +1589,7 @@
         event.target.value = '';
     }
 
+    /* --- CAMERA HANDLING --- */
     async function openCamera() {
         const modal = document.getElementById('cameraModal');
         document.getElementById('camInstruction').innerText = STEP_INFO[state.currentStep].desc;
@@ -1255,11 +1645,7 @@
         setTimeout(() => { closeCamera(); updateWizardUI(); }, 150);
     }
 
-    function escapeHTML(str) {
-        if (!str) return '';
-        return str.toString().replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
-    }
-
+    /* --- REALTIME SCANNING ANIMATION --- */
     function startRealtimeAnalysisUI() {
         const previewImg = document.getElementById('scanPreviewTarget');
         if (state.photos[0]) previewImg.src = `${state.photos[0].mime},${state.photos[0].base64}`;
@@ -1299,6 +1685,7 @@
         }, interval);
     }
 
+    /* --- GEMINI AI ANALYSIS --- */
     async function startAnalysis() {
         const apiKey = window.getGlobalApiKey ? window.getGlobalApiKey() : null;
         if (!apiKey) {
@@ -1337,7 +1724,7 @@
                 }
             }
 
-            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
             const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -1368,6 +1755,7 @@
                 document.getElementById('mainPanel').style.display = 'none';
                 document.getElementById('resultDashboard').style.display = 'block';
                 document.getElementById('compareSection').style.display = 'block';
+                document.getElementById('homeScore').innerText = resultData.overall_score || "--";
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }, 500);
 
@@ -1380,6 +1768,7 @@
         }
     }
 
+    /* --- RENDERING RESULTS --- */
     function renderResults(data) {
         document.getElementById('analysisTime').textContent = new Date().toLocaleString('vi-VN');
         animateCounter('res-overall', 0, data.overall_score || 0, 1000);
@@ -1453,6 +1842,7 @@
         window.requestAnimationFrame(step);
     }
 
+    /* --- RADAR CHART (SVG) --- */
     function drawRadarChart(dataArr, labels) {
         const container = document.getElementById('radarChartContainer');
         const size = 300, center = size / 2, radius = (size / 2) - 40, numSides = dataArr.length, angleStep = (Math.PI * 2) / numSides;
@@ -1479,6 +1869,7 @@
         container.innerHTML = svg;
     }
 
+    /* --- HISTORY & COMPARE --- */
     function saveToHistory(res) {
         let history = JSON.parse(localStorage.getItem('gmax_hist')) || [];
         history.unshift({ id: Date.now(), date: new Date().toLocaleString('vi-VN'), overall: res.overall_score, shape: res.face_shape, data: res });
@@ -1525,7 +1916,7 @@
         btn.innerText = "Đang phân tích..."; btn.disabled = true;
         try {
             const compressed = await compressImage(state.afterPhoto.base64);
-            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
             const res = await fetch(endpoint, {
                 method: 'POST', 
                 headers: { 'Content-Type': 'application/json' },
@@ -1565,6 +1956,56 @@
     function exportResult() {
         if (navigator.share) navigator.share({ title: 'Glowmax Result', text: `Điểm số: ${state.currentResult?.overall_score}/100. AI Glowmax.`, url: window.location.href }).catch(console.error);
         else window.print();
+    }
+
+    /* --- AI COACH CHAT --- */
+    function openCoachChat() { document.getElementById('coachModal').style.display = 'flex'; }
+    function closeCoachChat() { document.getElementById('coachModal').style.display = 'none'; }
+
+    async function sendCoachMessage() {
+        const input = document.getElementById('chatInput');
+        const text = input.value.trim();
+        if(!text) return;
+
+        const msgs = document.getElementById('chatMessages');
+        msgs.innerHTML += `<div class="chat-bubble user">${text}</div>`;
+        input.value = '';
+        msgs.scrollTop = msgs.scrollHeight;
+
+        const apiKey = window.getGlobalApiKey ? window.getGlobalApiKey() : null;
+        if(!apiKey) {
+            msgs.innerHTML += `<div class="chat-bubble ai">Chưa tìm thấy API Key cấu hình. Vui lòng kiểm tra lại Dashboard.</div>`;
+            return;
+        }
+
+        try {
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+            const res = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: `Bạn là AI Coach tư vấn diện mạo Glowmax. Trả lời ngắn gọn, chân thành, khuyến khích bài tập posture/grooming/skincare an toàn: ${text}` }] }]
+                })
+            });
+            const data = await res.json();
+            const reply = data.candidates[0].content.parts[0].text;
+            msgs.innerHTML += `<div class="chat-bubble ai">${reply}</div>`;
+            msgs.scrollTop = msgs.scrollHeight;
+        } catch(e) {
+            msgs.innerHTML += `<div class="chat-bubble ai">Lỗi kết nối AI Coach.</div>`;
+        }
+    }
+
+    function startExerciseTimer(name, seconds) {
+        alert(`Bắt đầu bài tập "${name}" trong ${seconds / 60} phút. Hãy giữ tư thế chuẩn!`);
+    }
+
+    function clearUserData() {
+        if(confirm("Xóa toàn bộ dữ liệu phân tích cá nhân?")) {
+            localStorage.clear();
+            alert("Đã xóa dữ liệu thành công!");
+            location.reload();
+        }
     }
 </script>
 
