@@ -510,43 +510,73 @@
         .capture-slot.has-image:hover .img-overlay-actions,
         .capture-slot.has-image:active .img-overlay-actions { opacity: 1; }
 
-        /* --- CAMERA MODAL --- */
+        /* --- CAMERA MODAL & NATIVE UI --- */
         #cameraModal {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: #000; z-index: 9999; display: none; flex-direction: column;
+            justify-content: space-between; align-items: center;
         }
 
         .camera-header {
             padding: 20px 24px; display: flex; justify-content: space-between; align-items: center;
-            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
-            position: absolute; width: 100%; z-index: 10;
+            background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, transparent 100%);
+            width: 100%; z-index: 10;
             padding-top: max(20px, env(safe-area-inset-top));
         }
 
-        .camera-view { flex: 1; position: relative; display: flex; justify-content: center; align-items: center; overflow: hidden; }
-        #videoElement { width: 100%; height: 100%; object-fit: cover; }
-
-        .camera-guide-overlay {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 72vw; height: 48vh; max-width: 320px; max-height: 440px;
-            border: 1.5px dashed rgba(255, 255, 255, 0.4);
-            border-radius: 50%;
-            box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.65);
-            pointer-events: none;
-            transition: border-color 0.3s;
+        .camera-view-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
         }
 
-        .camera-instruction {
-            position: absolute; top: 15%; left: 0; width: 100%;
-            text-align: center; color: #fff; font-size: 16px; font-weight: 600;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.8); z-index: 10;
+        .camera-viewport-square {
+            position: relative;
+            width: 88vw;
+            height: 88vw;
+            max-width: 360px;
+            max-height: 360px;
+            border-radius: var(--radius-large);
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.9), 0 0 20px var(--accent-glow);
+            background: #050507;
+        }
+
+        #videoElement { width: 100%; height: 100%; object-fit: cover; }
+
+        /* 3D Face Canvas Overlay */
+        #faceGuideCanvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .camera-instruction-box {
+            margin-top: 16px;
+            background: rgba(18, 18, 22, 0.75);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            padding: 8px 18px;
+            border-radius: 100px;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            z-index: 10;
         }
 
         .camera-controls {
-            padding: 30px 24px max(30px, env(safe-area-inset-bottom)) 24px;
+            padding: 20px 24px max(30px, env(safe-area-inset-bottom)) 24px;
             display: flex; justify-content: center; align-items: center; gap: 30px;
             background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, transparent 100%);
-            position: absolute; bottom: 0; width: 100%; z-index: 10;
+            width: 100%; z-index: 10;
         }
 
         .shutter-btn {
@@ -570,6 +600,7 @@
         .camera-flash {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: #fff; z-index: 99; opacity: 0; pointer-events: none;
+            transition: opacity 0.1s ease-out;
         }
 
         /* --- REALTIME SCANNING ANALYSIS SCREEN --- */
@@ -968,11 +999,11 @@
                     </div>
                     <div class="step-node" id="node-1">
                         <div class="step-node-circle" id="dot-1">2</div>
-                        <span class="step-node-label">30°</span>
+                        <span class="step-node-label">30° L</span>
                     </div>
                     <div class="step-node" id="node-2">
                         <div class="step-node-circle" id="dot-2">3</div>
-                        <span class="step-node-label">PROFILE</span>
+                        <span class="step-node-label">30° R</span>
                     </div>
                 </div>
 
@@ -983,12 +1014,12 @@
                     <div class="corner-bracket cb-br"></div>
 
                     <div class="status-badge" id="wizBadge">READY FOR SCAN</div>
-                    <div class="capture-title" id="wizTitle">FRONT (Chính diện)</div>
+                    <div class="capture-title" id="wizTitle">FRONT (Chính diện 0°)</div>
                     <div class="capture-desc" id="wizDesc">Giữ đầu thẳng, nhìn trực tiếp vào camera</div>
                     
                     <div style="display: flex; gap: 10px; width: 100%; max-width: 280px; margin-top: 10px;">
-                        <button class="btn-secondary" style="flex:1; padding: 12px;" onclick="triggerFileInput()">Tải Ảnh</button>
-                        <button style="flex:1; padding: 12px;" onclick="openCamera()">Mở Camera</button>
+                        <button class="btn-secondary" style="flex:1; padding: 12px;" onclick="triggerFileInput()">🖼️ Tải Ảnh</button>
+                        <button style="flex:1; padding: 12px;" onclick="requestCameraPermission()">📷 Quét Camera</button>
                     </div>
                 </div>
 
@@ -1023,7 +1054,7 @@
                     <span class="progress-text-percent" id="progressPercentText">0%</span>
                 </div>
 
-                <div class="analysis-status-text" id="loadingText">INITIALIZING AI SCANNER...</div>
+                <div class="analysis-status-text" id="loadingText">INITIALIZING DIGITALMOD AI...</div>
 
                 <div class="realtime-metrics-list">
                     <div class="rt-metric-card"><span class="rt-metric-name">LANDMARKS</span><span class="rt-metric-val" id="rtLandmarks">DETECTING</span></div>
@@ -1034,7 +1065,7 @@
             </div>
 
             <p class="privacy-note">
-                Dữ liệu xử lý tức thì. Không lưu trữ trên máy chủ công khai.
+                Dữ liệu xử lý tức thì bởi DigitalsMod AI. Không lưu trữ trên máy chủ công khai.
             </p>
         </div>
 
@@ -1189,7 +1220,7 @@
 
         <div class="glass-card">
             <h3>Quyền Riêng Tư & Dữ Liệu</h3>
-            <p style="font-size: 12px; color: var(--text-secondary); margin: 6px 0 12px 0;">Ảnh khuôn mặt xử lý tức thì, chỉ lưu kết quả đánh giá cá nhân.</p>
+            <p style="font-size: 12px; color: var(--text-secondary); margin: 6px 0 12px 0;">Ảnh khuôn mặt xử lý tức thì bởi DigitalsMod AI, chỉ lưu kết quả đánh giá cá nhân.</p>
             <button class="btn-danger" style="padding: 10px; font-size: 13px;" onclick="clearUserData()">Xóa Lịch Sử & Dữ Liệu AI</button>
         </div>
 
@@ -1197,18 +1228,40 @@
     </div>
 </div>
 
-<!-- CAMERA MODAL -->
+<!-- CAMERA PERMISSION MODAL -->
+<div class="modal-overlay" id="cameraPermissionModal">
+    <div class="modal-content" style="text-align: center;">
+        <div class="brand-logo-icon" style="margin: 0 auto 16px auto; width: 50px; height: 50px;">
+            <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <h3 style="font-size: 18px; margin-bottom: 8px;">Cho phép Glowmax sử dụng camera</h3>
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5;">
+            Camera được sử dụng để chụp ảnh khuôn mặt phục vụ quá trình phân tích 3D hình học diện mạo. Dữ liệu hình ảnh được xử lý trực tiếp trên thiết bị và không lưu trữ ngầm.
+        </p>
+        <div style="display: flex; gap: 12px;">
+            <button class="btn-secondary" style="flex:1;" onclick="closePermissionModal()">Hủy</button>
+            <button style="flex:1;" onclick="confirmCameraPermission()">Cho Phép Camera</button>
+        </div>
+    </div>
+</div>
+
+<!-- CAMERA MODAL (NATIVE LOOK & FEEL) -->
 <div id="cameraModal">
     <div class="camera-flash" id="cameraFlash"></div>
     <div class="camera-header">
         <button class="history-capsule-btn" onclick="closeCamera()">Hủy</button>
-        <button class="history-capsule-btn" id="switchCamBtn" onclick="switchCamera()">Đổi Camera</button>
+        <span style="font-size: 13px; font-weight: 700; color: var(--accent-color);" id="camTitleHeader">FRONT 0°</span>
+        <button class="history-capsule-btn" id="switchCamBtn" onclick="switchCamera()">🔄 Đổi Cam</button>
     </div>
-    <div class="camera-instruction" id="camInstruction">Giữ đầu thẳng</div>
-    <div class="camera-view">
-        <video id="videoElement" autoplay playsinline></video>
-        <div class="camera-guide-overlay"></div>
+
+    <div class="camera-view-container">
+        <div class="camera-viewport-square">
+            <video id="videoElement" autoplay playsinline></video>
+            <canvas id="faceGuideCanvas"></canvas>
+        </div>
+        <div class="camera-instruction-box" id="camInstruction">Căn khuôn mặt vào khung 3D • Giữ điện thoại thẳng</div>
     </div>
+
     <div class="camera-controls">
         <div class="shutter-btn" onclick="takeSnapshot()">
             <div class="shutter-btn-inner"></div>
@@ -1238,11 +1291,11 @@
 <div class="chat-modal" id="coachModal">
     <div class="chat-container">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--glass-border);">
-            <h3>Glowmax AI Coach</h3>
+            <h3>Glowmax AI Coach (DigitalsMod AI)</h3>
             <button class="btn-ghost" style="width: auto; padding: 4px 8px;" onclick="closeCoachChat()">Đóng</button>
         </div>
         <div class="chat-messages" id="chatMessages">
-            <div class="chat-bubble ai">Chào bạn! Tôi là AI Coach của Glowmax. Bạn cần tư vấn bài tập hay quy trình chăm sóc hôm nay?</div>
+            <div class="chat-bubble ai">Chào bạn! Tôi là DigitalsMod AI Coach của Glowmax. Bạn cần tư vấn bài tập hay quy trình chăm sóc hôm nay?</div>
         </div>
         <div style="display: flex; gap: 8px;">
             <input type="text" id="chatInput" style="flex:1; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: var(--radius-small); color: #fff; outline: none;" placeholder="Nhập câu hỏi...">
@@ -1281,7 +1334,7 @@
     import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // Đoạn cấu hình Firebase chính thức từ yêu cầu của bạn
+    // Cấu hình Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
       authDomain: "quocdat-396fe.firebaseapp.com",
@@ -1335,7 +1388,7 @@
     onSnapshot(configRef, (snap) => {
         if (snap.exists() && snap.data().apiKey) {
             activeApiKey = snap.data().apiKey;
-            document.getElementById('aiStatusBadge').innerText = "Glowmax AI Ready";
+            document.getElementById('aiStatusBadge').innerText = "DigitalsMod AI Ready";
         } else {
             activeApiKey = null;
             document.getElementById('aiStatusBadge').innerText = "Chưa cấu hình API Key";
@@ -1380,13 +1433,14 @@
         stream: null,
         facingMode: 'user',
         currentResult: null,
-        analysisTimer: null
+        analysisTimer: null,
+        guideAnimFrame: null
     };
 
     const STEP_INFO = [
-        { title: "FRONT (Chính diện)", desc: "Giữ đầu thẳng, nhìn trực tiếp vào camera" },
-        { title: "30° ANGLE (Góc nghiêng)", desc: "Xoay mặt nhẹ 30° sang trái hoặc phải" },
-        { title: "PROFILE (Góc 90°)", desc: "Xoay mặt ngang hoàn toàn vuông góc" }
+        { title: "FRONT (Chính diện 0°)", desc: "Giữ đầu thẳng, nhìn trực tiếp vào camera" },
+        { title: "30° LEFT (Nghiêng trái)", desc: "Xoay mặt nhẹ ~30° sang bên trái" },
+        { title: "30° RIGHT (Nghiêng phải)", desc: "Xoay mặt nhẹ ~30° sang bên phải" }
     ];
 
     const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -1503,7 +1557,7 @@
         
         if (state.photos[step]) {
             btnNext.disabled = false;
-            btnNext.innerText = step === 2 ? "BẮT ĐẦU PHÂN TÍCH" : "LƯU & TIẾP TỤC";
+            btnNext.innerText = step === 2 ? "BẮT ĐẦU PHÂN TÍCH DIGITALSMOD AI" : "LƯU & TIẾP TỤC";
             btnSkip.style.display = 'none';
         } else {
             btnNext.disabled = true;
@@ -1536,8 +1590,8 @@
                 <div class="capture-title">${STEP_INFO[state.currentStep].title}</div>
                 <div class="capture-desc">${STEP_INFO[state.currentStep].desc}</div>
                 <div style="display: flex; gap: 10px; width: 100%; max-width: 280px;">
-                    <button class="btn-secondary" style="flex:1; padding: 12px;" onclick="triggerFileInput()">Tải Ảnh</button>
-                    <button style="flex:1; padding: 12px;" onclick="openCamera()">Mở Camera</button>
+                    <button class="btn-secondary" style="flex:1; padding: 12px;" onclick="triggerFileInput()">🖼️ Tải Ảnh</button>
+                    <button style="flex:1; padding: 12px;" onclick="requestCameraPermission()">📷 Quét Camera</button>
                 </div>
             `;
         }
@@ -1552,7 +1606,7 @@
         if (state.currentStep < 2) {
             state.currentStep++;
             updateWizardUI();
-            if (!state.photos[state.currentStep]) openCamera();
+            if (!state.photos[state.currentStep]) requestCameraPermission();
         } else {
             startAnalysis();
         }
@@ -1563,7 +1617,7 @@
             state.photos[state.currentStep] = null;
             state.currentStep++;
             updateWizardUI();
-            if (!state.photos[state.currentStep]) openCamera();
+            if (!state.photos[state.currentStep]) requestCameraPermission();
         }
     }
 
@@ -1591,16 +1645,33 @@
         event.target.value = '';
     }
 
-    /* --- CAMERA HANDLING --- */
+    /* --- CAMERA PERMISSION & STREAM HANDLING --- */
+    function requestCameraPermission() {
+        document.getElementById('cameraPermissionModal').style.display = 'flex';
+    }
+
+    function closePermissionModal() {
+        document.getElementById('cameraPermissionModal').style.display = 'none';
+    }
+
+    function confirmCameraPermission() {
+        closePermissionModal();
+        openCamera();
+    }
+
     async function openCamera() {
         const modal = document.getElementById('cameraModal');
+        document.getElementById('camTitleHeader').innerText = STEP_INFO[state.currentStep].title;
         document.getElementById('camInstruction').innerText = STEP_INFO[state.currentStep].desc;
         modal.style.display = 'flex';
         await startStream();
+        start3DFaceGuideAnimation();
     }
 
     async function startStream() {
-        if (state.stream) state.stream.getTracks().forEach(track => track.stop());
+        if (state.stream) {
+            state.stream.getTracks().forEach(track => track.stop());
+        }
         try {
             const constraints = { video: { facingMode: state.facingMode, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false };
             state.stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -1608,7 +1679,7 @@
             video.srcObject = state.stream;
             video.style.transform = state.facingMode === 'user' ? 'scaleX(-1)' : 'none';
         } catch (err) {
-            alert("Lỗi truy cập camera: " + err.message);
+            alert("Không thể truy cập Camera. Vui lòng cho phép quyền ứng dụng và thử lại!");
             closeCamera();
         }
     }
@@ -1624,6 +1695,82 @@
             state.stream.getTracks().forEach(track => track.stop());
             state.stream = null;
         }
+        if (state.guideAnimFrame) {
+            cancelAnimationFrame(state.guideAnimFrame);
+            state.guideAnimFrame = null;
+        }
+    }
+
+    /* --- 3D FACE GUIDE ANIMATION OVERLAY --- */
+    function start3DFaceGuideAnimation() {
+        const canvas = document.getElementById('faceGuideCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let angle = 0;
+
+        function renderGuide() {
+            canvas.width = canvas.clientWidth;
+            canvas.height = canvas.clientHeight;
+            const w = canvas.width, h = canvas.height;
+            const cx = w / 2, cy = h / 2 - 10;
+            const rx = w * 0.32, ry = h * 0.42;
+
+            ctx.clearRect(0, 0, w, h);
+            angle += 0.03;
+            const floatOffset = Math.sin(angle) * 3;
+
+            // Soft Glow Outer Head Outline
+            ctx.save();
+            ctx.beginPath();
+            ctx.ellipse(cx, cy + floatOffset, rx, ry, 0, 0, 2 * Math.PI);
+            ctx.strokeStyle = "rgba(10, 132, 255, 0.65)";
+            ctx.lineWidth = 2;
+            ctx.setLineDash([8, 6]);
+            ctx.shadowColor = "#0A84FF";
+            ctx.shadowBlur = 12;
+            ctx.stroke();
+            ctx.restore();
+
+            // Facial Center Guidelines
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+            ctx.lineWidth = 1;
+            ctx.setLineDash([]);
+            
+            // Vertical Line
+            ctx.beginPath();
+            ctx.moveTo(cx, cy - ry + floatOffset);
+            ctx.lineTo(cx, cy + ry + floatOffset);
+            ctx.stroke();
+
+            // Eye Level Line
+            ctx.beginPath();
+            ctx.moveTo(cx - rx * 0.8, cy - ry * 0.1 + floatOffset);
+            ctx.lineTo(cx + rx * 0.8, cy - ry * 0.1 + floatOffset);
+            ctx.stroke();
+
+            // 3D Landmark Points (Eyes, Nose, Mouth)
+            const pts = [
+                { x: cx - rx * 0.35, y: cy - ry * 0.1 },
+                { x: cx + rx * 0.35, y: cy - ry * 0.1 },
+                { x: cx, y: cy + ry * 0.15 },
+                { x: cx - rx * 0.25, y: cy + ry * 0.45 },
+                { x: cx + rx * 0.25, y: cy + ry * 0.45 }
+            ];
+
+            pts.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y + floatOffset, 3.5, 0, 2 * Math.PI);
+                ctx.fillStyle = "#30D158";
+                ctx.shadowColor = "#30D158";
+                ctx.shadowBlur = 8;
+                ctx.fill();
+            });
+
+            state.guideAnimFrame = requestAnimationFrame(renderGuide);
+        }
+
+        if (state.guideAnimFrame) cancelAnimationFrame(state.guideAnimFrame);
+        renderGuide();
     }
 
     function takeSnapshot() {
@@ -1636,15 +1783,21 @@
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         const ctx = canvas.getContext('2d');
+
         if (state.facingMode === 'user') {
             ctx.translate(canvas.width, 0);
             ctx.scale(-1, 1);
         }
+
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
         const base64 = dataUrl.split(',')[1];
         state.photos[state.currentStep] = { base64: base64, mime: 'data:image/jpeg;base64', size: Math.round((base64.length * 3) / 4) };
-        setTimeout(() => { closeCamera(); updateWizardUI(); }, 150);
+
+        setTimeout(() => { 
+            closeCamera(); 
+            updateWizardUI(); 
+        }, 150);
     }
 
     /* --- REALTIME SCANNING ANIMATION --- */
@@ -1657,7 +1810,7 @@
         const loadingText = document.getElementById('loadingText');
 
         const steps = [
-            { pct: 15, text: "INITIALIZING AI SCANNER...", lm: "68 POINTS", sym: "MAPPING", jaw: "WAITING", rat: "WAITING" },
+            { pct: 15, text: "DIGITALMOD AI INITIALIZING...", lm: "68 POINTS", sym: "MAPPING", jaw: "WAITING", rat: "WAITING" },
             { pct: 35, text: "DETECTING FACIAL LANDMARKS...", lm: "DETECTED", sym: "ANALYZING", jaw: "MAPPING", rat: "WAITING" },
             { pct: 60, text: "MAPPING FACIAL GEOMETRY...", lm: "DETECTED", sym: "CALCULATED", jaw: "88° CORNER", rat: "ANALYZING" },
             { pct: 85, text: "GENERATING LOOKSMAX PROTOCOL...", lm: "DETECTED", sym: "CALCULATED", jaw: "88° CORNER", rat: "GOLDEN 1:1.6" },
@@ -1687,7 +1840,7 @@
         }, interval);
     }
 
-    /* --- GEMINI AI ANALYSIS --- */
+    /* --- GEMINI / DIGITALMOD AI ANALYSIS --- */
     async function startAnalysis() {
         const apiKey = window.getGlobalApiKey ? window.getGlobalApiKey() : null;
         if (!apiKey) {
@@ -1706,7 +1859,7 @@
         try {
             const parts = [];
             const promptInstruction = `
-            Đóng vai chuyên gia thẩm mỹ (Looksmaxxing AI). 
+            Đóng vai chuyên gia thẩm mỹ DigitalsMod AI (Looksmaxxing AI Engine). 
             TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (Không dùng markdown, không giải thích thêm):
             {
               "overall_score": 80, "face_shape": "Oval", "symmetry_score": 85, "proportion_score": 80, "skin_score": 75, "eyes_score": 88, "eyebrows_score": 82, "nose_score": 79, "lips_score": 84, "jawline_score": 86, "chin_score": 80, "hair_score": 83,
@@ -1717,7 +1870,7 @@
             }`;
             parts.push({ text: promptInstruction });
 
-            const angles = ["FRONT", "30°", "PROFILE"];
+            const angles = ["FRONT", "30° LEFT", "30° RIGHT"];
             for (let i = 0; i < 3; i++) {
                 if (state.photos[i]) {
                     const compressed = await compressImage(state.photos[i].base64);
@@ -1735,11 +1888,11 @@
 
             if (!response.ok) {
                 const errJson = await response.json();
-                throw new Error(errJson.error?.message || `Lỗi từ Gemini API (${response.status})`);
+                throw new Error(errJson.error?.message || `Lỗi từ DigitalsMod AI Engine (${response.status})`);
             }
 
             const data = await response.json();
-            if (!data.candidates || data.candidates.length === 0) throw new Error("AI không phản hồi dữ liệu.");
+            if (!data.candidates || data.candidates.length === 0) throw new Error("DigitalsMod AI không phản hồi dữ liệu.");
 
             const rawText = data.candidates[0].content.parts[0].text;
             const resultData = parseAIJsonResponse(rawText);
@@ -1986,7 +2139,7 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    contents: [{ parts: [{ text: `Bạn là AI Coach tư vấn diện mạo Glowmax. Trả lời ngắn gọn, chân thành, khuyến khích bài tập posture/grooming/skincare an toàn: ${text}` }] }]
+                    contents: [{ parts: [{ text: `Bạn là DigitalsMod AI Coach tư vấn diện mạo Glowmax. Trả lời ngắn gọn, chân thành, khuyến khích bài tập posture/grooming/skincare an toàn: ${text}` }] }]
                 })
             });
             const data = await res.json();
