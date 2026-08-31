@@ -5,20 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>DIGITALSHOP - Hệ Thống Cung Cấp Dịch Vụ & Tài Khoản Game Tự Động</title>
 
-    <!-- Google AdSense Code -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9027610508064536" crossorigin="anonymous"></script>
 
-    <!-- ADSTERRA: Popunder Code -->
     <script src="https://pl31118161.profitableratecpmnetwork.com/c3/77/29/c377293fa2e4da0d9621a9f8fd7f0550.js"></script>
-
-    <!-- ADSTERRA: SocialBar Code -->
-    <script src="https://pl31118162.profitableratecpmnetwork.com/23/7f/f6/237ff623f13acdec1211c0f23abceb9e.js"></script>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- hCaptcha SDK -->
     <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
-    <!-- Google Identity Services SDK -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
@@ -75,12 +68,9 @@
 </head>
 <body class="text-slate-100 flex flex-col min-h-full bg-slate-950 selection:bg-orange-600 selection:text-white">
 
-    <!-- FULLSCREEN INITIAL LOADING SCREEN -->
     <div id="preloader" class="fixed inset-0 z-[99999] bg-slate-950 flex flex-col items-center justify-center space-y-6">
         <div class="relative w-28 h-28 flex items-center justify-center">
-            <!-- Thanh Load Viền Ngoài -->
             <div class="spinner-ring absolute inset-0 w-full h-full shadow-lg shadow-orange-500/20"></div>
-            <!-- Chữ DS Trung Tâm Phát Sáng -->
             <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-orange-600 to-amber-500 flex items-center justify-center font-black text-white text-2xl shadow-xl shadow-amber-500/30 animate-pulse">
                 DS
             </div>
@@ -93,7 +83,6 @@
 
     <div id="toast-container" class="fixed top-5 right-5 left-5 sm:left-auto z-[9999] space-y-3 pointer-events-none"></div>
 
-    <!-- HEADER -->
     <header class="sticky top-0 z-40 w-full border-b border-slate-800 glass-header">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
@@ -119,9 +108,7 @@
         </div>
     </header>
 
-    <!-- MAIN -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
-        <!-- BANNER -->
         <section class="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-800 bg-gradient-to-br from-slate-900 via-amber-950/30 to-slate-900 p-6 sm:p-10 shadow-2xl">
             <div class="relative z-10 max-w-2xl space-y-3 sm:space-y-4">
                 <div class="inline-flex items-center gap-2 bg-orange-500/10 border border-orange-500/20 text-orange-400 text-[10px] sm:text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">
@@ -137,21 +124,25 @@
             </div>
         </section>
 
-        <!-- ADSTERRA: Banner 160x300 -->
-        <div class="flex justify-center my-4 overflow-hidden">
-            <script type="text/javascript">
-                atOptions = {
-                    'key' : '54a53d5ecd42baaf318262e29c098240',
-                    'format' : 'iframe',
-                    'height' : 300,
-                    'width' : 160,
-                    'params' : {}
-                };
-            </script>
-            <script type="text/javascript" src="https://www.highrevenueformat.com/54a53d5ecd42baaf318262e29c098240/invoke.js"></script>
+        <div id="ad-banner-box" class="relative max-w-xl mx-auto glass-card p-3 rounded-2xl border border-slate-800 flex flex-col items-center justify-center my-4 transition-all">
+            <div class="w-full flex justify-between items-center mb-2 px-1 border-b border-slate-800/60 pb-1">
+                <span class="text-[10px] uppercase font-bold text-slate-500 tracking-wider"><i class="fa-solid fa-rectangle-ad text-amber-500 mr-1"></i> Quảng Cáo Khách Hàng</span>
+                <button onclick="document.getElementById('ad-banner-box').style.display='none'" class="text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 w-5 h-5 rounded-full flex items-center justify-center text-xs transition" title="Tắt quảng cáo">&times;</button>
+            </div>
+            <div class="overflow-hidden flex justify-center">
+                <script type="text/javascript">
+                    atOptions = {
+                        'key' : '54a53d5ecd42baaf318262e29c098240',
+                        'format' : 'iframe',
+                        'height' : 300,
+                        'width' : 160,
+                        'params' : {}
+                    };
+                </script>
+                <script type="text/javascript" src="https://www.highrevenueformat.com/54a53d5ecd42baaf318262e29c098240/invoke.js"></script>
+            </div>
         </div>
 
-        <!-- 2 NÚT NỔI BẬT (Tích hợp Smartlink Adsterra) -->
         <section class="space-y-3 sm:space-y-4">
             <a href="https://www.profitableratecpmnetwork.com/wyz54mnzj?key=9aa535a9480e8308f5caac92971eebfc" target="_blank" class="btn-glow-amber group relative flex items-center justify-between p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 border-2 border-amber-400/80 hover:scale-[1.01] active:scale-[0.99] transition duration-300">
                 <div class="flex items-center gap-3 sm:gap-4">
@@ -194,7 +185,6 @@
             </a>
         </section>
 
-        <!-- DANH MỤC SẢN PHẨM -->
         <section id="categories-section" class="space-y-4 pt-2">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                 <h2 class="text-lg sm:text-xl font-black text-white flex items-center gap-2">
@@ -207,7 +197,6 @@
             </div>
         </section>
 
-        <!-- SẢN PHẨM -->
         <section id="products-section" class="space-y-6 pt-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
                 <div class="flex items-center gap-3">
@@ -235,7 +224,6 @@
         </section>
     </main>
 
-    <!-- FOOTER CHUẨN ADSENSE -->
     <footer class="bg-slate-900/80 border-t border-slate-800 mt-16 py-10">
         <div class="max-w-7xl mx-auto px-4 space-y-6">
             <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left border-b border-slate-800 pb-6">
@@ -259,8 +247,6 @@
         </div>
     </footer>
 
-    <!-- MODALS -->
-    <!-- LOGIN MODAL -->
     <div id="modal-login" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden">
         <div class="glass-modal border border-slate-800 rounded-2xl max-w-md w-full p-5 sm:p-6 space-y-5 max-h-[90vh] overflow-y-auto custom-scrollbar">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -323,7 +309,6 @@
         </div>
     </div>
 
-    <!-- MODAL QUÊN MẬT KHẨU -->
     <div id="modal-forgot-password" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden">
         <div class="glass-modal border border-slate-800 rounded-2xl max-w-md w-full p-5 sm:p-6 space-y-5">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -355,7 +340,6 @@
         </div>
     </div>
 
-    <!-- REGISTER MODAL -->
     <div id="modal-register" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden">
         <div class="glass-modal border border-slate-800 rounded-2xl max-w-md w-full p-5 sm:p-6 space-y-5 max-h-[90vh] overflow-y-auto custom-scrollbar">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -394,7 +378,6 @@
         </div>
     </div>
 
-    <!-- MODAL GIỚI THIỆU (ABOUT US - BẮT BUỘC ADSENSE) -->
     <div id="modal-about" class="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden">
         <div class="glass-modal border border-slate-800 rounded-2xl max-w-2xl w-full p-5 sm:p-6 space-y-4 max-h-[85vh] flex flex-col">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3 shrink-0">
@@ -419,7 +402,6 @@
         </div>
     </div>
 
-    <!-- MODAL CHÍNH SÁCH BẢO MẬT (PRIVACY POLICY - BẮT BUỘC ADSENSE) -->
     <div id="modal-privacy" class="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden">
         <div class="glass-modal border border-slate-800 rounded-2xl max-w-2xl w-full p-5 sm:p-6 space-y-4 max-h-[85vh] flex flex-col">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3 shrink-0">
@@ -446,7 +428,6 @@
         </div>
     </div>
 
-    <!-- MODAL LIÊN HỆ (CONTACT US - BẮT BUỘC ADSENSE) -->
     <div id="modal-contact" class="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden">
         <div class="glass-modal border border-slate-800 rounded-2xl max-w-md w-full p-5 sm:p-6 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -476,7 +457,6 @@
         </div>
     </div>
 
-    <!-- TERMS & CONDITIONS MODAL -->
     <div id="modal-terms" class="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden">
         <div class="glass-modal border border-slate-800 rounded-2xl max-w-2xl w-full p-5 sm:p-6 space-y-4 max-h-[85vh] flex flex-col">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3 shrink-0">
@@ -520,7 +500,6 @@
         </div>
     </div>
 
-    <!-- SYSTEM POPUP MODAL -->
     <div id="modal-system-popup" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/80 hidden">
         <div class="glass-modal border border-sky-500/50 rounded-2xl w-full max-w-md p-6 relative shadow-[0_0_40px_rgba(14,165,233,0.3)] transform transition-transform scale-95 opacity-0 duration-300" id="popup-content-box">
             <div class="text-center mb-4 pt-2">
@@ -536,7 +515,6 @@
         </div>
     </div>
 
-    <!-- DEPOSIT HISTORY MODAL -->
     <div id="modal-deposit-history" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden">
         <div class="glass-modal border border-slate-800 rounded-2xl max-w-4xl w-full p-4 sm:p-6 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -556,7 +534,6 @@
         </div>
     </div>
 
-    <!-- ORDER HISTORY MODAL -->
     <div id="modal-order-history" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden">
         <div class="glass-modal border border-slate-800 rounded-2xl max-w-4xl w-full p-4 sm:p-6 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -576,7 +553,6 @@
         </div>
     </div>
 
-    <!-- CONFIRM PURCHASE MODAL -->
     <div id="modal-confirm-purchase" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden">
         <div class="glass-modal border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-5 text-center">
             <div class="w-16 h-16 bg-yellow-500/20 text-yellow-400 rounded-full flex items-center justify-center mx-auto text-3xl">
@@ -591,7 +567,6 @@
         </div>
     </div>
 
-    <!-- PURCHASE SUCCESS MODAL -->
     <div id="modal-purchase-success" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden">
         <div class="glass-modal border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-5 text-center">
             <div class="w-16 h-16 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center mx-auto text-3xl animate-bounce">
@@ -608,7 +583,6 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT FIXED ENGINE -->
     <script>
         const FIREBASE_PROJECT_ID = "quocdat-396fe";
         const BASE_URL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
@@ -639,7 +613,6 @@
             }
         }
 
-        // Wrapper bọc timeout cho các API Fetch để tránh nghẽn
         function fetchWithTimeout(promise, ms = 2500) {
             const timeout = new Promise((_, reject) =>
                 setTimeout(() => reject(new Error('Request Timeout')), ms)
@@ -946,7 +919,6 @@
         }
 
         async function fetchStoreData() {
-            // TIMEOUT TOÀN CỤC DỰ PHÒNG: Ép buộc tắt preloader sau tối đa 2.5s bất kể lỗi/treo API
             const forceHideTimeout = setTimeout(() => {
                 hidePreloader();
             }, 2500);
@@ -968,7 +940,6 @@
                     } catch(e) {}
                 }
 
-                // Tải danh mục và sản phẩm đồng thời bằng Promise.allSettled để tránh nghẽn
                 const [catResult, prodResult] = await Promise.allSettled([
                     fetchWithTimeout(fetch(`${BASE_URL}/categories?pageSize=100`), 2000),
                     fetchWithTimeout(fetch(`${BASE_URL}/products?pageSize=100`), 2000)
@@ -1010,8 +981,7 @@
                 showToast('Không thể đồng bộ nhanh từ hệ thống, đang hiển thị chế độ offline.', 'error');
             } finally {
                 clearTimeout(forceHideTimeout);
-                hidePreloader(); // Đảm bảo preloader luôn luôn ẩn đi
-                // Tải Popups ở background không chặn giao diện
+                hidePreloader();
                 fetchSystemPopups().catch(() => {});
             }
         }
@@ -1424,7 +1394,6 @@
             showToast('Đã đăng xuất thành công!', 'info');
         }
 
-        // Tự động giải phóng Preloader dự phòng cuối cùng từ Event Listener
         document.addEventListener('DOMContentLoaded', () => {
             renderHeaderAuth();
             fetchStoreData();
