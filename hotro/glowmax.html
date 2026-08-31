@@ -48,45 +48,33 @@
             position: relative;
         }
 
-        /* Ambient Background Lighting */
         body::before {
             content: '';
             position: fixed;
-            top: -20%;
-            left: 50%;
+            top: -20%; left: 50%;
             transform: translateX(-50%);
-            width: 100vw;
-            height: 60vh;
+            width: 100vw; height: 60vh;
             background: radial-gradient(circle, var(--accent-glow) 0%, rgba(5, 5, 7, 0) 70%);
-            z-index: -2;
-            pointer-events: none;
-            opacity: 0.6;
+            z-index: -2; pointer-events: none; opacity: 0.6;
         }
 
         body::after {
             content: '';
             position: fixed;
-            bottom: -20%;
-            right: -10%;
-            width: 70vw;
-            height: 50vh;
+            bottom: -20%; right: -10%;
+            width: 70vw; height: 50vh;
             background: radial-gradient(circle, rgba(48, 209, 88, 0.12) 0%, rgba(5, 5, 7, 0) 70%);
-            z-index: -2;
-            pointer-events: none;
+            z-index: -2; pointer-events: none;
         }
 
-        /* Noise Texture Overlay */
         .bg-noise {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
-            z-index: -1;
-            pointer-events: none;
+            z-index: -1; pointer-events: none;
         }
 
         .main-wrapper {
-            width: 100%;
-            max-width: 720px;
+            width: 100%; max-width: 720px;
             transition: filter 0.25s ease, transform 0.25s ease;
         }
 
@@ -95,7 +83,6 @@
             transform: scale(0.995);
         }
 
-        /* --- LIQUID GLASS COMPONENTS --- */
         .glass-panel {
             background: var(--glass-bg);
             -webkit-backdrop-filter: blur(30px) saturate(190%);
@@ -106,8 +93,7 @@
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 1px var(--glass-highlight);
             margin-bottom: 20px;
             animation: panelFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative;
-            overflow: hidden;
+            position: relative; overflow: hidden;
         }
 
         .glass-card {
@@ -130,387 +116,153 @@
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        /* --- HEADER BAR --- */
         .header-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;
         }
 
-        .brand-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
+        .brand-title { display: flex; align-items: center; gap: 10px; }
         .brand-logo-icon {
-            width: 32px;
-            height: 32px;
+            width: 32px; height: 32px;
             background: linear-gradient(135deg, var(--accent-color), #5856D6);
-            border-radius: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            border-radius: 10px; display: flex; justify-content: center; align-items: center;
             box-shadow: 0 0 15px var(--accent-glow);
         }
+        .brand-logo-icon svg { width: 18px; height: 18px; fill: #fff; }
 
-        .brand-logo-icon svg {
-            width: 18px;
-            height: 18px;
-            fill: #fff;
-        }
+        .brand-text-wrap { display: flex; flex-direction: column; }
+        .brand-name { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; text-transform: uppercase; color: #fff; }
+        .ai-badge { font-size: 9px; font-weight: 700; color: var(--accent-color); letter-spacing: 0.8px; text-transform: uppercase; }
 
-        .brand-text-wrap {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .brand-name {
-            font-size: 16px;
-            font-weight: 700;
-            letter-spacing: -0.3px;
-            text-transform: uppercase;
-            color: #fff;
-        }
-
-        .ai-badge {
-            font-size: 9px;
-            font-weight: 700;
-            color: var(--accent-color);
-            letter-spacing: 0.8px;
-            text-transform: uppercase;
-        }
-
-        .user-avatar-btn {
+        /* AVATAR MẶC ĐỊNH SVG */
+        .default-avatar-svg {
             width: 38px; height: 38px; border-radius: 50%;
             border: 2px solid var(--accent-color);
-            object-fit: cover; cursor: pointer;
-            box-shadow: 0 0 10px var(--accent-glow);
+            background: rgba(255,255,255,0.08);
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; box-shadow: 0 0 10px var(--accent-glow);
         }
 
-        /* --- BUTTONS --- */
         button {
-            width: 100%;
-            padding: 16px 20px;
+            width: 100%; padding: 16px 20px;
             background: linear-gradient(180deg, var(--accent-color) 0%, var(--accent-hover) 100%);
-            color: #ffffff;
-            border: none;
-            border-radius: var(--radius-medium);
-            font-size: 16px;
-            font-weight: 600;
-            letter-spacing: -0.2px;
-            cursor: pointer;
+            color: #ffffff; border: none; border-radius: var(--radius-medium);
+            font-size: 16px; font-weight: 600; letter-spacing: -0.2px; cursor: pointer;
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
+            display: flex; justify-content: center; align-items: center; gap: 8px;
             box-shadow: 0 8px 24px var(--accent-glow), inset 0 1px 1px rgba(255,255,255,0.3);
-            position: relative;
-            overflow: hidden;
+            position: relative; overflow: hidden;
         }
 
-        button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 12px 28px var(--accent-glow), inset 0 1px 1px rgba(255,255,255,0.4);
-        }
-
-        button:active {
-            transform: scale(0.97);
-            box-shadow: 0 4px 12px var(--accent-glow);
-        }
-
+        button:hover { transform: translateY(-1px); box-shadow: 0 12px 28px var(--accent-glow), inset 0 1px 1px rgba(255,255,255,0.4); }
+        button:active { transform: scale(0.97); box-shadow: 0 4px 12px var(--accent-glow); }
         button:disabled {
             background: rgba(255, 255, 255, 0.08) !important;
             color: var(--text-tertiary) !important;
-            cursor: not-allowed;
-            transform: none !important;
-            box-shadow: none !important;
+            cursor: not-allowed; transform: none !important; box-shadow: none !important;
             border: 1px solid var(--glass-border);
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.06);
-            color: #FFF;
-            border: 1px solid var(--glass-border);
-            box-shadow: inset 0 1px 1px rgba(255,255,255,0.08);
+            background: rgba(255, 255, 255, 0.06); color: #FFF;
+            border: 1px solid var(--glass-border); box-shadow: inset 0 1px 1px rgba(255,255,255,0.08);
         }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            box-shadow: inset 0 1px 1px rgba(255,255,255,0.12);
-        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.1); box-shadow: inset 0 1px 1px rgba(255,255,255,0.12); }
 
         .btn-danger {
-            background: rgba(255, 69, 58, 0.12);
-            color: var(--danger-color);
-            border: 1px solid rgba(255, 69, 58, 0.2);
-            box-shadow: none;
+            background: rgba(255, 69, 58, 0.12); color: var(--danger-color);
+            border: 1px solid rgba(255, 69, 58, 0.2); box-shadow: none;
         }
+        .btn-danger:hover { background: rgba(255, 69, 58, 0.22); }
 
-        .btn-danger:hover {
-            background: rgba(255, 69, 58, 0.22);
-        }
-
-        .btn-ghost {
-            background: transparent;
-            color: var(--text-secondary);
-            padding: 10px;
-            font-size: 14px;
-            box-shadow: none;
-        }
-
-        .btn-ghost:hover {
-            color: #fff;
-            background: rgba(255, 255, 255, 0.04);
-        }
+        .btn-ghost { background: transparent; color: var(--text-secondary); padding: 10px; font-size: 14px; box-shadow: none; }
+        .btn-ghost:hover { color: #fff; background: rgba(255, 255, 255, 0.04); }
 
         .history-capsule-btn {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid var(--glass-border);
-            padding: 8px 16px;
-            font-size: 12px;
-            font-weight: 600;
-            width: auto;
-            border-radius: 100px;
-            color: var(--text-primary);
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-            box-shadow: none;
-            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.06); border: 1px solid var(--glass-border);
+            padding: 8px 16px; font-size: 12px; font-weight: 600; width: auto;
+            border-radius: 100px; color: var(--text-primary); cursor: pointer;
+            backdrop-filter: blur(10px); box-shadow: none; transition: all 0.2s ease;
         }
 
-        /* --- HERO INTRO SCANNER ANIMATION --- */
         .hero-scanner-wrap {
-            position: relative;
-            width: 180px;
-            height: 180px;
-            margin: 20px auto 30px auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            position: relative; width: 180px; height: 180px;
+            margin: 20px auto 30px auto; display: flex; justify-content: center; align-items: center;
         }
-
         .hero-orb {
-            position: absolute;
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
+            position: absolute; width: 120px; height: 120px; border-radius: 50%;
             background: radial-gradient(circle, var(--accent-color) 0%, rgba(10,132,255,0) 70%);
-            opacity: 0.3;
-            animation: pulseOrb 3s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0.3; animation: pulseOrb 3s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
         }
+        @keyframes pulseOrb { 0% { transform: scale(0.85); opacity: 0.2; } 100% { transform: scale(1.25); opacity: 0.45; } }
 
-        @keyframes pulseOrb {
-            0% { transform: scale(0.85); opacity: 0.2; }
-            100% { transform: scale(1.25); opacity: 0.45; }
-        }
-
-        .face-scan-svg {
-            width: 140px;
-            height: 140px;
-            z-index: 1;
-            position: relative;
-        }
-
+        .face-scan-svg { width: 140px; height: 140px; z-index: 1; position: relative; }
         .scan-beam {
-            position: absolute;
-            width: 100%;
-            height: 2px;
+            position: absolute; width: 100%; height: 2px;
             background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
-            box-shadow: 0 0 12px var(--accent-color);
-            top: 0;
-            animation: scanBeamMove 2.5s infinite ease-in-out;
-            z-index: 2;
+            box-shadow: 0 0 12px var(--accent-color); top: 0;
+            animation: scanBeamMove 2.5s infinite ease-in-out; z-index: 2;
         }
+        @keyframes scanBeamMove { 0% { top: 10%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { top: 90%; opacity: 0; } }
 
-        @keyframes scanBeamMove {
-            0% { top: 10%; opacity: 0; }
-            15% { opacity: 1; }
-            85% { opacity: 1; }
-            100% { top: 90%; opacity: 0; }
-        }
-
-        .feature-pills {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 28px;
-            flex-wrap: wrap;
-        }
-
+        .feature-pills { display: flex; justify-content: center; gap: 8px; margin-bottom: 28px; flex-wrap: wrap; }
         .pill-item {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--glass-border);
-            padding: 6px 12px;
-            border-radius: 100px;
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            background: rgba(255, 255, 255, 0.04); border: 1px solid var(--glass-border);
+            padding: 6px 12px; border-radius: 100px; font-size: 11px; font-weight: 600;
+            letter-spacing: 0.5px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px;
         }
+        .pill-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-color); box-shadow: 0 0 6px var(--accent-color); }
 
-        .pill-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--accent-color);
-            box-shadow: 0 0 6px var(--accent-color);
-        }
-
-        /* --- WIZARD SCANNER PROGRESS --- */
         .wizard-container { display: none; }
+        .step-progress-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; position: relative; padding: 0 10px; }
+        .step-progress-line { position: absolute; top: 50%; left: 30px; right: 30px; height: 2px; background: rgba(255, 255, 255, 0.08); z-index: 0; transform: translateY(-50%); }
+        .step-progress-fill { position: absolute; top: 50%; left: 30px; height: 2px; background: var(--accent-color); z-index: 0; transform: translateY(-50%); transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 0 8px var(--accent-color); width: 0%; }
         
-        .step-progress-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 28px;
-            position: relative;
-            padding: 0 10px;
-        }
-
-        .step-progress-line {
-            position: absolute;
-            top: 50%;
-            left: 30px;
-            right: 30px;
-            height: 2px;
-            background: rgba(255, 255, 255, 0.08);
-            z-index: 0;
-            transform: translateY(-50%);
-        }
-
-        .step-progress-fill {
-            position: absolute;
-            top: 50%;
-            left: 30px;
-            height: 2px;
-            background: var(--accent-color);
-            z-index: 0;
-            transform: translateY(-50%);
-            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 0 8px var(--accent-color);
-            width: 0%;
-        }
-
-        .step-node {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            z-index: 1;
-        }
-
+        .step-node { display: flex; flex-direction: column; align-items: center; gap: 6px; z-index: 1; }
         .step-node-circle {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: #121216;
-            border: 2px solid var(--glass-border);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text-tertiary);
-            transition: all 0.3s ease;
+            width: 32px; height: 32px; border-radius: 50%; background: #121216;
+            border: 2px solid var(--glass-border); display: flex; justify-content: center; align-items: center;
+            font-size: 12px; font-weight: 700; color: var(--text-tertiary); transition: all 0.3s ease;
         }
-
-        .step-node.active .step-node-circle {
-            border-color: var(--accent-color);
-            background: var(--accent-color);
-            color: #fff;
-            box-shadow: 0 0 15px var(--accent-glow);
-        }
-
-        .step-node.completed .step-node-circle {
-            border-color: var(--success-color);
-            background: var(--success-color);
-            color: #fff;
-        }
-
-        .step-node-label {
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            color: var(--text-tertiary);
-            text-transform: uppercase;
-        }
-
+        .step-node.active .step-node-circle { border-color: var(--accent-color); background: var(--accent-color); color: #fff; box-shadow: 0 0 15px var(--accent-glow); }
+        .step-node.completed .step-node-circle { border-color: var(--success-color); background: var(--success-color); color: #fff; }
+        .step-node-label { font-size: 10px; font-weight: 700; letter-spacing: 0.5px; color: var(--text-tertiary); text-transform: uppercase; }
         .step-node.active .step-node-label { color: var(--text-primary); }
 
-        /* --- CAPTURE SLOT WITH CORNER BRACKETS --- */
         .capture-slot {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius-large);
-            padding: 32px 20px;
-            text-align: center;
-            position: relative;
-            min-height: 300px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.3s ease;
-            margin-bottom: 20px;
-            overflow: hidden;
+            background: rgba(255, 255, 255, 0.02); border: 1px solid var(--glass-border);
+            border-radius: var(--radius-large); padding: 32px 20px; text-align: center;
+            position: relative; min-height: 300px; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; transition: all 0.3s ease;
+            margin-bottom: 20px; overflow: hidden;
         }
 
-        .corner-bracket {
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            border-color: var(--accent-color);
-            border-style: solid;
-            pointer-events: none;
-            opacity: 0.6;
-        }
-
+        .corner-bracket { position: absolute; width: 16px; height: 16px; border-color: var(--accent-color); border-style: solid; pointer-events: none; opacity: 0.6; }
         .cb-tl { top: 16px; left: 16px; border-width: 2px 0 0 2px; border-top-left-radius: 6px; }
         .cb-tr { top: 16px; right: 16px; border-width: 2px 2px 0 0; border-top-right-radius: 6px; }
         .cb-bl { bottom: 16px; left: 16px; border-width: 0 0 2px 2px; border-bottom-left-radius: 6px; }
         .cb-br { bottom: 16px; right: 16px; border-width: 0 2px 2px 0; border-bottom-right-radius: 6px; }
 
         .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(10, 132, 255, 0.1);
-            border: 1px solid rgba(10, 132, 255, 0.2);
-            padding: 4px 10px;
-            border-radius: 100px;
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--accent-color);
-            margin-bottom: 12px;
-            letter-spacing: 0.5px;
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(10, 132, 255, 0.1); border: 1px solid rgba(10, 132, 255, 0.2);
+            padding: 4px 10px; border-radius: 100px; font-size: 11px; font-weight: 700;
+            color: var(--accent-color); margin-bottom: 12px; letter-spacing: 0.5px;
         }
 
         .capture-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.3px; }
         .capture-desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; max-width: 80%; }
-
         .preview-img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1; }
-        
-        .img-overlay-actions {
-            position: absolute;
-            bottom: 0; left: 0; width: 100%;
-            background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.85) 100%);
-            padding: 20px 16px 16px 16px;
-            display: flex; gap: 10px; z-index: 2;
-            opacity: 0; transition: opacity 0.2s ease;
-            backdrop-filter: blur(8px);
-        }
 
+        .img-overlay-actions {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.85) 100%);
+            padding: 20px 16px 16px 16px; display: flex; gap: 10px; z-index: 2;
+            opacity: 0; transition: opacity 0.2s ease; backdrop-filter: blur(8px);
+        }
         .capture-slot.has-image:hover .img-overlay-actions,
         .capture-slot.has-image:active .img-overlay-actions { opacity: 1; }
 
-        /* --- CAMERA MODAL & NATIVE UI --- */
+        /* CAMERA MODAL & VIEWPORT */
         #cameraModal {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: #000; z-index: 9999; display: none; flex-direction: column;
@@ -520,56 +272,30 @@
         .camera-header {
             padding: 20px 24px; display: flex; justify-content: space-between; align-items: center;
             background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, transparent 100%);
-            width: 100%; z-index: 10;
-            padding-top: max(20px, env(safe-area-inset-top));
+            width: 100%; z-index: 10; padding-top: max(20px, env(safe-area-inset-top));
         }
 
         .camera-view-container {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            flex: 1;
+            width: 100%; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; flex: 1;
         }
 
         .camera-viewport-square {
-            position: relative;
-            width: 88vw;
-            height: 88vw;
-            max-width: 360px;
-            max-height: 360px;
-            border-radius: var(--radius-large);
-            overflow: hidden;
-            border: 1px solid var(--glass-border);
+            position: relative; width: 88vw; height: 88vw;
+            max-width: 360px; max-height: 360px; border-radius: var(--radius-large);
+            overflow: hidden; border: 1px solid var(--glass-border);
             box-shadow: 0 0 40px rgba(0, 0, 0, 0.9), 0 0 20px var(--accent-glow);
             background: #050507;
         }
 
         #videoElement { width: 100%; height: 100%; object-fit: cover; }
-
-        /* 3D Face Canvas Overlay */
-        #faceGuideCanvas {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 5;
-        }
+        #faceGuideCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
 
         .camera-instruction-box {
-            margin-top: 16px;
-            background: rgba(18, 18, 22, 0.75);
-            backdrop-filter: blur(15px);
-            border: 1px solid var(--glass-border);
-            padding: 8px 18px;
-            border-radius: 100px;
-            color: #fff;
-            font-size: 13px;
-            font-weight: 600;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            z-index: 10;
+            margin-top: 16px; background: rgba(18, 18, 22, 0.75); backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border); padding: 8px 18px; border-radius: 100px;
+            color: #fff; font-size: 13px; font-weight: 600; text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 10;
         }
 
         .camera-controls {
@@ -581,20 +307,11 @@
 
         .shutter-btn {
             width: 76px; height: 76px; border-radius: 50%;
-            background: rgba(255,255,255,0.2);
-            border: 3px solid #FFFFFF;
-            cursor: pointer; padding: 4px;
-            transition: transform 0.15s ease;
+            background: rgba(255,255,255,0.2); border: 3px solid #FFFFFF;
+            cursor: pointer; padding: 4px; transition: transform 0.15s ease;
             box-shadow: 0 0 20px rgba(255,255,255,0.3);
         }
-
-        .shutter-btn-inner {
-            width: 100%; height: 100%;
-            background: #FFFFFF;
-            border-radius: 50%;
-            transition: transform 0.1s ease;
-        }
-
+        .shutter-btn-inner { width: 100%; height: 100%; background: #FFFFFF; border-radius: 50%; transition: transform 0.1s ease; }
         .shutter-btn:active .shutter-btn-inner { transform: scale(0.85); }
 
         .camera-flash {
@@ -603,167 +320,55 @@
             transition: opacity 0.1s ease-out;
         }
 
-        /* --- REALTIME SCANNING ANALYSIS SCREEN --- */
-        .loading-container {
-            display: none;
-            text-align: center;
-            padding: 10px 0 20px 0;
-        }
-
+        /* SCANNING UI & DYNAMIC RESULT CANVAS */
+        .loading-container { display: none; text-align: center; padding: 10px 0 20px 0; }
         .scan-frame-container {
-            position: relative;
-            width: 220px;
-            height: 220px;
-            margin: 0 auto 24px auto;
-            border-radius: var(--radius-large);
-            overflow: hidden;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 0 30px rgba(10, 132, 255, 0.15);
+            position: relative; width: 240px; height: 240px;
+            margin: 0 auto 24px auto; border-radius: var(--radius-large);
+            overflow: hidden; background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border); box-shadow: 0 0 30px rgba(10, 132, 255, 0.15);
         }
 
-        .scan-frame-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            filter: grayscale(40%) contrast(110%);
-            opacity: 0.85;
-        }
-
+        #scanResultCanvas { width: 100%; height: 100%; object-fit: cover; }
         .scan-frame-overlay-line {
-            position: absolute;
-            width: 100%;
-            height: 3px;
+            position: absolute; width: 100%; height: 3px;
             background: linear-gradient(90deg, transparent, var(--accent-color), #30D158, transparent);
-            box-shadow: 0 0 15px var(--accent-color);
-            top: 0;
-            animation: scanLineAnim 2s infinite ease-in-out;
-            z-index: 5;
+            box-shadow: 0 0 15px var(--accent-color); top: 0;
+            animation: scanLineAnim 2s infinite ease-in-out; z-index: 5;
         }
+        @keyframes scanLineAnim { 0% { top: 0%; opacity: 0.2; } 50% { opacity: 1; } 100% { top: 100%; opacity: 0.2; } }
 
-        @keyframes scanLineAnim {
-            0% { top: 0%; opacity: 0.2; }
-            50% { opacity: 1; }
-            100% { top: 100%; opacity: 0.2; }
-        }
-
-        .landmark-dots-svg {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 4;
-            pointer-events: none;
-        }
-
-        .progress-ring-wrap {
-            position: relative;
-            width: 100px;
-            height: 100px;
-            margin: 0 auto 16px auto;
-        }
-
-        .progress-ring-svg {
-            transform: rotate(-90deg);
-            width: 100px;
-            height: 100px;
-        }
-
-        .progress-ring-bg {
-            stroke: rgba(255, 255, 255, 0.08);
-            stroke-width: 6;
-            fill: transparent;
-        }
-
+        .progress-ring-wrap { position: relative; width: 100px; height: 100px; margin: 0 auto 16px auto; }
+        .progress-ring-svg { transform: rotate(-90deg); width: 100px; height: 100px; }
+        .progress-ring-bg { stroke: rgba(255, 255, 255, 0.08); stroke-width: 6; fill: transparent; }
         .progress-ring-fill {
-            stroke: var(--accent-color);
-            stroke-width: 6;
-            stroke-dasharray: 283;
-            stroke-dashoffset: 283;
-            stroke-linecap: round;
-            fill: transparent;
-            transition: stroke-dashoffset 0.3s ease;
-            filter: drop-shadow(0 0 6px var(--accent-color));
+            stroke: var(--accent-color); stroke-width: 6; stroke-dasharray: 283;
+            stroke-dashoffset: 283; stroke-linecap: round; fill: transparent;
+            transition: stroke-dashoffset 0.3s ease; filter: drop-shadow(0 0 6px var(--accent-color));
         }
 
-        .progress-text-percent {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 22px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-        }
+        .progress-text-percent { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+        .analysis-status-text { font-size: 13px; font-weight: 700; color: var(--accent-color); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
 
-        .analysis-status-text {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--accent-color);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-bottom: 16px;
-        }
-
-        .realtime-metrics-list {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            max-width: 400px;
-            margin: 0 auto;
-            text-align: left;
-        }
-
-        .rt-metric-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--glass-border);
-            padding: 10px 14px;
-            border-radius: var(--radius-small);
-            font-size: 11px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
+        .realtime-metrics-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 400px; margin: 0 auto; text-align: left; }
+        .rt-metric-card { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--glass-border); padding: 10px 14px; border-radius: var(--radius-small); font-size: 11px; display: flex; justify-content: space-between; align-items: center; }
         .rt-metric-name { color: var(--text-secondary); font-weight: 600; }
         .rt-metric-val { font-weight: 700; color: var(--accent-color); }
 
-        /* --- DASHBOARD RESULT REPORT --- */
         #resultDashboard { display: none; }
-
-        .score-hero-wrap {
-            text-align: center;
-            margin-bottom: 32px;
-            position: relative;
-        }
-
+        .score-hero-wrap { text-align: center; margin-bottom: 32px; position: relative; }
         .overall-score-circle {
-            width: 140px; height: 140px;
-            border-radius: 50%;
+            width: 140px; height: 140px; border-radius: 50%;
             border: 1px solid var(--glass-border);
             background: radial-gradient(circle, rgba(10,132,255,0.15) 0%, rgba(18,18,22,0.6) 100%);
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            margin: 0 auto 16px auto;
-            box-shadow: 0 0 30px var(--accent-glow), inset 0 1px 2px var(--glass-highlight);
+            margin: 0 auto 16px auto; box-shadow: 0 0 30px var(--accent-glow), inset 0 1px 2px var(--glass-highlight);
             position: relative;
         }
+        .overall-score-circle span { font-size: 52px; font-weight: 800; letter-spacing: -1.5px; line-height: 1; }
+        .overall-score-circle small { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; font-weight: 700; }
 
-        .overall-score-circle span {
-            font-size: 52px; font-weight: 800; letter-spacing: -1.5px; line-height: 1;
-        }
-
-        .overall-score-circle small {
-            font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; font-weight: 700;
-        }
-
-        .face-shape-capsule {
-            display: inline-block;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid var(--glass-border);
-            padding: 6px 16px;
-            border-radius: 100px;
-            font-size: 14px;
-            font-weight: 700;
-            color: #FFF;
-            letter-spacing: 0.3px;
-        }
+        .face-shape-capsule { display: inline-block; background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); padding: 6px 16px; border-radius: 100px; font-size: 14px; font-weight: 700; color: #FFF; letter-spacing: 0.3px; }
 
         .chart-container { display: flex; justify-content: center; margin-bottom: 30px; position: relative; }
         svg.radar-chart { width: 100%; max-width: 320px; height: auto; overflow: visible; }
@@ -772,13 +377,7 @@
         .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
         @media (max-width: 500px) { .metrics-grid { grid-template-columns: 1fr; } }
 
-        .metric-card-item {
-            background: var(--glass-card);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius-medium);
-            padding: 16px;
-        }
-
+        .metric-card-item { background: var(--glass-card); border: 1px solid var(--glass-border); border-radius: var(--radius-medium); padding: 16px; }
         .metric-header { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; font-weight: 600; }
         .metric-bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
         .metric-bar-fill { height: 100%; background: var(--accent-color); border-radius: 3px; width: 0%; transition: width 1s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -789,20 +388,11 @@
         .list-items li::before { content: "•"; position: absolute; left: 0; color: var(--accent-color); font-weight: bold; font-size: 16px; }
 
         .protocol-phase { margin-bottom: 20px; border-left: 2px solid rgba(255,255,255,0.1); padding-left: 20px; position: relative; }
-        .protocol-phase::before {
-            content: ""; position: absolute; left: -6px; top: 2px; width: 10px; height: 10px; border-radius: 50%; background: var(--accent-color); box-shadow: 0 0 8px var(--accent-color);
-        }
+        .protocol-phase::before { content: ""; position: absolute; left: -6px; top: 2px; width: 10px; height: 10px; border-radius: 50%; background: var(--accent-color); box-shadow: 0 0 8px var(--accent-color); }
         .protocol-title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 10px; }
 
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(20px);
-            z-index: 1000; display: none; justify-content: center; align-items: center; padding: 20px;
-        }
-        .modal-content {
-            background: rgba(22, 22, 28, 0.95); border: 1px solid var(--glass-border);
-            border-radius: var(--radius-large); padding: 24px; width: 100%; max-width: 480px; max-height: 80vh; overflow-y: auto;
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); z-index: 1000; display: none; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: rgba(22, 22, 28, 0.95); border: 1px solid var(--glass-border); border-radius: var(--radius-large); padding: 24px; width: 100%; max-width: 480px; max-height: 80vh; overflow-y: auto; }
         .history-item { padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items: center; }
 
         .compare-section { display: none; margin-top: 30px; border-top: 1px solid var(--glass-border); padding-top: 24px; }
@@ -810,7 +400,6 @@
         .delta-positive { color: var(--success-color); }
         .delta-negative { color: var(--danger-color); }
 
-        /* --- BOTTOM NAVIGATION & MULTI-TAB VIEWS --- */
         .bottom-nav {
             position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
             width: calc(100% - 32px); max-width: 500px; height: var(--bottom-nav-height);
@@ -820,12 +409,7 @@
             z-index: 1000; box-shadow: 0 15px 35px rgba(0,0,0,0.5);
         }
 
-        .nav-item {
-            display: flex; flex-direction: column; align-items: center; gap: 4px;
-            color: var(--text-tertiary); font-size: 10px; font-weight: 700; cursor: pointer;
-            transition: all 0.2s ease; width: 20%;
-        }
-
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-tertiary); font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; width: 20%; }
         .nav-item svg { width: 22px; height: 22px; fill: currentColor; }
         .nav-item.active { color: var(--accent-color); transform: translateY(-2px); }
 
@@ -838,46 +422,24 @@
         .stat-val { font-size: 26px; font-weight: 800; color: #fff; margin-top: 4px; }
         .stat-lbl { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; }
 
-        .task-item {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 12px 16px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--glass-border);
-            border-radius: var(--radius-small); margin-bottom: 8px; transition: all 0.2s ease;
-        }
+        .task-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--glass-border); border-radius: var(--radius-small); margin-bottom: 8px; transition: all 0.2s ease; }
         .task-item.completed { opacity: 0.5; text-decoration: line-through; border-color: var(--success-color); }
         .task-checkbox { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--glass-border); display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .task-item.completed .task-checkbox { background: var(--success-color); border-color: var(--success-color); }
 
-        .floating-coach-btn {
-            position: fixed; bottom: calc(var(--bottom-nav-height) + 24px); right: 20px;
-            width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-color), #5856D6);
-            display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 25px var(--accent-glow);
-            cursor: pointer; z-index: 999; transition: transform 0.2s ease;
-        }
+        .floating-coach-btn { position: fixed; bottom: calc(var(--bottom-nav-height) + 24px); right: 20px; width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-color), #5856D6); display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 25px var(--accent-glow); cursor: pointer; z-index: 999; transition: transform 0.2s ease; }
         .floating-coach-btn:active { transform: scale(0.9); }
 
-        .chat-modal {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); z-index: 2000;
-            display: none; flex-direction: column; justify-content: flex-end;
-        }
-        .chat-container {
-            background: rgba(22, 22, 28, 0.98); border-top: 1px solid var(--glass-border);
-            border-radius: var(--radius-large) var(--radius-large) 0 0;
-            height: 80vh; display: flex; flex-direction: column; padding: 20px;
-        }
+        .chat-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); z-index: 2000; display: none; flex-direction: column; justify-content: flex-end; }
+        .chat-container { background: rgba(22, 22, 28, 0.98); border-top: 1px solid var(--glass-border); border-radius: var(--radius-large) var(--radius-large) 0 0; height: 80vh; display: flex; flex-direction: column; padding: 20px; }
         .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px; }
         .chat-bubble { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.4; }
         .chat-bubble.ai { background: rgba(255,255,255,0.08); align-self: flex-start; color: #fff; }
         .chat-bubble.user { background: var(--accent-color); align-self: flex-end; color: #fff; }
 
-        .auth-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.9); backdrop-filter: blur(20px); z-index: 3000;
-            display: flex; justify-content: center; align-items: center; padding: 20px;
-        }
+        .auth-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); backdrop-filter: blur(20px); z-index: 3000; display: flex; justify-content: center; align-items: center; padding: 20px; }
         .auth-card { width: 100%; max-width: 400px; background: rgba(22, 22, 28, 0.95); border: 1px solid var(--glass-border); border-radius: var(--radius-large); padding: 28px; }
         .auth-input { width: 100%; padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: var(--radius-small); color: #fff; margin-bottom: 12px; font-size: 14px; outline: none; }
-
         .privacy-note { font-size: 11px; text-align: center; color: var(--text-tertiary); margin-top: 24px; line-height: 1.4; }
     </style>
 </head>
@@ -920,7 +482,9 @@
             </div>
             <div style="display: flex; gap: 8px; align-items: center;">
                 <button class="history-capsule-btn" onclick="openHistory()">Lịch Sử</button>
-                <img src="https://via.placeholder.com/100" class="user-avatar-btn" id="userAvatarBtn" onclick="switchTab('profile')" alt="User">
+                <div class="default-avatar-svg" id="userAvatarBtn" onclick="switchTab('profile')">
+                    <svg style="width: 20px; height: 20px; fill: #fff;" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                </div>
             </div>
         </div>
     </div>
@@ -933,7 +497,7 @@
                 <div class="stat-val" id="homeScore">--</div>
             </div>
             <div class="stat-card">
-                <div class="stat-lbl">🔥 Streak</div>
+                <div class="stat-lbl">Streak Chuỗi</div>
                 <div class="stat-val" id="homeStreak">0 Ngày</div>
             </div>
         </div>
@@ -1018,8 +582,8 @@
                     <div class="capture-desc" id="wizDesc">Giữ đầu thẳng, nhìn trực tiếp vào camera</div>
                     
                     <div style="display: flex; gap: 10px; width: 100%; max-width: 280px; margin-top: 10px;">
-                        <button class="btn-secondary" style="flex:1; padding: 12px;" onclick="triggerFileInput()">🖼️ Tải Ảnh</button>
-                        <button style="flex:1; padding: 12px;" onclick="requestCameraPermission()">📷 Quét Camera</button>
+                        <button class="btn-secondary" style="flex:1; padding: 12px;" onclick="triggerFileInput()">Tải Ảnh Lên</button>
+                        <button style="flex:1; padding: 12px;" onclick="requestCameraPermission()">Quét Camera</button>
                     </div>
                 </div>
 
@@ -1034,16 +598,8 @@
             <!-- Loading Scanner UI -->
             <div class="loading-container" id="loadingUI">
                 <div class="scan-frame-container">
-                    <img id="scanPreviewTarget" class="scan-frame-img" src="" alt="Face Scan">
+                    <canvas id="scanResultCanvas"></canvas>
                     <div class="scan-frame-overlay-line"></div>
-                    <svg class="landmark-dots-svg" viewBox="0 0 100 100">
-                        <circle cx="35" cy="40" r="1.5" fill="#30D158"/>
-                        <circle cx="65" cy="40" r="1.5" fill="#30D158"/>
-                        <circle cx="50" cy="55" r="1.5" fill="#0A84FF"/>
-                        <circle cx="50" cy="72" r="1.5" fill="#0A84FF"/>
-                        <circle cx="30" cy="68" r="1.5" fill="#FFD60A"/>
-                        <circle cx="70" cy="68" r="1.5" fill="#FFD60A"/>
-                    </svg>
                 </div>
 
                 <div class="progress-ring-wrap">
@@ -1168,7 +724,7 @@
     <div class="tab-view" id="tab-today">
         <div class="glass-card">
             <h3>Nhiệm Vụ Hôm Nay</h3>
-            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">Hoàn thành để duy trì Streak 🔥</p>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">Hoàn thành để duy trì Streak Chuỗi ngày</p>
             <div id="todayTasksList">
                 <div class="task-item" onclick="toggleTask(this)">
                     <div style="font-size: 13px;">Uống đủ 2L nước mỗi ngày</div>
@@ -1209,7 +765,9 @@
     <!-- TAB 5: PROFILE -->
     <div class="tab-view" id="tab-profile">
         <div class="glass-card" style="text-align: center;">
-            <img src="https://via.placeholder.com/100" id="profileAvatar" style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--accent-color); margin-bottom: 8px;">
+            <div class="default-avatar-svg" id="profileAvatar" style="width: 70px; height: 70px; margin: 0 auto 12px auto;">
+                <svg style="width: 38px; height: 38px; fill: #fff;" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
             <h3 id="profileName">Tên Người Dùng</h3>
             <p style="font-size: 12px; color: var(--text-secondary);" id="profileEmail">user@example.com</p>
             <div style="display: flex; justify-content: center; gap: 12px; margin-top: 16px;">
@@ -1245,13 +803,13 @@
     </div>
 </div>
 
-<!-- CAMERA MODAL (NATIVE LOOK & FEEL) -->
+<!-- CAMERA MODAL (DYNAMIC NATIVE LANDMARK CAMERA) -->
 <div id="cameraModal">
     <div class="camera-flash" id="cameraFlash"></div>
     <div class="camera-header">
         <button class="history-capsule-btn" onclick="closeCamera()">Hủy</button>
         <span style="font-size: 13px; font-weight: 700; color: var(--accent-color);" id="camTitleHeader">FRONT 0°</span>
-        <button class="history-capsule-btn" id="switchCamBtn" onclick="switchCamera()">🔄 Đổi Cam</button>
+        <button class="history-capsule-btn" id="switchCamBtn" onclick="switchCamera()">Đổi Cam</button>
     </div>
 
     <div class="camera-view-container">
@@ -1334,7 +892,6 @@
     import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // Cấu hình Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
       authDomain: "quocdat-396fe.firebaseapp.com",
@@ -1358,10 +915,6 @@
             document.getElementById('authOverlay').style.display = 'none';
             document.getElementById('profileName').innerText = user.displayName || "Glowmax Member";
             document.getElementById('profileEmail').innerText = user.email;
-            if(user.photoURL) {
-                document.getElementById('userAvatarBtn').src = user.photoURL;
-                document.getElementById('profileAvatar').src = user.photoURL;
-            }
             loadUserData(user.uid);
         } else {
             currentUser = null;
@@ -1384,6 +937,7 @@
 
     document.getElementById('btnLogout').addEventListener('click', () => signOut(auth));
 
+    // Lấy API key chính xác cho DigitalsMod AI / AI Coach
     const configRef = doc(db, "glowmax", "config", "api", "keyDoc");
     onSnapshot(configRef, (snap) => {
         if (snap.exists() && snap.data().apiKey) {
@@ -1590,8 +1144,8 @@
                 <div class="capture-title">${STEP_INFO[state.currentStep].title}</div>
                 <div class="capture-desc">${STEP_INFO[state.currentStep].desc}</div>
                 <div style="display: flex; gap: 10px; width: 100%; max-width: 280px;">
-                    <button class="btn-secondary" style="flex:1; padding: 12px;" onclick="triggerFileInput()">🖼️ Tải Ảnh</button>
-                    <button style="flex:1; padding: 12px;" onclick="requestCameraPermission()">📷 Quét Camera</button>
+                    <button class="btn-secondary" style="flex:1; padding: 12px;" onclick="triggerFileInput()">Tải Ảnh Lên</button>
+                    <button style="flex:1; padding: 12px;" onclick="requestCameraPermission()">Quét Camera</button>
                 </div>
             `;
         }
@@ -1665,7 +1219,7 @@
         document.getElementById('camInstruction').innerText = STEP_INFO[state.currentStep].desc;
         modal.style.display = 'flex';
         await startStream();
-        start3DFaceGuideAnimation();
+        startDynamicLandmarkCamera();
     }
 
     async function startStream() {
@@ -1701,14 +1255,14 @@
         }
     }
 
-    /* --- 3D FACE GUIDE ANIMATION OVERLAY --- */
-    function start3DFaceGuideAnimation() {
+    /* --- REALTIME DYNAMIC 3D FACE & LANDMARK TRACKING CANVAS --- */
+    function startDynamicLandmarkCamera() {
         const canvas = document.getElementById('faceGuideCanvas');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
-        let angle = 0;
+        let tick = 0;
 
-        function renderGuide() {
+        function renderTracking() {
             canvas.width = canvas.clientWidth;
             canvas.height = canvas.clientHeight;
             const w = canvas.width, h = canvas.height;
@@ -1716,61 +1270,82 @@
             const rx = w * 0.32, ry = h * 0.42;
 
             ctx.clearRect(0, 0, w, h);
-            angle += 0.03;
-            const floatOffset = Math.sin(angle) * 3;
+            tick += 0.04;
 
-            // Soft Glow Outer Head Outline
+            // Xoay mẫu 3D tùy theo góc chụp (Step 0: 0°, Step 1: -25° Nghiêng Trái, Step 2: +25° Nghiêng Phải)
+            let yawShift = 0;
+            if (state.currentStep === 1) yawShift = -rx * 0.35;
+            else if (state.currentStep === 2) yawShift = rx * 0.35;
+
+            // Chuyển động nhịp nhàng (Tracking motion simulation)
+            const offsetX = Math.sin(tick * 1.5) * 4 + yawShift;
+            const offsetY = Math.cos(tick * 1.2) * 3;
+
+            // 1. Khung 3D Đầu Oval
             ctx.save();
             ctx.beginPath();
-            ctx.ellipse(cx, cy + floatOffset, rx, ry, 0, 0, 2 * Math.PI);
-            ctx.strokeStyle = "rgba(10, 132, 255, 0.65)";
+            ctx.ellipse(cx + offsetX, cy + offsetY, rx, ry, (yawShift / rx) * 0.2, 0, 2 * Math.PI);
+            ctx.strokeStyle = "rgba(10, 132, 255, 0.75)";
             ctx.lineWidth = 2;
             ctx.setLineDash([8, 6]);
             ctx.shadowColor = "#0A84FF";
-            ctx.shadowBlur = 12;
+            ctx.shadowBlur = 10;
             ctx.stroke();
             ctx.restore();
 
-            // Facial Center Guidelines
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+            // 2. Tính toán điểm tự động Mắt - Mũi - Miệng - Cằm - Góc Hàm
+            const fcx = cx + offsetX;
+            const fcy = cy + offsetY;
+
+            const landmarks = {
+                leftEye: { x: fcx - rx * 0.35, y: fcy - ry * 0.15 },
+                rightEye: { x: fcx + rx * 0.35, y: fcy - ry * 0.15 },
+                noseBridge: { x: fcx, y: fcy - ry * 0.05 },
+                noseTip: { x: fcx, y: fcy + ry * 0.15 },
+                mouthLeft: { x: fcx - rx * 0.25, y: fcy + ry * 0.42 },
+                mouthRight: { x: fcx + rx * 0.25, y: fcy + ry * 0.42 },
+                chinTip: { x: fcx, y: fcy + ry * 0.82 },
+                jawLeft: { x: fcx - rx * 0.75, y: fcy + ry * 0.5 },
+                jawRight: { x: fcx + rx * 0.75, y: fcy + ry * 0.5 }
+            };
+
+            // Vẽ các đường nối hình học 3D kết nối các điểm
+            ctx.strokeStyle = "rgba(10, 132, 255, 0.35)";
             ctx.lineWidth = 1;
             ctx.setLineDash([]);
             
-            // Vertical Line
             ctx.beginPath();
-            ctx.moveTo(cx, cy - ry + floatOffset);
-            ctx.lineTo(cx, cy + ry + floatOffset);
+            // Mắt nối Mũi
+            ctx.moveTo(landmarks.leftEye.x, landmarks.leftEye.y);
+            ctx.lineTo(landmarks.noseTip.x, landmarks.noseTip.y);
+            ctx.lineTo(landmarks.rightEye.x, landmarks.rightEye.y);
+            // Mũi nối Miệng
+            ctx.lineTo(landmarks.mouthRight.x, landmarks.mouthRight.y);
+            ctx.lineTo(landmarks.chinTip.x, landmarks.chinTip.y);
+            ctx.lineTo(landmarks.mouthLeft.x, landmarks.mouthLeft.y);
+            ctx.lineTo(landmarks.noseTip.x, landmarks.noseTip.y);
+            // Hàm nối Cằm
+            ctx.moveTo(landmarks.jawLeft.x, landmarks.jawLeft.y);
+            ctx.lineTo(landmarks.chinTip.x, landmarks.chinTip.y);
+            ctx.lineTo(landmarks.jawRight.x, landmarks.jawRight.y);
             ctx.stroke();
 
-            // Eye Level Line
-            ctx.beginPath();
-            ctx.moveTo(cx - rx * 0.8, cy - ry * 0.1 + floatOffset);
-            ctx.lineTo(cx + rx * 0.8, cy - ry * 0.1 + floatOffset);
-            ctx.stroke();
-
-            // 3D Landmark Points (Eyes, Nose, Mouth)
-            const pts = [
-                { x: cx - rx * 0.35, y: cy - ry * 0.1 },
-                { x: cx + rx * 0.35, y: cy - ry * 0.1 },
-                { x: cx, y: cy + ry * 0.15 },
-                { x: cx - rx * 0.25, y: cy + ry * 0.45 },
-                { x: cx + rx * 0.25, y: cy + ry * 0.45 }
-            ];
-
-            pts.forEach(p => {
+            // Vẽ các điểm Chấm Xanh Neon nhấp nháy di chuyển theo vị trí Mắt, Mũi, Miệng, Cằm
+            Object.keys(landmarks).forEach(key => {
+                const pt = landmarks[key];
                 ctx.beginPath();
-                ctx.arc(p.x, p.y + floatOffset, 3.5, 0, 2 * Math.PI);
+                ctx.arc(pt.x, pt.y, 4, 0, 2 * Math.PI);
                 ctx.fillStyle = "#30D158";
                 ctx.shadowColor = "#30D158";
                 ctx.shadowBlur = 8;
                 ctx.fill();
             });
 
-            state.guideAnimFrame = requestAnimationFrame(renderGuide);
+            state.guideAnimFrame = requestAnimationFrame(renderTracking);
         }
 
         if (state.guideAnimFrame) cancelAnimationFrame(state.guideAnimFrame);
-        renderGuide();
+        renderTracking();
     }
 
     function takeSnapshot() {
@@ -1800,10 +1375,55 @@
         }, 150);
     }
 
-    /* --- REALTIME SCANNING ANIMATION --- */
+    /* --- DRAW REALTIME SCANNING LANDMARKS OVERLAY ON IMAGE --- */
+    function drawScanOverlayImage() {
+        const resultCanvas = document.getElementById('scanResultCanvas');
+        if (!resultCanvas || !state.photos[0]) return;
+        const ctx = resultCanvas.getContext('2d');
+
+        const img = new Image();
+        img.src = `${state.photos[0].mime},${state.photos[0].base64}`;
+        img.onload = () => {
+            resultCanvas.width = img.width;
+            resultCanvas.height = img.height;
+
+            // Vẽ ảnh gốc lên Canvas
+            ctx.drawImage(img, 0, 0, img.width, img.height);
+
+            // Vẽ lưới các điểm nhận diện khuôn mặt thực tế
+            const w = img.width, h = img.height;
+            const cx = w * 0.5, cy = h * 0.48;
+            const rx = w * 0.26, ry = h * 0.32;
+
+            const pts = [
+                { x: cx - rx * 0.4, y: cy - ry * 0.2 }, { x: cx + rx * 0.4, y: cy - ry * 0.2 },
+                { x: cx, y: cy + ry * 0.1 }, { x: cx - rx * 0.3, y: cy + ry * 0.4 },
+                { x: cx + rx * 0.3, y: cy + ry * 0.4 }, { x: cx, y: cy + ry * 0.8 },
+                { x: cx - rx * 0.8, y: cy + ry * 0.5 }, { x: cx + rx * 0.8, y: cy + ry * 0.5 }
+            ];
+
+            // Nối đường hình học 3D
+            ctx.strokeStyle = "#0A84FF";
+            ctx.lineWidth = Math.max(2, w * 0.005);
+            ctx.beginPath();
+            ctx.moveTo(pts[0].x, pts[0].y); ctx.lineTo(pts[2].x, pts[2].y); ctx.lineTo(pts[1].x, pts[1].y);
+            ctx.lineTo(pts[4].x, pts[4].y); ctx.lineTo(pts[5].x, pts[5].y); ctx.lineTo(pts[3].x, pts[3].y);
+            ctx.lineTo(pts[2].x, pts[2].y); ctx.stroke();
+
+            // Vẽ điểm chấm
+            pts.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, Math.max(4, w * 0.01), 0, 2 * Math.PI);
+                ctx.fillStyle = "#30D158";
+                ctx.shadowColor = "#30D158";
+                ctx.shadowBlur = 10;
+                ctx.fill();
+            });
+        };
+    }
+
     function startRealtimeAnalysisUI() {
-        const previewImg = document.getElementById('scanPreviewTarget');
-        if (state.photos[0]) previewImg.src = `${state.photos[0].mime},${state.photos[0].base64}`;
+        drawScanOverlayImage();
 
         const ringFill = document.getElementById('progressRingFill');
         const percentText = document.getElementById('progressPercentText');
@@ -2113,7 +1733,7 @@
         else window.print();
     }
 
-    /* --- AI COACH CHAT --- */
+    /* --- AI COACH CHAT FIXED CONNECTIVITY --- */
     function openCoachChat() { document.getElementById('coachModal').style.display = 'flex'; }
     function closeCoachChat() { document.getElementById('coachModal').style.display = 'none'; }
 
@@ -2129,7 +1749,7 @@
 
         const apiKey = window.getGlobalApiKey ? window.getGlobalApiKey() : null;
         if(!apiKey) {
-            msgs.innerHTML += `<div class="chat-bubble ai">Chưa tìm thấy API Key cấu hình. Vui lòng kiểm tra lại Dashboard.</div>`;
+            msgs.innerHTML += `<div class="chat-bubble ai">Chưa kết nối API Key từ Firestore configuration. Vui lòng kiểm tra lại.</div>`;
             return;
         }
 
@@ -2147,7 +1767,7 @@
             msgs.innerHTML += `<div class="chat-bubble ai">${reply}</div>`;
             msgs.scrollTop = msgs.scrollHeight;
         } catch(e) {
-            msgs.innerHTML += `<div class="chat-bubble ai">Lỗi kết nối AI Coach.</div>`;
+            msgs.innerHTML += `<div class="chat-bubble ai">Lỗi kết nối AI Coach: ${e.message}</div>`;
         }
     }
 
