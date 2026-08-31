@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Glowmax Dashboard - API & Multi-Model Configuration</title>
+    <title>Glowmax Dashboard - API & digitalsmod Configuration</title>
 
     <style>
         * {
@@ -553,6 +553,15 @@
             </div>
         </div>
 
+        <!-- ================= STATS & THỐNG KÊ SỐ LẦN SỬ DỤNG API ================= -->
+        <div class="glass-card">
+            <div class="section-header">📊 Thống Kê Sử Dụng API Web Glowmax</div>
+            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+                <div>API Vừa Sử Dụng: <b id="lastUsedApiDash" style="color: var(--accent-color);">Chưa sử dụng</b></div>
+                <div>Tổng Số Lần Gọi API: <b id="totalApiCountDash" style="color: var(--success-color);">0</b> lần</div>
+            </div>
+        </div>
+
         <!-- ================= GEMINI SECTION ================= -->
         <div class="glass-card">
             <div class="section-header">⚙️ Hệ thống Gemini API</div>
@@ -720,6 +729,20 @@
     const orRotationBox = document.getElementById("orRotationBox");
     const orRotationTime = document.getElementById("orRotationTime");
     const orProgressBar = document.getElementById("orProgressBar");
+
+    function updateApiStatsUI() {
+        const totalCalls = localStorage.getItem('gmax_api_call_count') || '0';
+        const lastUsed = localStorage.getItem('gmax_last_used_api') || 'Chưa sử dụng';
+        const elLast = document.getElementById('lastUsedApiDash');
+        const elTotal = document.getElementById('totalApiCountDash');
+        if (elLast) elLast.innerText = lastUsed;
+        if (elTotal) elTotal.innerText = totalCalls;
+    }
+
+    window.addEventListener('load', () => {
+        updateApiStatsUI();
+        window.addEventListener('storage', updateApiStatsUI);
+    });
 
     function showToast(msg) {
         const toast = document.getElementById("toastMessage");
