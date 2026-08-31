@@ -354,7 +354,7 @@
             border: 1px solid var(--glass-border);
             background: rgba(255,255,255,0.06);
             color: white;
-            border-radius: 9px;
+            border-radius: 99px;
             height: 30px;
             padding: 0 10px;
             font-size: 11px;
@@ -658,13 +658,15 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, setDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+    // Đồng bộ lại chuẩn Firebase Config để kết nối chính xác Firestore
     const firebaseConfig = {
-        apiKey: "AIzaSyDummyKeyForInitializationOnly-ReplaceIfCustom",
-        authDomain: "quocdat-396fe.firebaseapp.com",
-        projectId: "quocdat-396fe",
-        storageBucket: "quocdat-396fe.appspot.com",
-        messagingSenderId: "38927491028",
-        appId: "1:38927491028:web:abcdef123456789"
+      apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
+      authDomain: "quocdat-396fe.firebaseapp.com",
+      databaseURL: "https://quocdat-396fe-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "quocdat-396fe",
+      storageBucket: "quocdat-396fe.firebasestorage.app",
+      messagingSenderId: "685476439350",
+      appId: "1:685476439350:web:949054ecba7f0a0c383f97"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -680,7 +682,6 @@
     let rotationStartedAt = 0;
     let rawApiKey = "";
     let isMasked = true;
-    let rotationTimer = null;
 
     // ================= OPENROUTER STATE & REGISTRY (1 TIẾNG XOAY VÒNG) =================
     let orConfig = {
@@ -696,7 +697,6 @@
             { id: "nvidia/nemotron-nano-4b-instruct", name: "Nemotron Nano Omni", vision: true, enabled: true, priority: 4 }
         ]
     };
-    let orRotationTimer = null;
 
     // DOM Elements Gemini
     const inputEl = document.getElementById("apiKeyInput");
@@ -885,7 +885,7 @@
         orProgressBar.style.width = Math.min(100, Math.max(0, (elapsed / OR_ROTATION_TIME) * 100)) + "%";
     }
 
-    // ================= GEMINI LOGIC GIỮ NGUYÊN =================
+    // ================= GEMINI LOGIC =================
     function getActiveKeyIndex() {
         if (!apiKeys.length) return -1;
         if (currentIndex >= 0 && currentIndex < apiKeys.length && apiKeys[currentIndex].enabled !== false) {
@@ -965,7 +965,6 @@
                 rotationStartedAt: rotationStartedAt ? new Date(rotationStartedAt) : serverTimestamp(),
                 rotationMinutes: 10,
                 enabled: apiKeys.some(key => key.enabled !== false),
-                // OpenRouter config sync
                 openRouter: {
                     ...orConfig,
                     orRotationStartedAt: orConfig.orRotationStartedAt ? new Date(orConfig.orRotationStartedAt) : serverTimestamp()
