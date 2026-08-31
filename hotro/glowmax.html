@@ -427,12 +427,13 @@
         .floating-coach-btn { position: fixed; bottom: calc(var(--bottom-nav-height) + 24px); right: 20px; width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-color), #5856D6); display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 25px var(--accent-glow); cursor: pointer; z-index: 999; transition: transform 0.2s ease; }
         .floating-coach-btn:active { transform: scale(0.9); }
 
-        .chat-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); z-index: 2000; display: none; flex-direction: column; justify-content: flex-end; }
-        .chat-container { background: rgba(22, 22, 28, 0.98); border-top: 1px solid var(--glass-border); border-radius: var(--radius-large) var(--radius-large) 0 0; height: 80vh; display: flex; flex-direction: column; padding: 20px; }
-        .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px; }
-        .chat-bubble { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.4; }
-        .chat-bubble.ai { background: rgba(255,255,255,0.08); align-self: flex-start; color: #fff; }
-        .chat-bubble.user { background: var(--accent-color); align-self: flex-end; color: #fff; }
+        /* FIXED AI COACH CHAT LAYOUT */
+        .chat-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); z-index: 2000; display: none; justify-content: flex-end; align-items: center; flex-direction: column; }
+        .chat-container { background: rgba(22, 22, 28, 0.98); border-top: 1px solid var(--glass-border); border-radius: var(--radius-large) var(--radius-large) 0 0; width: 100%; max-width: 600px; height: 85vh; display: flex; flex-direction: column; padding: 20px; box-shadow: 0 -10px 40px rgba(0,0,0,0.8); }
+        .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; padding-right: 4px; }
+        .chat-bubble { max-width: 85%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.5; word-break: break-word; }
+        .chat-bubble.ai { background: rgba(255,255,255,0.08); align-self: flex-start; color: #fff; border-bottom-left-radius: 4px; border: 1px solid var(--glass-border); }
+        .chat-bubble.user { background: var(--accent-color); align-self: flex-end; color: #fff; border-bottom-right-radius: 4px; box-shadow: 0 4px 12px var(--accent-glow); }
 
         .auth-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); backdrop-filter: blur(20px); z-index: 3000; display: flex; justify-content: center; align-items: center; padding: 20px; }
         .auth-card { width: 100%; max-width: 400px; background: rgba(22, 22, 28, 0.95); border: 1px solid var(--glass-border); border-radius: var(--radius-large); padding: 28px; }
@@ -842,7 +843,7 @@
     <svg style="width: 26px; height: 26px; fill: #fff;" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
 </div>
 
-<!-- COACH CHAT MODAL -->
+<!-- COACH CHAT MODAL FIXED LAYOUT -->
 <div class="chat-modal" id="coachModal">
     <div class="chat-container">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--glass-border);">
@@ -852,8 +853,8 @@
         <div class="chat-messages" id="chatMessages">
             <div class="chat-bubble ai">Chào bạn! Tôi là DigitalsMod AI Coach của Glowmax. Bạn cần tư vấn bài tập hay quy trình chăm sóc hôm nay?</div>
         </div>
-        <div style="display: flex; gap: 8px;">
-            <input type="text" id="chatInput" style="flex:1; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: var(--radius-small); color: #fff; outline: none;" placeholder="Nhập câu hỏi...">
+        <div style="display: flex; gap: 8px; padding-top: 8px; border-top: 1px solid var(--glass-border);">
+            <input type="text" id="chatInput" style="flex:1; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: var(--radius-small); color: #fff; outline: none; font-size: 14px;" placeholder="Nhập câu hỏi..." onkeypress="if(event.key==='Enter') sendCoachMessage()">
             <button style="width: auto; padding: 12px 18px;" onclick="sendCoachMessage()">Gửi</button>
         </div>
     </div>
@@ -1251,7 +1252,7 @@
         }
     }
 
-    /* --- REALTIME DYNAMIC 3D FACE & ANGLED LANDMARK TRACKING CANVAS --- */
+    /* --- REAL 3D FACE MESH MODEL DRAWING (EXACT YAW PERSPECTIVE, NO GREEN DOTS) --- */
     function startDynamicLandmarkCamera() {
         const canvas = document.getElementById('faceGuideCanvas');
         if (!canvas) return;
@@ -1263,87 +1264,139 @@
             canvas.height = canvas.clientHeight;
             const w = canvas.width, h = canvas.height;
             const cx = w / 2, cy = h / 2 - 10;
-            const rx = w * 0.32, ry = h * 0.42;
+            const radiusScale = w * 0.35;
 
             ctx.clearRect(0, 0, w, h);
             tick += 0.04;
 
-            // Xoay mẫu 3D tùy theo góc chụp (Step 0: 0°, Step 1: -30° Nghiêng Trái, Step 2: +30° Nghiêng Phải)
-            let yawShift = 0;
-            let yawAngle = 0;
-            if (state.currentStep === 1) {
-                yawShift = -rx * 0.35;
-                yawAngle = -0.3;
-            } else if (state.currentStep === 2) {
-                yawShift = rx * 0.35;
-                yawAngle = 0.3;
+            // Xác định góc xoay YAW thực sự (Step 0: 0°, Step 1: -30° Trái, Step 2: +30° Phải)
+            let yawRad = 0;
+            if (state.currentStep === 1) yawRad = -0.52; // ~ -30 deg
+            else if (state.currentStep === 2) yawRad = 0.52;  // ~ +30 deg
+
+            const pulseOffset = Math.sin(tick * 1.5) * 2;
+
+            // Hàm biến đổi tọa độ 3D (X, Y, Z) thành 2D Canvas có tính chiều sâu xoay YAW
+            function project3D(x, y, z) {
+                // Xoay quanh trục Y (Yaw Rotation)
+                const cosY = Math.cos(yawRad);
+                const sinY = Math.sin(yawRad);
+
+                const rx = x * cosY + z * sinY;
+                const ry = y;
+                const rz = -x * sinY + z * cosY;
+
+                // Chiếu phối cảnh (Perspective projection)
+                const fov = 400;
+                const scale = fov / (fov + rz + 100);
+
+                return {
+                    x: cx + rx * scale * (radiusScale / 120) + Math.sin(tick * 1.2) * 2,
+                    y: cy + ry * scale * (radiusScale / 120) + pulseOffset,
+                    visible: scale > 0.3
+                };
             }
 
-            const offsetX = Math.sin(tick * 1.5) * 3 + yawShift;
-            const offsetY = Math.cos(tick * 1.2) * 2;
+            // Tọa độ 3D chuẩn khuôn mặt nhân tạo (x, y, z)
+            const p3d = {
+                // Đường viền sọ mặt
+                crown: project3D(0, -90, 0),
+                jawLeft: project3D(-75, 20, -10),
+                jawRight: project3D(75, 20, -10),
+                chin: project3D(0, 95, 25),
+                cheekLeft: project3D(-68, -10, 20),
+                cheekRight: project3D(68, -10, 20),
 
-            // 1. Khung 3D Đầu Oval tự xoay theo góc nghiêng
-            ctx.save();
-            ctx.beginPath();
-            const ovalRx = rx * (1 - Math.abs(yawAngle) * 0.25);
-            ctx.ellipse(cx + offsetX, cy + offsetY, ovalRx, ry, yawAngle, 0, 2 * Math.PI);
-            ctx.strokeStyle = "rgba(10, 132, 255, 0.75)";
-            ctx.lineWidth = 2;
-            ctx.setLineDash([8, 6]);
-            ctx.shadowColor = "#0A84FF";
-            ctx.shadowBlur = 10;
-            ctx.stroke();
-            ctx.restore();
+                // Lông mày
+                browLeftOuter: project3D(-50, -42, 35),
+                browLeftInner: project3D(-12, -42, 48),
+                browRightInner: project3D(12, -42, 48),
+                browRightOuter: project3D(50, -42, 35),
 
-            // 2. Tính toán vị trí các điểm nhận diện khuôn mặt theo góc nghiêng 3D
-            const fcx = cx + offsetX;
-            const fcy = cy + offsetY;
+                // Đôi mắt
+                eyeLeftOuter: project3D(-42, -26, 38),
+                eyeLeftCenter: project3D(-28, -26, 42),
+                eyeLeftInner: project3D(-14, -26, 42),
+                eyeRightInner: project3D(14, -26, 42),
+                eyeRightCenter: project3D(28, -26, 42),
+                eyeRightOuter: project3D(42, -26, 38),
 
-            const eyeDist = rx * 0.35 * (1 - Math.abs(yawAngle) * 0.2);
-            const noseX = fcx + yawShift * 0.5;
+                // Mũi 3D nhô ra ngoài
+                noseBridgeTop: project3D(0, -38, 50),
+                noseTip: project3D(0, 10, 72),
+                noseBaseLeft: project3D(-16, 16, 50),
+                noseBaseRight: project3D(16, 16, 50),
 
-            const landmarks = {
-                leftEye: { x: fcx - eyeDist + yawShift * 0.2, y: fcy - ry * 0.15 },
-                rightEye: { x: fcx + eyeDist + yawShift * 0.2, y: fcy - ry * 0.15 },
-                noseBridge: { x: noseX, y: fcy - ry * 0.05 },
-                noseTip: { x: noseX + yawShift * 0.3, y: fcy + ry * 0.15 },
-                mouthLeft: { x: fcx - rx * 0.25 + yawShift * 0.3, y: fcy + ry * 0.42 },
-                mouthRight: { x: fcx + rx * 0.25 + yawShift * 0.3, y: fcy + ry * 0.42 },
-                chinTip: { x: fcx + yawShift * 0.4, y: fcy + ry * 0.82 },
-                jawLeft: { x: fcx - rx * 0.75 + yawShift * 0.2, y: fcy + ry * 0.5 },
-                jawRight: { x: fcx + rx * 0.75 + yawShift * 0.2, y: fcy + ry * 0.5 }
+                // Bờ môi 3D
+                mouthLeft: project3D(-25, 48, 42),
+                mouthRight: project3D(25, 48, 42),
+                lipTop: project3D(0, 42, 54),
+                lipBottom: project3D(0, 56, 50)
             };
 
-            // Vẽ các đường nối hình học 3D
-            ctx.strokeStyle = "rgba(10, 132, 255, 0.35)";
-            ctx.lineWidth = 1;
-            ctx.setLineDash([]);
-            
+            ctx.strokeStyle = "rgba(10, 132, 255, 0.75)";
+            ctx.lineWidth = 1.5;
+            ctx.shadowColor = "#0A84FF";
+            ctx.shadowBlur = 8;
+
+            // 1. Vẽ khung đường viền khuôn mặt (Face Outline Mesh)
             ctx.beginPath();
-            ctx.moveTo(landmarks.leftEye.x, landmarks.leftEye.y);
-            ctx.lineTo(landmarks.noseTip.x, landmarks.noseTip.y);
-            ctx.lineTo(landmarks.rightEye.x, landmarks.rightEye.y);
-            
-            ctx.lineTo(landmarks.mouthRight.x, landmarks.mouthRight.y);
-            ctx.lineTo(landmarks.chinTip.x, landmarks.chinTip.y);
-            ctx.lineTo(landmarks.mouthLeft.x, landmarks.mouthLeft.y);
-            ctx.lineTo(landmarks.noseTip.x, landmarks.noseTip.y);
-            
-            ctx.moveTo(landmarks.jawLeft.x, landmarks.jawLeft.y);
-            ctx.lineTo(landmarks.chinTip.x, landmarks.chinTip.y);
-            ctx.lineTo(landmarks.jawRight.x, landmarks.jawRight.y);
+            ctx.moveTo(p3d.crown.x, p3d.crown.y);
+            ctx.quadraticCurveTo(p3d.cheekLeft.x, p3d.cheekLeft.y, p3d.jawLeft.x, p3d.jawLeft.y);
+            ctx.quadraticCurveTo(p3d.chin.x - (yawRad * 15), p3d.chin.y, p3d.chin.x, p3d.chin.y);
+            ctx.quadraticCurveTo(p3d.jawRight.x, p3d.jawRight.y, p3d.cheekRight.x, p3d.cheekRight.y);
+            ctx.quadraticCurveTo(p3d.crown.x, p3d.crown.y, p3d.crown.x, p3d.crown.y);
             ctx.stroke();
 
-            // Vẽ các điểm Chấm Xanh Neon nhấp nháy di chuyển chuẩn vị trí
-            Object.keys(landmarks).forEach(key => {
-                const pt = landmarks[key];
-                ctx.beginPath();
-                ctx.arc(pt.x, pt.y, 4, 0, 2 * Math.PI);
-                ctx.fillStyle = "#30D158";
-                ctx.shadowColor = "#30D158";
-                ctx.shadowBlur = 8;
-                ctx.fill();
-            });
+            // 2. Vẽ Chân mày (Brows)
+            ctx.beginPath();
+            ctx.moveTo(p3d.browLeftOuter.x, p3d.browLeftOuter.y);
+            ctx.lineTo(p3d.browLeftInner.x, p3d.browLeftInner.y);
+            ctx.moveTo(p3d.browRightInner.x, p3d.browRightInner.y);
+            ctx.lineTo(p3d.browRightOuter.x, p3d.browRightOuter.y);
+            ctx.stroke();
+
+            // 3. Vẽ Đôi mắt (Eyes Oval 3D)
+            ctx.beginPath();
+            ctx.moveTo(p3d.eyeLeftOuter.x, p3d.eyeLeftOuter.y);
+            ctx.quadraticCurveTo(p3d.eyeLeftCenter.x, p3d.eyeLeftCenter.y - 6, p3d.eyeLeftInner.x, p3d.eyeLeftInner.y);
+            ctx.quadraticCurveTo(p3d.eyeLeftCenter.x, p3d.eyeLeftCenter.y + 6, p3d.eyeLeftOuter.x, p3d.eyeLeftOuter.y);
+
+            ctx.moveTo(p3d.eyeRightInner.x, p3d.eyeRightInner.y);
+            ctx.quadraticCurveTo(p3d.eyeRightCenter.x, p3d.eyeRightCenter.y - 6, p3d.eyeRightOuter.x, p3d.eyeRightOuter.y);
+            ctx.quadraticCurveTo(p3d.eyeRightCenter.x, p3d.eyeRightCenter.y + 6, p3d.eyeRightInner.x, p3d.eyeRightInner.y);
+            ctx.stroke();
+
+            // 4. Vẽ Sống mũi 3D (3D Nose Projection)
+            ctx.beginPath();
+            ctx.moveTo(p3d.noseBridgeTop.x, p3d.noseBridgeTop.y);
+            ctx.lineTo(p3d.noseTip.x, p3d.noseTip.y);
+            ctx.lineTo(p3d.noseBaseLeft.x, p3d.noseBaseLeft.y);
+            ctx.moveTo(p3d.noseTip.x, p3d.noseTip.y);
+            ctx.lineTo(p3d.noseBaseRight.x, p3d.noseBaseRight.y);
+            ctx.stroke();
+
+            // 5. Vẽ Bờ môi (Lips Contour)
+            ctx.beginPath();
+            ctx.moveTo(p3d.mouthLeft.x, p3d.mouthLeft.y);
+            ctx.lineTo(p3d.lipTop.x, p3d.lipTop.y);
+            ctx.lineTo(p3d.mouthRight.x, p3d.mouthRight.y);
+            ctx.lineTo(p3d.lipBottom.x, p3d.lipBottom.y);
+            ctx.closePath();
+            ctx.stroke();
+
+            // 6. Vẽ các đường tham chiếu hình học 3D nhẹ (Wireframe lines)
+            ctx.strokeStyle = "rgba(10, 132, 255, 0.25)";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(p3d.browLeftInner.x, p3d.browLeftInner.y);
+            ctx.lineTo(p3d.noseBridgeTop.x, p3d.noseBridgeTop.y);
+            ctx.lineTo(p3d.browRightInner.x, p3d.browRightInner.y);
+
+            ctx.moveTo(p3d.noseTip.x, p3d.noseTip.y);
+            ctx.lineTo(p3d.lipTop.x, p3d.lipTop.y);
+            ctx.lineTo(p3d.chin.x, p3d.chin.y);
+            ctx.stroke();
 
             state.guideAnimFrame = requestAnimationFrame(renderTracking);
         }
@@ -1379,7 +1432,7 @@
         }, 150);
     }
 
-    /* --- DRAW REALTIME SCANNING LANDMARKS OVERLAY ON IMAGE --- */
+    /* --- DRAW REALTIME SCANNING OVERLAY ON IMAGE --- */
     function drawScanOverlayImage() {
         const resultCanvas = document.getElementById('scanResultCanvas');
         if (!resultCanvas || !state.photos[0]) return;
@@ -1410,15 +1463,6 @@
             ctx.moveTo(pts[0].x, pts[0].y); ctx.lineTo(pts[2].x, pts[2].y); ctx.lineTo(pts[1].x, pts[1].y);
             ctx.lineTo(pts[4].x, pts[4].y); ctx.lineTo(pts[5].x, pts[5].y); ctx.lineTo(pts[3].x, pts[3].y);
             ctx.lineTo(pts[2].x, pts[2].y); ctx.stroke();
-
-            pts.forEach(p => {
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, Math.max(4, w * 0.01), 0, 2 * Math.PI);
-                ctx.fillStyle = "#30D158";
-                ctx.shadowColor = "#30D158";
-                ctx.shadowBlur = 10;
-                ctx.fill();
-            });
         };
     }
 
@@ -1734,7 +1778,11 @@
     }
 
     /* --- AI COACH CHAT CONNECTIVITY --- */
-    function openCoachChat() { document.getElementById('coachModal').style.display = 'flex'; }
+    function openCoachChat() { 
+        document.getElementById('coachModal').style.display = 'flex';
+        const msgs = document.getElementById('chatMessages');
+        msgs.scrollTop = msgs.scrollHeight;
+    }
     function closeCoachChat() { document.getElementById('coachModal').style.display = 'none'; }
 
     async function sendCoachMessage() {
@@ -1743,13 +1791,14 @@
         if(!text) return;
 
         const msgs = document.getElementById('chatMessages');
-        msgs.innerHTML += `<div class="chat-bubble user">${text}</div>`;
+        msgs.innerHTML += `<div class="chat-bubble user">${escapeHTML(text)}</div>`;
         input.value = '';
         msgs.scrollTop = msgs.scrollHeight;
 
         const apiKey = window.getGlobalApiKey ? window.getGlobalApiKey() : null;
         if(!apiKey) {
             msgs.innerHTML += `<div class="chat-bubble ai">Chưa kết nối API Key từ Firestore configuration. Vui lòng kiểm tra lại.</div>`;
+            msgs.scrollTop = msgs.scrollHeight;
             return;
         }
 
@@ -1764,10 +1813,11 @@
             });
             const data = await res.json();
             const reply = data.candidates[0].content.parts[0].text;
-            msgs.innerHTML += `<div class="chat-bubble ai">${reply}</div>`;
+            msgs.innerHTML += `<div class="chat-bubble ai">${escapeHTML(reply)}</div>`;
             msgs.scrollTop = msgs.scrollHeight;
         } catch(e) {
             msgs.innerHTML += `<div class="chat-bubble ai">Lỗi kết nối AI Coach: ${e.message}</div>`;
+            msgs.scrollTop = msgs.scrollHeight;
         }
     }
 
