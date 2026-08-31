@@ -133,7 +133,6 @@
         .brand-name { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; text-transform: uppercase; color: #fff; }
         .ai-badge { font-size: 9px; font-weight: 700; color: var(--accent-color); letter-spacing: 0.8px; text-transform: uppercase; }
 
-        /* AVATAR MẶC ĐỊNH SVG */
         .default-avatar-svg {
             width: 38px; height: 38px; border-radius: 50%;
             border: 2px solid var(--accent-color);
@@ -262,7 +261,6 @@
         .capture-slot.has-image:hover .img-overlay-actions,
         .capture-slot.has-image:active .img-overlay-actions { opacity: 1; }
 
-        /* CAMERA MODAL & VIEWPORT */
         #cameraModal {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: #000; z-index: 9999; display: none; flex-direction: column;
@@ -320,7 +318,6 @@
             transition: opacity 0.1s ease-out;
         }
 
-        /* SCANNING UI & DYNAMIC RESULT CANVAS */
         .loading-container { display: none; text-align: center; padding: 10px 0 20px 0; }
         .scan-frame-container {
             position: relative; width: 240px; height: 240px;
@@ -937,7 +934,6 @@
 
     document.getElementById('btnLogout').addEventListener('click', () => signOut(auth));
 
-    // Lấy API key chính xác cho DigitalsMod AI / AI Coach
     const configRef = doc(db, "glowmax", "config", "api", "keyDoc");
     onSnapshot(configRef, (snap) => {
         if (snap.exists() && snap.data().apiKey) {
@@ -1255,7 +1251,7 @@
         }
     }
 
-    /* --- REALTIME DYNAMIC 3D FACE & LANDMARK TRACKING CANVAS --- */
+    /* --- REALTIME DYNAMIC 3D FACE & ANGLED LANDMARK TRACKING CANVAS --- */
     function startDynamicLandmarkCamera() {
         const canvas = document.getElementById('faceGuideCanvas');
         if (!canvas) return;
@@ -1272,19 +1268,25 @@
             ctx.clearRect(0, 0, w, h);
             tick += 0.04;
 
-            // Xoay mẫu 3D tùy theo góc chụp (Step 0: 0°, Step 1: -25° Nghiêng Trái, Step 2: +25° Nghiêng Phải)
+            // Xoay mẫu 3D tùy theo góc chụp (Step 0: 0°, Step 1: -30° Nghiêng Trái, Step 2: +30° Nghiêng Phải)
             let yawShift = 0;
-            if (state.currentStep === 1) yawShift = -rx * 0.35;
-            else if (state.currentStep === 2) yawShift = rx * 0.35;
+            let yawAngle = 0;
+            if (state.currentStep === 1) {
+                yawShift = -rx * 0.35;
+                yawAngle = -0.3;
+            } else if (state.currentStep === 2) {
+                yawShift = rx * 0.35;
+                yawAngle = 0.3;
+            }
 
-            // Chuyển động nhịp nhàng (Tracking motion simulation)
-            const offsetX = Math.sin(tick * 1.5) * 4 + yawShift;
-            const offsetY = Math.cos(tick * 1.2) * 3;
+            const offsetX = Math.sin(tick * 1.5) * 3 + yawShift;
+            const offsetY = Math.cos(tick * 1.2) * 2;
 
-            // 1. Khung 3D Đầu Oval
+            // 1. Khung 3D Đầu Oval tự xoay theo góc nghiêng
             ctx.save();
             ctx.beginPath();
-            ctx.ellipse(cx + offsetX, cy + offsetY, rx, ry, (yawShift / rx) * 0.2, 0, 2 * Math.PI);
+            const ovalRx = rx * (1 - Math.abs(yawAngle) * 0.25);
+            ctx.ellipse(cx + offsetX, cy + offsetY, ovalRx, ry, yawAngle, 0, 2 * Math.PI);
             ctx.strokeStyle = "rgba(10, 132, 255, 0.75)";
             ctx.lineWidth = 2;
             ctx.setLineDash([8, 6]);
@@ -1293,44 +1295,46 @@
             ctx.stroke();
             ctx.restore();
 
-            // 2. Tính toán điểm tự động Mắt - Mũi - Miệng - Cằm - Góc Hàm
+            // 2. Tính toán vị trí các điểm nhận diện khuôn mặt theo góc nghiêng 3D
             const fcx = cx + offsetX;
             const fcy = cy + offsetY;
 
+            const eyeDist = rx * 0.35 * (1 - Math.abs(yawAngle) * 0.2);
+            const noseX = fcx + yawShift * 0.5;
+
             const landmarks = {
-                leftEye: { x: fcx - rx * 0.35, y: fcy - ry * 0.15 },
-                rightEye: { x: fcx + rx * 0.35, y: fcy - ry * 0.15 },
-                noseBridge: { x: fcx, y: fcy - ry * 0.05 },
-                noseTip: { x: fcx, y: fcy + ry * 0.15 },
-                mouthLeft: { x: fcx - rx * 0.25, y: fcy + ry * 0.42 },
-                mouthRight: { x: fcx + rx * 0.25, y: fcy + ry * 0.42 },
-                chinTip: { x: fcx, y: fcy + ry * 0.82 },
-                jawLeft: { x: fcx - rx * 0.75, y: fcy + ry * 0.5 },
-                jawRight: { x: fcx + rx * 0.75, y: fcy + ry * 0.5 }
+                leftEye: { x: fcx - eyeDist + yawShift * 0.2, y: fcy - ry * 0.15 },
+                rightEye: { x: fcx + eyeDist + yawShift * 0.2, y: fcy - ry * 0.15 },
+                noseBridge: { x: noseX, y: fcy - ry * 0.05 },
+                noseTip: { x: noseX + yawShift * 0.3, y: fcy + ry * 0.15 },
+                mouthLeft: { x: fcx - rx * 0.25 + yawShift * 0.3, y: fcy + ry * 0.42 },
+                mouthRight: { x: fcx + rx * 0.25 + yawShift * 0.3, y: fcy + ry * 0.42 },
+                chinTip: { x: fcx + yawShift * 0.4, y: fcy + ry * 0.82 },
+                jawLeft: { x: fcx - rx * 0.75 + yawShift * 0.2, y: fcy + ry * 0.5 },
+                jawRight: { x: fcx + rx * 0.75 + yawShift * 0.2, y: fcy + ry * 0.5 }
             };
 
-            // Vẽ các đường nối hình học 3D kết nối các điểm
+            // Vẽ các đường nối hình học 3D
             ctx.strokeStyle = "rgba(10, 132, 255, 0.35)";
             ctx.lineWidth = 1;
             ctx.setLineDash([]);
             
             ctx.beginPath();
-            // Mắt nối Mũi
             ctx.moveTo(landmarks.leftEye.x, landmarks.leftEye.y);
             ctx.lineTo(landmarks.noseTip.x, landmarks.noseTip.y);
             ctx.lineTo(landmarks.rightEye.x, landmarks.rightEye.y);
-            // Mũi nối Miệng
+            
             ctx.lineTo(landmarks.mouthRight.x, landmarks.mouthRight.y);
             ctx.lineTo(landmarks.chinTip.x, landmarks.chinTip.y);
             ctx.lineTo(landmarks.mouthLeft.x, landmarks.mouthLeft.y);
             ctx.lineTo(landmarks.noseTip.x, landmarks.noseTip.y);
-            // Hàm nối Cằm
+            
             ctx.moveTo(landmarks.jawLeft.x, landmarks.jawLeft.y);
             ctx.lineTo(landmarks.chinTip.x, landmarks.chinTip.y);
             ctx.lineTo(landmarks.jawRight.x, landmarks.jawRight.y);
             ctx.stroke();
 
-            // Vẽ các điểm Chấm Xanh Neon nhấp nháy di chuyển theo vị trí Mắt, Mũi, Miệng, Cằm
+            // Vẽ các điểm Chấm Xanh Neon nhấp nháy di chuyển chuẩn vị trí
             Object.keys(landmarks).forEach(key => {
                 const pt = landmarks[key];
                 ctx.beginPath();
@@ -1387,10 +1391,8 @@
             resultCanvas.width = img.width;
             resultCanvas.height = img.height;
 
-            // Vẽ ảnh gốc lên Canvas
             ctx.drawImage(img, 0, 0, img.width, img.height);
 
-            // Vẽ lưới các điểm nhận diện khuôn mặt thực tế
             const w = img.width, h = img.height;
             const cx = w * 0.5, cy = h * 0.48;
             const rx = w * 0.26, ry = h * 0.32;
@@ -1402,7 +1404,6 @@
                 { x: cx - rx * 0.8, y: cy + ry * 0.5 }, { x: cx + rx * 0.8, y: cy + ry * 0.5 }
             ];
 
-            // Nối đường hình học 3D
             ctx.strokeStyle = "#0A84FF";
             ctx.lineWidth = Math.max(2, w * 0.005);
             ctx.beginPath();
@@ -1410,7 +1411,6 @@
             ctx.lineTo(pts[4].x, pts[4].y); ctx.lineTo(pts[5].x, pts[5].y); ctx.lineTo(pts[3].x, pts[3].y);
             ctx.lineTo(pts[2].x, pts[2].y); ctx.stroke();
 
-            // Vẽ điểm chấm
             pts.forEach(p => {
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, Math.max(4, w * 0.01), 0, 2 * Math.PI);
@@ -1499,7 +1499,7 @@
                 }
             }
 
-            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
             const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -1733,7 +1733,7 @@
         else window.print();
     }
 
-    /* --- AI COACH CHAT FIXED CONNECTIVITY --- */
+    /* --- AI COACH CHAT CONNECTIVITY --- */
     function openCoachChat() { document.getElementById('coachModal').style.display = 'flex'; }
     function closeCoachChat() { document.getElementById('coachModal').style.display = 'none'; }
 
@@ -1754,7 +1754,7 @@
         }
 
         try {
-            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
             const res = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
