@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Glowmax Dashboard - Multi-AI Configuration</title>
+    <title>Glowmax Dashboard - API & Multi-Model Configuration</title>
 
     <style>
         * {
@@ -124,50 +124,26 @@
             color: #fff;
         }
 
-        /* PROVIDER SELECTOR TABS */
-        .provider-tabs {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 20px;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 4px;
-            border-radius: 16px;
-            border: 1px solid var(--glass-border);
-        }
-
-        .provider-tab {
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            padding: 10px;
-            font-size: 13px;
-            font-weight: 600;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .provider-tab.active {
-            background: var(--accent-color);
-            color: #fff;
-            box-shadow: 0 4px 12px var(--accent-glow);
-        }
-
-        .provider-section {
-            display: none;
-        }
-
-        .provider-section.active {
-            display: block;
-        }
-
         .glass-card {
             background: var(--glass-card);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius-medium);
             padding: 20px;
             margin-bottom: 20px;
+        }
+
+        .section-header {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 8px;
         }
 
         .status-indicator {
@@ -272,36 +248,6 @@
             transform: scale(0.94);
         }
 
-        button.primary-btn {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(
-                180deg,
-                var(--accent-color) 0%,
-                var(--accent-hover) 100%
-            );
-            color: #fff;
-            border: none;
-            border-radius: var(--radius-medium);
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 8px 24px var(--accent-glow);
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin-top: 8px;
-        }
-
-        button.primary-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 12px 28px var(--accent-glow);
-        }
-
-        button.primary-btn:disabled {
-            opacity: 0.55;
-            cursor: not-allowed;
-            transform: none;
-        }
-
         .meta-info {
             font-size: 12px;
             color: var(--text-tertiary);
@@ -309,7 +255,7 @@
             text-align: center;
         }
 
-        /* API LIST (GEMINI) */
+        /* API LIST */
         .api-list {
             display: flex;
             flex-direction: column;
@@ -489,7 +435,7 @@
             cursor: pointer;
         }
 
-        /* OPENROUTER STYLES */
+        /* OPENROUTER STYLES (DƯỚI CÙNG) */
         .or-model-list {
             display: flex;
             flex-direction: column;
@@ -564,56 +510,6 @@
             transform: translateX(18px);
         }
 
-        .advanced-options {
-            margin-top: 14px;
-            padding-top: 14px;
-            border-top: 1px solid var(--glass-border);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .checkbox-label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 13px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            text-transform: none;
-            letter-spacing: normal;
-        }
-
-        .checkbox-label input {
-            width: 16px;
-            height: 16px;
-            accent-color: var(--accent-color);
-            cursor: pointer;
-        }
-
-        .test-btn-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 14px;
-        }
-
-        .test-btn {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid var(--glass-border);
-            color: #fff;
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .test-btn:hover {
-            background: rgba(255, 255, 255, 0.12);
-        }
-
         .toast {
             position: fixed;
             bottom: 24px;
@@ -657,110 +553,97 @@
             </div>
         </div>
 
-        <!-- AI PROVIDER SELECTOR TABS -->
-        <div class="provider-tabs">
-            <button type="button" class="provider-tab active" id="tabGemini" onclick="switchProvider('gemini')">Gemini</button>
-            <button type="button" class="provider-tab" id="tabOpenRouter" onclick="switchProvider('openrouter')">OpenRouter</button>
-        </div>
-
         <!-- ================= GEMINI SECTION ================= -->
-        <div class="provider-section active" id="sectionGemini">
-            <div class="glass-card">
-                <div class="status-indicator">
-                    <span class="status-dot" id="statusDot"></span>
-                    <span id="statusText">Đang kết nối Firestore...</span>
-                </div>
+        <div class="glass-card">
+            <div class="section-header">⚙️ Hệ thống Gemini API</div>
 
-                <div>
-                    <label>API Key đang sử dụng</label>
-                    <div class="input-group">
-                        <input type="text" id="apiKeyInput" placeholder="Chưa có API Key..." autocomplete="off" readonly>
-                        <div class="input-actions">
-                            <button type="button" class="icon-btn" id="toggleVisibility" title="Hiện/Ẩn">👁</button>
-                            <button type="button" class="icon-btn" id="copyKey" title="Sao chép">📋</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="rotation-box">
-                    <div class="rotation-title">Tự động chuyển API Key sau 10 phút</div>
-                    <div class="rotation-time" id="rotationTime">--:--</div>
-                    <div class="progress-track">
-                        <div class="progress-bar" id="progressBar"></div>
-                    </div>
-                </div>
-
-                <div class="meta-info" id="metaInfo">Cập nhật cuối: Chưa có dữ liệu</div>
+            <div class="status-indicator">
+                <span class="status-dot" id="statusDot"></span>
+                <span id="statusText">Đang kết nối Firestore...</span>
             </div>
 
-            <div class="glass-card">
-                <label>Danh sách Gemini API Key</label>
-                <div class="api-list" id="apiList">
-                    <div class="empty-state">Chưa có API Key</div>
+            <div>
+                <label>API Key đang sử dụng</label>
+                <div class="input-group">
+                    <input type="text" id="apiKeyInput" placeholder="Chưa có API Key..." autocomplete="off" readonly>
+                    <div class="input-actions">
+                        <button type="button" class="icon-btn" id="toggleVisibility" title="Hiện/Ẩn">👁</button>
+                        <button type="button" class="icon-btn" id="copyKey" title="Sao chép">📋</button>
+                    </div>
                 </div>
+            </div>
 
-                <div class="add-section">
-                    <label for="newApiKey">Thêm API Key mới</label>
-                    <input type="password" id="newApiKey" placeholder="AIza..." autocomplete="off">
-                    <button type="button" class="add-btn" id="addKeyBtn">＋ Thêm API Key</button>
+            <div class="rotation-box">
+                <div class="rotation-title">Tự động chuyển API Key sau 10 phút</div>
+                <div class="rotation-time" id="rotationTime">--:--</div>
+                <div class="progress-track">
+                    <div class="progress-bar" id="progressBar"></div>
                 </div>
+            </div>
+
+            <div class="meta-info" id="metaInfo">Cập nhật cuối: Chưa có dữ liệu</div>
+        </div>
+
+        <div class="glass-card">
+            <label>Danh sách Gemini API Key</label>
+            <div class="api-list" id="apiList">
+                <div class="empty-state">Chưa có API Key</div>
+            </div>
+
+            <div class="add-section">
+                <label for="newApiKey">Thêm API Key mới</label>
+                <input type="password" id="newApiKey" placeholder="AIza..." autocomplete="off">
+                <button type="button" class="add-btn" id="addKeyBtn">＋ Thêm API Key</button>
             </div>
         </div>
 
-        <!-- ================= OPENROUTER SECTION ================= -->
-        <div class="provider-section" id="sectionOpenRouter">
-            <div class="glass-card">
-                <div class="status-indicator">
-                    <span class="status-dot" id="orStatusDot"></span>
-                    <span id="orStatusText">OpenRouter sẵn sàng</span>
-                </div>
+        <!-- ================= OPENROUTER SECTION (ĐẶT Ở DƯỚI) ================= -->
+        <div class="glass-card">
+            <div class="section-header">🌐 Cấu hình OpenRouter & Model thông minh</div>
 
-                <div>
-                    <label>OpenRouter API Key</label>
-                    <div class="input-group">
-                        <input type="password" id="orApiKeyInput" placeholder="sk-or-v1-..." autocomplete="off">
-                        <div class="input-actions">
-                            <button type="button" class="icon-btn" id="orToggleVisibility" title="Hiện/Ẩn">👁</button>
-                            <button type="button" class="icon-btn" id="orCopyKey" title="Sao chép">📋</button>
-                        </div>
+            <div class="status-indicator">
+                <span class="status-dot" id="orStatusDot"></span>
+                <span id="orStatusText">OpenRouter sẵn sàng</span>
+            </div>
+
+            <div style="margin-bottom: 16px;">
+                <label>OpenRouter API Key</label>
+                <div class="input-group">
+                    <input type="password" id="orApiKeyInput" placeholder="sk-or-v1-..." autocomplete="off">
+                    <div class="input-actions">
+                        <button type="button" class="icon-btn" id="orToggleVisibility" title="Hiện/Ẩn">👁</button>
+                        <button type="button" class="icon-btn" id="orCopyKey" title="Sao chép">📋</button>
                     </div>
-                </div>
-
-                <div style="margin-top: 16px;">
-                    <label>Model Mode</label>
-                    <select id="orModelMode" onchange="updateORModeUI()">
-                        <option value="AUTO">AUTO (Tự động Fallback theo Priority)</option>
-                        <option value="MANUAL">MANUAL (Chọn Model cụ thể)</option>
-                    </select>
-                </div>
-
-                <div id="orManualContainer" style="margin-top: 16px; display: none;">
-                    <label>Chọn Model Thủ Công</label>
-                    <select id="orManualModelSelect">
-                        <!-- Render dynamically -->
-                    </select>
                 </div>
             </div>
 
-            <div class="glass-card">
-                <label>Available Models Registry (Vision Supported)</label>
-                <div class="or-model-list" id="orModelList">
-                    <!-- Render dynamic registry -->
-                </div>
+            <div style="margin-bottom: 16px;">
+                <label>Model Mode</label>
+                <select id="orModelMode" onchange="updateORModeUI()">
+                    <option value="AUTO">AUTO (Tự động chọn thông minh & Xoay vòng sau 1 giờ)</option>
+                    <option value="MANUAL">MANUAL (Chọn Model cố định)</option>
+                </select>
+            </div>
 
-                <div class="advanced-options">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="crossProviderFallback"> Enable Cross-Provider Fallback (Gemini ⇄ OpenRouter)
-                    </label>
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="multiAiConsensus"> Multi-AI Consensus (Tối đa 3 model phân tích đồng thời)
-                    </label>
-                </div>
+            <div id="orManualContainer" style="margin-bottom: 16px; display: none;">
+                <label>Chọn Model Cố Định</label>
+                <select id="orManualModelSelect">
+                    <!-- Render dynamically -->
+                </select>
+            </div>
 
-                <div class="test-btn-group">
-                    <button type="button" class="test-btn" id="testOrConnection">Test Connection</button>
-                    <button type="button" class="test-btn" id="testOrVision">Test Vision</button>
+            <!-- ROTATION BOX CHO OPENROUTER (1 TIẾNG) -->
+            <div class="rotation-box" id="orRotationBox">
+                <div class="rotation-title">Tự động xoay vòng Model OpenRouter sau 1 giờ</div>
+                <div class="rotation-time" id="orRotationTime">--:--</div>
+                <div class="progress-track">
+                    <div class="progress-bar" id="orProgressBar" style="background: linear-gradient(90deg, #30D158, #0A84FF);"></div>
                 </div>
+            </div>
+
+            <label style="margin-top: 16px;">Danh sách Model hỗ trợ Vision (Đang bật)</label>
+            <div class="or-model-list" id="orModelList">
+                <!-- Render dynamic registry -->
             </div>
         </div>
 
@@ -788,7 +671,8 @@
     const db = getFirestore(app);
 
     const configRef = doc(db, "glowmax", "config", "api", "keyDoc");
-    const ROTATION_TIME = 10 * 60 * 1000;
+    const ROTATION_TIME = 10 * 60 * 1000; // 10 phút cho Gemini
+    const OR_ROTATION_TIME = 60 * 60 * 1000; // 1 giờ cho OpenRouter
 
     // ================= GEMINI STATE =================
     let apiKeys = [];
@@ -798,21 +682,21 @@
     let isMasked = true;
     let rotationTimer = null;
 
-    // ================= OPENROUTER REGISTRY & STATE =================
+    // ================= OPENROUTER STATE & REGISTRY (1 TIẾNG XOAY VÒNG) =================
     let orConfig = {
-        provider: "gemini",
         apiKey: "",
         modelMode: "AUTO",
-        manualModel: "google/gemma-3-27b-it", // Hoặc model mặc định
-        crossProviderFallback: false,
-        multiAiConsensus: false,
+        manualModel: "google/gemma-3-27b-it",
+        currentModelIndex: 0,
+        orRotationStartedAt: 0,
         models: [
-            { id: "google/gemma-3-27b-it", name: "Gemma 3 27B IT", provider: "OpenRouter", vision: true, enabled: true, priority: 1 },
-            { id: "google/gemma-2-9b-it", name: "Gemma 2 9B IT", provider: "OpenRouter", vision: true, enabled: true, priority: 2 },
-            { id: "minimax/minimax-m3", name: "MiniMax M3", provider: "OpenRouter", vision: true, enabled: true, priority: 3 },
-            { id: "nvidia/nemotron-nano-4b-instruct", name: "Nemotron Nano Omni", provider: "OpenRouter", vision: true, enabled: true, priority: 4 }
+            { id: "google/gemma-3-27b-it", name: "Gemma 3 27B IT", vision: true, enabled: true, priority: 1 },
+            { id: "google/gemma-2-9b-it", name: "Gemma 2 9B IT", vision: true, enabled: true, priority: 2 },
+            { id: "minimax/minimax-m3", name: "MiniMax M3", vision: true, enabled: true, priority: 3 },
+            { id: "nvidia/nemotron-nano-4b-instruct", name: "Nemotron Nano Omni", vision: true, enabled: true, priority: 4 }
         ]
     };
+    let orRotationTimer = null;
 
     // DOM Elements Gemini
     const inputEl = document.getElementById("apiKeyInput");
@@ -833,8 +717,9 @@
     const orManualContainer = document.getElementById("orManualContainer");
     const orManualModelSelect = document.getElementById("orManualModelSelect");
     const orModelList = document.getElementById("orModelList");
-    const crossProviderFallback = document.getElementById("crossProviderFallback");
-    const multiAiConsensus = document.getElementById("multiAiConsensus");
+    const orRotationBox = document.getElementById("orRotationBox");
+    const orRotationTime = document.getElementById("orRotationTime");
+    const orProgressBar = document.getElementById("orProgressBar");
 
     function showToast(msg) {
         const toast = document.getElementById("toastMessage");
@@ -853,52 +738,46 @@
         return key.substring(0, 6) + "••••••••••" + key.substring(key.length - 4);
     }
 
-    function maskOrKey(key) {
-        if (!key) return "";
-        if (key.length <= 12) return "••••••••••••";
-        return key.substring(0, 10) + "••••••••••" + key.substring(key.length - 4);
+    // ================= OPENROUTER UI & ROTATION LOGIC (1 TIẾNG) =================
+    function getActiveOrModel() {
+        const enabledModels = orConfig.models.filter(m => m.enabled);
+        if (!enabledModels.length) return null;
+        if (orConfig.modelMode === "MANUAL") {
+            return orConfig.manualModel;
+        }
+        // AUTO Mode: Dùng index theo chu kỳ 1 tiếng
+        if (orConfig.currentModelIndex >= enabledModels.length) {
+            orConfig.currentModelIndex = 0;
+        }
+        return enabledModels[orConfig.currentModelIndex].id;
     }
 
-    // ================= TAB SWITCHING =================
-    window.switchProvider = function(provider) {
-        orConfig.provider = provider;
-        document.getElementById("tabGemini").classList.toggle("active", provider === "gemini");
-        document.getElementById("tabOpenRouter").classList.toggle("active", provider === "openrouter");
-        document.getElementById("sectionGemini").classList.toggle("active", provider === "gemini");
-        document.getElementById("sectionOpenRouter").classList.toggle("active", provider === "openrouter");
-        saveConfig({ activeProvider: provider });
-    };
-
-    // ================= OPENROUTER UI RENDER =================
     function renderOpenRouterUI() {
         if (orApiKeyInput !== document.activeElement) {
             orApiKeyInput.value = orConfig.apiKey || "";
         }
         orModelMode.value = orConfig.modelMode || "AUTO";
-        crossProviderFallback.checked = !!orConfig.crossProviderFallback;
-        multiAiConsensus.checked = !!orConfig.multiAiConsensus;
-
         orManualContainer.style.display = orConfig.modelMode === "MANUAL" ? "block" : "none";
+        orRotationBox.style.display = orConfig.modelMode === "AUTO" ? "block" : "none";
 
-        // Render manual model options
+        // Render manual model select options
         orManualModelSelect.innerHTML = "";
         orModelList.innerHTML = "";
 
-        orConfig.models.forEach((m, idx) => {
-            // Manual select options
+        orConfig.models.forEach((m) => {
             const opt = document.createElement("option");
             opt.value = m.id;
             opt.innerText = m.name + (m.vision ? " (Vision)" : "");
             if (m.id === orConfig.manualModel) opt.selected = true;
             orManualModelSelect.appendChild(opt);
 
-            // Registry list items
             const div = document.createElement("div");
             div.className = "or-model-item";
+            const isActiveAuto = orConfig.modelMode === "AUTO" && getActiveOrModel() === m.id;
             div.innerHTML = `
                 <div class="or-model-info">
                     <span class="or-model-badge">Priority ${m.priority}</span>
-                    <span>${m.name}</span>
+                    <span>${m.name} ${isActiveAuto ? '<b>(ĐANG DÙNG)</b>' : ''}</span>
                 </div>
                 <label class="toggle-switch">
                     <input type="checkbox" data-model-id="${m.id}" ${m.enabled ? "checked" : ""} onchange="toggleOrModel('${m.id}')">
@@ -910,7 +789,7 @@
 
         if (orConfig.apiKey) {
             orStatusDot.className = "status-dot active";
-            orStatusText.innerText = "● OpenRouter Connected";
+            orStatusText.innerText = `● OpenRouter Sẵn sàng (${orConfig.modelMode === 'AUTO' ? 'Đang Auto Model: ' + getActiveOrModel() : 'Manual'})`;
         } else {
             orStatusDot.className = "status-dot inactive";
             orStatusText.innerText = "● Chưa cấu hình OpenRouter Key";
@@ -929,7 +808,9 @@
     window.updateORModeUI = function() {
         orConfig.modelMode = orModelMode.value;
         orManualContainer.style.display = orConfig.modelMode === "MANUAL" ? "block" : "none";
+        orRotationBox.style.display = orConfig.modelMode === "AUTO" ? "block" : "none";
         saveConfig();
+        renderOpenRouterUI();
     };
 
     orApiKeyInput.addEventListener("input", (e) => {
@@ -940,17 +821,69 @@
     orManualModelSelect.addEventListener("change", (e) => {
         orConfig.manualModel = e.target.value;
         saveConfig();
+        renderOpenRouterUI();
     });
 
-    crossProviderFallback.addEventListener("change", (e) => {
-        orConfig.crossProviderFallback = e.target.checked;
-        saveConfig();
+    document.getElementById("orToggleVisibility").addEventListener("click", () => {
+        orApiKeyInput.type = orApiKeyInput.type === "password" ? "text" : "password";
     });
 
-    multiAiConsensus.addEventListener("change", (e) => {
-        orConfig.multiAiConsensus = e.target.checked;
-        saveConfig();
+    document.getElementById("orCopyKey").addEventListener("click", async () => {
+        if (!orConfig.apiKey) { showToast("Không có OpenRouter Key!"); return; }
+        try {
+            await navigator.clipboard.writeText(orConfig.apiKey);
+            showToast("Đã sao chép OpenRouter Key!");
+        } catch { showToast("Không thể sao chép!"); }
     });
+
+    // Xoay vòng Model OpenRouter sau 1 giờ
+    async function rotateOrModel() {
+        const enabledModels = orConfig.models.filter(m => m.enabled);
+        if (enabledModels.length <= 1) {
+            orConfig.orRotationStartedAt = Date.now();
+            return;
+        }
+        orConfig.currentModelIndex = (orConfig.currentModelIndex + 1) % enabledModels.length;
+        orConfig.orRotationStartedAt = Date.now();
+        try { await saveConfig(); } catch (err) { console.error(err); }
+        renderOpenRouterUI();
+        showToast("Đã tự động chuyển sang Model OpenRouter thông minh tiếp theo");
+    }
+
+    function updateOrRotationTimer() {
+        if (orConfig.modelMode !== "AUTO") {
+            orRotationTime.innerText = "Đang chế độ Manual";
+            orProgressBar.style.width = "0%";
+            return;
+        }
+        const enabledModels = orConfig.models.filter(m => m.enabled);
+        if (!enabledModels.length) {
+            orRotationTime.innerText = "--:--";
+            orProgressBar.style.width = "0%";
+            return;
+        }
+        if (!orConfig.orRotationStartedAt) {
+            orConfig.orRotationStartedAt = Date.now();
+        }
+        const elapsed = Date.now() - orConfig.orRotationStartedAt;
+        const remaining = OR_ROTATION_TIME - elapsed;
+
+        if (remaining <= 0) {
+            rotateOrModel();
+            return;
+        }
+
+        const hours = Math.floor(remaining / 3600000);
+        const minutes = Math.floor((remaining % 3600000) / 60000);
+        const seconds = Math.floor((remaining % 60000) / 1000);
+
+        orRotationTime.innerText = 
+            String(hours).padStart(2, "0") + ":" + 
+            String(minutes).padStart(2, "0") + ":" + 
+            String(seconds).padStart(2, "0");
+
+        orProgressBar.style.width = Math.min(100, Math.max(0, (elapsed / OR_ROTATION_TIME) * 100)) + "%";
+    }
 
     // ================= GEMINI LOGIC GIỮ NGUYÊN =================
     function getActiveKeyIndex() {
@@ -1033,7 +966,10 @@
                 rotationMinutes: 10,
                 enabled: apiKeys.some(key => key.enabled !== false),
                 // OpenRouter config sync
-                openRouter: orConfig,
+                openRouter: {
+                    ...orConfig,
+                    orRotationStartedAt: orConfig.orRotationStartedAt ? new Date(orConfig.orRotationStartedAt) : serverTimestamp()
+                },
                 ...extra,
                 updatedAt: serverTimestamp()
             },
@@ -1133,30 +1069,6 @@
         } catch { showToast("Không thể sao chép!"); }
     });
 
-    // OpenRouter Key Visibility & Copy
-    document.getElementById("orToggleVisibility").addEventListener("click", () => {
-        orApiKeyInput.type = orApiKeyInput.type === "password" ? "text" : "password";
-    });
-
-    document.getElementById("orCopyKey").addEventListener("click", async () => {
-        if (!orConfig.apiKey) { showToast("Không có OpenRouter Key!"); return; }
-        try {
-            await navigator.clipboard.writeText(orConfig.apiKey);
-            showToast("Đã sao chép OpenRouter Key!");
-        } catch { showToast("Không thể sao chép!"); }
-    });
-
-    // Test Connections
-    document.getElementById("testOrConnection").addEventListener("click", () => {
-        if (!orConfig.apiKey) { showToast("Chưa nhập OpenRouter API Key!"); return; }
-        showToast("OpenRouter Key đã sẵn sàng cấu hình!");
-    });
-
-    document.getElementById("testOrVision").addEventListener("click", () => {
-        if (!orConfig.apiKey) { showToast("Chưa nhập OpenRouter API Key!"); return; }
-        showToast("Vision capabilities verified across registry models.");
-    });
-
     async function rotateApiKey() {
         if (apiKeys.length <= 1) { rotationStartedAt = Date.now(); return; }
         const enabledKeys = apiKeys.filter(key => key.enabled !== false);
@@ -1171,7 +1083,7 @@
         rotationStartedAt = Date.now();
         try { await saveConfig(); } catch (error) { console.error("Rotation error:", error); }
         updateCurrentKeyUI();
-        showToast("Đã tự động chuyển sang API Key tiếp theo");
+        showToast("Đã tự động chuyển sang API Key Gemini tiếp theo");
     }
 
     function updateRotationTimer() {
@@ -1229,9 +1141,16 @@
         // Sync OpenRouter config if exists
         if (data.openRouter) {
             orConfig = { ...orConfig, ...data.openRouter };
-            if (orConfig.provider) {
-                switchProvider(orConfig.provider);
+            if (data.openRouter.orRotationStartedAt) {
+                if (typeof data.openRouter.orRotationStartedAt.toMillis === "function") {
+                    orConfig.orRotationStartedAt = data.openRouter.orRotationStartedAt.toMillis();
+                } else if (data.openRouter.orRotationStartedAt instanceof Date) {
+                    orConfig.orRotationStartedAt = data.openRouter.orRotationStartedAt.getTime();
+                }
             }
+        }
+        if (!orConfig.orRotationStartedAt) {
+            orConfig.orRotationStartedAt = Date.now();
         }
 
         updateCurrentKeyUI();
@@ -1248,7 +1167,9 @@
     });
 
     setInterval(updateRotationTimer, 1000);
+    setInterval(updateOrRotationTimer, 1000);
     updateRotationTimer();
+    updateOrRotationTimer();
 
 </script>
 
