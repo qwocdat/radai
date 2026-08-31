@@ -745,7 +745,6 @@
         if (orConfig.modelMode === "MANUAL") {
             return orConfig.manualModel;
         }
-        // AUTO Mode: Dùng index theo chu kỳ 1 tiếng
         if (orConfig.currentModelIndex >= enabledModels.length) {
             orConfig.currentModelIndex = 0;
         }
@@ -760,7 +759,6 @@
         orManualContainer.style.display = orConfig.modelMode === "MANUAL" ? "block" : "none";
         orRotationBox.style.display = orConfig.modelMode === "AUTO" ? "block" : "none";
 
-        // Render manual model select options
         orManualModelSelect.innerHTML = "";
         orModelList.innerHTML = "";
 
@@ -836,7 +834,6 @@
         } catch { showToast("Không thể sao chép!"); }
     });
 
-    // Xoay vòng Model OpenRouter sau 1 giờ
     async function rotateOrModel() {
         const enabledModels = orConfig.models.filter(m => m.enabled);
         if (enabledModels.length <= 1) {
