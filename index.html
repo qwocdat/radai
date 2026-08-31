@@ -49,7 +49,6 @@
             50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.8); }
         }
 
-        /* LOADING SCREEN ANIMATION */
         #preloader {
             transition: opacity 0.5s ease, visibility 0.5s ease;
         }
@@ -143,8 +142,9 @@
             </div>
         </div>
 
+        <!-- 2 NÚT NỔI BẬT: Đã tối ưu logic bấm lần 1 hiện QC Adsterra, từ lần 2 sang thẳng trang -->
         <section class="space-y-3 sm:space-y-4">
-            <a href="https://www.profitableratecpmnetwork.com/wyz54mnzj?key=9aa535a9480e8308f5caac92971eebfc" target="_blank" class="btn-glow-amber group relative flex items-center justify-between p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 border-2 border-amber-400/80 hover:scale-[1.01] active:scale-[0.99] transition duration-300">
+            <button onclick="handleSmartRedirect('nhanacc.html', 'https://www.profitableratecpmnetwork.com/wyz54mnzj?key=9aa535a9480e8308f5caac92971eebfc', 'ads_clicked_nhanacc')" class="w-full text-left btn-glow-amber group relative flex items-center justify-between p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 border-2 border-amber-400/80 hover:scale-[1.01] active:scale-[0.99] transition duration-300 cursor-pointer">
                 <div class="flex items-center gap-3 sm:gap-4">
                     <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-slate-950/40 border border-amber-300/40 flex items-center justify-center text-2xl sm:text-3xl shrink-0">
                         🎁
@@ -158,13 +158,13 @@
                         </p>
                     </div>
                 </div>
-                <div class="flex items-center gap-2 bg-slate-950/40 border border-amber-300/30 px-3 sm:px-4 py-2 rounded-xl text-amber-200 font-bold text-xs sm:text-sm group-hover:bg-amber-400 group-hover:text-slate-950 transition">
+                <div class="flex items-center gap-2 bg-slate-950/40 border border-amber-300/30 px-3 sm:px-4 py-2 rounded-xl text-amber-200 font-bold text-xs sm:text-sm group-hover:bg-amber-400 group-hover:text-slate-950 transition shrink-0">
                     <span>NHẬN NGAY</span>
                     <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition"></i>
                 </div>
-            </a>
+            </button>
 
-            <a href="https://www.profitableratecpmnetwork.com/wyz54mnzj?key=9aa535a9480e8308f5caac92971eebfc" target="_blank" class="btn-glow-cyan group relative flex items-center justify-between p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-700 border-2 border-cyan-400/80 hover:scale-[1.01] active:scale-[0.99] transition duration-300">
+            <button onclick="handleSmartRedirect('link.html', 'https://www.profitableratecpmnetwork.com/wyz54mnzj?key=9aa535a9480e8308f5caac92971eebfc', 'ads_clicked_link')" class="w-full text-left btn-glow-cyan group relative flex items-center justify-between p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-700 border-2 border-cyan-400/80 hover:scale-[1.01] active:scale-[0.99] transition duration-300 cursor-pointer">
                 <div class="flex items-center gap-3 sm:gap-4">
                     <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-slate-950/40 border border-cyan-300/40 flex items-center justify-center text-2xl sm:text-3xl shrink-0">
                         ⚡
@@ -178,11 +178,11 @@
                         </p>
                     </div>
                 </div>
-                <div class="flex items-center gap-2 bg-slate-950/40 border border-cyan-300/30 px-3 sm:px-4 py-2 rounded-xl text-cyan-200 font-bold text-xs sm:text-sm group-hover:bg-cyan-400 group-hover:text-slate-950 transition">
+                <div class="flex items-center gap-2 bg-slate-950/40 border border-cyan-300/30 px-3 sm:px-4 py-2 rounded-xl text-cyan-200 font-bold text-xs sm:text-sm group-hover:bg-cyan-400 group-hover:text-slate-950 transition shrink-0">
                     <span>TẢI NGAY</span>
                     <i class="fa-solid fa-download text-xs group-hover:translate-y-0.5 transition"></i>
                 </div>
-            </a>
+            </button>
         </section>
 
         <section id="categories-section" class="space-y-4 pt-2">
@@ -587,6 +587,22 @@
         const FIREBASE_PROJECT_ID = "quocdat-396fe";
         const BASE_URL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
         const TELEGRAM_BOT_TOKEN = "8997842751:AAHje_VZ_sjw5ffnw64RJNz3bxqxehRlMwo"; 
+
+        // Hàm thông minh xử lý chuyển trang theo yêu cầu: Lần 1 mở QC, lần 2 sang trang luôn
+        function handleSmartRedirect(targetUrl, adUrl, storageKey) {
+            const hasClickedAds = sessionStorage.getItem(storageKey);
+            if (!hasClickedAds) {
+                // Lần bấm đầu tiên: Mở quảng cáo Adsterra ở tab mới, đồng thời chuyển trang đích luôn
+                sessionStorage.setItem(storageKey, 'true');
+                window.open(adUrl, '_blank');
+                setTimeout(() => {
+                    window.location.href = targetUrl;
+                }, 200);
+            } else {
+                // Từ lần bấm thứ 2 trở đi: Sang thẳng trang đích không hiện quảng cáo nữa
+                window.location.href = targetUrl;
+            }
+        }
 
         function goToNapTien() {
             if (!currentUser) {
