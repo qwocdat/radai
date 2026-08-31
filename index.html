@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DIGITALSHOP - Hệ Thống Bán Tài Khoản Game Tự Động</title>
+    <title>DIGITALSHOP - Hệ Thống Cung Cấp Dịch Vụ & Tài Khoản Game Tự Động</title>
 
     <!-- Google AdSense Code -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9027610508064536" crossorigin="anonymous"></script>
@@ -100,6 +100,13 @@
                     </span>
                 </a>
 
+                <div class="hidden md:flex items-center gap-6 text-xs font-bold text-slate-300">
+                    <button onclick="openModal('modal-about')" class="hover:text-orange-400 transition">Giới Thiệu</button>
+                    <button onclick="openModal('modal-privacy')" class="hover:text-orange-400 transition">Bảo Mật</button>
+                    <button onclick="openModal('modal-terms')" class="hover:text-orange-400 transition">Điều Khoản</button>
+                    <button onclick="openModal('modal-contact')" class="hover:text-orange-400 transition">Liên Hệ</button>
+                </div>
+
                 <div id="nav-auth-container" class="flex items-center gap-2 sm:gap-3">
                 </div>
             </div>
@@ -116,15 +123,15 @@
                     HỆ THỐNG DIGITALSHOP TỰ ĐỘNG 24/7
                 </div>
                 <h1 class="text-2xl sm:text-4xl font-black text-white leading-tight">
-                    Kho <span class="bg-gradient-to-r from-orange-400 to-amber-300 bg-clip-text text-transparent">Tài Khoản Game</span> Giá Rẻ & Uy Tín
+                    Kho <span class="bg-gradient-to-r from-orange-400 to-amber-300 bg-clip-text text-transparent">Dịch Vụ & Tài Khoản Game</span> Uy Tín
                 </h1>
                 <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
-                    Giao dịch tự động, nhận tài khoản tức thì sau khi thanh toán. An toàn và bảo mật tuyệt đối!
+                    Hệ thống phân phối tiện ích game, hỗ trợ giao dịch tự động nhanh chóng và an toàn tuyệt đối.
                 </p>
             </div>
         </section>
 
-        <!-- 2 NÚT NỔI BẬT -->
+        <!-- 2 NÚT NỔI BẬT (Đã chuẩn hóa ngôn từ cho AdSense) -->
         <section class="space-y-3 sm:space-y-4">
             <a href="/nhanacc" class="btn-glow-amber group relative flex items-center justify-between p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 border-2 border-amber-400/80 hover:scale-[1.01] active:scale-[0.99] transition duration-300">
                 <div class="flex items-center gap-3 sm:gap-4">
@@ -133,10 +140,10 @@
                     </div>
                     <div>
                         <h3 class="text-base sm:text-xl font-black text-white group-hover:text-amber-200 transition tracking-wide drop-shadow-md">
-                            NHẬN ACC LIÊN QUÂN MIỄN PHÍ
+                            NHẬN TÀI KHOẢN TRẢI NGHIỆM MIỄN PHÍ
                         </h3>
                         <p class="text-xs sm:text-sm text-amber-100/90 font-medium line-clamp-1">
-                            Bấm vào đây để vượt link nhận Acc VIP Liên Quân hoàn toàn miễn phí
+                            Tham gia hoàn thành nhiệm vụ để nhận tài khoản thử nghiệm Liên Quân miễn phí
                         </p>
                     </div>
                 </div>
@@ -153,10 +160,10 @@
                     </div>
                     <div>
                         <h3 class="text-base sm:text-xl font-black text-white group-hover:text-cyan-200 transition tracking-wide drop-shadow-md">
-                            TẢI MAP LIÊN QUÂN CHẤP TỐ
+                            TẢI BẢN CẤU HÌNH & TỐI ƯU GAME
                         </h3>
                         <p class="text-xs sm:text-sm text-cyan-100/90 font-medium line-clamp-1">
-                            Trang tổng hợp File Hack Map, APK Mod, Key VIP mới nhất cực mượt
+                            Trang tổng hợp File Cấu Hình, Tool Tối Ưu Đồ Họa, Patch hỗ trợ mượt mà
                         </p>
                     </div>
                 </div>
@@ -208,11 +215,27 @@
         </section>
     </main>
 
-    <!-- FOOTER -->
-    <footer class="bg-slate-900/50 border-t border-slate-800 mt-16 py-8">
-        <div class="max-w-7xl mx-auto px-4 text-center text-slate-500 text-xs sm:text-sm space-y-2">
-            <p>© 2026 DIGITALSHOP. Hệ thống bán tài khoản game tự động 24/7.</p>
-            <button onclick="openModal('modal-terms')" class="text-orange-400 hover:underline text-xs"><i class="fa-solid fa-file-contract mr-1"></i>Điều khoản Dịch vụ & Chính sách Mua bán</button>
+    <!-- FOOTER CHUẨN ADSENSE -->
+    <footer class="bg-slate-900/80 border-t border-slate-800 mt-16 py-10">
+        <div class="max-w-7xl mx-auto px-4 space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left border-b border-slate-800 pb-6">
+                <div>
+                    <span class="text-xl font-black bg-gradient-to-r from-orange-400 via-amber-300 to-yellow-400 bg-clip-text text-transparent">
+                        DIGITAL<span class="text-white">SHOP</span>
+                    </span>
+                    <p class="text-xs text-slate-400 mt-1">Hệ thống phân phối tiện ích và tài khoản game tự động 24/7.</p>
+                </div>
+                <div class="flex flex-wrap justify-center gap-4 text-xs font-semibold text-slate-300">
+                    <button onclick="openModal('modal-about')" class="hover:text-orange-400 transition">Giới Thiệu</button>
+                    <button onclick="openModal('modal-privacy')" class="hover:text-orange-400 transition">Chính Sách Bảo Mật</button>
+                    <button onclick="openModal('modal-terms')" class="hover:text-orange-400 transition">Điều Khoản Dịch Vụ</button>
+                    <button onclick="openModal('modal-contact')" class="hover:text-orange-400 transition">Liên Hệ Trợ Giúp</button>
+                </div>
+            </div>
+            <div class="text-center text-slate-500 text-xs space-y-1">
+                <p>© 2026 DIGITALSHOP (digitalsmod.site). All rights reserved.</p>
+                <p>Mọi dịch vụ đều tuân thủ các quy định hiện hành về thương mại điện tử.</p>
+            </div>
         </div>
     </footer>
 
@@ -348,6 +371,88 @@
                     Đăng Ký Tài Khoản
                 </button>
             </form>
+        </div>
+    </div>
+
+    <!-- MODAL GIỚI THIỆU (ABOUT US - BẮT BUỘC ADSENSE) -->
+    <div id="modal-about" class="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden">
+        <div class="glass-modal border border-slate-800 rounded-2xl max-w-2xl w-full p-5 sm:p-6 space-y-4 max-h-[85vh] flex flex-col">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3 shrink-0">
+                <h3 class="text-lg font-bold text-white"><i class="fa-solid fa-circle-info text-orange-400 mr-2"></i>Giới Thiệu Về DIGITALSHOP</h3>
+                <button onclick="closeModal('modal-about')" class="text-slate-400 hover:text-white text-xl">&times;</button>
+            </div>
+            <div class="overflow-y-auto custom-scrollbar space-y-4 text-xs sm:text-sm text-slate-300 pr-2 leading-relaxed">
+                <p><strong>DIGITALSHOP</strong> (vận hành tại nền tảng <code>digitalsmod.site</code>) là hệ thống chuyên cung cấp dịch vụ tiện ích, tối ưu hóa đồ họa game và các tài khoản giải trí trực tuyến hoàn toàn tự động 24/7.</p>
+                <p>Chúng tôi tập trung mang lại giải pháp giao dịch nhanh chóng, minh bạch và an toàn cho cộng đồng game thủ tại Việt Nam với các cam kết hàng đầu về chất lượng dịch vụ và bảo mật thông tin khách hàng.</p>
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-2">
+                    <h4 class="font-bold text-amber-400">Tầm nhìn & Sứ mệnh:</h4>
+                    <ul class="list-disc pl-5 space-y-1 text-slate-400">
+                        <li>Cung cấp công cụ tối ưu trải nghiệm chơi game mượt mà.</li>
+                        <li>Đảm bảo hệ thống nạp và bàn giao tài khoản tự động trong vòng vài giây.</li>
+                        <li>Tạo dựng môi trường giao dịch an toàn, rõ ràng.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pt-3 border-t border-slate-800 shrink-0">
+                <button onclick="closeModal('modal-about')" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl transition text-xs sm:text-sm">Đóng Màn Hình</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CHÍNH SÁCH BẢO MẬT (PRIVACY POLICY - BẮT BUỘC ADSENSE) -->
+    <div id="modal-privacy" class="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden">
+        <div class="glass-modal border border-slate-800 rounded-2xl max-w-2xl w-full p-5 sm:p-6 space-y-4 max-h-[85vh] flex flex-col">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3 shrink-0">
+                <h3 class="text-lg font-bold text-white"><i class="fa-solid fa-user-shield text-green-400 mr-2"></i>Chính Sách Bảo Mật (Privacy Policy)</h3>
+                <button onclick="closeModal('modal-privacy')" class="text-slate-400 hover:text-white text-xl">&times;</button>
+            </div>
+            <div class="overflow-y-auto custom-scrollbar space-y-4 text-xs sm:text-sm text-slate-300 pr-2 leading-relaxed">
+                <div>
+                    <h4 class="font-black text-amber-400 uppercase mb-1">1. Thu thập dữ liệu</h4>
+                    <p class="text-slate-400">Chúng tôi chỉ thu thập các thông tin cần thiết như Email, Tên tài khoản để phục vụ mục đích lưu trữ lịch sử giao dịch và khôi phục mật khẩu cá nhân.</p>
+                </div>
+                <div>
+                    <h4 class="font-black text-amber-400 uppercase mb-1">2. Sử dụng Cookies & Google AdSense</h4>
+                    <p class="text-slate-400">Trang web sử dụng Cookies để cải thiện trải nghiệm người dùng và cung cấp quảng cáo liên quan thông qua Google AdSense. Google có thể sử dụng các tập tin cookie DoubleClick để hiển thị quảng cáo dựa trên lịch sử truy cập trang web của bạn.</p>
+                </div>
+                <div>
+                    <h4 class="font-black text-amber-400 uppercase mb-1">3. Cam kết bảo mật</h4>
+                    <p class="text-slate-400">DIGITALSHOP cam kết không chia sẻ, bán hoặc trao đổi thông tin cá nhân của người dùng cho bất kỳ bên thứ ba nào khác dưới mọi hình thức.</p>
+                </div>
+            </div>
+            <div class="pt-3 border-t border-slate-800 shrink-0">
+                <button onclick="closeModal('modal-privacy')" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl transition text-xs sm:text-sm">Tôi Đã Hiểu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL LIÊN HỆ (CONTACT US - BẮT BUỘC ADSENSE) -->
+    <div id="modal-contact" class="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden">
+        <div class="glass-modal border border-slate-800 rounded-2xl max-w-md w-full p-5 sm:p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="text-lg font-bold text-white"><i class="fa-solid fa-headset text-sky-400 mr-2"></i>Liên Hệ & Hỗ Trợ</h3>
+                <button onclick="closeModal('modal-contact')" class="text-slate-400 hover:text-white text-xl">&times;</button>
+            </div>
+            <div class="space-y-3 text-xs sm:text-sm text-slate-300">
+                <p>Nếu bạn gặp sự cố khi thanh toán hoặc cần hỗ trợ về dịch vụ, vui lòng liên hệ qua các kênh chính thức:</p>
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-3">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-brands fa-telegram text-sky-400 text-xl"></i>
+                        <div>
+                            <p class="text-slate-400 text-[10px]">Kênh Telegram Chăm Sóc Khách Hàng</p>
+                            <p class="font-bold text-white">@DigitalShopSupport</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 border-t border-slate-800 pt-2">
+                        <i class="fa-solid fa-envelope text-amber-400 text-xl"></i>
+                        <div>
+                            <p class="text-slate-400 text-[10px]">Email Hỗ Trợ Trực Tuyến</p>
+                            <p class="font-bold text-white">support@digitalsmod.site</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button onclick="closeModal('modal-contact')" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl transition text-xs sm:text-sm">Đóng</button>
         </div>
     </div>
 
