@@ -1135,7 +1135,7 @@
     /* --- WIZARD FLOW & SCANNER --- */
     function startWizard() {
         const config = window.getGlobalConfig ? window.getGlobalConfig() : null;
-        if (!config || (!config.apiKey && !config.openRouter?.apiKey)) {
+        if (!config || (!config.apiKey && !config.openRouter?.apiKey && (!config.apiKeys || config.apiKeys.length === 0))) {
             alert("Chưa cấu hình API Key. Vui lòng cấu hình trong Dashglow.");
             return;
         }
@@ -1478,30 +1478,27 @@
         });
     }
 
-    /* --- CƠ CHẾ GỌI API MULTI-MODEL FALLBACK (KHÔNG ƯU TIÊN, TỰ ĐỘNG THỬ VÀ BỎ QUA LỖI NGẦM) --- */
+    /* --- CƠ CHẾ GỌI API MULTI-MODEL FALLBACK TỰ ĐỘNG BỎ QUA LỖI NGẦM --- */
     async function executeMultiModelAnalysis(parts) {
         const config = window.getGlobalConfig ? window.getGlobalConfig() : null;
         if (!config) throw new Error("Chưa cấu hình API từ hệ thống.");
 
-        // Tạo danh sách các endpoints tiềm năng cần thử theo thứ tự linh hoạt
         const targets = [];
 
-        // 1. Nếu có cấu hình OpenRouter và có key
+        // 1. Cấu hình OpenRouter
         if (config.openRouter && config.openRouter.apiKey) {
             const orKey = config.openRouter.apiKey;
             const models = config.openRouter.models || [];
-            // Lọc các model đang bật và hỗ trợ vision
             const activeOrModels = models.filter(m => m.enabled && m.vision);
             
-            // Nếu chế độ MANUAL thì đẩy model được chọn lên đầu
+            // Sửa lỗi điều kiện Manual mode đúng tham số
             if (config.openRouter.modelMode === "MANUAL" && config.openRouter.manualModel) {
-                const manualMod = activeOrModels.find(m => m.id === config.openRouter.modelMode);
+                const manualMod = activeOrModels.find(m => m.id === config.openRouter.manualModel);
                 if(manualMod) {
                     targets.push({ type: 'openrouter', model: manualMod.id, key: orKey });
                 }
             }
             
-            // Thêm các model AUTO còn lại
             activeOrModels.forEach(m => {
                 if(!targets.some(t => t.model === m.id)) {
                     targets.push({ type: 'openrouter', model: m.id, key: orKey });
@@ -1509,25 +1506,31 @@
             });
         }
 
-        // 2. Thêm các Gemini key & model dự phòng
+        // 2. Cấu hình Gemini Key dự phòng (Dùng chuẩn v1beta API)
         if (config.apiKeys && config.apiKeys.length > 0) {
             const activeKeys = config.apiKeys.filter(k => k.enabled !== false);
             activeKeys.forEach(k => {
-                targets.push({ type: 'gemini', model: 'gemini-3.6-flash', key: k.apiKey });
-                targets.push({ type: 'gemini', model: 'gemini-2.5-flash', key: k.apiKey });
+                targets.push({ type: 'gemini', model: 'gemini-1.5-flash', key: k.apiKey });
             });
         } else if (config.apiKey) {
-            targets.push({ type: 'gemini', model: 'gemini-3.6-flash', key: config.apiKey });
-            targets.push({ type: 'gemini', model: 'gemini-2.5-flash', key: config.apiKey });
+            targets.push({ type: 'gemini', model: 'gemini-1.5-flash', key: config.apiKey });
         }
 
         if (targets.length === 0) {
             throw new Error("Không tìm thấy API Key hợp lệ nào trong cấu hình.");
         }
 
+        // Chuẩn hóa prompt văn bản và ảnh tách biệt
+        let systemPromptText = "";
+        let imagesData = [];
+
+        parts.forEach(p => {
+            if (p.text) systemPromptText += p.text + "\n";
+            if (p.inline_data) imagesData.push(p.inline_data);
+        });
+
         let lastError = null;
 
-        // Vòng lặp tuần tự thử nghiệm: Model nào lỗi sẽ tự động bỏ qua ngầm không báo lỗi
         for (const target of targets) {
             try {
                 let endpoint = "";
@@ -1540,24 +1543,20 @@
                 } else if (target.type === 'openrouter') {
                     endpoint = `https://openrouter.ai/api/v1/chat/completions`;
                     headers['Authorization'] = `Bearer ${target.key}`;
-                    headers['HTTP-Referer'] = window.location.origin;
+                    headers['HTTP-Referer'] = window.location.origin || 'https://glowmax.app';
                     headers['X-Title'] = 'Glowmax Looksmax';
 
-                    // Chuyển đổi parts sang chuẩn OpenAI OpenRouter format nếu cần
-                    let textPrompt = "";
-                    let imageUrls = [];
-                    parts.forEach(p => {
-                        if (p.text) textPrompt += p.text + "\n";
-                        if (p.inline_data) {
-                            imageUrls.push({ type: "image_url", image_url: { url: `${p.inline_data.mime_type || 'data:image/jpeg;base64'},${p.inline_data.data}` } });
-                        }
+                    let messageContent = [{ type: "text", text: systemPromptText }];
+                    imagesData.forEach(img => {
+                        messageContent.push({
+                            type: "image_url",
+                            image_url: { url: `data:${img.mime_type || 'image/jpeg'};base64,${img.data}` }
+                        });
                     });
 
                     bodyData = {
                         model: target.model,
-                        messages: [
-                            { role: "user", content: [{ type: "text", text: textPrompt }, ...imageUrls] }
-                        ]
+                        messages: [{ role: "user", content: messageContent }]
                     };
                 }
 
@@ -1571,21 +1570,16 @@
                     const data = await response.json();
                     let rawText = "";
                     if (target.type === 'gemini') {
-                        if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
-                            rawText = data.candidates[0].content.parts[0].text;
-                        }
+                        rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
                     } else if (target.type === 'openrouter') {
-                        if (data.choices && data.choices[0]?.message?.content) {
-                            rawText = data.choices[0].message.content;
-                        }
+                        rawText = data.choices?.[0]?.message?.content || "";
                     }
 
                     if (rawText) {
-                        return parseAIJsonResponse(rawText); // Thành công trả về kết quả luôn
+                        return parseAIJsonResponse(rawText);
                     }
                 }
             } catch (err) {
-                // Nuốt lỗi ngầm (silent fail), tự động chuyển sang model tiếp theo không hiện popup
                 lastError = err;
             }
         }
@@ -1615,7 +1609,7 @@
             const promptInstruction = `
             Đóng vai chuyên gia thẩm mỹ Looksmaxxing AI Engine. 
             Hãy đánh giá chân thực, công bằng, khách quan điểm số khuôn mặt người thật dựa trên hình học 3D. TUYỆT ĐỐI KHÔNG tâng bốc điểm số.
-            TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (Không markdown, không giải thích):
+            TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (Không dùng markdown, không giải thích):
             {
               "overall_score": 75, "face_shape": "Oval", "symmetry_score": 78, "proportion_score": 74, "skin_score": 70, "eyes_score": 76, "eyebrows_score": 72, "nose_score": 73, "lips_score": 75, "jawline_score": 77, "chin_score": 74, "hair_score": 76,
               "summary": "Tóm tắt đánh giá cấu trúc mặt", "strengths": ["Cấu trúc mắt cân đối", "Góc hàm nét"], "weaknesses": ["Làn da cần chăm sóc kỹ hơn"], "hairstyles": ["Textured Crop", "Side Part"], "grooming_tips": ["Tỉa gọn lông mày"], "skincare_tips": ["Sử dụng sữa rửa mặt & chống nắng"],
@@ -1634,7 +1628,6 @@
                 }
             }
 
-            // Gọi hàm Multi-Model Fallback tự động chọn model hoạt động
             const resultData = await executeMultiModelAnalysis(parts);
             state.currentResult = resultData;
 
