@@ -217,7 +217,7 @@
         .pill-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-color); box-shadow: 0 0 6px var(--accent-color); }
 
         .wizard-container { display: none; }
-        .step-progress-bar { display: flex; justify-content: space-around; align-items: center; margin-bottom: 28px; position: relative; padding: 0 30px; }
+        .step-progress-bar { display: flex; justify-style: space-around; align-items: center; margin-bottom: 28px; position: relative; padding: 0 30px; }
         .step-progress-line { position: absolute; top: 50%; left: 50px; right: 50px; height: 2px; background: rgba(255, 255, 255, 0.08); z-index: 0; transform: translateY(-50%); }
         .step-progress-fill { position: absolute; top: 50%; left: 50px; height: 2px; background: var(--accent-color); z-index: 0; transform: translateY(-50%); transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 0 8px var(--accent-color); width: 0%; }
         
@@ -671,6 +671,12 @@
         <!-- Result Dashboard Report -->
         <div class="glass-panel" id="resultDashboard">
             <h1 style="margin-bottom: 4px; font-size: 22px;">BÁO CÁO PHÂN TÍCH</h1>
+            
+            <!-- HIỂN THỊ THỐNG KÊ SỐ LẦN DÙNG API THỰC TẾ -->
+            <div id="apiUsageStats" style="margin-top: 8px; font-size: 11px; color: var(--accent-color); font-weight: 600; text-align: center;">
+                API Vừa Dùng: <span id="lastUsedApiDisplay">Chưa sử dụng</span> | Tổng Lượt Gọi: <span id="totalApiCountDisplay">0</span>
+            </div>
+
             <p style="text-align: center; margin-bottom: 24px; font-size: 12px; color: var(--text-tertiary);" id="analysisTime"></p>
 
             <div class="score-hero-wrap">
@@ -1034,6 +1040,13 @@
 
     window.addEventListener('load', () => {
         initFaceMeshEngine();
+        // Load thông tin thống kê đếm API từ bộ nhớ local
+        const totalCalls = localStorage.getItem('gmax_api_call_count') || '0';
+        const lastUsed = localStorage.getItem('gmax_last_used_api') || 'Chưa sử dụng';
+        const elLastUsed = document.getElementById('lastUsedApiDisplay');
+        const elTotalCalls = document.getElementById('totalApiCountDisplay');
+        if (elLastUsed) elLastUsed.innerText = lastUsed;
+        if (elTotalCalls) elTotalCalls.innerText = totalCalls;
     });
 
     /* --- MOTION BLUR SCROLL --- */
@@ -1478,7 +1491,7 @@
         });
     }
 
-    /* --- CƠ CHẾ GỌI API MULTI-MODEL FALLBACK TỰ ĐỘNG BỎ QUA LỖI NGẦM --- */
+    /* --- CƠ CHẾ GỌI API MULTI-MODEL FALLBACK & ĐẾM SỐ LẦN DÙNG --- */
     async function executeMultiModelAnalysis(parts) {
         const config = window.getGlobalConfig ? window.getGlobalConfig() : null;
         if (!config) throw new Error("Chưa cấu hình API từ hệ thống.");
@@ -1491,7 +1504,6 @@
             const models = config.openRouter.models || [];
             const activeOrModels = models.filter(m => m.enabled && m.vision);
             
-            // Sửa lỗi điều kiện Manual mode đúng tham số
             if (config.openRouter.modelMode === "MANUAL" && config.openRouter.manualModel) {
                 const manualMod = activeOrModels.find(m => m.id === config.openRouter.manualModel);
                 if(manualMod) {
@@ -1506,7 +1518,7 @@
             });
         }
 
-        // 2. Cấu hình Gemini Key dự phòng (Dùng chuẩn v1beta API)
+        // 2. Cấu hình Gemini Key dự phòng
         if (config.apiKeys && config.apiKeys.length > 0) {
             const activeKeys = config.apiKeys.filter(k => k.enabled !== false);
             activeKeys.forEach(k => {
@@ -1520,7 +1532,6 @@
             throw new Error("Không tìm thấy API Key hợp lệ nào trong cấu hình.");
         }
 
-        // Chuẩn hóa prompt văn bản và ảnh tách biệt
         let systemPromptText = "";
         let imagesData = [];
 
@@ -1576,6 +1587,18 @@
                     }
 
                     if (rawText) {
+                        // --- CẬP NHẬT THỐNG KÊ SỐ LẦN DÙNG API ---
+                        let totalCalls = parseInt(localStorage.getItem('gmax_api_call_count') || '0', 10) + 1;
+                        localStorage.setItem('gmax_api_call_count', totalCalls.toString());
+
+                        const providerName = target.type === 'gemini' ? `Gemini (${target.model})` : `OpenRouter (${target.model})`;
+                        localStorage.setItem('gmax_last_used_api', providerName);
+
+                        const elLastUsed = document.getElementById('lastUsedApiDisplay');
+                        const elTotalCalls = document.getElementById('totalApiCountDisplay');
+                        if (elLastUsed) elLastUsed.innerText = providerName;
+                        if (elTotalCalls) elTotalCalls.innerText = totalCalls;
+
                         return parseAIJsonResponse(rawText);
                     }
                 }
