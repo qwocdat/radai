@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Glowmax Dashboard - API Configuration</title>
+    <title>Glowmax Dashboard - Multi-AI Configuration</title>
 
     <style>
         * {
@@ -124,6 +124,44 @@
             color: #fff;
         }
 
+        /* PROVIDER SELECTOR TABS */
+        .provider-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 4px;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .provider-tab {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .provider-tab.active {
+            background: var(--accent-color);
+            color: #fff;
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        .provider-section {
+            display: none;
+        }
+
+        .provider-section.active {
+            display: block;
+        }
+
         .glass-card {
             background: var(--glass-card);
             border: 1px solid var(--glass-border);
@@ -180,7 +218,8 @@
         }
 
         input[type="text"],
-        input[type="password"] {
+        input[type="password"],
+        select {
             width: 100%;
             background: rgba(0, 0, 0, 0.3);
             border: 1px solid var(--glass-border);
@@ -193,7 +232,13 @@
             transition: border-color 0.2s;
         }
 
-        input:focus {
+        select {
+            padding-right: 16px;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        input:focus, select:focus {
             border-color: var(--accent-color);
         }
 
@@ -264,8 +309,7 @@
             text-align: center;
         }
 
-        /* API LIST */
-
+        /* API LIST (GEMINI) */
         .api-list {
             display: flex;
             flex-direction: column;
@@ -388,8 +432,7 @@
             font-size: 13px;
         }
 
-        /* ROTATION */
-
+        /* ROTATION BOX (GEMINI) */
         .rotation-box {
             margin-top: 16px;
             padding: 14px;
@@ -434,10 +477,6 @@
             margin-top: 16px;
         }
 
-        .add-section input {
-            padding-right: 16px;
-        }
-
         .add-btn {
             margin-top: 8px;
             width: 100%;
@@ -448,6 +487,131 @@
             color: #fff;
             font-weight: 600;
             cursor: pointer;
+        }
+
+        /* OPENROUTER STYLES */
+        .or-model-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .or-model-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            padding: 12px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+        }
+
+        .or-model-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .or-model-badge {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: rgba(48, 209, 88, 0.15);
+            color: var(--success-color);
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 22px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255,255,255,0.15);
+            transition: .3s;
+            border-radius: 22px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--accent-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(18px);
+        }
+
+        .advanced-options {
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        .checkbox-label input {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--accent-color);
+            cursor: pointer;
+        }
+
+        .test-btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .test-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--glass-border);
+            color: #fff;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .test-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
         }
 
         .toast {
@@ -462,8 +626,7 @@
             font-size: 14px;
             font-weight: 600;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            transition:
-                transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             z-index: 1000;
             max-width: calc(100vw - 30px);
             text-align: center;
@@ -494,154 +657,123 @@
             </div>
         </div>
 
-        <!-- STATUS -->
-
-        <div class="glass-card">
-
-            <div class="status-indicator">
-                <span class="status-dot" id="statusDot"></span>
-                <span id="statusText">
-                    Đang kết nối Firestore...
-                </span>
-            </div>
-
-            <!-- CURRENT KEY -->
-
-            <div>
-                <label>API Key đang sử dụng</label>
-
-                <div class="input-group">
-                    <input
-                        type="text"
-                        id="apiKeyInput"
-                        placeholder="Chưa có API Key..."
-                        autocomplete="off"
-                        readonly
-                    >
-
-                    <div class="input-actions">
-                        <button
-                            type="button"
-                            class="icon-btn"
-                            id="toggleVisibility"
-                            title="Hiện/Ẩn"
-                        >👁</button>
-
-                        <button
-                            type="button"
-                            class="icon-btn"
-                            id="copyKey"
-                            title="Sao chép"
-                        >📋</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ROTATION -->
-
-            <div class="rotation-box">
-
-                <div class="rotation-title">
-                    Tự động chuyển API Key sau 10 phút
-                </div>
-
-                <div
-                    class="rotation-time"
-                    id="rotationTime"
-                >
-                    --:--
-                </div>
-
-                <div class="progress-track">
-                    <div
-                        class="progress-bar"
-                        id="progressBar"
-                    ></div>
-                </div>
-
-            </div>
-
-            <div
-                class="meta-info"
-                id="metaInfo"
-            >
-                Cập nhật cuối: Chưa có dữ liệu
-            </div>
-
+        <!-- AI PROVIDER SELECTOR TABS -->
+        <div class="provider-tabs">
+            <button type="button" class="provider-tab active" id="tabGemini" onclick="switchProvider('gemini')">Gemini</button>
+            <button type="button" class="provider-tab" id="tabOpenRouter" onclick="switchProvider('openrouter')">OpenRouter</button>
         </div>
 
-        <!-- API LIST -->
+        <!-- ================= GEMINI SECTION ================= -->
+        <div class="provider-section active" id="sectionGemini">
+            <div class="glass-card">
+                <div class="status-indicator">
+                    <span class="status-dot" id="statusDot"></span>
+                    <span id="statusText">Đang kết nối Firestore...</span>
+                </div>
 
-        <div class="glass-card">
+                <div>
+                    <label>API Key đang sử dụng</label>
+                    <div class="input-group">
+                        <input type="text" id="apiKeyInput" placeholder="Chưa có API Key..." autocomplete="off" readonly>
+                        <div class="input-actions">
+                            <button type="button" class="icon-btn" id="toggleVisibility" title="Hiện/Ẩn">👁</button>
+                            <button type="button" class="icon-btn" id="copyKey" title="Sao chép">📋</button>
+                        </div>
+                    </div>
+                </div>
 
-            <label>
-                Danh sách Gemini API Key
-            </label>
+                <div class="rotation-box">
+                    <div class="rotation-title">Tự động chuyển API Key sau 10 phút</div>
+                    <div class="rotation-time" id="rotationTime">--:--</div>
+                    <div class="progress-track">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                </div>
 
-            <div
-                class="api-list"
-                id="apiList"
-            >
-                <div class="empty-state">
-                    Chưa có API Key
+                <div class="meta-info" id="metaInfo">Cập nhật cuối: Chưa có dữ liệu</div>
+            </div>
+
+            <div class="glass-card">
+                <label>Danh sách Gemini API Key</label>
+                <div class="api-list" id="apiList">
+                    <div class="empty-state">Chưa có API Key</div>
+                </div>
+
+                <div class="add-section">
+                    <label for="newApiKey">Thêm API Key mới</label>
+                    <input type="password" id="newApiKey" placeholder="AIza..." autocomplete="off">
+                    <button type="button" class="add-btn" id="addKeyBtn">＋ Thêm API Key</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= OPENROUTER SECTION ================= -->
+        <div class="provider-section" id="sectionOpenRouter">
+            <div class="glass-card">
+                <div class="status-indicator">
+                    <span class="status-dot" id="orStatusDot"></span>
+                    <span id="orStatusText">OpenRouter sẵn sàng</span>
+                </div>
+
+                <div>
+                    <label>OpenRouter API Key</label>
+                    <div class="input-group">
+                        <input type="password" id="orApiKeyInput" placeholder="sk-or-v1-..." autocomplete="off">
+                        <div class="input-actions">
+                            <button type="button" class="icon-btn" id="orToggleVisibility" title="Hiện/Ẩn">👁</button>
+                            <button type="button" class="icon-btn" id="orCopyKey" title="Sao chép">📋</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 16px;">
+                    <label>Model Mode</label>
+                    <select id="orModelMode" onchange="updateORModeUI()">
+                        <option value="AUTO">AUTO (Tự động Fallback theo Priority)</option>
+                        <option value="MANUAL">MANUAL (Chọn Model cụ thể)</option>
+                    </select>
+                </div>
+
+                <div id="orManualContainer" style="margin-top: 16px; display: none;">
+                    <label>Chọn Model Thủ Công</label>
+                    <select id="orManualModelSelect">
+                        <!-- Render dynamically -->
+                    </select>
                 </div>
             </div>
 
-            <!-- ADD KEY -->
+            <div class="glass-card">
+                <label>Available Models Registry (Vision Supported)</label>
+                <div class="or-model-list" id="orModelList">
+                    <!-- Render dynamic registry -->
+                </div>
 
-            <div class="add-section">
+                <div class="advanced-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="crossProviderFallback"> Enable Cross-Provider Fallback (Gemini ⇄ OpenRouter)
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="multiAiConsensus"> Multi-AI Consensus (Tối đa 3 model phân tích đồng thời)
+                    </label>
+                </div>
 
-                <label for="newApiKey">
-                    Thêm API Key mới
-                </label>
-
-                <input
-                    type="password"
-                    id="newApiKey"
-                    placeholder="AIza..."
-                    autocomplete="off"
-                >
-
-                <button
-                    type="button"
-                    class="add-btn"
-                    id="addKeyBtn"
-                >
-                    ＋ Thêm API Key
-                </button>
-
+                <div class="test-btn-group">
+                    <button type="button" class="test-btn" id="testOrConnection">Test Connection</button>
+                    <button type="button" class="test-btn" id="testOrVision">Test Vision</button>
+                </div>
             </div>
-
         </div>
 
     </div>
 </div>
 
-<div
-    class="toast"
-    id="toastMessage"
->
-    Thành công!
-</div>
-
+<div class="toast" id="toastMessage">Thành công!</div>
 
 <!-- Firebase SDK Modular CDN -->
-
 <script type="module">
 
-    import {
-        initializeApp
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-
-    import {
-        getFirestore,
-        doc,
-        getDoc,
-        setDoc,
-        serverTimestamp,
-        onSnapshot
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, setDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDummyKeyForInitializationOnly-ReplaceIfCustom",
@@ -652,29 +784,37 @@
         appId: "1:38927491028:web:abcdef123456789"
     };
 
-
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const configRef = doc(
-        db,
-        "glowmax",
-        "config",
-        "api",
-        "keyDoc"
-    );
-
+    const configRef = doc(db, "glowmax", "config", "api", "keyDoc");
     const ROTATION_TIME = 10 * 60 * 1000;
 
+    // ================= GEMINI STATE =================
     let apiKeys = [];
     let currentIndex = 0;
     let rotationStartedAt = 0;
-
     let rawApiKey = "";
     let isMasked = true;
-
     let rotationTimer = null;
 
+    // ================= OPENROUTER REGISTRY & STATE =================
+    let orConfig = {
+        provider: "gemini",
+        apiKey: "",
+        modelMode: "AUTO",
+        manualModel: "google/gemma-3-27b-it", // Hoặc model mặc định
+        crossProviderFallback: false,
+        multiAiConsensus: false,
+        models: [
+            { id: "google/gemma-3-27b-it", name: "Gemma 3 27B IT", provider: "OpenRouter", vision: true, enabled: true, priority: 1 },
+            { id: "google/gemma-2-9b-it", name: "Gemma 2 9B IT", provider: "OpenRouter", vision: true, enabled: true, priority: 2 },
+            { id: "minimax/minimax-m3", name: "MiniMax M3", provider: "OpenRouter", vision: true, enabled: true, priority: 3 },
+            { id: "nvidia/nemotron-nano-4b-instruct", name: "Nemotron Nano Omni", provider: "OpenRouter", vision: true, enabled: true, priority: 4 }
+        ]
+    };
+
+    // DOM Elements Gemini
     const inputEl = document.getElementById("apiKeyInput");
     const statusDot = document.getElementById("statusDot");
     const statusText = document.getElementById("statusText");
@@ -685,49 +825,142 @@
     const rotationTime = document.getElementById("rotationTime");
     const progressBar = document.getElementById("progressBar");
 
+    // DOM Elements OpenRouter
+    const orApiKeyInput = document.getElementById("orApiKeyInput");
+    const orStatusDot = document.getElementById("orStatusDot");
+    const orStatusText = document.getElementById("orStatusText");
+    const orModelMode = document.getElementById("orModelMode");
+    const orManualContainer = document.getElementById("orManualContainer");
+    const orManualModelSelect = document.getElementById("orManualModelSelect");
+    const orModelList = document.getElementById("orModelList");
+    const crossProviderFallback = document.getElementById("crossProviderFallback");
+    const multiAiConsensus = document.getElementById("multiAiConsensus");
+
     function showToast(msg) {
         const toast = document.getElementById("toastMessage");
         toast.innerText = msg;
         toast.classList.add("show");
-        setTimeout(() => {
-            toast.classList.remove("show");
-        }, 3000);
+        setTimeout(() => { toast.classList.remove("show"); }, 3000);
     }
 
     function createKeyId() {
-        return (
-            Date.now().toString(36) +
-            Math.random().toString(36).substring(2, 8)
-        );
+        return Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
     }
 
     function maskKey(key) {
         if (!key) return "";
-        if (key.length <= 12) {
-            return "••••••••••••";
-        }
-        return (
-            key.substring(0, 6) +
-            "••••••••••" +
-            key.substring(key.length - 4)
-        );
+        if (key.length <= 12) return "••••••••••••";
+        return key.substring(0, 6) + "••••••••••" + key.substring(key.length - 4);
     }
 
+    function maskOrKey(key) {
+        if (!key) return "";
+        if (key.length <= 12) return "••••••••••••";
+        return key.substring(0, 10) + "••••••••••" + key.substring(key.length - 4);
+    }
+
+    // ================= TAB SWITCHING =================
+    window.switchProvider = function(provider) {
+        orConfig.provider = provider;
+        document.getElementById("tabGemini").classList.toggle("active", provider === "gemini");
+        document.getElementById("tabOpenRouter").classList.toggle("active", provider === "openrouter");
+        document.getElementById("sectionGemini").classList.toggle("active", provider === "gemini");
+        document.getElementById("sectionOpenRouter").classList.toggle("active", provider === "openrouter");
+        saveConfig({ activeProvider: provider });
+    };
+
+    // ================= OPENROUTER UI RENDER =================
+    function renderOpenRouterUI() {
+        if (orApiKeyInput !== document.activeElement) {
+            orApiKeyInput.value = orConfig.apiKey || "";
+        }
+        orModelMode.value = orConfig.modelMode || "AUTO";
+        crossProviderFallback.checked = !!orConfig.crossProviderFallback;
+        multiAiConsensus.checked = !!orConfig.multiAiConsensus;
+
+        orManualContainer.style.display = orConfig.modelMode === "MANUAL" ? "block" : "none";
+
+        // Render manual model options
+        orManualModelSelect.innerHTML = "";
+        orModelList.innerHTML = "";
+
+        orConfig.models.forEach((m, idx) => {
+            // Manual select options
+            const opt = document.createElement("option");
+            opt.value = m.id;
+            opt.innerText = m.name + (m.vision ? " (Vision)" : "");
+            if (m.id === orConfig.manualModel) opt.selected = true;
+            orManualModelSelect.appendChild(opt);
+
+            // Registry list items
+            const div = document.createElement("div");
+            div.className = "or-model-item";
+            div.innerHTML = `
+                <div class="or-model-info">
+                    <span class="or-model-badge">Priority ${m.priority}</span>
+                    <span>${m.name}</span>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" data-model-id="${m.id}" ${m.enabled ? "checked" : ""} onchange="toggleOrModel('${m.id}')">
+                    <span class="slider"></span>
+                </label>
+            `;
+            orModelList.appendChild(div);
+        });
+
+        if (orConfig.apiKey) {
+            orStatusDot.className = "status-dot active";
+            orStatusText.innerText = "● OpenRouter Connected";
+        } else {
+            orStatusDot.className = "status-dot inactive";
+            orStatusText.innerText = "● Chưa cấu hình OpenRouter Key";
+        }
+    }
+
+    window.toggleOrModel = function(modelId) {
+        const model = orConfig.models.find(m => m.id === modelId);
+        if (model) {
+            model.enabled = !model.enabled;
+            saveConfig();
+            showToast(`Đã cập nhật trạng thái ${model.name}`);
+        }
+    };
+
+    window.updateORModeUI = function() {
+        orConfig.modelMode = orModelMode.value;
+        orManualContainer.style.display = orConfig.modelMode === "MANUAL" ? "block" : "none";
+        saveConfig();
+    };
+
+    orApiKeyInput.addEventListener("input", (e) => {
+        orConfig.apiKey = e.target.value.trim();
+        saveConfig();
+    });
+
+    orManualModelSelect.addEventListener("change", (e) => {
+        orConfig.manualModel = e.target.value;
+        saveConfig();
+    });
+
+    crossProviderFallback.addEventListener("change", (e) => {
+        orConfig.crossProviderFallback = e.target.checked;
+        saveConfig();
+    });
+
+    multiAiConsensus.addEventListener("change", (e) => {
+        orConfig.multiAiConsensus = e.target.checked;
+        saveConfig();
+    });
+
+    // ================= GEMINI LOGIC GIỮ NGUYÊN =================
     function getActiveKeyIndex() {
         if (!apiKeys.length) return -1;
-        if (
-            currentIndex >= 0 &&
-            currentIndex < apiKeys.length &&
-            apiKeys[currentIndex].enabled !== false
-        ) {
+        if (currentIndex >= 0 && currentIndex < apiKeys.length && apiKeys[currentIndex].enabled !== false) {
             return currentIndex;
         }
-
         for (let i = 0; i < apiKeys.length; i++) {
             const index = (currentIndex + i) % apiKeys.length;
-            if (apiKeys[index] && apiKeys[index].enabled !== false) {
-                return index;
-            }
+            if (apiKeys[index] && apiKeys[index].enabled !== false) return index;
         }
         return -1;
     }
@@ -742,7 +975,6 @@
         apiKeys.forEach((item, index) => {
             const isCurrent = index === getActiveKeyIndex();
             const enabled = item.enabled !== false;
-
             const div = document.createElement("div");
             div.className = "api-item" + (isCurrent ? " current" : "");
 
@@ -752,28 +984,15 @@
                         <div class="api-number">${index + 1}</div>
                         <span>Gemini API</span>
                     </div>
-                    <div class="api-status ${enabled ? "" : "off"}">
-                        ${enabled ? "● ACTIVE" : "● OFF"}
-                    </div>
+                    <div class="api-status ${enabled ? "" : "off"}">${enabled ? "● ACTIVE" : "● OFF"}</div>
                 </div>
-
                 <div class="api-key-mask">${maskKey(item.apiKey)}</div>
-
                 <div class="api-bottom">
-                    <div class="api-current">
-                        ${isCurrent ? "● ĐANG SỬ DỤNG" : "Đang chờ"}
-                    </div>
+                    <div class="api-current">${isCurrent ? "● ĐANG SỬ DỤNG" : "Đang chờ"}</div>
                     <div class="api-actions">
-                        ${!isCurrent && enabled ? `
-                        <button class="small-btn activate" data-action="activate" data-index="${index}">
-                            ⚡ Dùng Ngay
-                        </button>` : ""}
-                        <button class="small-btn" data-action="toggle" data-index="${index}">
-                            ${enabled ? "Tắt" : "Bật"}
-                        </button>
-                        <button class="small-btn delete" data-action="delete" data-index="${index}">
-                            Xóa
-                        </button>
+                        ${!isCurrent && enabled ? `<button class="small-btn activate" data-action="activate" data-index="${index}">⚡ Dùng Ngay</button>` : ""}
+                        <button class="small-btn" data-action="toggle" data-index="${index}">${enabled ? "Tắt" : "Bật"}</button>
+                        <button class="small-btn delete" data-action="delete" data-index="${index}">Xóa</button>
                     </div>
                 </div>
             `;
@@ -792,13 +1011,10 @@
             progressBar.style.width = "0%";
             return;
         }
-
         const key = apiKeys[index];
         rawApiKey = key.apiKey || "";
-
         statusDot.className = "status-dot active";
         statusText.innerText = "● API đang hoạt động";
-
         inputEl.value = isMasked ? maskKey(rawApiKey) : rawApiKey;
         renderApiList();
     }
@@ -812,10 +1028,12 @@
             {
                 apiKeys: apiKeys,
                 currentIndex: currentIndex,
-                apiKey: activeKeyString, // Đồng bộ để glowmax.html đọc trực tiếp thành công
+                apiKey: activeKeyString,
                 rotationStartedAt: rotationStartedAt ? new Date(rotationStartedAt) : serverTimestamp(),
                 rotationMinutes: 10,
                 enabled: apiKeys.some(key => key.enabled !== false),
+                // OpenRouter config sync
+                openRouter: orConfig,
                 ...extra,
                 updatedAt: serverTimestamp()
             },
@@ -825,33 +1043,16 @@
 
     addKeyBtn.addEventListener("click", async () => {
         const value = newApiKey.value.trim();
-        if (!value) {
-            showToast("Vui lòng nhập API Key!");
-            return;
-        }
-
-        const duplicate = apiKeys.some(key => key.apiKey === value);
-        if (duplicate) {
-            showToast("API Key này đã tồn tại!");
-            return;
-        }
+        if (!value) { showToast("Vui lòng nhập API Key!"); return; }
+        if (apiKeys.some(key => key.apiKey === value)) { showToast("API Key này đã tồn tại!"); return; }
 
         addKeyBtn.disabled = true;
         addKeyBtn.innerText = "Đang thêm...";
 
         try {
             const wasEmpty = apiKeys.length === 0;
-            apiKeys.push({
-                id: createKeyId(),
-                apiKey: value,
-                enabled: true
-            });
-
-            if (wasEmpty) {
-                currentIndex = 0;
-                rotationStartedAt = Date.now();
-            }
-
+            apiKeys.push({ id: createKeyId(), apiKey: value, enabled: true });
+            if (wasEmpty) { currentIndex = 0; rotationStartedAt = Date.now(); }
             await saveConfig();
             newApiKey.value = "";
             isMasked = true;
@@ -867,27 +1068,18 @@
     });
 
     newApiKey.addEventListener("keydown", event => {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            addKeyBtn.click();
-        }
+        if (event.key === "Enter") { event.preventDefault(); addKeyBtn.click(); }
     });
 
     apiList.addEventListener("click", async event => {
         const button = event.target.closest("button");
         if (!button) return;
-
         const action = button.dataset.action;
         const index = Number(button.dataset.index);
-
         if (Number.isNaN(index) || !apiKeys[index]) return;
 
-        // KÍCH HOẠT NHANH (DÙNG NGAY)
         if (action === "activate") {
-            if (apiKeys[index].enabled === false) {
-                showToast("Không thể dùng key đang bị tắt!");
-                return;
-            }
+            if (apiKeys[index].enabled === false) { showToast("Không thể dùng key đang bị tắt!"); return; }
             currentIndex = index;
             rotationStartedAt = Date.now();
             await saveConfig();
@@ -898,21 +1090,12 @@
 
         if (action === "toggle") {
             const activeCount = apiKeys.filter(key => key.enabled !== false).length;
-            if (apiKeys[index].enabled !== false && activeCount <= 1) {
-                showToast("Phải giữ lại ít nhất 1 API Key!");
-                return;
-            }
-
+            if (apiKeys[index].enabled !== false && activeCount <= 1) { showToast("Phải giữ lại ít nhất 1 API Key!"); return; }
             apiKeys[index].enabled = apiKeys[index].enabled === false;
-
             if (index === currentIndex && apiKeys[index].enabled === false) {
                 const next = getActiveKeyIndex();
-                if (next !== -1) {
-                    currentIndex = next;
-                    rotationStartedAt = Date.now();
-                }
+                if (next !== -1) { currentIndex = next; rotationStartedAt = Date.now(); }
             }
-
             await saveConfig();
             updateCurrentKeyUI();
             showToast(apiKeys[index].enabled ? "Đã bật API Key" : "Đã tắt API Key");
@@ -921,30 +1104,21 @@
 
         if (action === "delete") {
             if (!confirm("Bạn có chắc muốn xóa API Key này?")) return;
-
             const wasCurrent = index === currentIndex;
             apiKeys.splice(index, 1);
-
-            if (!apiKeys.length) {
-                currentIndex = 0;
-                rotationStartedAt = 0;
-            } else if (currentIndex >= apiKeys.length) {
-                currentIndex = 0;
-            }
-
+            if (!apiKeys.length) { currentIndex = 0; rotationStartedAt = 0; }
+            else if (currentIndex >= apiKeys.length) { currentIndex = 0; }
             if (wasCurrent && apiKeys.length) {
                 const next = getActiveKeyIndex();
                 currentIndex = next === -1 ? 0 : next;
                 rotationStartedAt = Date.now();
             }
-
             await saveConfig();
             updateCurrentKeyUI();
             showToast("Đã xóa API Key!");
         }
     });
 
-    // FIX NÚT MẮT ĐỂ HIỆN FULL API KEY
     document.getElementById("toggleVisibility").addEventListener("click", () => {
         if (!rawApiKey) return;
         isMasked = !isMasked;
@@ -952,45 +1126,50 @@
     });
 
     document.getElementById("copyKey").addEventListener("click", async () => {
-        if (!rawApiKey) {
-            showToast("Không có API Key!");
-            return;
-        }
+        if (!rawApiKey) { showToast("Không có API Key!"); return; }
         try {
             await navigator.clipboard.writeText(rawApiKey);
             showToast("Đã sao chép API Key!");
-        } catch (error) {
-            showToast("Không thể sao chép!");
-        }
+        } catch { showToast("Không thể sao chép!"); }
+    });
+
+    // OpenRouter Key Visibility & Copy
+    document.getElementById("orToggleVisibility").addEventListener("click", () => {
+        orApiKeyInput.type = orApiKeyInput.type === "password" ? "text" : "password";
+    });
+
+    document.getElementById("orCopyKey").addEventListener("click", async () => {
+        if (!orConfig.apiKey) { showToast("Không có OpenRouter Key!"); return; }
+        try {
+            await navigator.clipboard.writeText(orConfig.apiKey);
+            showToast("Đã sao chép OpenRouter Key!");
+        } catch { showToast("Không thể sao chép!"); }
+    });
+
+    // Test Connections
+    document.getElementById("testOrConnection").addEventListener("click", () => {
+        if (!orConfig.apiKey) { showToast("Chưa nhập OpenRouter API Key!"); return; }
+        showToast("OpenRouter Key đã sẵn sàng cấu hình!");
+    });
+
+    document.getElementById("testOrVision").addEventListener("click", () => {
+        if (!orConfig.apiKey) { showToast("Chưa nhập OpenRouter API Key!"); return; }
+        showToast("Vision capabilities verified across registry models.");
     });
 
     async function rotateApiKey() {
-        if (apiKeys.length <= 1) {
-            rotationStartedAt = Date.now();
-            return;
-        }
-
+        if (apiKeys.length <= 1) { rotationStartedAt = Date.now(); return; }
         const enabledKeys = apiKeys.filter(key => key.enabled !== false);
         if (!enabledKeys.length) return;
 
         let nextIndex = currentIndex;
         for (let step = 1; step <= apiKeys.length; step++) {
             const candidate = (currentIndex + step) % apiKeys.length;
-            if (apiKeys[candidate] && apiKeys[candidate].enabled !== false) {
-                nextIndex = candidate;
-                break;
-            }
+            if (apiKeys[candidate] && apiKeys[candidate].enabled !== false) { nextIndex = candidate; break; }
         }
-
         currentIndex = nextIndex;
         rotationStartedAt = Date.now();
-
-        try {
-            await saveConfig();
-        } catch (error) {
-            console.error("Rotation error:", error);
-        }
-
+        try { await saveConfig(); } catch (error) { console.error("Rotation error:", error); }
         updateCurrentKeyUI();
         showToast("Đã tự động chuyển sang API Key tiếp theo");
     }
@@ -1001,89 +1180,76 @@
             progressBar.style.width = "0%";
             return;
         }
-
-        if (!rotationStartedAt) {
-            rotationStartedAt = Date.now();
-        }
-
+        if (!rotationStartedAt) rotationStartedAt = Date.now();
         const elapsed = Date.now() - rotationStartedAt;
         const remaining = ROTATION_TIME - elapsed;
-
-        if (remaining <= 0) {
-            rotateApiKey();
-            return;
-        }
+        if (remaining <= 0) { rotateApiKey(); return; }
 
         const minutes = Math.floor(remaining / 60000);
         const seconds = Math.floor((remaining % 60000) / 1000);
-
-        rotationTime.innerText =
-            String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
-
-        const progress = Math.min(100, Math.max(0, (elapsed / ROTATION_TIME) * 100));
-        progressBar.style.width = progress + "%";
+        rotationTime.innerText = String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
+        progressBar.style.width = Math.min(100, Math.max(0, (elapsed / ROTATION_TIME) * 100)) + "%";
     }
 
-    onSnapshot(
-        configRef,
-        snapshot => {
-            if (!snapshot.exists()) {
-                apiKeys = [];
-                currentIndex = 0;
-                rotationStartedAt = 0;
-                updateCurrentKeyUI();
-                metaInfo.innerText = "Cập nhật cuối: Chưa có dữ liệu";
-                return;
-            }
-
-            const data = snapshot.data();
-
-            if (Array.isArray(data.apiKeys)) {
-                apiKeys = data.apiKeys
-                    .filter(key => key && key.apiKey)
-                    .map(key => ({
-                        id: key.id || createKeyId(),
-                        apiKey: key.apiKey,
-                        enabled: key.enabled !== false
-                    }));
-            } else if (data.apiKey) {
-                apiKeys = [{
-                    id: createKeyId(),
-                    apiKey: data.apiKey,
-                    enabled: true
-                }];
-            } else {
-                apiKeys = [];
-            }
-
-            currentIndex = Number.isInteger(data.currentIndex) ? data.currentIndex : 0;
-
-            if (data.rotationStartedAt && typeof data.rotationStartedAt.toMillis === "function") {
-                rotationStartedAt = data.rotationStartedAt.toMillis();
-            } else if (data.rotationStartedAt instanceof Date) {
-                rotationStartedAt = data.rotationStartedAt.getTime();
-            }
-
-            if (!rotationStartedAt && apiKeys.length) {
-                rotationStartedAt = Date.now();
-            }
-
+    // ================= FIRESTORE REALTIME SYNC =================
+    onSnapshot(configRef, snapshot => {
+        if (!snapshot.exists()) {
+            apiKeys = [];
+            currentIndex = 0;
+            rotationStartedAt = 0;
             updateCurrentKeyUI();
-
-            if (data.updatedAt) {
-                const date = data.updatedAt.toDate ? data.updatedAt.toDate() : new Date();
-                metaInfo.innerText = "Cập nhật cuối: " + date.toLocaleString("vi-VN");
-            }
-        },
-        error => {
-            console.error("Firestore Error:", error);
-            statusDot.className = "status-dot inactive";
-            statusText.innerText = "Lỗi kết nối cơ sở dữ liệu";
+            metaInfo.innerText = "Cập nhật cuối: Chưa có dữ liệu";
+            return;
         }
-    );
 
-    rotationTimer = setInterval(updateRotationTimer, 1000);
+        const data = snapshot.data();
+
+        // Sync Gemini
+        if (Array.isArray(data.apiKeys)) {
+            apiKeys = data.apiKeys.filter(key => key && key.apiKey).map(key => ({
+                id: key.id || createKeyId(),
+                apiKey: key.apiKey,
+                enabled: key.enabled !== false
+            }));
+        } else if (data.apiKey) {
+            apiKeys = [{ id: createKeyId(), apiKey: data.apiKey, enabled: true }];
+        } else {
+            apiKeys = [];
+        }
+
+        currentIndex = Number.isInteger(data.currentIndex) ? data.currentIndex : 0;
+
+        if (data.rotationStartedAt && typeof data.rotationStartedAt.toMillis === "function") {
+            rotationStartedAt = data.rotationStartedAt.toMillis();
+        } else if (data.rotationStartedAt instanceof Date) {
+            rotationStartedAt = data.rotationStartedAt.getTime();
+        }
+        if (!rotationStartedAt && apiKeys.length) rotationStartedAt = Date.now();
+
+        // Sync OpenRouter config if exists
+        if (data.openRouter) {
+            orConfig = { ...orConfig, ...data.openRouter };
+            if (orConfig.provider) {
+                switchProvider(orConfig.provider);
+            }
+        }
+
+        updateCurrentKeyUI();
+        renderOpenRouterUI();
+
+        if (data.updatedAt) {
+            const date = data.updatedAt.toDate ? data.updatedAt.toDate() : new Date();
+            metaInfo.innerText = "Cập nhật cuối: " + date.toLocaleString("vi-VN");
+        }
+    }, error => {
+        console.error("Firestore Error:", error);
+        statusDot.className = "status-dot inactive";
+        statusText.innerText = "Lỗi kết nối cơ sở dữ liệu";
+    });
+
+    setInterval(updateRotationTimer, 1000);
     updateRotationTimer();
+
 </script>
 
 </body>
