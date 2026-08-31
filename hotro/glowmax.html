@@ -293,7 +293,6 @@
 
         #videoElement { width: 100%; height: 100%; object-fit: cover; }
         
-        /* CẤU HÌNH TÁCH NỀN XOÁ KHỐI VUÔNG & LÀM MỜ MẪU */
         .silhouette-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: 5; display: flex; justify-content: center; align-items: center;
@@ -336,7 +335,6 @@
             transition: opacity 0.1s ease-out;
         }
 
-        /* KHUNG QUÉT FEATURE SCANNER TỪNG BỘ PHẬN CHUẨN LOOKSMAX */
         .loading-container { display: none; text-align: center; padding: 10px 0 20px 0; }
         .scan-frame-container {
             position: relative; width: 280px; height: 340px;
@@ -594,7 +592,7 @@
                 <button id="startScanBtn" onclick="startWizard()">BẮT ĐẦU QUÉT</button>
             </div>
 
-            <!-- Wizard Flow (Đã rút gọn còn 2 bước) -->
+            <!-- Wizard Flow -->
             <div class="wizard-container" id="wizardScreen">
                 <div class="step-progress-bar">
                     <div class="step-progress-line"></div>
@@ -634,7 +632,7 @@
                 <input type="file" id="wizFileInput" accept="image/jpeg, image/png, image/webp" style="display: none;" onchange="handleFileSelect(event)">
             </div>
 
-            <!-- Loading Scanner UI CHUẨN LOOKSMAX -->
+            <!-- Loading Scanner UI -->
             <div class="loading-container" id="loadingUI">
                 <div class="scan-frame-container">
                     <canvas id="scanResultCanvas"></canvas>
@@ -655,7 +653,7 @@
                     <span class="progress-text-percent" id="progressPercentText">0%</span>
                 </div>
 
-                <div class="analysis-status-text" id="loadingText">ĐANG TÍNH TOÁN PSL...</div>
+                <div class="analysis-status-text" id="loadingText">ĐANG TÍNH TOÁN PSLS...</div>
 
                 <div class="realtime-metrics-list">
                     <div class="rt-metric-card"><span class="rt-metric-name">LANDMARKS</span><span class="rt-metric-val" id="rtLandmarks">DETECTING</span></div>
@@ -666,7 +664,7 @@
             </div>
 
             <p class="privacy-note">
-                Dữ liệu xử lý tức thì bởi DigitalsMod AI. Không lưu trữ trên máy chủ công khai.
+                Dữ liệu xử lý tức thì bởi Multi-Model AI Engine. Không lưu trữ trên máy chủ công khai.
             </p>
         </div>
 
@@ -823,7 +821,7 @@
 
         <div class="glass-card">
             <h3>Quyền Riêng Tư & Dữ Liệu</h3>
-            <p style="font-size: 12px; color: var(--text-secondary); margin: 6px 0 12px 0;">Ảnh khuôn mặt xử lý tức thì bởi DigitalsMod AI, chỉ lưu kết quả đánh giá cá nhân.</p>
+            <p style="font-size: 12px; color: var(--text-secondary); margin: 6px 0 12px 0;">Ảnh khuôn mặt xử lý tức thì bởi AI, chỉ lưu kết quả đánh giá cá nhân.</p>
             <button class="btn-danger" style="padding: 10px; font-size: 13px;" onclick="clearUserData()">Xóa Lịch Sử & Dữ Liệu AI</button>
         </div>
 
@@ -848,7 +846,7 @@
     </div>
 </div>
 
-<!-- CAMERA MODAL (SỬ DỤNG MẪU ẢNH TRỰC TIẾP LÀM KHUNG CĂN CÓ XUYÊN THẤU & GLOW) -->
+<!-- CAMERA MODAL -->
 <div id="cameraModal">
     <div class="camera-flash" id="cameraFlash"></div>
     <div class="camera-header">
@@ -862,10 +860,7 @@
             <video id="videoElement" autoplay playsinline></video>
             
             <div class="silhouette-overlay" id="silhouetteOverlay">
-                <!-- Mẫu ảnh chính diện (Bước 1) -->
                 <img id="imgSilhouetteFront" class="silhouette-img" src="https://i.ibb.co/whmxs5g0/68685-removebg-preview.png" alt="Front Model">
-
-                <!-- Mẫu ảnh góc nghiêng 90° (Bước 2) -->
                 <img id="imgSilhouetteProfile" class="silhouette-img" src="https://i.ibb.co/GvQZJTd2/68687-removebg-preview.png" alt="Profile Model" style="display:none;">
             </div>
         </div>
@@ -897,15 +892,15 @@
     <svg style="width: 26px; height: 26px; fill: #fff;" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
 </div>
 
-<!-- COACH CHAT MODAL FIXED LAYOUT -->
+<!-- COACH CHAT MODAL -->
 <div class="chat-modal" id="coachModal">
     <div class="chat-container">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--glass-border);">
-            <h3>Glowmax AI Coach (DigitalsMod AI)</h3>
+            <h3>Glowmax AI Coach</h3>
             <button class="btn-ghost" style="width: auto; padding: 4px 8px;" onclick="closeCoachChat()">Đóng</button>
         </div>
         <div class="chat-messages" id="chatMessages">
-            <div class="chat-bubble ai">Chào bạn! Tôi là DigitalsMod AI Coach của Glowmax. Bạn cần tư vấn bài tập hay quy trình chăm sóc hôm nay?</div>
+            <div class="chat-bubble ai">Chào bạn! Tôi là AI Coach của Glowmax. Bạn cần tư vấn bài tập hay quy trình chăm sóc hôm nay?</div>
         </div>
         <div style="display: flex; gap: 8px; padding-top: 8px; border-top: 1px solid var(--glass-border);">
             <input type="text" id="chatInput" style="flex:1; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: var(--radius-small); color: #fff; outline: none; font-size: 14px;" placeholder="Nhập câu hỏi..." onkeypress="if(event.key==='Enter') sendCoachMessage()">
@@ -938,7 +933,7 @@
     </div>
 </div>
 
-<!-- FIREBASE SDK MODULAR -->
+<!-- FIREBASE & MULTI-MODEL CONFIG SYNC -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -959,7 +954,7 @@
     const db = getFirestore(app);
 
     let currentUser = null;
-    let activeApiKey = null;
+    let globalConfigCache = null;
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -989,14 +984,15 @@
 
     document.getElementById('btnLogout').addEventListener('click', () => signOut(auth));
 
+    // Lắng nghe config từ Firestore (đồng bộ với dashglow.html)
     const configRef = doc(db, "glowmax", "config", "api", "keyDoc");
     onSnapshot(configRef, (snap) => {
-        if (snap.exists() && snap.data().apiKey) {
-            activeApiKey = snap.data().apiKey;
-            document.getElementById('aiStatusBadge').innerText = "DigitalsMod AI Ready";
+        if (snap.exists()) {
+            globalConfigCache = snap.data();
+            document.getElementById('aiStatusBadge').innerText = "Multi-AI Ready";
         } else {
-            activeApiKey = null;
-            document.getElementById('aiStatusBadge').innerText = "Chưa cấu hình API Key";
+            globalConfigCache = null;
+            document.getElementById('aiStatusBadge').innerText = "Chưa cấu hình API";
         }
     });
 
@@ -1014,7 +1010,7 @@
         }
     }
 
-    window.getGlobalApiKey = () => activeApiKey;
+    window.getGlobalConfig = () => globalConfigCache;
     window.getCurrentUser = () => currentUser;
     window.getDb = () => db;
 </script>
@@ -1086,17 +1082,11 @@
     function switchPlanSubTab(days) {
         const list = document.getElementById('planContentList');
         if(days === 7) {
-            list.innerHTML = `
-                <div class="glass-card"><h4>Tuần 1: Thiết Lập Nền Tảng</h4><p style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Chin Tuck Posture + Skincare Sáng/Tối cơ bản.</p></div>
-            `;
+            list.innerHTML = `<div class="glass-card"><h4>Tuần 1: Thiết Lập Nền Tảng</h4><p style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Chin Tuck Posture + Skincare Sáng/Tối cơ bản.</p></div>`;
         } else if(days === 30) {
-            list.innerHTML = `
-                <div class="glass-card"><h4>Tháng 1: Định Hình Cấu Trúc Mặt & Da</h4><p style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Tăng cường bài tập giãn cơ cổ và Grooming chân mày.</p></div>
-            `;
+            list.innerHTML = `<div class="glass-card"><h4>Tháng 1: Định Hình Cấu Trúc Mặt & Da</h4><p style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Tăng cường bài tập giãn cơ cổ và Grooming chân mày.</p></div>`;
         } else {
-            list.innerHTML = `
-                <div class="glass-card"><h4>Chương Trình 1 Năm Glow Up</h4><p style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Theo dõi sự thay đổi qua các đợt Checkpoint hàng tháng.</p></div>
-            `;
+            list.innerHTML = `<div class="glass-card"><h4>Chương Trình 1 Năm Glow Up</h4><p style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Theo dõi sự thay đổi qua các đợt Checkpoint hàng tháng.</p></div>`;
         }
     }
     switchPlanSubTab(7);
@@ -1144,9 +1134,9 @@
 
     /* --- WIZARD FLOW & SCANNER --- */
     function startWizard() {
-        const key = window.getGlobalApiKey ? window.getGlobalApiKey() : null;
-        if (!key) {
-            alert("Chưa cấu hình API Key. Vui lòng cấu hình trong Glowmax Dashboard.");
+        const config = window.getGlobalConfig ? window.getGlobalConfig() : null;
+        if (!config || (!config.apiKey && !config.openRouter?.apiKey)) {
+            alert("Chưa cấu hình API Key. Vui lòng cấu hình trong Dashglow.");
             return;
         }
         document.getElementById('introScreen').style.display = 'none';
@@ -1181,7 +1171,7 @@
         
         if (state.photos[step]) {
             btnNext.disabled = false;
-            btnNext.innerText = step === 1 ? "BẮT ĐẦU PHÂN TÍCH DIGITALSMOD AI" : "LƯU & TIẾP TỤC";
+            btnNext.innerText = step === 1 ? "BẮT ĐẦU PHÂN TÍCH MULTI-MODEL AI" : "LƯU & TIẾP TỤC";
             btnSkip.style.display = 'none';
         } else {
             btnNext.disabled = true;
@@ -1269,7 +1259,7 @@
         event.target.value = '';
     }
 
-    /* --- CAMERA PERMISSION & STREAM HANDLING --- */
+    /* --- CAMERA STREAM --- */
     function requestCameraPermission() {
         document.getElementById('cameraPermissionModal').style.display = 'flex';
     }
@@ -1291,14 +1281,8 @@
         const frontImg = document.getElementById('imgSilhouetteFront');
         const profileImg = document.getElementById('imgSilhouetteProfile');
         
-        frontImg.style.display = 'none';
-        profileImg.style.display = 'none';
-
-        if (state.currentStep === 0) {
-            frontImg.style.display = 'block';
-        } else if (state.currentStep === 1) {
-            profileImg.style.display = 'block';
-        }
+        frontImg.style.display = state.currentStep === 0 ? 'block' : 'none';
+        profileImg.style.display = state.currentStep === 1 ? 'block' : 'none';
 
         modal.style.display = 'flex';
         await startStream();
@@ -1315,7 +1299,7 @@
             video.srcObject = state.stream;
             video.style.transform = state.facingMode === 'user' ? 'scaleX(-1)' : 'none';
         } catch (err) {
-            alert("Không thể truy cập Camera. Vui lòng cho phép quyền ứng dụng và thử lại!");
+            alert("Không thể truy cập Camera. Vui lòng cho phép quyền ứng dụng!");
             closeCamera();
         }
     }
@@ -1360,8 +1344,8 @@
         }, 150);
     }
 
-    /* --- QUÉT FEATURE SCANNER LOOKSMAX --- */
-    function runFeatureScanningSequence(landmarks) {
+    /* --- FEATURE SCANNER ANIMATION --- */
+    function runFeatureScanningSequence() {
         const resultCanvas = document.getElementById('scanResultCanvas');
         if (!resultCanvas || !state.photos[0]) return;
         const ctx = resultCanvas.getContext('2d');
@@ -1380,7 +1364,6 @@
 
             const stepsSequence = [
                 {
-                    name: "IPD (MẮT)",
                     action: () => {
                         scanBox.style.opacity = '1';
                         scanBox.style.top = "38%"; scanBox.style.left = "25%";
@@ -1391,7 +1374,6 @@
                     }
                 },
                 {
-                    name: "NOSE BRIDGE (SỐNG MŨI)",
                     action: () => {
                         scanBox.style.top = "42%"; scanBox.style.left = "40%";
                         scanBox.style.width = "20%"; scanBox.style.height = "22%";
@@ -1401,7 +1383,6 @@
                     }
                 },
                 {
-                    name: "LIP & CHIN (MÔI & CẰM)",
                     action: () => {
                         scanBox.style.top = "62%"; scanBox.style.left = "32%";
                         scanBox.style.width = "36%"; scanBox.style.height = "24%";
@@ -1411,7 +1392,6 @@
                     }
                 },
                 {
-                    name: "JAWLINE CONTOUR (VIỀN MẶT)",
                     action: () => {
                         scanBox.style.top = "20%"; scanBox.style.left = "18%";
                         scanBox.style.width = "64%"; scanBox.style.height = "72%";
@@ -1436,18 +1416,18 @@
         };
     }
 
-    function startRealtimeAnalysisUI(landmarks) {
-        runFeatureScanningSequence(landmarks);
+    function startRealtimeAnalysisUI() {
+        runFeatureScanningSequence();
 
         const ringFill = document.getElementById('progressRingFill');
         const percentText = document.getElementById('progressPercentText');
         const loadingText = document.getElementById('loadingText');
 
         const steps = [
-            { pct: 15, text: "ĐANG TÍNH TOÁN PSL...", lm: "468 POINTS", sym: "MAPPING", jaw: "WAITING", rat: "WAITING" },
-            { pct: 35, text: "DETECTING FACIAL LANDMARKS...", lm: "DETECTED", sym: "ANALYZING", jaw: "MAPPING", rat: "WAITING" },
+            { pct: 15, text: "MULTI-MODEL ROTATION...", lm: "468 POINTS", sym: "MAPPING", jaw: "WAITING", rat: "WAITING" },
+            { pct: 35, text: "CONNECTING ACTIVE PROVIDER...", lm: "DETECTED", sym: "ANALYZING", jaw: "MAPPING", rat: "WAITING" },
             { pct: 60, text: "MAPPING FACIAL GEOMETRY...", lm: "DETECTED", sym: "CALCULATED", jaw: "88° CORNER", rat: "ANALYZING" },
-            { pct: 85, text: "GENERATING LOOKSMAX PROTOCOL...", lm: "DETECTED", sym: "CALCULATED", jaw: "88° CORNER", rat: "GOLDEN 1:1.6" },
+            { pct: 85, text: "GENERATING REPORT...", lm: "DETECTED", sym: "CALCULATED", jaw: "88° CORNER", rat: "GOLDEN 1:1.6" },
             { pct: 98, text: "FINALIZING REPORT...", lm: "COMPLETE", sym: "COMPLETE", jaw: "COMPLETE", rat: "COMPLETE" }
         ];
 
@@ -1474,11 +1454,11 @@
         }, interval);
     }
 
-    /* --- PHÁT HIỆN MẶT NGƯỜI THẬT BẰNG MEDIAPIPE AI --- */
+    /* --- HUMAN FACE DETECTION --- */
     function detectRealHumanFace(imgBase64) {
         return new Promise((resolve) => {
             if(!faceMeshEngine) {
-                resolve({ isHuman: true, landmarks: null });
+                resolve({ isHuman: true });
                 return;
             }
 
@@ -1486,32 +1466,135 @@
             img.src = imgBase64.startsWith('data:') ? imgBase64 : 'data:image/jpeg;base64,' + imgBase64;
             img.onload = async () => {
                 let detected = false;
-                let faceLandmarks = null;
-
                 faceMeshEngine.onResults((results) => {
                     if(results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
                         detected = true;
-                        faceLandmarks = results.multiFaceLandmarks;
                     }
                 });
-
                 await faceMeshEngine.send({ image: img });
-                
-                setTimeout(() => {
-                    resolve({ isHuman: detected, landmarks: faceLandmarks });
-                }, 350);
+                setTimeout(() => { resolve({ isHuman: detected }); }, 350);
             };
-            img.onerror = () => resolve({ isHuman: false, landmarks: null });
+            img.onerror = () => resolve({ isHuman: false });
         });
     }
 
-    /* --- GEMINI / DIGITALMOD AI ANALYSIS (Gửi 2 góc ảnh) --- */
-    async function startAnalysis() {
-        const apiKey = window.getGlobalApiKey ? window.getGlobalApiKey() : null;
-        if (!apiKey) {
-            alert("API Key chưa sẵn sàng. Vui lòng kiểm tra lại cấu hình Dashboard.");
-            return;
+    /* --- CƠ CHẾ GỌI API MULTI-MODEL FALLBACK (KHÔNG ƯU TIÊN, TỰ ĐỘNG THỬ VÀ BỎ QUA LỖI NGẦM) --- */
+    async function executeMultiModelAnalysis(parts) {
+        const config = window.getGlobalConfig ? window.getGlobalConfig() : null;
+        if (!config) throw new Error("Chưa cấu hình API từ hệ thống.");
+
+        // Tạo danh sách các endpoints tiềm năng cần thử theo thứ tự linh hoạt
+        const targets = [];
+
+        // 1. Nếu có cấu hình OpenRouter và có key
+        if (config.openRouter && config.openRouter.apiKey) {
+            const orKey = config.openRouter.apiKey;
+            const models = config.openRouter.models || [];
+            // Lọc các model đang bật và hỗ trợ vision
+            const activeOrModels = models.filter(m => m.enabled && m.vision);
+            
+            // Nếu chế độ MANUAL thì đẩy model được chọn lên đầu
+            if (config.openRouter.modelMode === "MANUAL" && config.openRouter.manualModel) {
+                const manualMod = activeOrModels.find(m => m.id === config.openRouter.modelMode);
+                if(manualMod) {
+                    targets.push({ type: 'openrouter', model: manualMod.id, key: orKey });
+                }
+            }
+            
+            // Thêm các model AUTO còn lại
+            activeOrModels.forEach(m => {
+                if(!targets.some(t => t.model === m.id)) {
+                    targets.push({ type: 'openrouter', model: m.id, key: orKey });
+                }
+            });
         }
+
+        // 2. Thêm các Gemini key & model dự phòng
+        if (config.apiKeys && config.apiKeys.length > 0) {
+            const activeKeys = config.apiKeys.filter(k => k.enabled !== false);
+            activeKeys.forEach(k => {
+                targets.push({ type: 'gemini', model: 'gemini-3.6-flash', key: k.apiKey });
+                targets.push({ type: 'gemini', model: 'gemini-2.5-flash', key: k.apiKey });
+            });
+        } else if (config.apiKey) {
+            targets.push({ type: 'gemini', model: 'gemini-3.6-flash', key: config.apiKey });
+            targets.push({ type: 'gemini', model: 'gemini-2.5-flash', key: config.apiKey });
+        }
+
+        if (targets.length === 0) {
+            throw new Error("Không tìm thấy API Key hợp lệ nào trong cấu hình.");
+        }
+
+        let lastError = null;
+
+        // Vòng lặp tuần tự thử nghiệm: Model nào lỗi sẽ tự động bỏ qua ngầm không báo lỗi
+        for (const target of targets) {
+            try {
+                let endpoint = "";
+                let headers = { 'Content-Type': 'application/json' };
+                let bodyData = {};
+
+                if (target.type === 'gemini') {
+                    endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${target.model}:generateContent?key=${target.key}`;
+                    bodyData = { contents: [{ parts: parts }] };
+                } else if (target.type === 'openrouter') {
+                    endpoint = `https://openrouter.ai/api/v1/chat/completions`;
+                    headers['Authorization'] = `Bearer ${target.key}`;
+                    headers['HTTP-Referer'] = window.location.origin;
+                    headers['X-Title'] = 'Glowmax Looksmax';
+
+                    // Chuyển đổi parts sang chuẩn OpenAI OpenRouter format nếu cần
+                    let textPrompt = "";
+                    let imageUrls = [];
+                    parts.forEach(p => {
+                        if (p.text) textPrompt += p.text + "\n";
+                        if (p.inline_data) {
+                            imageUrls.push({ type: "image_url", image_url: { url: `${p.inline_data.mime_type || 'data:image/jpeg;base64'},${p.inline_data.data}` } });
+                        }
+                    });
+
+                    bodyData = {
+                        model: target.model,
+                        messages: [
+                            { role: "user", content: [{ type: "text", text: textPrompt }, ...imageUrls] }
+                        ]
+                    };
+                }
+
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(bodyData)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    let rawText = "";
+                    if (target.type === 'gemini') {
+                        if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
+                            rawText = data.candidates[0].content.parts[0].text;
+                        }
+                    } else if (target.type === 'openrouter') {
+                        if (data.choices && data.choices[0]?.message?.content) {
+                            rawText = data.choices[0].message.content;
+                        }
+                    }
+
+                    if (rawText) {
+                        return parseAIJsonResponse(rawText); // Thành công trả về kết quả luôn
+                    }
+                }
+            } catch (err) {
+                // Nuốt lỗi ngầm (silent fail), tự động chuyển sang model tiếp theo không hiện popup
+                lastError = err;
+            }
+        }
+
+        throw new Error(lastError?.message || "Tất cả các model trong hệ thống đều gặp sự cố tạm thời.");
+    }
+
+    /* --- PHÂN TÍCH CHÍNH --- */
+    async function startAnalysis() {
         if (!state.photos[0]) {
             alert("Cần ít nhất ảnh chính diện để phân tích.");
             return;
@@ -1519,20 +1602,20 @@
 
         const faceCheck = await detectRealHumanFace(`${state.photos[0].mime},${state.photos[0].base64}`);
         if(!faceCheck.isHuman) {
-            alert("CẢNH BÁO: Hệ thống phát hiện đây không phải khuôn mặt người thật! Vui lòng tải lên ảnh mặt người thật.");
+            alert("CẢNH BÁO: Không phát hiện khuôn mặt người thật trong ảnh!");
             return;
         }
 
         document.getElementById('wizardScreen').style.display = 'none';
         document.getElementById('loadingUI').style.display = 'block';
-        startRealtimeAnalysisUI(faceCheck.landmarks);
+        startRealtimeAnalysisUI();
 
         try {
             const parts = [];
             const promptInstruction = `
-            Đóng vai chuyên gia thẩm mỹ DigitalsMod AI (Looksmaxxing AI Engine). 
-            Hãy đánh giá chân thực, công bằng, khách quan điểm số khuôn mặt người thật dựa trên hình học 3D. TUYỆT ĐỐI KHÔNG tâng bốc điểm số hay nịnh người dùng.
-            TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (Không dùng markdown, không giải thích thêm):
+            Đóng vai chuyên gia thẩm mỹ Looksmaxxing AI Engine. 
+            Hãy đánh giá chân thực, công bằng, khách quan điểm số khuôn mặt người thật dựa trên hình học 3D. TUYỆT ĐỐI KHÔNG tâng bốc điểm số.
+            TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (Không markdown, không giải thích):
             {
               "overall_score": 75, "face_shape": "Oval", "symmetry_score": 78, "proportion_score": 74, "skin_score": 70, "eyes_score": 76, "eyebrows_score": 72, "nose_score": 73, "lips_score": 75, "jawline_score": 77, "chin_score": 74, "hair_score": 76,
               "summary": "Tóm tắt đánh giá cấu trúc mặt", "strengths": ["Cấu trúc mắt cân đối", "Góc hàm nét"], "weaknesses": ["Làn da cần chăm sóc kỹ hơn"], "hairstyles": ["Textured Crop", "Side Part"], "grooming_tips": ["Tỉa gọn lông mày"], "skincare_tips": ["Sử dụng sữa rửa mặt & chống nắng"],
@@ -1551,23 +1634,8 @@
                 }
             }
 
-            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: parts }] })
-            });
-
-            if (!response.ok) {
-                const errJson = await response.json();
-                throw new Error(errJson.error?.message || `Lỗi từ DigitalsMod AI Engine (${response.status})`);
-            }
-
-            const data = await response.json();
-            if (!data.candidates || data.candidates.length === 0) throw new Error("DigitalsMod AI không phản hồi dữ liệu.");
-
-            const rawText = data.candidates[0].content.parts[0].text;
-            const resultData = parseAIJsonResponse(rawText);
+            // Gọi hàm Multi-Model Fallback tự động chọn model hoạt động
+            const resultData = await executeMultiModelAnalysis(parts);
             state.currentResult = resultData;
 
             clearInterval(state.analysisTimer);
@@ -1737,28 +1805,16 @@
     }
 
     async function runCompareAnalysis() {
-        const apiKey = window.getGlobalApiKey ? window.getGlobalApiKey() : null;
-        if (!state.afterPhoto || !apiKey) return;
+        if (!state.afterPhoto) return;
         const btn = document.getElementById('btnUploadAfter');
         btn.innerText = "Đang phân tích..."; btn.disabled = true;
         try {
             const compressed = await compressImage(state.afterPhoto.base64);
-            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-            const res = await fetch(endpoint, {
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    contents: [{
-                        parts: [
-                            { text: `TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON: { "overall_score": 85 }` }, 
-                            { inline_data: { mime_type: compressed.mime, data: compressed.base64 } }
-                        ]
-                    }] 
-                })
-            });
-            const data = await res.json();
-            const rawText = data.candidates[0].content.parts[0].text;
-            const scoreAfter = parseAIJsonResponse(rawText).overall_score || 0;
+            const resultData = await executeMultiModelAnalysis([
+                { text: `TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON: { "overall_score": 85 }` },
+                { inline_data: { mime_type: compressed.mime, data: compressed.base64 } }
+            ]);
+            const scoreAfter = resultData.overall_score || 0;
             const scoreBefore = state.currentResult.overall_score || 0, delta = scoreAfter - scoreBefore;
             document.getElementById('cmp-before').innerText = scoreBefore;
             document.getElementById('cmp-after').innerText = scoreAfter;
@@ -1766,7 +1822,7 @@
             deltaElem.innerText = delta > 0 ? `+${delta} Điểm!` : (delta < 0 ? `${delta} Điểm` : `0 Điểm`);
             deltaElem.className = delta > 0 ? 'delta-positive' : (delta < 0 ? 'delta-negative' : '');
             document.getElementById('compareResult').style.display = 'block';
-        } catch(e) { alert("Lỗi: " + e.message); }
+        } catch(e) { alert("Lỗi so sánh: " + e.message); }
         btn.innerText = "Tải Ảnh Khác"; btn.disabled = false;
     }
 
@@ -1781,11 +1837,11 @@
     }
 
     function exportResult() {
-        if (navigator.share) navigator.share({ title: 'Glowmax Result', text: `Điểm số: ${state.currentResult?.overall_score}/100. AI Glowmax.`, url: window.location.href }).catch(console.error);
+        if (navigator.share) navigator.share({ title: 'Glowmax Result', text: `Điểm số: ${state.currentResult?.overall_score}/100.`, url: window.location.href }).catch(console.error);
         else window.print();
     }
 
-    /* --- AI COACH CHAT CONNECTIVITY --- */
+    /* --- AI COACH CHAT --- */
     function openCoachChat() { 
         document.getElementById('coachModal').style.display = 'flex';
         const msgs = document.getElementById('chatMessages');
@@ -1803,34 +1859,20 @@
         input.value = '';
         msgs.scrollTop = msgs.scrollHeight;
 
-        const apiKey = window.getGlobalApiKey ? window.getGlobalApiKey() : null;
-        if(!apiKey) {
-            msgs.innerHTML += `<div class="chat-bubble ai">Chưa kết nối API Key từ Firestore configuration. Vui lòng kiểm tra lại.</div>`;
-            msgs.scrollTop = msgs.scrollHeight;
-            return;
-        }
-
         try {
-            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
-            const res = await fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: `Bạn là DigitalsMod AI Coach tư vấn diện mạo Glowmax. Trả lời ngắn gọn, chân thành, khuyến khích bài tập posture/grooming/skincare an toàn: ${text}` }] }]
-                })
-            });
-            const data = await res.json();
-            const reply = data.candidates[0].content.parts[0].text;
-            msgs.innerHTML += `<div class="chat-bubble ai">${escapeHTML(reply)}</div>`;
+            const resultData = await executeMultiModelAnalysis([
+                { text: `Bạn là AI Coach tư vấn diện mạo Glowmax. Trả lời ngắn gọn, chân thành, khuyến khích bài tập posture/grooming/skincare an toàn: ${text}` }
+            ]);
+            msgs.innerHTML += `<div class="chat-bubble ai">${escapeHTML(resultData.summary || "Đã ghi nhận câu hỏi của bạn.")}</div>`;
             msgs.scrollTop = msgs.scrollHeight;
         } catch(e) {
-            msgs.innerHTML += `<div class="chat-bubble ai">Lỗi kết nối AI Coach: ${e.message}</div>`;
+            msgs.innerHTML += `<div class="chat-bubble ai">AI Coach tạm thời bận. Vui lòng thử lại sau.</div>`;
             msgs.scrollTop = msgs.scrollHeight;
         }
     }
 
     function startExerciseTimer(name, seconds) {
-        alert(`Bắt đầu bài tập "${name}" trong ${seconds / 60} phút. Hãy giữ tư thế chuẩn!`);
+        alert(`Bắt đầu bài tập "${name}" trong ${seconds / 60} phút.`);
     }
 
     function clearUserData() {
