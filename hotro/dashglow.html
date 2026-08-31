@@ -357,6 +357,7 @@
         .api-actions {
             display: flex;
             gap: 6px;
+            flex-wrap: wrap;
         }
 
         .small-btn {
@@ -368,6 +369,12 @@
             padding: 0 10px;
             font-size: 11px;
             cursor: pointer;
+        }
+
+        .small-btn.activate {
+            background: rgba(10, 132, 255, 0.15);
+            border-color: rgba(10, 132, 255, 0.3);
+            color: var(--accent-color);
         }
 
         .small-btn.delete {
@@ -505,7 +512,7 @@
 
                 <div class="input-group">
                     <input
-                        type="password"
+                        type="text"
                         id="apiKeyInput"
                         placeholder="Chưa có API Key..."
                         autocomplete="off"
@@ -632,8 +639,7 @@
         getDoc,
         setDoc,
         serverTimestamp,
-        onSnapshot,
-        runTransaction
+        onSnapshot
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 
@@ -650,9 +656,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    /*
-        GIỮ NGUYÊN ĐƯỜNG DẪN FIRESTORE CŨ
-    */
     const configRef = doc(
         db,
         "glowmax",
@@ -661,14 +664,7 @@
         "keyDoc"
     );
 
-
-    /*
-        CẤU HÌNH ROTATION
-
-        10 phút = 600000 ms
-    */
     const ROTATION_TIME = 10 * 60 * 1000;
-
 
     let apiKeys = [];
     let currentIndex = 0;
@@ -678,85 +674,38 @@
     let isMasked = true;
 
     let rotationTimer = null;
-    let snapshotData = null;
 
-
-    const inputEl =
-        document.getElementById("apiKeyInput");
-
-    const statusDot =
-        document.getElementById("statusDot");
-
-    const statusText =
-        document.getElementById("statusText");
-
-    const metaInfo =
-        document.getElementById("metaInfo");
-
-    const apiList =
-        document.getElementById("apiList");
-
-    const newApiKey =
-        document.getElementById("newApiKey");
-
-    const addKeyBtn =
-        document.getElementById("addKeyBtn");
-
-    const rotationTime =
-        document.getElementById("rotationTime");
-
-    const progressBar =
-        document.getElementById("progressBar");
-
-
-    /*
-        TOAST
-    */
+    const inputEl = document.getElementById("apiKeyInput");
+    const statusDot = document.getElementById("statusDot");
+    const statusText = document.getElementById("statusText");
+    const metaInfo = document.getElementById("metaInfo");
+    const apiList = document.getElementById("apiList");
+    const newApiKey = document.getElementById("newApiKey");
+    const addKeyBtn = document.getElementById("addKeyBtn");
+    const rotationTime = document.getElementById("rotationTime");
+    const progressBar = document.getElementById("progressBar");
 
     function showToast(msg) {
-
-        const toast =
-            document.getElementById("toastMessage");
-
+        const toast = document.getElementById("toastMessage");
         toast.innerText = msg;
-
         toast.classList.add("show");
-
         setTimeout(() => {
             toast.classList.remove("show");
         }, 3000);
     }
 
-
-    /*
-        TẠO ID CHO KEY
-    */
-
     function createKeyId() {
-
         return (
             Date.now().toString(36) +
-            Math.random()
-                .toString(36)
-                .substring(2, 8)
+            Math.random().toString(36).substring(2, 8)
         );
     }
 
-
-    /*
-        MASK KEY
-
-        Chỉ hiển thị vài ký tự đầu/cuối
-    */
-
     function maskKey(key) {
-
         if (!key) return "";
-
         if (key.length <= 12) {
             return "••••••••••••";
         }
-
         return (
             key.substring(0, 6) +
             "••••••••••" +
@@ -764,20 +713,8 @@
         );
     }
 
-
-    /*
-        LẤY KEY ĐANG HOẠT ĐỘNG
-    */
-
     function getActiveKeyIndex() {
-
-        if (!apiKeys.length) {
-            return -1;
-        }
-
-        /*
-            Nếu index hiện tại hợp lệ
-        */
+        if (!apiKeys.length) return -1;
         if (
             currentIndex >= 0 &&
             currentIndex < apiKeys.length &&
@@ -786,1033 +723,367 @@
             return currentIndex;
         }
 
-
-        /*
-            Tìm key enabled tiếp theo
-        */
-
-        for (
-            let i = 0;
-            i < apiKeys.length;
-            i++
-        ) {
-
-            const index =
-                (currentIndex + i) %
-                apiKeys.length;
-
-            if (
-                apiKeys[index] &&
-                apiKeys[index].enabled !== false
-            ) {
+        for (let i = 0; i < apiKeys.length; i++) {
+            const index = (currentIndex + i) % apiKeys.length;
+            if (apiKeys[index] && apiKeys[index].enabled !== false) {
                 return index;
             }
         }
-
         return -1;
     }
 
-
-    /*
-        LẤY KEY HIỆN TẠI
-    */
-
-    function getCurrentKey() {
-
-        const index =
-            getActiveKeyIndex();
-
-        if (index === -1) {
-            return null;
-        }
-
-        return apiKeys[index];
-    }
-
-
-    /*
-        HIỂN THỊ DANH SÁCH
-    */
-
     function renderApiList() {
-
         apiList.innerHTML = "";
-
         if (!apiKeys.length) {
-
-            apiList.innerHTML = `
-                <div class="empty-state">
-                    Chưa có API Key
-                </div>
-            `;
-
+            apiList.innerHTML = `<div class="empty-state">Chưa có API Key</div>`;
             return;
         }
-
 
         apiKeys.forEach((item, index) => {
+            const isCurrent = index === getActiveKeyIndex();
+            const enabled = item.enabled !== false;
 
-            const isCurrent =
-                index === getActiveKeyIndex();
-
-            const enabled =
-                item.enabled !== false;
-
-
-            const div =
-                document.createElement("div");
-
-            div.className =
-                "api-item" +
-                (isCurrent ? " current" : "");
-
+            const div = document.createElement("div");
+            div.className = "api-item" + (isCurrent ? " current" : "");
 
             div.innerHTML = `
-
                 <div class="api-top">
-
                     <div class="api-name">
-
-                        <div class="api-number">
-                            ${index + 1}
-                        </div>
-
-                        <span>
-                            Gemini API
-                        </span>
-
+                        <div class="api-number">${index + 1}</div>
+                        <span>Gemini API</span>
                     </div>
-
-                    <div
-                        class="api-status ${enabled ? "" : "off"}"
-                    >
+                    <div class="api-status ${enabled ? "" : "off"}">
                         ${enabled ? "● ACTIVE" : "● OFF"}
                     </div>
-
                 </div>
 
-
-                <div class="api-key-mask">
-                    ${maskKey(item.apiKey)}
-                </div>
-
+                <div class="api-key-mask">${maskKey(item.apiKey)}</div>
 
                 <div class="api-bottom">
-
                     <div class="api-current">
-
-                        ${
-                            isCurrent
-                                ? "● ĐANG SỬ DỤNG"
-                                : "Đang chờ"
-                        }
-
+                        ${isCurrent ? "● ĐANG SỬ DỤNG" : "Đang chờ"}
                     </div>
-
-
                     <div class="api-actions">
-
-                        <button
-                            class="small-btn"
-                            data-action="toggle"
-                            data-index="${index}"
-                        >
+                        ${!isCurrent && enabled ? `
+                        <button class="small-btn activate" data-action="activate" data-index="${index}">
+                            ⚡ Dùng Ngay
+                        </button>` : ""}
+                        <button class="small-btn" data-action="toggle" data-index="${index}">
                             ${enabled ? "Tắt" : "Bật"}
                         </button>
-
-                        <button
-                            class="small-btn delete"
-                            data-action="delete"
-                            data-index="${index}"
-                        >
+                        <button class="small-btn delete" data-action="delete" data-index="${index}">
                             Xóa
                         </button>
-
                     </div>
-
                 </div>
-
             `;
-
             apiList.appendChild(div);
-
         });
-
     }
 
-
-    /*
-        CẬP NHẬT GIAO DIỆN KEY HIỆN TẠI
-    */
-
     function updateCurrentKeyUI() {
-
-        const index =
-            getActiveKeyIndex();
-
+        const index = getActiveKeyIndex();
         if (index === -1) {
-
             rawApiKey = "";
-
             inputEl.value = "";
-
-            statusDot.className =
-                "status-dot inactive";
-
-            statusText.innerText =
-                "● Chưa cấu hình API";
-
-            rotationTime.innerText =
-                "--:--";
-
-            progressBar.style.width =
-                "0%";
-
+            statusDot.className = "status-dot inactive";
+            statusText.innerText = "● Chưa cấu hình API";
+            rotationTime.innerText = "--:--";
+            progressBar.style.width = "0%";
             return;
         }
 
+        const key = apiKeys[index];
+        rawApiKey = key.apiKey || "";
 
-        const key =
-            apiKeys[index];
+        statusDot.className = "status-dot active";
+        statusText.innerText = "● API đang hoạt động";
 
-        rawApiKey =
-            key.apiKey || "";
-
-
-        statusDot.className =
-            "status-dot active";
-
-        statusText.innerText =
-            "● API đang hoạt động";
-
-
-        inputEl.value =
-            isMasked
-                ? maskKey(rawApiKey)
-                : rawApiKey;
-
-
+        inputEl.value = isMasked ? maskKey(rawApiKey) : rawApiKey;
         renderApiList();
-
     }
 
-
-    /*
-        LƯU TOÀN BỘ CONFIG
-    */
-
     async function saveConfig(extra = {}) {
+        const activeIndex = getActiveKeyIndex();
+        const activeKeyString = (activeIndex !== -1 && apiKeys[activeIndex]) ? apiKeys[activeIndex].apiKey : "";
 
         await setDoc(
             configRef,
             {
                 apiKeys: apiKeys,
-
                 currentIndex: currentIndex,
-
-                rotationStartedAt:
-                    rotationStartedAt
-                        ? new Date(rotationStartedAt)
-                        : serverTimestamp(),
-
+                apiKey: activeKeyString, // Đồng bộ để glowmax.html đọc trực tiếp thành công
+                rotationStartedAt: rotationStartedAt ? new Date(rotationStartedAt) : serverTimestamp(),
                 rotationMinutes: 10,
-
-                enabled:
-                    apiKeys.some(
-                        key =>
-                            key.enabled !== false
-                    ),
-
+                enabled: apiKeys.some(key => key.enabled !== false),
                 ...extra,
-
-                updatedAt:
-                    serverTimestamp()
-
+                updatedAt: serverTimestamp()
             },
-            {
-                merge: true
-            }
+            { merge: true }
         );
-
     }
 
-
-    /*
-        THÊM API KEY
-    */
-
-    addKeyBtn.addEventListener(
-        "click",
-        async () => {
-
-            const value =
-                newApiKey.value.trim();
-
-
-            if (!value) {
-
-                showToast(
-                    "Vui lòng nhập API Key!"
-                );
-
-                return;
-            }
-
-
-            /*
-                Tránh thêm trùng
-            */
-
-            const duplicate =
-                apiKeys.some(
-                    key =>
-                        key.apiKey === value
-                );
-
-
-            if (duplicate) {
-
-                showToast(
-                    "API Key này đã tồn tại!"
-                );
-
-                return;
-            }
-
-
-            addKeyBtn.disabled = true;
-            addKeyBtn.innerText =
-                "Đang thêm...";
-
-
-            try {
-
-                const wasEmpty =
-                    apiKeys.length === 0;
-
-
-                apiKeys.push({
-
-                    id: createKeyId(),
-
-                    apiKey: value,
-
-                    enabled: true
-
-                });
-
-
-                /*
-                    Nếu đây là key đầu tiên
-                    thì bắt đầu timer ngay
-                */
-
-                if (wasEmpty) {
-
-                    currentIndex = 0;
-
-                    rotationStartedAt =
-                        Date.now();
-
-                }
-
-
-                await saveConfig();
-
-
-                newApiKey.value = "";
-
-                isMasked = true;
-
-                updateCurrentKeyUI();
-
-                showToast(
-                    "Đã thêm API Key!"
-                );
-
-            } catch (error) {
-
-                console.error(error);
-
-                showToast(
-                    "Lỗi khi thêm API Key!"
-                );
-
-            } finally {
-
-                addKeyBtn.disabled = false;
-
-                addKeyBtn.innerText =
-                    "＋ Thêm API Key";
-
-            }
-
-        }
-    );
-
-
-    /*
-        ENTER ĐỂ THÊM KEY
-    */
-
-    newApiKey.addEventListener(
-        "keydown",
-        event => {
-
-            if (event.key === "Enter") {
-
-                event.preventDefault();
-
-                addKeyBtn.click();
-
-            }
-
-        }
-    );
-
-
-    /*
-        XỬ LÝ BẬT / TẮT / XÓA
-    */
-
-    apiList.addEventListener(
-        "click",
-        async event => {
-
-            const button =
-                event.target.closest("button");
-
-            if (!button) return;
-
-
-            const action =
-                button.dataset.action;
-
-            const index =
-                Number(button.dataset.index);
-
-
-            if (
-                Number.isNaN(index) ||
-                !apiKeys[index]
-            ) {
-                return;
-            }
-
-
-            /*
-                TẮT / BẬT
-            */
-
-            if (action === "toggle") {
-
-                const activeCount =
-                    apiKeys.filter(
-                        key =>
-                            key.enabled !== false
-                    ).length;
-
-
-                /*
-                    Không cho tắt key cuối
-                */
-
-                if (
-                    apiKeys[index].enabled !== false &&
-                    activeCount <= 1
-                ) {
-
-                    showToast(
-                        "Phải giữ lại ít nhất 1 API Key!"
-                    );
-
-                    return;
-                }
-
-
-                apiKeys[index].enabled =
-                    apiKeys[index].enabled === false;
-
-
-                /*
-                    Nếu key hiện tại bị tắt
-                    tìm key khác
-                */
-
-                if (
-                    index === currentIndex &&
-                    apiKeys[index].enabled === false
-                ) {
-
-                    const next =
-                        getActiveKeyIndex();
-
-                    if (next !== -1) {
-
-                        currentIndex = next;
-
-                        rotationStartedAt =
-                            Date.now();
-
-                    }
-
-                }
-
-
-                await saveConfig();
-
-                updateCurrentKeyUI();
-
-                showToast(
-                    apiKeys[index].enabled
-                        ? "Đã bật API Key"
-                        : "Đã tắt API Key"
-                );
-
-                return;
-            }
-
-
-            /*
-                XÓA
-            */
-
-            if (action === "delete") {
-
-                if (!confirm(
-                    "Bạn có chắc muốn xóa API Key này?"
-                )) {
-                    return;
-                }
-
-
-                const wasCurrent =
-                    index === currentIndex;
-
-
-                apiKeys.splice(index, 1);
-
-
-                /*
-                    Không còn key
-                */
-
-                if (!apiKeys.length) {
-
-                    currentIndex = 0;
-
-                    rotationStartedAt = 0;
-
-                }
-
-                /*
-                    Điều chỉnh index
-                */
-
-                else if (
-                    currentIndex >= apiKeys.length
-                ) {
-
-                    currentIndex = 0;
-
-                }
-
-
-                /*
-                    Nếu xóa key hiện tại
-                */
-
-                if (wasCurrent && apiKeys.length) {
-
-                    const next =
-                        getActiveKeyIndex();
-
-                    currentIndex =
-                        next === -1
-                            ? 0
-                            : next;
-
-                    rotationStartedAt =
-                        Date.now();
-
-                }
-
-
-                await saveConfig();
-
-                updateCurrentKeyUI();
-
-                showToast(
-                    "Đã xóa API Key!"
-                );
-
-            }
-
-        }
-    );
-
-
-    /*
-        HIỆN / ẨN KEY
-    */
-
-    document
-        .getElementById("toggleVisibility")
-        .addEventListener(
-            "click",
-            () => {
-
-                if (!rawApiKey) return;
-
-                isMasked =
-                    !isMasked;
-
-                inputEl.value =
-                    isMasked
-                        ? maskKey(rawApiKey)
-                        : rawApiKey;
-
-            }
-        );
-
-
-    /*
-        COPY KEY
-    */
-
-    document
-        .getElementById("copyKey")
-        .addEventListener(
-            "click",
-            async () => {
-
-                if (!rawApiKey) {
-
-                    showToast(
-                        "Không có API Key!"
-                    );
-
-                    return;
-                }
-
-
-                try {
-
-                    await navigator
-                        .clipboard
-                        .writeText(rawApiKey);
-
-                    showToast(
-                        "Đã sao chép API Key!"
-                    );
-
-                } catch (error) {
-
-                    showToast(
-                        "Không thể sao chép!"
-                    );
-
-                }
-
-            }
-        );
-
-
-    /*
-        CHUYỂN KEY
-    */
-
-    async function rotateApiKey() {
-
-        if (apiKeys.length <= 1) {
-
-            rotationStartedAt =
-                Date.now();
-
+    addKeyBtn.addEventListener("click", async () => {
+        const value = newApiKey.value.trim();
+        if (!value) {
+            showToast("Vui lòng nhập API Key!");
             return;
-
         }
 
-
-        const enabledKeys =
-            apiKeys.filter(
-                key =>
-                    key.enabled !== false
-            );
-
-
-        if (!enabledKeys.length) {
-
+        const duplicate = apiKeys.some(key => key.apiKey === value);
+        if (duplicate) {
+            showToast("API Key này đã tồn tại!");
             return;
-
         }
 
-
-        let nextIndex =
-            currentIndex;
-
-
-        /*
-            Tìm key enabled tiếp theo
-        */
-
-        for (
-            let step = 1;
-            step <= apiKeys.length;
-            step++
-        ) {
-
-            const candidate =
-                (currentIndex + step) %
-                apiKeys.length;
-
-
-            if (
-                apiKeys[candidate] &&
-                apiKeys[candidate].enabled !== false
-            ) {
-
-                nextIndex =
-                    candidate;
-
-                break;
-
-            }
-
-        }
-
-
-        currentIndex =
-            nextIndex;
-
-
-        rotationStartedAt =
-            Date.now();
-
+        addKeyBtn.disabled = true;
+        addKeyBtn.innerText = "Đang thêm...";
 
         try {
+            const wasEmpty = apiKeys.length === 0;
+            apiKeys.push({
+                id: createKeyId(),
+                apiKey: value,
+                enabled: true
+            });
+
+            if (wasEmpty) {
+                currentIndex = 0;
+                rotationStartedAt = Date.now();
+            }
 
             await saveConfig();
-
+            newApiKey.value = "";
+            isMasked = true;
+            updateCurrentKeyUI();
+            showToast("Đã thêm API Key!");
         } catch (error) {
+            console.error(error);
+            showToast("Lỗi khi thêm API Key!");
+        } finally {
+            addKeyBtn.disabled = false;
+            addKeyBtn.innerText = "＋ Thêm API Key";
+        }
+    });
 
-            console.error(
-                "Rotation error:",
-                error
-            );
+    newApiKey.addEventListener("keydown", event => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            addKeyBtn.click();
+        }
+    });
 
+    apiList.addEventListener("click", async event => {
+        const button = event.target.closest("button");
+        if (!button) return;
+
+        const action = button.dataset.action;
+        const index = Number(button.dataset.index);
+
+        if (Number.isNaN(index) || !apiKeys[index]) return;
+
+        // KÍCH HOẠT NHANH (DÙNG NGAY)
+        if (action === "activate") {
+            if (apiKeys[index].enabled === false) {
+                showToast("Không thể dùng key đang bị tắt!");
+                return;
+            }
+            currentIndex = index;
+            rotationStartedAt = Date.now();
+            await saveConfig();
+            updateCurrentKeyUI();
+            showToast("Đã chuyển sang API Key này!");
+            return;
         }
 
+        if (action === "toggle") {
+            const activeCount = apiKeys.filter(key => key.enabled !== false).length;
+            if (apiKeys[index].enabled !== false && activeCount <= 1) {
+                showToast("Phải giữ lại ít nhất 1 API Key!");
+                return;
+            }
+
+            apiKeys[index].enabled = apiKeys[index].enabled === false;
+
+            if (index === currentIndex && apiKeys[index].enabled === false) {
+                const next = getActiveKeyIndex();
+                if (next !== -1) {
+                    currentIndex = next;
+                    rotationStartedAt = Date.now();
+                }
+            }
+
+            await saveConfig();
+            updateCurrentKeyUI();
+            showToast(apiKeys[index].enabled ? "Đã bật API Key" : "Đã tắt API Key");
+            return;
+        }
+
+        if (action === "delete") {
+            if (!confirm("Bạn có chắc muốn xóa API Key này?")) return;
+
+            const wasCurrent = index === currentIndex;
+            apiKeys.splice(index, 1);
+
+            if (!apiKeys.length) {
+                currentIndex = 0;
+                rotationStartedAt = 0;
+            } else if (currentIndex >= apiKeys.length) {
+                currentIndex = 0;
+            }
+
+            if (wasCurrent && apiKeys.length) {
+                const next = getActiveKeyIndex();
+                currentIndex = next === -1 ? 0 : next;
+                rotationStartedAt = Date.now();
+            }
+
+            await saveConfig();
+            updateCurrentKeyUI();
+            showToast("Đã xóa API Key!");
+        }
+    });
+
+    // FIX NÚT MẮT ĐỂ HIỆN FULL API KEY
+    document.getElementById("toggleVisibility").addEventListener("click", () => {
+        if (!rawApiKey) return;
+        isMasked = !isMasked;
+        inputEl.value = isMasked ? maskKey(rawApiKey) : rawApiKey;
+    });
+
+    document.getElementById("copyKey").addEventListener("click", async () => {
+        if (!rawApiKey) {
+            showToast("Không có API Key!");
+            return;
+        }
+        try {
+            await navigator.clipboard.writeText(rawApiKey);
+            showToast("Đã sao chép API Key!");
+        } catch (error) {
+            showToast("Không thể sao chép!");
+        }
+    });
+
+    async function rotateApiKey() {
+        if (apiKeys.length <= 1) {
+            rotationStartedAt = Date.now();
+            return;
+        }
+
+        const enabledKeys = apiKeys.filter(key => key.enabled !== false);
+        if (!enabledKeys.length) return;
+
+        let nextIndex = currentIndex;
+        for (let step = 1; step <= apiKeys.length; step++) {
+            const candidate = (currentIndex + step) % apiKeys.length;
+            if (apiKeys[candidate] && apiKeys[candidate].enabled !== false) {
+                nextIndex = candidate;
+                break;
+            }
+        }
+
+        currentIndex = nextIndex;
+        rotationStartedAt = Date.now();
+
+        try {
+            await saveConfig();
+        } catch (error) {
+            console.error("Rotation error:", error);
+        }
 
         updateCurrentKeyUI();
-
-        showToast(
-            "Đã tự động chuyển sang API Key tiếp theo"
-        );
-
+        showToast("Đã tự động chuyển sang API Key tiếp theo");
     }
-
-
-    /*
-        TIMER 10 PHÚT
-    */
 
     function updateRotationTimer() {
-
-        if (
-            !apiKeys.length ||
-            getActiveKeyIndex() === -1
-        ) {
-
-            rotationTime.innerText =
-                "--:--";
-
-            progressBar.style.width =
-                "0%";
-
+        if (!apiKeys.length || getActiveKeyIndex() === -1) {
+            rotationTime.innerText = "--:--";
+            progressBar.style.width = "0%";
             return;
-
         }
-
 
         if (!rotationStartedAt) {
-
-            rotationStartedAt =
-                Date.now();
-
+            rotationStartedAt = Date.now();
         }
 
-
-        const elapsed =
-            Date.now() -
-            rotationStartedAt;
-
-
-        const remaining =
-            ROTATION_TIME -
-            elapsed;
-
-
-        /*
-            Đã đủ 10 phút
-        */
+        const elapsed = Date.now() - rotationStartedAt;
+        const remaining = ROTATION_TIME - elapsed;
 
         if (remaining <= 0) {
-
             rotateApiKey();
-
             return;
-
         }
 
-
-        const minutes =
-            Math.floor(
-                remaining / 60000
-            );
-
-
-        const seconds =
-            Math.floor(
-                (remaining % 60000) /
-                1000
-            );
-
+        const minutes = Math.floor(remaining / 60000);
+        const seconds = Math.floor((remaining % 60000) / 1000);
 
         rotationTime.innerText =
-            String(minutes).padStart(2, "0") +
-            ":" +
-            String(seconds).padStart(2, "0");
+            String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
 
-
-        const progress =
-            Math.min(
-                100,
-                Math.max(
-                    0,
-                    (elapsed /
-                        ROTATION_TIME) *
-                    100
-                )
-            );
-
-
-        progressBar.style.width =
-            progress + "%";
-
+        const progress = Math.min(100, Math.max(0, (elapsed / ROTATION_TIME) * 100));
+        progressBar.style.width = progress + "%";
     }
-
-
-    /*
-        ĐỒNG BỘ REALTIME FIRESTORE
-    */
 
     onSnapshot(
         configRef,
         snapshot => {
-
             if (!snapshot.exists()) {
-
                 apiKeys = [];
-
                 currentIndex = 0;
-
                 rotationStartedAt = 0;
-
                 updateCurrentKeyUI();
-
-                metaInfo.innerText =
-                    "Cập nhật cuối: Chưa có dữ liệu";
-
+                metaInfo.innerText = "Cập nhật cuối: Chưa có dữ liệu";
                 return;
-
             }
 
+            const data = snapshot.data();
 
-            const data =
-                snapshot.data();
-
-
-            snapshotData =
-                data;
-
-
-            /*
-                Hỗ trợ cả cấu trúc mới
-            */
-
-            if (
-                Array.isArray(data.apiKeys)
-            ) {
-
-                apiKeys =
-                    data.apiKeys
-                        .filter(
-                            key =>
-                                key &&
-                                key.apiKey
-                        )
-                        .map(key => ({
-
-                            id:
-                                key.id ||
-                                createKeyId(),
-
-                            apiKey:
-                                key.apiKey,
-
-                            enabled:
-                                key.enabled !== false
-
-                        }));
-
-            }
-
-            /*
-                HỖ TRỢ DỮ LIỆU CŨ
-
-                Nếu Firestore vẫn đang có:
-                apiKey: "AIza..."
-            */
-
-            else if (
-                data.apiKey
-            ) {
-
-                apiKeys = [
-
-                    {
-                        id: createKeyId(),
-
-                        apiKey:
-                            data.apiKey,
-
-                        enabled: true
-
-                    }
-
-                ];
-
-            }
-
-            else {
-
+            if (Array.isArray(data.apiKeys)) {
+                apiKeys = data.apiKeys
+                    .filter(key => key && key.apiKey)
+                    .map(key => ({
+                        id: key.id || createKeyId(),
+                        apiKey: key.apiKey,
+                        enabled: key.enabled !== false
+                    }));
+            } else if (data.apiKey) {
+                apiKeys = [{
+                    id: createKeyId(),
+                    apiKey: data.apiKey,
+                    enabled: true
+                }];
+            } else {
                 apiKeys = [];
-
             }
 
+            currentIndex = Number.isInteger(data.currentIndex) ? data.currentIndex : 0;
 
-            currentIndex =
-                Number.isInteger(
-                    data.currentIndex
-                )
-                    ? data.currentIndex
-                    : 0;
-
-
-            /*
-                Đọc timestamp rotation
-            */
-
-            if (
-                data.rotationStartedAt &&
-                typeof
-                    data.rotationStartedAt.toMillis ===
-                    "function"
-            ) {
-
-                rotationStartedAt =
-                    data.rotationStartedAt.toMillis();
-
+            if (data.rotationStartedAt && typeof data.rotationStartedAt.toMillis === "function") {
+                rotationStartedAt = data.rotationStartedAt.toMillis();
+            } else if (data.rotationStartedAt instanceof Date) {
+                rotationStartedAt = data.rotationStartedAt.getTime();
             }
 
-            /*
-                Timestamp dạng Date
-            */
-
-            else if (
-                data.rotationStartedAt
-                instanceof Date
-            ) {
-
-                rotationStartedAt =
-                    data.rotationStartedAt.getTime();
-
+            if (!rotationStartedAt && apiKeys.length) {
+                rotationStartedAt = Date.now();
             }
-
-
-            /*
-                Nếu chưa có thời gian
-            */
-
-            if (
-                !rotationStartedAt &&
-                apiKeys.length
-            ) {
-
-                rotationStartedAt =
-                    Date.now();
-
-            }
-
 
             updateCurrentKeyUI();
 
-
             if (data.updatedAt) {
-
-                const date =
-                    data.updatedAt.toDate
-                        ? data.updatedAt.toDate()
-                        : new Date();
-
-
-                metaInfo.innerText =
-                    "Cập nhật cuối: " +
-                    date.toLocaleString(
-                        "vi-VN"
-                    );
-
+                const date = data.updatedAt.toDate ? data.updatedAt.toDate() : new Date();
+                metaInfo.innerText = "Cập nhật cuối: " + date.toLocaleString("vi-VN");
             }
-
         },
-
         error => {
-
-            console.error(
-                "Firestore Error:",
-                error
-            );
-
-
-            statusDot.className =
-                "status-dot inactive";
-
-            statusText.innerText =
-                "Lỗi kết nối cơ sở dữ liệu";
-
+            console.error("Firestore Error:", error);
+            statusDot.className = "status-dot inactive";
+            statusText.innerText = "Lỗi kết nối cơ sở dữ liệu";
         }
     );
 
-
-    /*
-        TIMER CHẠY MỖI GIÂY
-    */
-
-    rotationTimer =
-        setInterval(
-            updateRotationTimer,
-            1000
-        );
-
-
-    /*
-        CHẠY NGAY KHI LOAD
-    */
-
+    rotationTimer = setInterval(updateRotationTimer, 1000);
     updateRotationTimer();
-
-
 </script>
 
 </body>
