@@ -850,7 +850,7 @@
     </div>
 </div>
 
-<!-- CAMERA MODAL (SILHOUETTE MASK OVERLAY CHUẨN MẶT NGƯỜI THẬT) -->
+<!-- CAMERA MODAL (FIXED VECTOR SILHOUETTE OVERLAY CHUẨN TỶ LỆ HÌNH HỌC LOOKSMAX) -->
 <div id="cameraModal">
     <div class="camera-flash" id="cameraFlash"></div>
     <div class="camera-header">
@@ -873,19 +873,23 @@
                     <line x1="50" y1="20" x2="50" y2="105" stroke-dasharray="1 2" opacity="0.6"/>
                 </svg>
 
-                <!-- SVG Profile 90° Face Model (Bước 2: Nghiêng góc đúng 90°) -->
+                <!-- SVG Profile 90° Face Model (Bước 2: Nghiêng góc đúng 90° - ĐÃ FIX CHUẨN XƯƠNG HÀM/MŨI/CẰM) -->
                 <svg id="svgSilhouetteProfile" viewBox="0 0 100 130" style="display:none;">
-                    <!-- Trán -> Sống mũi -> Môi -> Cằm -> Xương hàm -> Tai -> Cổ -->
-                    <path d="M30,15 C42,15 52,22 56,32 C58,37 62,45 68,50 C62,54 59,57 60,65 C62,69 66,72 63,77 C58,84 52,95 48,102 C42,112 30,112 25,112 C20,112 18,105 18,90 L18,50 C18,30 22,15 30,15 Z M30,112 L10,130 L60,130 L45,112 Z"/>
-                    <!-- Vùng căn sống mũi high-bridge & jawline -->
+                    <!-- Đỉnh đầu -> Trán -> Hốc mắt -> Sống mũi nhô -> Nhân trung -> Môi trên/dưới -> Cằm nhọn -> Xương hàm -> Cổ -->
+                    <path d="M 38 12 C 22 12 12 28 12 55 C 12 78 18 95 32 108 L 10 130 L 75 130 C 70 120 58 112 48 108 C 58 102 66 90 64 78 C 64 78 58 78 56 78 C 54 78 55 74 57 73 C 59 72 63 71 61 67 C 59 63 56 64 54 64 C 53 64 54 61 58 59 C 62 57 70 51 64 43 C 58 35 50 30 46 22 C 43 16 41 12 38 12 Z"/>
+                    <!-- Điểm căn đỉnh sống mũi & góc jawline -->
                     <circle cx="68" cy="50" r="1.5" fill="var(--accent-color)" stroke="none"/>
-                    <circle cx="63" cy="77" r="1.5" fill="var(--accent-color)" stroke="none"/>
+                    <circle cx="63" cy="78" r="1.5" fill="var(--accent-color)" stroke="none"/>
+                    <line x1="20" y1="50" x2="68" y2="50" stroke-dasharray="1 2" opacity="0.5"/>
                 </svg>
 
-                <!-- SVG Profile 30° Face Model (Bước 3: Nghiêng 30° chuẩn xác) -->
+                <!-- SVG Profile 30° Face Model (Bước 3: Nghiêng góc 30° - ĐÃ FIX KHÔNG BỊ TRÙNG MẶT THẲNG) -->
                 <svg id="svgSilhouette30" viewBox="0 0 100 130" style="display:none;">
-                    <path d="M42,14 C26,14 18,30 18,58 C18,88 30,112 46,112 C60,112 72,90 76,64 C76,38 62,14 42,14 Z M46,118 C22,118 10,130 10,130 L90,130 C90,130 74,118 46,118 Z"/>
-                    <line x1="25" y1="52" x2="72" y2="52" stroke-dasharray="1 2" opacity="0.6"/>
+                    <!-- Khung mặt góc 3/4 thể hiện độ nhô của một bên má & mũi -->
+                    <path d="M 46 12 C 28 12 18 28 18 58 C 18 88 32 112 48 112 C 64 112 78 92 78 62 C 78 52 74 38 70 28 C 68 23 60 12 46 12 Z M 48 118 C 24 118 10 130 10 130 L 90 130 C 90 130 76 118 48 118 Z"/>
+                    <!-- Đường căn má và mắt góc nghiêng 3/4 -->
+                    <path d="M 62 28 C 68 40 70 52 66 68 C 62 80 56 94 48 108" stroke-dasharray="1 2" opacity="0.6"/>
+                    <line x1="22" y1="52" x2="72" y2="52" stroke-dasharray="1 2" opacity="0.5"/>
                 </svg>
             </div>
         </div>
