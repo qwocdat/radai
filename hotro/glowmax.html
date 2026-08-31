@@ -293,7 +293,7 @@
 
         #videoElement { width: 100%; height: 100%; object-fit: cover; }
         
-        /* CHUẨN SILHOUETTE MẶT NGƯỜI CHÂN THẬT - HIGH PRECISION PNG OVERLAY */
+        /* CẤU HÌNH TÁCH NỀN XOÁ KHỐI VUÔNG & LÀM MỜ MẪU */
         .silhouette-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: 5; display: flex; justify-content: center; align-items: center;
@@ -301,9 +301,9 @@
 
         .silhouette-img {
             width: 88%; height: 88%; object-fit: contain;
-            opacity: 0.65;
-            mix-blend-mode: screen;
-            filter: drop-shadow(0 0 10px rgba(10, 132, 255, 0.8)) brightness(1.2);
+            opacity: 0.30;
+            mix-blend-mode: color-dodge;
+            filter: grayscale(100%) contrast(160%) brightness(0.7) drop-shadow(0 0 8px rgba(10, 132, 255, 0.5));
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -863,10 +863,10 @@
             
             <div class="silhouette-overlay" id="silhouetteOverlay">
                 <!-- Mẫu ảnh chính diện (Bước 1) -->
-                <img id="imgSilhouetteFront" class="silhouette-img" src="https://i.ibb.co/MxhSW216/Screenshot-2026-09-01-01-22-32-441-com-miui-gallery-edit.jpg" alt="Front Model">
+                <img id="imgSilhouetteFront" class="silhouette-img" src="https://i.ibb.co/6c0PfZJv/screenshot-front-nobg.png" alt="Front Model">
 
                 <!-- Mẫu ảnh góc nghiêng 90° (Bước 2) -->
-                <img id="imgSilhouetteProfile" class="silhouette-img" src="https://i.ibb.co/zTGM5Mmv/Screenshot-2026-09-01-01-22-47-541-com-miui-gallery-edit.jpg" alt="Profile Model" style="display:none;">
+                <img id="imgSilhouetteProfile" class="silhouette-img" src="https://i.ibb.co/XrnM3S5G/screenshot-profile-nobg.png" alt="Profile Model" style="display:none;">
             </div>
         </div>
         <div class="camera-instruction-box" id="camInstruction">Mặt nhìn thẳng • Ảnh gốc • Đủ sáng</div>
