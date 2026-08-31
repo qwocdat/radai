@@ -293,16 +293,16 @@
 
         #videoElement { width: 100%; height: 100%; object-fit: cover; }
         
-        /* CHUẨN SILHOUETTE MẶT NGƯỜI CHÂN THẬT */
+        /* CHUẨN SILHOUETTE MẶT NGƯỜI CHÂN THẬT - HIGH PRECISION APP STORE MASK */
         .silhouette-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: 5; display: flex; justify-content: center; align-items: center;
         }
 
         .silhouette-overlay svg {
-            width: 82%; height: 82%; fill: rgba(255, 255, 255, 0.28);
-            filter: drop-shadow(0 0 12px rgba(0,0,0,0.85));
-            transition: all 0.3s ease;
+            width: 88%; height: 88%; stroke: rgba(10, 132, 255, 0.85); stroke-width: 1.5;
+            fill: rgba(10, 132, 255, 0.08); filter: drop-shadow(0 0 10px rgba(10, 132, 255, 0.5));
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .camera-instruction-box {
@@ -334,7 +334,7 @@
             transition: opacity 0.1s ease-out;
         }
 
-        /* KHUNG QUÉT FEATURE SCANNER TỪNG BỘ PHẬN NHƯ VIDEO */
+        /* KHUNG QUÉT FEATURE SCANNER TỪNG BỘ PHẬN CHUẨN LOOKSMAX */
         .loading-container { display: none; text-align: center; padding: 10px 0 20px 0; }
         .scan-frame-container {
             position: relative; width: 280px; height: 340px;
@@ -347,30 +347,36 @@
         
         .feature-scan-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 6; display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
+            pointer-events: none; z-index: 6;
+        }
+
+        .feature-box-scan {
+            position: absolute; border: 2px dashed #0A84FF;
+            border-radius: 12px; box-shadow: 0 0 15px rgba(10,132,255,0.6);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); opacity: 0;
         }
 
         .feature-line-h {
             position: absolute; height: 2px; background: #FFFFFF;
             box-shadow: 0 0 10px #FFFFFF, 0 0 20px var(--accent-color);
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            opacity: 0;
+            opacity: 0; width: 100%;
         }
 
         .feature-line-v {
             position: absolute; width: 2px; background: #FFFFFF;
             box-shadow: 0 0 10px #FFFFFF, 0 0 20px var(--accent-color);
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            opacity: 0;
+            opacity: 0; height: 100%;
         }
 
         .feature-tag-badge {
-            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border); padding: 6px 16px; border-radius: 100px;
-            color: #FFF; font-size: 13px; font-weight: 800; letter-spacing: 1px;
+            position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px);
+            border: 1px solid var(--accent-color); padding: 6px 16px; border-radius: 100px;
+            color: #FFF; font-size: 12px; font-weight: 800; letter-spacing: 1px;
             text-transform: uppercase; z-index: 7; opacity: 0; transition: opacity 0.3s ease;
+            box-shadow: 0 0 12px var(--accent-glow);
         }
 
         .progress-ring-wrap { position: relative; width: 80px; height: 80px; margin: 0 auto 12px auto; }
@@ -636,6 +642,7 @@
                     <canvas id="scanResultCanvas"></canvas>
                     
                     <div class="feature-scan-overlay" id="featureOverlay">
+                        <div class="feature-box-scan" id="scanBox"></div>
                         <div class="feature-line-h" id="scanLineH"></div>
                         <div class="feature-line-v" id="scanLineV"></div>
                         <div class="feature-tag-badge" id="featureTagBadge">IPD</div>
@@ -857,13 +864,28 @@
             <video id="videoElement" autoplay playsinline></video>
             
             <div class="silhouette-overlay" id="silhouetteOverlay">
-                <!-- SVG Front Face Model (Chính diện) -->
+                <!-- SVG Front Face Model (Bước 1: Chính diện 0°) -->
                 <svg id="svgSilhouetteFront" viewBox="0 0 100 130">
-                    <path d="M50,12 C28,12 18,30 18,58 C18,88 32,112 50,112 C68,112 82,88 82,58 C82,30 72,12 50,12 Z M50,118 C22,118 10,130 10,130 L90,130 C90,130 78,118 50,118 Z"/>
+                    <!-- Đầu, cổ & vai cân đối -->
+                    <path d="M50,12 C30,12 18,28 18,58 C18,88 32,112 50,112 C68,112 82,88 82,58 C82,28 70,12 50,12 Z M50,118 C24,118 10,130 10,130 L90,130 C90,130 76,118 50,118 Z"/>
+                    <!-- Đường căn mắt & trung tâm -->
+                    <line x1="25" y1="52" x2="75" y2="52" stroke-dasharray="1 2" opacity="0.6"/>
+                    <line x1="50" y1="20" x2="50" y2="105" stroke-dasharray="1 2" opacity="0.6"/>
                 </svg>
-                <!-- SVG Profile 90° Face Model (Nghiêng) -->
+
+                <!-- SVG Profile 90° Face Model (Bước 2: Nghiêng góc đúng 90°) -->
                 <svg id="svgSilhouetteProfile" viewBox="0 0 100 130" style="display:none;">
-                    <path d="M38,15 C52,15 65,26 65,42 C65,48 72,52 75,58 C72,62 65,65 65,72 C65,80 75,85 70,95 C62,108 45,115 35,115 C22,115 15,95 15,60 C15,30 25,15 38,15 Z"/>
+                    <!-- Trán -> Sống mũi -> Môi -> Cằm -> Xương hàm -> Tai -> Cổ -->
+                    <path d="M30,15 C42,15 52,22 56,32 C58,37 62,45 68,50 C62,54 59,57 60,65 C62,69 66,72 63,77 C58,84 52,95 48,102 C42,112 30,112 25,112 C20,112 18,105 18,90 L18,50 C18,30 22,15 30,15 Z M30,112 L10,130 L60,130 L45,112 Z"/>
+                    <!-- Vùng căn sống mũi high-bridge & jawline -->
+                    <circle cx="68" cy="50" r="1.5" fill="var(--accent-color)" stroke="none"/>
+                    <circle cx="63" cy="77" r="1.5" fill="var(--accent-color)" stroke="none"/>
+                </svg>
+
+                <!-- SVG Profile 30° Face Model (Bước 3: Nghiêng 30° chuẩn xác) -->
+                <svg id="svgSilhouette30" viewBox="0 0 100 130" style="display:none;">
+                    <path d="M42,14 C26,14 18,30 18,58 C18,88 30,112 46,112 C60,112 72,90 76,64 C76,38 62,14 42,14 Z M46,118 C22,118 10,130 10,130 L90,130 C90,130 74,118 46,118 Z"/>
+                    <line x1="25" y1="52" x2="72" y2="52" stroke-dasharray="1 2" opacity="0.6"/>
                 </svg>
             </div>
         </div>
@@ -1289,13 +1311,18 @@
         
         const frontSvg = document.getElementById('svgSilhouetteFront');
         const profileSvg = document.getElementById('svgSilhouetteProfile');
+        const svg30 = document.getElementById('svgSilhouette30');
         
-        if (state.currentStep === 1) {
-            frontSvg.style.display = 'none';
-            profileSvg.style.display = 'block';
-        } else {
+        frontSvg.style.display = 'none';
+        profileSvg.style.display = 'none';
+        svg30.style.display = 'none';
+
+        if (state.currentStep === 0) {
             frontSvg.style.display = 'block';
-            profileSvg.style.display = 'none';
+        } else if (state.currentStep === 1) {
+            profileSvg.style.display = 'block';
+        } else if (state.currentStep === 2) {
+            svg30.style.display = 'block';
         }
 
         modal.style.display = 'flex';
@@ -1358,7 +1385,7 @@
         }, 150);
     }
 
-    /* --- QUÉT TỪNG BỘ PHẬN ĐÚNG CHUẨN VIDEO MẪU LOOKSMAX/UMAX --- */
+    /* --- QUÉT TOÀN BỘ BỘ PHẬN: MẮT, SỐNG MŨI, MÔI, CẰM, VIỀN MẶT --- */
     function runFeatureScanningSequence(landmarks) {
         const resultCanvas = document.getElementById('scanResultCanvas');
         if (!resultCanvas || !state.photos[0]) return;
@@ -1373,63 +1400,51 @@
 
             const w = img.width, h = img.height;
 
-            let eyeL = { x: w * 0.35, y: h * 0.42 }, eyeR = { x: w * 0.65, y: h * 0.42 };
-            let noseTip = { x: w * 0.5, y: h * 0.55 }, noseTop = { x: w * 0.5, y: h * 0.42 };
-            let mouthL = { x: w * 0.4, y: h * 0.7 }, mouthR = { x: w * 0.6, y: h * 0.7 };
-
-            if(landmarks && landmarks.length > 0) {
-                const p = landmarks[0];
-                eyeL = { x: (p[468]?.x || p[33]?.x || 0.35) * w, y: (p[468]?.y || p[33]?.y || 0.42) * h };
-                eyeR = { x: (p[473]?.x || p[263]?.x || 0.65) * w, y: (p[473]?.y || p[263]?.y || 0.42) * h };
-                noseTip = { x: (p[1]?.x || 0.5) * w, y: (p[1]?.y || 0.55) * h };
-                noseTop = { x: (p[6]?.x || 0.5) * w, y: (p[6]?.y || 0.42) * h };
-                mouthL = { x: (p[61]?.x || 0.4) * w, y: (p[61]?.y || 0.7) * h };
-                mouthR = { x: (p[291]?.x || 0.6) * w, y: (p[291]?.y || 0.7) * h };
-            }
-
+            const scanBox = document.getElementById('scanBox');
             const lineH = document.getElementById('scanLineH');
             const lineV = document.getElementById('scanLineV');
             const tagBadge = document.getElementById('featureTagBadge');
 
             const stepsSequence = [
                 {
-                    name: "IPD",
+                    name: "IPD (MẮT)",
                     action: () => {
+                        scanBox.style.opacity = '1';
+                        scanBox.style.top = "38%"; scanBox.style.left = "25%";
+                        scanBox.style.width = "50%"; scanBox.style.height = "15%";
                         lineH.style.opacity = '1'; lineV.style.opacity = '0';
-                        lineH.style.top = (eyeL.y / h * 100) + "%";
-                        lineH.style.left = (eyeL.x / w * 100) + "%";
-                        lineH.style.width = ((eyeR.x - eyeL.x) / w * 100) + "%";
-                        tagBadge.innerText = "IPD"; tagBadge.style.opacity = '1';
+                        lineH.style.top = "45%";
+                        tagBadge.innerText = "EYES & IPD"; tagBadge.style.opacity = '1';
                     }
                 },
                 {
-                    name: "NOSE",
+                    name: "NOSE BRIDGE (SỐNG MŨI)",
                     action: () => {
+                        scanBox.style.top = "42%"; scanBox.style.left = "40%";
+                        scanBox.style.width = "20%"; scanBox.style.height = "22%";
                         lineH.style.opacity = '0'; lineV.style.opacity = '1';
-                        lineV.style.left = (noseTip.x / w * 100) + "%";
-                        lineV.style.top = (noseTop.y / h * 100) + "%";
-                        lineV.style.height = ((noseTip.y - noseTop.y) / h * 100) + "%";
-                        tagBadge.innerText = "NOSE";
+                        lineV.style.left = "50%";
+                        tagBadge.innerText = "NOSE BRIDGE";
                     }
                 },
                 {
-                    name: "EYE TYPE",
+                    name: "LIP & CHIN (MÔI & CẰM)",
                     action: () => {
+                        scanBox.style.top = "62%"; scanBox.style.left = "32%";
+                        scanBox.style.width = "36%"; scanBox.style.height = "24%";
                         lineV.style.opacity = '0'; lineH.style.opacity = '1';
-                        lineH.style.top = (eyeL.y / h * 100) + "%";
-                        lineH.style.left = ((eyeL.x - 20) / w * 100) + "%";
-                        lineH.style.width = ((eyeR.x - eyeL.x + 40) / w * 100) + "%";
-                        tagBadge.innerText = "EYE TYPE";
+                        lineH.style.top = "70%";
+                        tagBadge.innerText = "LIP & CHIN";
                     }
                 },
                 {
-                    name: "MOUTH",
+                    name: "JAWLINE CONTOUR (VIỀN MẶT)",
                     action: () => {
-                        lineH.style.opacity = '1';
-                        lineH.style.top = (mouthL.y / h * 100) + "%";
-                        lineH.style.left = (mouthL.x / w * 100) + "%";
-                        lineH.style.width = ((mouthR.x - mouthL.x) / w * 100) + "%";
-                        tagBadge.innerText = "MOUTH";
+                        scanBox.style.top = "20%"; scanBox.style.left = "18%";
+                        scanBox.style.width = "64%"; scanBox.style.height = "72%";
+                        lineH.style.opacity = '1'; lineV.style.opacity = '1';
+                        lineH.style.top = "82%"; lineV.style.left = "50%";
+                        tagBadge.innerText = "JAWLINE CONTOUR";
                     }
                 }
             ];
@@ -1441,9 +1456,10 @@
                     stepIdx++;
                 } else {
                     clearInterval(seqInterval);
+                    scanBox.style.opacity = '0';
                     lineH.style.opacity = '0'; lineV.style.opacity = '0'; tagBadge.style.opacity = '0';
                 }
-            }, 1200);
+            }, 1100);
         };
     }
 
@@ -1463,7 +1479,7 @@
         ];
 
         let currentIdx = 0;
-        const totalDuration = 5200;
+        const totalDuration = 4800;
         const interval = totalDuration / steps.length;
 
         state.analysisTimer = setInterval(() => {
