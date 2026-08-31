@@ -279,15 +279,26 @@
         }
 
         .camera-viewport-square {
-            position: relative; width: 88vw; height: 88vw;
-            max-width: 360px; max-height: 360px; border-radius: var(--radius-large);
+            position: relative; width: 90vw; height: 110vw;
+            max-width: 380px; max-height: 480px; border-radius: var(--radius-large);
             overflow: hidden; border: 1px solid var(--glass-border);
             box-shadow: 0 0 40px rgba(0, 0, 0, 0.9), 0 0 20px var(--accent-glow);
             background: #050507;
         }
 
         #videoElement { width: 100%; height: 100%; object-fit: cover; }
-        #faceGuideCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+        
+        /* SILHOUETTE OVERLAY CONTAINER */
+        .silhouette-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 5; display: flex; justify-content: center; align-items: center;
+        }
+
+        .silhouette-overlay svg {
+            width: 85%; height: 85%; fill: rgba(255, 255, 255, 0.22);
+            filter: drop-shadow(0 0 8px rgba(0,0,0,0.6));
+            transition: all 0.3s ease;
+        }
 
         .camera-instruction-box {
             margin-top: 16px; background: rgba(18, 18, 22, 0.75); backdrop-filter: blur(15px);
@@ -427,7 +438,6 @@
         .floating-coach-btn { position: fixed; bottom: calc(var(--bottom-nav-height) + 24px); right: 20px; width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-color), #5856D6); display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 25px var(--accent-glow); cursor: pointer; z-index: 999; transition: transform 0.2s ease; }
         .floating-coach-btn:active { transform: scale(0.9); }
 
-        /* FIXED AI COACH CHAT LAYOUT */
         .chat-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); z-index: 2000; display: none; justify-content: flex-end; align-items: center; flex-direction: column; }
         .chat-container { background: rgba(22, 22, 28, 0.98); border-top: 1px solid var(--glass-border); border-radius: var(--radius-large) var(--radius-large) 0 0; width: 100%; max-width: 600px; height: 85vh; display: flex; flex-direction: column; padding: 20px; box-shadow: 0 -10px 40px rgba(0,0,0,0.8); }
         .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; padding-right: 4px; }
@@ -561,7 +571,7 @@
                     </div>
                     <div class="step-node" id="node-1">
                         <div class="step-node-circle" id="dot-1">2</div>
-                        <span class="step-node-label">30° L</span>
+                        <span class="step-node-label">PROFILE</span>
                     </div>
                     <div class="step-node" id="node-2">
                         <div class="step-node-circle" id="dot-2">3</div>
@@ -801,7 +811,7 @@
     </div>
 </div>
 
-<!-- CAMERA MODAL (DYNAMIC NATIVE LANDMARK CAMERA) -->
+<!-- CAMERA MODAL (SILHOUETTE MASK OVERLAY) -->
 <div id="cameraModal">
     <div class="camera-flash" id="cameraFlash"></div>
     <div class="camera-header">
@@ -813,9 +823,20 @@
     <div class="camera-view-container">
         <div class="camera-viewport-square">
             <video id="videoElement" autoplay playsinline></video>
-            <canvas id="faceGuideCanvas"></canvas>
+            
+            <!-- SILHOUETTE OVERLAY CONTAINER -->
+            <div class="silhouette-overlay" id="silhouetteOverlay">
+                <!-- SVG Front Face Model -->
+                <svg id="svgSilhouetteFront" viewBox="0 0 100 130">
+                    <path d="M50,15 C28,15 18,32 18,58 C18,85 30,112 50,112 C70,112 82,85 82,58 C82,32 72,15 50,15 Z M50,118 C22,118 10,130 10,130 L90,130 C90,130 78,118 50,118 Z"/>
+                </svg>
+                <!-- SVG Profile 90° Face Model (Hidden by default) -->
+                <svg id="svgSilhouetteProfile" viewBox="0 0 100 130" style="display:none;">
+                    <path d="M35,15 C55,15 72,30 72,50 C72,55 78,60 82,65 C78,68 70,72 70,78 C70,85 80,90 75,100 C70,110 50,115 40,115 C25,115 15,95 15,60 C15,30 25,15 35,15 Z"/>
+                </svg>
+            </div>
         </div>
-        <div class="camera-instruction-box" id="camInstruction">Căn khuôn mặt vào khung 3D • Giữ điện thoại thẳng</div>
+        <div class="camera-instruction-box" id="camInstruction">Mặt nhìn thẳng • Ảnh gốc • Đủ sáng</div>
     </div>
 
     <div class="camera-controls">
@@ -984,14 +1005,13 @@
         stream: null,
         facingMode: 'user',
         currentResult: null,
-        analysisTimer: null,
-        guideAnimFrame: null
+        analysisTimer: null
     };
 
     const STEP_INFO = [
-        { title: "FRONT (Chính diện 0°)", desc: "Giữ đầu thẳng, nhìn trực tiếp vào camera" },
-        { title: "30° LEFT (Nghiêng trái)", desc: "Xoay mặt nhẹ ~30° sang bên trái" },
-        { title: "30° RIGHT (Nghiêng phải)", desc: "Xoay mặt nhẹ ~30° sang bên phải" }
+        { title: "CHỤP ẢNH CHÍNH DIỆN", desc: "Mặt nhìn thẳng • Ảnh gốc • Đủ sáng" },
+        { title: "CHỤP ẢNH NGHIÊNG", desc: "Nghiêng đúng 90° • Ảnh gốc • Đủ sáng" },
+        { title: "CHỤP ẢNH 30° PHẢI", desc: "Nghiêng góc nhẹ 30° • Ảnh gốc • Đủ sáng" }
     ];
 
     const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -1214,9 +1234,21 @@
         const modal = document.getElementById('cameraModal');
         document.getElementById('camTitleHeader').innerText = STEP_INFO[state.currentStep].title;
         document.getElementById('camInstruction').innerText = STEP_INFO[state.currentStep].desc;
+        
+        // Điều chỉnh mặt nạ Silhouette dựa vào góc chụp
+        const frontSvg = document.getElementById('svgSilhouetteFront');
+        const profileSvg = document.getElementById('svgSilhouetteProfile');
+        
+        if (state.currentStep === 1) {
+            frontSvg.style.display = 'none';
+            profileSvg.style.display = 'block';
+        } else {
+            frontSvg.style.display = 'block';
+            profileSvg.style.display = 'none';
+        }
+
         modal.style.display = 'flex';
         await startStream();
-        startDynamicLandmarkCamera();
     }
 
     async function startStream() {
@@ -1246,163 +1278,6 @@
             state.stream.getTracks().forEach(track => track.stop());
             state.stream = null;
         }
-        if (state.guideAnimFrame) {
-            cancelAnimationFrame(state.guideAnimFrame);
-            state.guideAnimFrame = null;
-        }
-    }
-
-    /* --- REAL 3D FACE MESH MODEL DRAWING (EXACT YAW PERSPECTIVE, NO GREEN DOTS) --- */
-    function startDynamicLandmarkCamera() {
-        const canvas = document.getElementById('faceGuideCanvas');
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        let tick = 0;
-
-        function renderTracking() {
-            canvas.width = canvas.clientWidth;
-            canvas.height = canvas.clientHeight;
-            const w = canvas.width, h = canvas.height;
-            const cx = w / 2, cy = h / 2 - 10;
-            const radiusScale = w * 0.35;
-
-            ctx.clearRect(0, 0, w, h);
-            tick += 0.04;
-
-            // Xác định góc xoay YAW thực sự (Step 0: 0°, Step 1: -30° Trái, Step 2: +30° Phải)
-            let yawRad = 0;
-            if (state.currentStep === 1) yawRad = -0.52; // ~ -30 deg
-            else if (state.currentStep === 2) yawRad = 0.52;  // ~ +30 deg
-
-            const pulseOffset = Math.sin(tick * 1.5) * 2;
-
-            // Hàm biến đổi tọa độ 3D (X, Y, Z) thành 2D Canvas có tính chiều sâu xoay YAW
-            function project3D(x, y, z) {
-                // Xoay quanh trục Y (Yaw Rotation)
-                const cosY = Math.cos(yawRad);
-                const sinY = Math.sin(yawRad);
-
-                const rx = x * cosY + z * sinY;
-                const ry = y;
-                const rz = -x * sinY + z * cosY;
-
-                // Chiếu phối cảnh (Perspective projection)
-                const fov = 400;
-                const scale = fov / (fov + rz + 100);
-
-                return {
-                    x: cx + rx * scale * (radiusScale / 120) + Math.sin(tick * 1.2) * 2,
-                    y: cy + ry * scale * (radiusScale / 120) + pulseOffset,
-                    visible: scale > 0.3
-                };
-            }
-
-            // Tọa độ 3D chuẩn khuôn mặt nhân tạo (x, y, z)
-            const p3d = {
-                // Đường viền sọ mặt
-                crown: project3D(0, -90, 0),
-                jawLeft: project3D(-75, 20, -10),
-                jawRight: project3D(75, 20, -10),
-                chin: project3D(0, 95, 25),
-                cheekLeft: project3D(-68, -10, 20),
-                cheekRight: project3D(68, -10, 20),
-
-                // Lông mày
-                browLeftOuter: project3D(-50, -42, 35),
-                browLeftInner: project3D(-12, -42, 48),
-                browRightInner: project3D(12, -42, 48),
-                browRightOuter: project3D(50, -42, 35),
-
-                // Đôi mắt
-                eyeLeftOuter: project3D(-42, -26, 38),
-                eyeLeftCenter: project3D(-28, -26, 42),
-                eyeLeftInner: project3D(-14, -26, 42),
-                eyeRightInner: project3D(14, -26, 42),
-                eyeRightCenter: project3D(28, -26, 42),
-                eyeRightOuter: project3D(42, -26, 38),
-
-                // Mũi 3D nhô ra ngoài
-                noseBridgeTop: project3D(0, -38, 50),
-                noseTip: project3D(0, 10, 72),
-                noseBaseLeft: project3D(-16, 16, 50),
-                noseBaseRight: project3D(16, 16, 50),
-
-                // Bờ môi 3D
-                mouthLeft: project3D(-25, 48, 42),
-                mouthRight: project3D(25, 48, 42),
-                lipTop: project3D(0, 42, 54),
-                lipBottom: project3D(0, 56, 50)
-            };
-
-            ctx.strokeStyle = "rgba(10, 132, 255, 0.75)";
-            ctx.lineWidth = 1.5;
-            ctx.shadowColor = "#0A84FF";
-            ctx.shadowBlur = 8;
-
-            // 1. Vẽ khung đường viền khuôn mặt (Face Outline Mesh)
-            ctx.beginPath();
-            ctx.moveTo(p3d.crown.x, p3d.crown.y);
-            ctx.quadraticCurveTo(p3d.cheekLeft.x, p3d.cheekLeft.y, p3d.jawLeft.x, p3d.jawLeft.y);
-            ctx.quadraticCurveTo(p3d.chin.x - (yawRad * 15), p3d.chin.y, p3d.chin.x, p3d.chin.y);
-            ctx.quadraticCurveTo(p3d.jawRight.x, p3d.jawRight.y, p3d.cheekRight.x, p3d.cheekRight.y);
-            ctx.quadraticCurveTo(p3d.crown.x, p3d.crown.y, p3d.crown.x, p3d.crown.y);
-            ctx.stroke();
-
-            // 2. Vẽ Chân mày (Brows)
-            ctx.beginPath();
-            ctx.moveTo(p3d.browLeftOuter.x, p3d.browLeftOuter.y);
-            ctx.lineTo(p3d.browLeftInner.x, p3d.browLeftInner.y);
-            ctx.moveTo(p3d.browRightInner.x, p3d.browRightInner.y);
-            ctx.lineTo(p3d.browRightOuter.x, p3d.browRightOuter.y);
-            ctx.stroke();
-
-            // 3. Vẽ Đôi mắt (Eyes Oval 3D)
-            ctx.beginPath();
-            ctx.moveTo(p3d.eyeLeftOuter.x, p3d.eyeLeftOuter.y);
-            ctx.quadraticCurveTo(p3d.eyeLeftCenter.x, p3d.eyeLeftCenter.y - 6, p3d.eyeLeftInner.x, p3d.eyeLeftInner.y);
-            ctx.quadraticCurveTo(p3d.eyeLeftCenter.x, p3d.eyeLeftCenter.y + 6, p3d.eyeLeftOuter.x, p3d.eyeLeftOuter.y);
-
-            ctx.moveTo(p3d.eyeRightInner.x, p3d.eyeRightInner.y);
-            ctx.quadraticCurveTo(p3d.eyeRightCenter.x, p3d.eyeRightCenter.y - 6, p3d.eyeRightOuter.x, p3d.eyeRightOuter.y);
-            ctx.quadraticCurveTo(p3d.eyeRightCenter.x, p3d.eyeRightCenter.y + 6, p3d.eyeRightInner.x, p3d.eyeRightInner.y);
-            ctx.stroke();
-
-            // 4. Vẽ Sống mũi 3D (3D Nose Projection)
-            ctx.beginPath();
-            ctx.moveTo(p3d.noseBridgeTop.x, p3d.noseBridgeTop.y);
-            ctx.lineTo(p3d.noseTip.x, p3d.noseTip.y);
-            ctx.lineTo(p3d.noseBaseLeft.x, p3d.noseBaseLeft.y);
-            ctx.moveTo(p3d.noseTip.x, p3d.noseTip.y);
-            ctx.lineTo(p3d.noseBaseRight.x, p3d.noseBaseRight.y);
-            ctx.stroke();
-
-            // 5. Vẽ Bờ môi (Lips Contour)
-            ctx.beginPath();
-            ctx.moveTo(p3d.mouthLeft.x, p3d.mouthLeft.y);
-            ctx.lineTo(p3d.lipTop.x, p3d.lipTop.y);
-            ctx.lineTo(p3d.mouthRight.x, p3d.mouthRight.y);
-            ctx.lineTo(p3d.lipBottom.x, p3d.lipBottom.y);
-            ctx.closePath();
-            ctx.stroke();
-
-            // 6. Vẽ các đường tham chiếu hình học 3D nhẹ (Wireframe lines)
-            ctx.strokeStyle = "rgba(10, 132, 255, 0.25)";
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(p3d.browLeftInner.x, p3d.browLeftInner.y);
-            ctx.lineTo(p3d.noseBridgeTop.x, p3d.noseBridgeTop.y);
-            ctx.lineTo(p3d.browRightInner.x, p3d.browRightInner.y);
-
-            ctx.moveTo(p3d.noseTip.x, p3d.noseTip.y);
-            ctx.lineTo(p3d.lipTop.x, p3d.lipTop.y);
-            ctx.lineTo(p3d.chin.x, p3d.chin.y);
-            ctx.stroke();
-
-            state.guideAnimFrame = requestAnimationFrame(renderTracking);
-        }
-
-        if (state.guideAnimFrame) cancelAnimationFrame(state.guideAnimFrame);
-        renderTracking();
     }
 
     function takeSnapshot() {
@@ -1534,7 +1409,7 @@
             }`;
             parts.push({ text: promptInstruction });
 
-            const angles = ["FRONT", "30° LEFT", "30° RIGHT"];
+            const angles = ["FRONT", "PROFILE", "30° RIGHT"];
             for (let i = 0; i < 3; i++) {
                 if (state.photos[i]) {
                     const compressed = await compressImage(state.photos[i].base64);
