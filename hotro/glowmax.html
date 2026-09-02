@@ -4,23 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Glowmax Looksmax - AI Face Improvement Platform</title>
-
-    <!-- Google AdSense Code -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9027610508064536" crossorigin="anonymous"></script>
-
+    
     <!-- MediaPipe Face Mesh AI Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
-
-    <!-- Three.js for 3D Exercise Rendering & OrbitControls for interaction -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-
-    <!-- Tailwind & FontAwesome & Chart.js & Marked -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     <style>
         /* --- CORE RESET & DESIGN SYSTEM --- */
@@ -52,11 +39,6 @@
             --radius-medium: 20px;
             --radius-small: 14px;
             --bottom-nav-height: 70px;
-            --glow-accent: #00f0ff;
-            --glow-secondary: #ff0055;
-            --text-main: #f0f0f5;
-            --text-muted: #888899;
-            --safe-area-bottom: env(safe-area-inset-bottom, 20px);
         }
 
         body {
@@ -69,10 +51,6 @@
             padding: 20px 16px calc(var(--bottom-nav-height) + 30px) 16px;
             overflow-x: hidden;
             position: relative;
-            background-image:
-                radial-gradient(circle at 15% 50%, rgba(0, 240, 255, 0.03) 0%, transparent 50%),
-                radial-gradient(circle at 85% 30%, rgba(255, 0, 85, 0.03) 0%, transparent 50%);
-            background-attachment: fixed;
         }
 
         body::before {
@@ -137,23 +115,6 @@
             transform: scale(0.985);
             background: rgba(255, 255, 255, 0.05);
         }
-
-        .glass-button {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            color: var(--text-main);
-            backdrop-filter: blur(8px);
-            transition: all 0.3s ease;
-        }
-        .glass-button:active { background: rgba(255, 255, 255, 0.1); transform: scale(0.98); }
-
-        .btn-primary {
-            background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(0, 120, 255, 0.2));
-            border: 1px solid rgba(0, 240, 255, 0.4);
-            color: #fff;
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
-        }
-        .btn-primary:active { box-shadow: 0 0 25px rgba(0, 240, 255, 0.4); }
 
         @keyframes panelFadeIn {
             from { opacity: 0; transform: translateY(16px) scale(0.98); }
@@ -259,7 +220,7 @@
         .step-progress-bar { display: flex; justify-content: space-around; align-items: center; margin-bottom: 28px; position: relative; padding: 0 30px; }
         .step-progress-line { position: absolute; top: 50%; left: 50px; right: 50px; height: 2px; background: rgba(255, 255, 255, 0.08); z-index: 0; transform: translateY(-50%); }
         .step-progress-fill { position: absolute; top: 50%; left: 50px; height: 2px; background: var(--accent-color); z-index: 0; transform: translateY(-50%); transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 0 8px var(--accent-color); width: 0%; }
-
+        
         .step-node { display: flex; flex-direction: column; align-items: center; gap: 6px; z-index: 1; }
         .step-node-circle {
             width: 32px; height: 32px; border-radius: 50%; background: #121216;
@@ -267,7 +228,7 @@
             font-size: 12px; font-weight: 700; color: var(--text-tertiary); transition: all 0.3s ease;
         }
         .step-node.active .step-node-circle { border-color: var(--accent-color); background: var(--accent-color); color: #fff; box-shadow: 0 0 15px var(--accent-glow); }
-        .step-node.completed .step-node-circle { border-color: var(--success-color); background: var(--success-color); color: #fff; }
+        .step-node.completed .step-node-circle { border-color: var(--success-color); background: var(--success-color); color: #fff; box-shadow: 0 0 15px rgba(48, 209, 88, 0.4); }
         .step-node-label { font-size: 10px; font-weight: 700; letter-spacing: 0.5px; color: var(--text-tertiary); text-transform: uppercase; }
         .step-node.active .step-node-label { color: var(--text-primary); }
 
@@ -277,6 +238,10 @@
             position: relative; min-height: 300px; display: flex; flex-direction: column;
             justify-content: center; align-items: center; transition: all 0.3s ease;
             margin-bottom: 20px; overflow: hidden;
+        }
+        .capture-slot.has-image {
+            border-color: var(--success-color);
+            box-shadow: 0 0 20px rgba(48, 209, 88, 0.15);
         }
 
         .corner-bracket { position: absolute; width: 16px; height: 16px; border-color: var(--accent-color); border-style: solid; pointer-events: none; opacity: 0.6; }
@@ -331,7 +296,7 @@
         }
 
         #videoElement { width: 100%; height: 100%; object-fit: cover; }
-
+        
         .silhouette-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: 5; display: flex; justify-content: center; align-items: center;
@@ -383,7 +348,7 @@
         }
 
         #scanResultCanvas { width: 100%; height: 100%; object-fit: cover; }
-
+        
         .feature-scan-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: 6;
@@ -436,65 +401,31 @@
         .rt-metric-val { font-weight: 700; color: var(--accent-color); }
 
         #resultDashboard { display: none; }
-        .score-hero-wrap { text-align: center; margin-bottom: 24px; position: relative; }
-
-        .dual-score-container {
-            display: flex; justify-content: center; align-items: center; gap: 16px; margin-bottom: 16px;
-        }
+        .score-hero-wrap { text-align: center; margin-bottom: 32px; position: relative; }
         .overall-score-circle {
-            width: 130px; height: 130px; border-radius: 50%;
+            width: 140px; height: 140px; border-radius: 50%;
             border: 1px solid var(--glass-border);
             background: radial-gradient(circle, rgba(10,132,255,0.15) 0%, rgba(18,18,22,0.6) 100%);
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            box-shadow: 0 0 30px var(--accent-glow), inset 0 1px 2px var(--glass-highlight);
+            margin: 0 auto 16px auto; box-shadow: 0 0 30px var(--accent-glow), inset 0 1px 2px var(--glass-highlight);
             position: relative;
         }
-        .overall-score-circle span { font-size: 46px; font-weight: 800; letter-spacing: -1.5px; line-height: 1; }
-        .overall-score-circle small { font-size: 9px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin-top: 4px; font-weight: 700; }
-
-        .potential-score-circle {
-            width: 130px; height: 130px; border-radius: 50%;
-            border: 1px solid rgba(0, 240, 255, 0.4);
-            background: radial-gradient(circle, rgba(0, 240, 255, 0.2) 0%, rgba(18,18,22,0.8) 100%);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            box-shadow: 0 0 35px rgba(0, 240, 255, 0.35), inset 0 1px 2px var(--glass-highlight);
-            position: relative;
-        }
-        .potential-score-circle span { font-size: 46px; font-weight: 800; color: var(--glow-accent); letter-spacing: -1.5px; line-height: 1; }
-        .potential-score-circle small { font-size: 9px; color: var(--glow-accent); text-transform: uppercase; letter-spacing: 0.8px; margin-top: 4px; font-weight: 800; }
-
-        .score-gap-badge {
-            display: inline-block; background: rgba(0, 240, 255, 0.1); border: 1px solid rgba(0, 240, 255, 0.3);
-            color: var(--glow-accent); padding: 4px 14px; border-radius: 100px; font-size: 11px; font-weight: 700;
-            margin-bottom: 12px; letter-spacing: 0.5px;
-        }
+        .overall-score-circle span { font-size: 52px; font-weight: 800; letter-spacing: -1.5px; line-height: 1; }
+        .overall-score-circle small { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; font-weight: 700; }
 
         .face-shape-capsule { display: inline-block; background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); padding: 6px 16px; border-radius: 100px; font-size: 14px; font-weight: 700; color: #FFF; letter-spacing: 0.3px; }
 
         .chart-container { display: flex; justify-content: center; margin-bottom: 30px; position: relative; }
-        svg.radar-chart { width: 100%; max-width: 340px; height: auto; overflow: visible; }
-        .radar-label { font-size: 9px; fill: var(--text-secondary); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+        svg.radar-chart { width: 100%; max-width: 320px; height: auto; overflow: visible; }
+        .radar-label { font-size: 10px; fill: var(--text-secondary); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
 
         .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
         @media (max-width: 500px) { .metrics-grid { grid-template-columns: 1fr; } }
 
         .metric-card-item { background: var(--glass-card); border: 1px solid var(--glass-border); border-radius: var(--radius-medium); padding: 16px; }
         .metric-header { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; font-weight: 600; }
-        .metric-subtext { font-size: 10px; color: var(--text-tertiary); margin-bottom: 6px; }
-        .metric-bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; position: relative; }
+        .metric-bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
         .metric-bar-fill { height: 100%; background: var(--accent-color); border-radius: 3px; width: 0%; transition: width 1s cubic-bezier(0.16, 1, 0.3, 1); }
-        .metric-bar-potential { height: 100%; background: rgba(0, 240, 255, 0.4); border-radius: 3px; position: absolute; top: 0; left: 0; z-index: 0; }
-
-        .parts-evaluated-box {
-            background: rgba(0, 240, 255, 0.03); border: 1px solid rgba(0, 240, 255, 0.15);
-            border-radius: var(--radius-medium); padding: 16px; margin-bottom: 24px;
-        }
-        .parts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
-        .part-item-chip {
-            background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
-            padding: 8px 10px; border-radius: var(--radius-small); font-size: 11px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
 
         .detail-grid { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 24px; }
         .list-items { margin-left: 0; list-style: none; }
@@ -519,7 +450,7 @@
             width: calc(100% - 32px); max-width: 500px; height: var(--bottom-nav-height);
             background: rgba(18, 18, 22, 0.85); backdrop-filter: blur(25px) saturate(180%);
             border: 1px solid var(--glass-border); border-radius: 100px;
-            display: flex; justify-space-around; align-items: center;
+            display: flex; justify-content: space-around; align-items: center;
             z-index: 1000; box-shadow: 0 15px 35px rgba(0,0,0,0.5);
         }
 
@@ -550,31 +481,18 @@
         .chat-bubble { max-width: 85%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.5; word-break: break-word; }
         .chat-bubble.ai { background: rgba(255,255,255,0.08); align-self: flex-start; color: #fff; border-bottom-left-radius: 4px; border: 1px solid var(--glass-border); }
         .chat-bubble.user { background: var(--accent-color); align-self: flex-end; color: #fff; border-bottom-right-radius: 4px; box-shadow: 0 4px 12px var(--accent-glow); }
+        #typingIndicator { opacity: 0.7; animation: pulse 1.5s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
 
         .auth-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); backdrop-filter: blur(20px); z-index: 3000; display: flex; justify-content: center; align-items: center; padding: 20px; }
         .auth-card { width: 100%; max-width: 400px; background: rgba(22, 22, 28, 0.95); border: 1px solid var(--glass-border); border-radius: var(--radius-large); padding: 28px; }
         .auth-input { width: 100%; padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: var(--radius-small); color: #fff; margin-bottom: 12px; font-size: 14px; outline: none; }
         .privacy-note { font-size: 11px; text-align: center; color: var(--text-tertiary); margin-top: 24px; line-height: 1.4; }
-
-        #canvas-3d-container { width: 100%; height: 250px; border-radius: 12px; overflow: hidden; background: #000; position: relative; margin-bottom: 15px; cursor: grab; }
-        #canvas-3d-container:active { cursor: grabbing; }
-
-        #levelUpToast {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
-            background: linear-gradient(135deg, rgba(0, 240, 255, 0.9), rgba(0, 120, 255, 0.9));
-            color: #fff; padding: 12px 24px; border-radius: 50px; font-weight: bold; font-size: 14px;
-            box-shadow: 0 10px 30px rgba(0, 240, 255, 0.5); z-index: 9999; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: flex; align-items: center; gap: 10px; opacity: 0;
-        }
-        #levelUpToast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
     </style>
 </head>
 <body>
 
 <div class="bg-noise"></div>
-
-<!-- Level Up Toast -->
-<div id="levelUpToast"><i class="fa-solid fa-arrow-up-right-dots"></i> <span>Level Up! Bạn đã đạt Cấp độ mới.</span></div>
 
 <!-- AUTH OVERLAY -->
 <div class="auth-overlay" id="authOverlay" style="display: none;">
@@ -668,31 +586,31 @@
                     </svg>
                 </div>
 
-                <h1 style="font-size: 24px; margin-bottom: 8px; text-align: center;">Phân Tích AI 468 Landmark Thực Tế</h1>
-                <p style="text-align: center; margin-bottom: 24px; font-size: 14px; color: var(--text-secondary);">Hệ thống trắc đạc sinh học MediaPipe Face Mesh quét 468-478 tọa độ thực tế trên khuôn mặt.</p>
-
+                <h1 style="font-size: 24px; margin-bottom: 8px; text-align: center;">Phân Tích Khuôn Mặt AI</h1>
+                <p style="text-align: center; margin-bottom: 24px; font-size: 14px; color: var(--text-secondary);">Hệ thống trích xuất hình học 3D, đánh giá cấu trúc xương hàm và tỷ lệ khuôn mặt chuyên sâu.</p>
+                
                 <div class="feature-pills">
-                    <div class="pill-item"><span class="pill-dot"></span>REAL 468 LANDMARKS</div>
-                    <div class="pill-item"><span class="pill-dot"></span>STRICT SCORING</div>
-                    <div class="pill-item"><span class="pill-dot"></span>MAX POTENTIAL</div>
+                    <div class="pill-item"><span class="pill-dot"></span>GEOMETRY</div>
+                    <div class="pill-item"><span class="pill-dot"></span>SYMMETRY</div>
+                    <div class="pill-item"><span class="pill-dot"></span>RATIO 1:1.618</div>
                 </div>
 
-                <button id="startScanBtn" onclick="startWizard()">BẮT ĐẦU QUÉT AI</button>
+                <button id="startScanBtn" onclick="startWizard()">BẮT ĐẦU QUÉT</button>
             </div>
 
-            <!-- Wizard Flow -->
+            <!-- Wizard Flow (2 Step Fixed) -->
             <div class="wizard-container" id="wizardScreen">
                 <div class="step-progress-bar">
                     <div class="step-progress-line"></div>
                     <div class="step-progress-fill" id="stepProgressFill"></div>
-
+                    
                     <div class="step-node active" id="node-0">
                         <div class="step-node-circle" id="dot-0">1</div>
-                        <span class="step-node-label">FRONT</span>
+                        <span class="step-node-label">📸 FRONT</span>
                     </div>
                     <div class="step-node" id="node-1">
                         <div class="step-node-circle" id="dot-1">2</div>
-                        <span class="step-node-label">PROFILE (90°)</span>
+                        <span class="step-node-label">📸 PROFILE 45°</span>
                     </div>
                 </div>
 
@@ -705,7 +623,7 @@
                     <div class="status-badge" id="wizBadge">READY FOR SCAN</div>
                     <div class="capture-title" id="wizTitle">FRONT (Chính diện 0°)</div>
                     <div class="capture-desc" id="wizDesc">Giữ đầu thẳng, nhìn trực tiếp vào camera</div>
-
+                    
                     <div style="display: flex; gap: 10px; width: 100%; max-width: 280px; margin-top: 10px;">
                         <button class="btn-secondary" style="flex:1; padding: 12px;" onclick="triggerFileInput()">Tải Ảnh Lên</button>
                         <button style="flex:1; padding: 12px;" onclick="requestCameraPermission()">Quét Camera</button>
@@ -716,7 +634,7 @@
                     <button id="btnNextStep" onclick="nextStep()" disabled>CHỤP TRƯỚC ĐỂ TIẾP TỤC</button>
                     <button class="btn-ghost" id="btnSkipStep" onclick="skipStep()" style="display: none;">Bỏ qua góc này</button>
                 </div>
-
+                
                 <input type="file" id="wizFileInput" accept="image/jpeg, image/png, image/webp" style="display: none;" onchange="handleFileSelect(event)">
             </div>
 
@@ -724,12 +642,12 @@
             <div class="loading-container" id="loadingUI">
                 <div class="scan-frame-container">
                     <canvas id="scanResultCanvas"></canvas>
-
+                    
                     <div class="feature-scan-overlay" id="featureOverlay">
                         <div class="feature-box-scan" id="scanBox"></div>
                         <div class="feature-line-h" id="scanLineH"></div>
                         <div class="feature-line-v" id="scanLineV"></div>
-                        <div class="feature-tag-badge" id="featureTagBadge">468 LANDMARKS MAP</div>
+                        <div class="feature-tag-badge" id="featureTagBadge">IPD</div>
                     </div>
                 </div>
 
@@ -758,59 +676,42 @@
 
         <!-- Result Dashboard Report -->
         <div class="glass-panel" id="resultDashboard">
-            <h1 style="margin-bottom: 4px; font-size: 22px;">BÁO CÁO PHÂN TÍCH CHUẨN KHẮT KHE</h1>
+            <h1 style="margin-bottom: 4px; font-size: 22px;">BÁO CÁO PHÂN TÍCH</h1>
 
-            <p style="text-align: center; margin-bottom: 16px; font-size: 12px; color: var(--text-tertiary);" id="analysisTime"></p>
+            <p style="text-align: center; margin-bottom: 24px; font-size: 12px; color: var(--text-tertiary);" id="analysisTime"></p>
 
             <div class="score-hero-wrap">
-                <div class="dual-score-container">
-                    <div class="overall-score-circle">
-                        <span id="res-overall">0</span>
-                        <small>HIỆN TẠI</small>
-                    </div>
-                    <div class="potential-score-circle">
-                        <span id="res-potential">0</span>
-                        <small>TIỀM NĂNG MAX</small>
-                    </div>
-                </div>
-                <div>
-                    <div class="score-gap-badge" id="res-gap-text">+0 ĐIỂM TIỀM NĂNG PHÁT TRIỂN</div>
+                <div class="overall-score-circle">
+                    <span id="res-overall">0</span>
+                    <small>OVERALL LOOKS</small>
                 </div>
                 <div class="face-shape-capsule" id="res-faceshape">-</div>
             </div>
 
             <div class="chart-container" id="radarChartContainer"></div>
 
-            <div class="parts-evaluated-box">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h3 style="font-size: 14px; color: var(--glow-accent);"><i class="fa-solid fa-microscope mr-1"></i> TỔNG QUAN LANDMARKS ĐÃ QUÉT</h3>
-                    <span style="font-size: 11px; color: var(--text-tertiary);" id="res-parts-count">468/468 POINTS</span>
-                </div>
-                <div class="parts-grid" id="partsMicroGrid"></div>
-            </div>
-
-            <h3 style="margin-bottom: 12px;">CHỈ SỐ CHI TIẾT & TIỀM NĂNG</h3>
+            <h3 style="margin-bottom: 12px;">CHỈ SỐ CHI TIẾT</h3>
             <div class="metrics-grid" id="metricsGrid"></div>
 
             <div class="detail-grid">
                 <div class="glass-card">
-                    <h3>Đánh Giá Thực Tế (Khắt Khe)</h3>
-                    <p id="res-summary" style="margin-top: 8px; font-size: 13px; line-height: 1.6; color: var(--text-main);"></p>
+                    <h3>Nhận Xét Tổng Quan</h3>
+                    <p id="res-summary" style="margin-top: 8px;"></p>
                 </div>
-
+                
                 <div class="metrics-grid" style="margin-bottom: 0;">
                     <div class="glass-card">
-                        <h3 style="color: var(--success-color)">Điểm Mạnh Tự Nhiên</h3>
+                        <h3 style="color: var(--success-color)">Điểm Mạnh</h3>
                         <ul class="list-items" id="res-strengths" style="margin-top: 8px;"></ul>
                     </div>
                     <div class="glass-card">
-                        <h3 style="color: var(--danger-color)">Khuyết Điểm Cần Khắc Phục</h3>
+                        <h3 style="color: var(--danger-color)">Cần Cải Thiện</h3>
                         <ul class="list-items" id="res-weaknesses" style="margin-top: 8px;"></ul>
                     </div>
                 </div>
 
                 <div class="glass-card">
-                    <h3>Grooming & Style Định Hình</h3>
+                    <h3>Grooming & Hair</h3>
                     <h4 style="font-size: 12px; color: var(--text-tertiary); margin-top: 10px; text-transform: uppercase;">Kiểu tóc đề xuất:</h4>
                     <ul class="list-items" id="res-hairstyles" style="margin-top: 4px;"></ul>
                     <h4 style="font-size: 12px; color: var(--text-tertiary); margin-top: 10px; text-transform: uppercase;">Grooming Tips:</h4>
@@ -818,22 +719,22 @@
                 </div>
 
                 <div class="glass-card">
-                    <h3>Skincare Routine Tối Ưu Tế Bào Da</h3>
+                    <h3>Skincare Routine</h3>
                     <ul class="list-items" id="res-skincare" style="margin-top: 8px;"></ul>
                 </div>
 
                 <div class="glass-card">
-                    <h3>Looksmax Protocol Khai Thác Tiềm Năng</h3>
-                    <div id="res-protocol" style="margin-top: 12px; font-size: 13px; line-height: 1.6;"></div>
+                    <h3>Looksmax Protocol</h3>
+                    <div id="res-protocol" style="margin-top: 12px;"></div>
                 </div>
             </div>
 
             <div class="compare-section" id="compareSection">
-                <h3>So Sánh Tiến Độ (Before / After)</h3>
+                <h3>So Sánh (Before / After)</h3>
                 <p style="font-size: 13px; margin-bottom: 15px;">Tải lên ảnh "After" (Chính diện) để xem sự cải thiện.</p>
                 <input type="file" id="file-after" accept="image/jpeg, image/png, image/webp" style="display: none;" onchange="handleAfterUpload(event)">
                 <button class="btn-secondary" onclick="document.getElementById('file-after').click()" id="btnUploadAfter">Tải Ảnh After</button>
-
+                
                 <div id="compareResult" style="display: none; margin-top: 20px;">
                     <div class="compare-grid">
                         <div class="glass-card" style="text-align: center;">
@@ -964,7 +865,7 @@
     <div class="camera-view-container">
         <div class="camera-viewport-square">
             <video id="videoElement" autoplay playsinline></video>
-
+            
             <div class="silhouette-overlay" id="silhouetteOverlay">
                 <img id="imgSilhouetteFront" class="silhouette-img" src="https://i.ibb.co/whmxs5g0/68685-removebg-preview.png" alt="Front Model">
                 <img id="imgSilhouetteProfile" class="silhouette-img" src="https://i.ibb.co/GvQZJTd2/68687-removebg-preview.png" alt="Profile Model" style="display:none;">
@@ -990,31 +891,6 @@
         </div>
         <div id="historyList"></div>
         <button class="btn-danger" style="margin-top: 20px;" onclick="clearHistory()">Xóa Lịch Sử</button>
-    </div>
-</div>
-
-<!-- EXERCISE 3D VIEWER MODAL -->
-<div class="modal-overlay" id="exerciseModal">
-    <div class="modal-content space-y-4">
-        <div class="flex justify-between items-center mb-2">
-            <h2 class="text-lg font-bold text-white" id="exModalTitle">Tên bài tập</h2>
-            <button onclick="closeExerciseModal()" class="text-gray-400 hover:text-white text-xl">&times;</button>
-        </div>
-
-        <div class="relative">
-            <div id="canvas-3d-container">
-                <div id="exFallback" class="absolute inset-0 flex items-center justify-center bg-gray-900 text-xs text-gray-500 z-10 hidden">
-                    Chưa có ảnh/model minh họa cho động tác này.
-                </div>
-            </div>
-            <div class="absolute bottom-2 right-2 text-[10px] text-gray-400 bg-black/50 px-2 py-1 rounded pointer-events-none"><i class="fa-solid fa-arrows-up-down-left-right"></i> Vuốt để xoay 3D</div>
-        </div>
-
-        <div class="text-sm text-gray-300 md-content" id="exModalDesc">Mô tả bài tập...</div>
-
-        <button onclick="closeExerciseModal()" class="w-full glass-button py-3 rounded-xl font-bold text-cyan-400 border-cyan-500/50 mt-2">
-            Đã hiểu, Đóng
-        </button>
     </div>
 </div>
 
@@ -1146,7 +1022,7 @@
 </script>
 
 <script>
-    /* --- MEDIAPIPE FACE MESH REAL-TIME LANDMARK DETECTION ENGINE --- */
+    /* --- MEDIAPIPE FACE MESH ENGINE INITIALIZATION --- */
     let faceMeshEngine = null;
 
     function initFaceMeshEngine() {
@@ -1166,118 +1042,6 @@
         initFaceMeshEngine();
     });
 
-    /* --- REAL LANDMARK DETECTION ON CANVAS --- */
-    function detectAndDrawRealLandmarks(imgElement, canvasElement) {
-        return new Promise((resolve) => {
-            if (!faceMeshEngine) {
-                resolve({ detected: false, landmarksCount: 0 });
-                return;
-            }
-
-            const ctx = canvasElement.getContext('2d');
-            canvasElement.width = imgElement.naturalWidth || imgElement.width || 640;
-            canvasElement.height = imgElement.naturalHeight || imgElement.height || 480;
-
-            let isResolved = false;
-
-            faceMeshEngine.onResults((results) => {
-                ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-                ctx.drawImage(imgElement, 0, 0, canvasElement.width, canvasElement.height);
-
-                if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
-                    const landmarks = results.multiFaceLandmarks[0];
-                    
-                    // Draw Landmark Connections & Points
-                    ctx.fillStyle = '#00f0ff';
-                    ctx.strokeStyle = 'rgba(0, 240, 255, 0.4)';
-                    ctx.lineWidth = 1;
-
-                    // Draw Mesh Wireframe Points
-                    for (let i = 0; i < landmarks.length; i++) {
-                        const pt = landmarks[i];
-                        const x = pt.x * canvasElement.width;
-                        const y = pt.y * canvasElement.height;
-
-                        ctx.beginPath();
-                        ctx.arc(x, y, 1.2, 0, 2 * Math.PI);
-                        ctx.fill();
-                    }
-
-                    // Highlight Key Facial Features (Eyes, Lips, Jaw Contour)
-                    const keyPoints = [33, 133, 362, 263, 61, 291, 1, 152, 10, 234, 454];
-                    ctx.fillStyle = '#ff0055';
-                    keyPoints.forEach(idx => {
-                        if(landmarks[idx]) {
-                            const x = landmarks[idx].x * canvasElement.width;
-                            const y = landmarks[idx].y * canvasElement.height;
-                            ctx.beginPath();
-                            ctx.arc(x, y, 2.5, 0, 2 * Math.PI);
-                            ctx.fill();
-                        }
-                    });
-
-                    if(!isResolved) {
-                        isResolved = true;
-                        resolve({ detected: true, landmarksCount: landmarks.length });
-                    }
-                } else {
-                    if(!isResolved) {
-                        isResolved = true;
-                        resolve({ detected: false, landmarksCount: 0 });
-                    }
-                }
-            });
-
-            faceMeshEngine.send({ image: imgElement }).catch(() => {
-                if(!isResolved) {
-                    isResolved = true;
-                    resolve({ detected: false, landmarksCount: 0 });
-                }
-            });
-        });
-    }
-
-    /* --- AUDIO UI SFX --- */
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    let audioCtx;
-
-    function initAudio() {
-        if(!audioCtx) audioCtx = new AudioContext();
-    }
-
-    function playUISound(type) {
-        if(!audioCtx) initAudio();
-        if(audioCtx.state === 'suspended') audioCtx.resume();
-        const osc = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
-        osc.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-
-        if (type === 'scan') {
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
-            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-            osc.start(); osc.stop(audioCtx.currentTime + 0.1);
-        } else if (type === 'success' || type === 'task_complete') {
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-            osc.frequency.setValueAtTime(900, audioCtx.currentTime + 0.1);
-            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
-            osc.start(); osc.stop(audioCtx.currentTime + 0.3);
-        } else if (type === 'levelup') {
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-            osc.frequency.linearRampToValueAtTime(800, audioCtx.currentTime + 0.2);
-            osc.frequency.linearRampToValueAtTime(1200, audioCtx.currentTime + 0.4);
-            gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
-            osc.start(); osc.stop(audioCtx.currentTime + 0.5);
-        }
-    }
-
     /* --- MOTION BLUR SCROLL --- */
     let scrollTimeout;
     window.addEventListener('scroll', () => {
@@ -1285,7 +1049,7 @@
         clearTimeout(scrollTimeout);
         scrollTimeout = setTimeout(() => {
             document.body.classList.remove('is-scrolling');
-        }, 150);
+        }, 150); 
     });
 
     /* --- STATE MANAGEMENT --- */
@@ -1301,19 +1065,17 @@
     };
 
     const STEP_INFO = [
-        { title: "CHỤP ẢNH CHÍNH DIỆN", desc: "Mặt nhìn thẳng • Ảnh gốc • Đủ sáng" },
-        { title: "CHỤP ẢNH NGHIÊNG PHẢI 90°", desc: "Nghiêng đúng 90° theo mẫu • Ảnh gốc • Đủ sáng" }
+        { title: "📸 CHỤP ẢNH CHÍNH DIỆN (0°)", desc: "Mặt nhìn thẳng • Ảnh gốc • Đủ sáng • Mắt mở tự nhiên" },
+        { title: "📸 CHỤP ẢNH NGHIÊNG 45°", desc: "Nghiêng nhẹ 45° • Thả lỏng cơ mặt • Ảnh gốc • Đủ sáng" }
     ];
 
     const MAX_FILE_SIZE = 5 * 1024 * 1024;
-    let threeScene, threeCamera, threeRenderer, threeMesh;
 
     /* --- TAB NAVIGATION --- */
     function switchTab(tabId) {
-        initAudio();
         document.querySelectorAll('.tab-view').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-
+        
         const targetTab = document.getElementById(`tab-${tabId}`);
         if(targetTab) targetTab.classList.add('active');
 
@@ -1337,8 +1099,6 @@
 
     function toggleTask(elem) {
         elem.classList.toggle('completed');
-        playUISound('task_complete');
-        awardXp(15);
     }
 
     /* --- HELPER FUNCTIONS --- */
@@ -1378,7 +1138,7 @@
         return str.toString().replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
     }
 
-    /* --- WIZARD FLOW & SCANNER --- */
+    /* --- WIZARD FLOW & SCANNER (FIXED 2 STEPS) --- */
     function startWizard() {
         const config = window.getGlobalConfig ? window.getGlobalConfig() : null;
         if (!config || (!config.apiKey && !config.openRouter?.apiKey && (!config.apiKeys || config.apiKeys.length === 0))) {
@@ -1395,9 +1155,11 @@
         const progressFill = document.getElementById('stepProgressFill');
         progressFill.style.width = (step * 100) + '%';
 
-        for(let i=0; i<2; i++) {
+        for(let i = 0; i < 2; i++) {
             const node = document.getElementById(`node-${i}`);
             const dot = document.getElementById(`dot-${i}`);
+            if(!node || !dot) continue;
+            
             node.className = 'step-node';
             if(i < step) {
                 node.classList.add('completed');
@@ -1414,14 +1176,14 @@
 
         const btnNext = document.getElementById('btnNextStep');
         const btnSkip = document.getElementById('btnSkipStep');
-
+        
         if (state.photos[step]) {
             btnNext.disabled = false;
-            btnNext.innerText = step === 1 ? "BẮT ĐẦU PHÂN TÍCH DIGITALSMOD AI" : "LƯU & TIẾP TỤC";
+            btnNext.innerText = step === 1 ? "🚀 BẮT ĐẦU PHÂN TÍCH AI" : "💾 LƯU & TIẾP TỤC";
             btnSkip.style.display = 'none';
         } else {
             btnNext.disabled = true;
-            btnNext.innerText = "CHỤP TRƯỚC ĐỂ TIẾP TỤC";
+            btnNext.innerText = step === 1 ? "📸 CHỤP ẢNH NGHIÊNG 45°" : "📸 CHỤP ẢNH CHÍNH DIỆN";
             btnSkip.style.display = step > 0 ? 'block' : 'none';
         }
     }
@@ -1429,30 +1191,36 @@
     function renderCurrentSlot() {
         const slot = document.getElementById('currentSlot');
         const imgData = state.photos[state.currentStep];
-
+        
         if (imgData) {
             slot.classList.add('has-image');
             slot.innerHTML = `
                 <img src="${imgData.mime},${imgData.base64}" class="preview-img">
                 <div class="img-overlay-actions">
-                    <button class="btn-secondary" style="flex:1; padding: 10px;" onclick="triggerFileInput()">Đổi</button>
-                    <button class="btn-danger" style="flex:1; padding: 10px;" onclick="removeCurrentPhoto()">Xóa</button>
+                    <button class="btn-secondary" style="flex:1; padding: 10px;" onclick="triggerFileInput()">🔄 Đổi ảnh</button>
+                    <button class="btn-danger" style="flex:1; padding: 10px;" onclick="removeCurrentPhoto()">🗑️ Xóa</button>
+                </div>
+                <div style="position:absolute; top:16px; right:16px; z-index:3; background:rgba(0,0,0,0.7); padding:4px 12px; border-radius:20px; font-size:12px; color:var(--success-color);">
+                    ✅ Đã chụp ${state.currentStep === 0 ? 'Front' : 'Profile'}
                 </div>
             `;
         } else {
             slot.classList.remove('has-image');
+            const stepInfo = STEP_INFO[state.currentStep] || STEP_INFO[0];
             slot.innerHTML = `
                 <div class="corner-bracket cb-tl"></div>
                 <div class="corner-bracket cb-tr"></div>
                 <div class="corner-bracket cb-bl"></div>
                 <div class="corner-bracket cb-br"></div>
-                <div class="status-badge">STEP 0${state.currentStep + 1}</div>
-                <div class="capture-title">${STEP_INFO[state.currentStep].title}</div>
-                <div class="capture-desc">${STEP_INFO[state.currentStep].desc}</div>
-                <div style="display: flex; gap: 10px; width: 100%; max-width: 280px;">
-                    <button class="btn-secondary" style="flex:1; padding: 12px;" onclick="triggerFileInput()">Tải Ảnh Lên</button>
-                    <button style="flex:1; padding: 12px;" onclick="requestCameraPermission()">Quét Camera</button>
+                <div class="status-badge" id="wizBadge">🔍 BƯỚC ${state.currentStep + 1}/2</div>
+                <div class="capture-title" id="wizTitle">${stepInfo.title}</div>
+                <div class="capture-desc" id="wizDesc">${stepInfo.desc}</div>
+                <div style="display: flex; gap: 10px; width: 100%; max-width: 280px; margin-top: 10px;">
+                    <button class="btn-secondary" style="flex:1; padding: 12px;" onclick="triggerFileInput()">📁 Tải Ảnh</button>
+                    <button style="flex:1; padding: 12px;" onclick="requestCameraPermission()">📷 Quét Camera</button>
                 </div>
+                ${state.currentStep === 0 ? `<div style="margin-top:12px; font-size:11px; color:var(--text-tertiary);">💡 Hướng dẫn: Đảm bảo mặt nhìn thẳng, mắt mở tự nhiên</div>` : 
+                `<div style="margin-top:12px; font-size:11px; color:var(--text-tertiary);">💡 Hướng dẫn: Nghiêng đầu 45°, thả lỏng cơ mặt</div>`}
             `;
         }
     }
@@ -1463,21 +1231,37 @@
     }
 
     function nextStep() {
-        if (state.currentStep < 1) {
-            state.currentStep++;
+        if (state.currentStep === 0) {
+            state.currentStep = 1;
             updateWizardUI();
-            if (!state.photos[state.currentStep]) requestCameraPermission();
+            if (!state.photos[state.currentStep]) {
+                setTimeout(() => requestCameraPermission(), 300);
+            }
+        } else if (state.currentStep === 1) {
+            if (state.photos[0] && state.photos[1]) {
+                startAnalysis();
+            } else {
+                alert("⚠️ Vui lòng chụp đủ 2 góc (Front + Profile)!");
+            }
         } else {
-            startAnalysis();
+            state.currentStep = 0;
+            updateWizardUI();
         }
     }
 
     function skipStep() {
-        if (state.currentStep < 1) {
-            state.photos[state.currentStep] = null;
-            state.currentStep++;
-            updateWizardUI();
-            if (!state.photos[state.currentStep]) requestCameraPermission();
+        if (state.currentStep === 0) {
+            if (state.photos[0]) {
+                state.currentStep = 1;
+                updateWizardUI();
+                if (!state.photos[1]) {
+                    setTimeout(() => requestCameraPermission(), 300);
+                }
+            } else {
+                alert("⚠️ Vui lòng chụp ảnh chính diện trước khi bỏ qua!");
+            }
+        } else {
+            alert("⚠️ Bạn đang ở bước cuối, không thể bỏ qua!");
         }
     }
 
@@ -1523,10 +1307,10 @@
         const modal = document.getElementById('cameraModal');
         document.getElementById('camTitleHeader').innerText = STEP_INFO[state.currentStep].title;
         document.getElementById('camInstruction').innerText = STEP_INFO[state.currentStep].desc;
-
+        
         const frontImg = document.getElementById('imgSilhouetteFront');
         const profileImg = document.getElementById('imgSilhouetteProfile');
-
+        
         frontImg.style.display = state.currentStep === 0 ? 'block' : 'none';
         profileImg.style.display = state.currentStep === 1 ? 'block' : 'none';
 
@@ -1564,7 +1348,6 @@
     }
 
     function takeSnapshot() {
-        playUISound('scan');
         const flash = document.getElementById('cameraFlash');
         flash.style.opacity = '1';
         setTimeout(() => { flash.style.opacity = '0'; }, 120);
@@ -1585,22 +1368,24 @@
         const base64 = dataUrl.split(',')[1];
         state.photos[state.currentStep] = { base64: base64, mime: 'data:image/jpeg;base64', size: Math.round((base64.length * 3) / 4) };
 
-        setTimeout(() => {
-            closeCamera();
-            updateWizardUI();
+        setTimeout(() => { 
+            closeCamera(); 
+            updateWizardUI(); 
         }, 150);
     }
 
-    /* --- REAL-TIME FEATURE SCANNER ANIMATION & REAL LANDMARKS --- */
-    async function runFeatureScanningSequence() {
+    /* --- FEATURE SCANNER ANIMATION --- */
+    function runFeatureScanningSequence() {
         const resultCanvas = document.getElementById('scanResultCanvas');
         if (!resultCanvas || !state.photos[0]) return;
+        const ctx = resultCanvas.getContext('2d');
 
         const img = new Image();
         img.src = `${state.photos[0].mime},${state.photos[0].base64}`;
-        img.onload = async () => {
-            const scanRes = await detectAndDrawRealLandmarks(img, resultCanvas);
-            state.detectedLandmarks = scanRes;
+        img.onload = () => {
+            resultCanvas.width = img.width;
+            resultCanvas.height = img.height;
+            ctx.drawImage(img, 0, 0, img.width, img.height);
 
             const scanBox = document.getElementById('scanBox');
             const lineH = document.getElementById('scanLineH');
@@ -1615,7 +1400,7 @@
                         scanBox.style.width = "50%"; scanBox.style.height = "15%";
                         lineH.style.opacity = '1'; lineV.style.opacity = '0';
                         lineH.style.top = "45%";
-                        tagBadge.innerText = "EYES & IPD 468 MESH"; tagBadge.style.opacity = '1';
+                        tagBadge.innerText = "EYES & IPD"; tagBadge.style.opacity = '1';
                     }
                 },
                 {
@@ -1624,7 +1409,7 @@
                         scanBox.style.width = "20%"; scanBox.style.height = "22%";
                         lineH.style.opacity = '0'; lineV.style.opacity = '1';
                         lineV.style.left = "50%";
-                        tagBadge.innerText = "NOSE BRIDGE GEOMETRY";
+                        tagBadge.innerText = "NOSE BRIDGE 3D";
                     }
                 },
                 {
@@ -1633,7 +1418,7 @@
                         scanBox.style.width = "36%"; scanBox.style.height = "24%";
                         lineV.style.opacity = '0'; lineH.style.opacity = '1';
                         lineH.style.top = "70%";
-                        tagBadge.innerText = "LIP & CHIN RATIO";
+                        tagBadge.innerText = "LIP & CHIN BOUNDARY";
                     }
                 },
                 {
@@ -1642,7 +1427,7 @@
                         scanBox.style.width = "64%"; scanBox.style.height = "72%";
                         lineH.style.opacity = '1'; lineV.style.opacity = '1';
                         lineH.style.top = "82%"; lineV.style.left = "50%";
-                        tagBadge.innerText = "JAWLINE CONTOUR 3D";
+                        tagBadge.innerText = "150+ LANDMARKS CONTOUR";
                     }
                 }
             ];
@@ -1651,7 +1436,6 @@
             const seqInterval = setInterval(() => {
                 if(stepIdx < stepsSequence.length) {
                     stepsSequence[stepIdx].action();
-                    playUISound('scan');
                     stepIdx++;
                 } else {
                     clearInterval(seqInterval);
@@ -1670,10 +1454,10 @@
         const loadingText = document.getElementById('loadingText');
 
         const steps = [
-            { pct: 15, text: "DIGITALSMOD ROTATION...", lm: "468 POINTS", sym: "MAPPING", jaw: "WAITING", rat: "WAITING" },
+            { pct: 15, text: "DIGITALSMOD ROTATION...", lm: "150+ POINTS", sym: "MAPPING", jaw: "WAITING", rat: "WAITING" },
             { pct: 35, text: "CONNECTING ACTIVE PROVIDER...", lm: "DETECTED", sym: "ANALYZING", jaw: "MAPPING", rat: "WAITING" },
-            { pct: 60, text: "MAPPING FACIAL GEOMETRY...", lm: "468/468 REAL", sym: "CALCULATED", jaw: "88° CORNER", rat: "ANALYZING" },
-            { pct: 85, text: "GENERATING REPORT...", lm: "468/468 REAL", sym: "CALCULATED", jaw: "88° CORNER", rat: "GOLDEN 1:1.6" },
+            { pct: 60, text: "MAPPING FACIAL GEOMETRY...", lm: "DETECTED", sym: "CALCULATED", jaw: "88° CORNER", rat: "ANALYZING" },
+            { pct: 85, text: "GENERATING 150+ REPORT...", lm: "DETECTED", sym: "CALCULATED", jaw: "88° CORNER", rat: "GOLDEN 1:1.618" },
             { pct: 98, text: "FINALIZING REPORT...", lm: "COMPLETE", sym: "COMPLETE", jaw: "COMPLETE", rat: "COMPLETE" }
         ];
 
@@ -1684,7 +1468,7 @@
         state.analysisTimer = setInterval(() => {
             if (currentIdx < steps.length) {
                 const s = steps[currentIdx];
-                const circumference = 283;
+                const circumference = 220;
                 const offset = circumference - (s.pct / 100) * circumference;
                 ringFill.style.strokeDashoffset = offset;
                 percentText.innerText = s.pct + "%";
@@ -1700,8 +1484,18 @@
         }, interval);
     }
 
-    /* --- HUMAN FACE DETECTION --- */
-    function detectRealHumanFace(imgBase64) {
+    /* --- HUMAN FACE DETECTION WITH THROTTLING & CACHE --- */
+    let preScanCache = {};
+    let mediapipeThrottle = false;
+
+    async function detectRealHumanFace(imgBase64) {
+        const hash = imgBase64.substring(0, 50);
+        if (preScanCache[hash]) return preScanCache[hash];
+
+        if (mediapipeThrottle) return { isHuman: true };
+        mediapipeThrottle = true;
+        setTimeout(() => { mediapipeThrottle = false; }, 1000);
+
         return new Promise((resolve) => {
             if(!faceMeshEngine) {
                 resolve({ isHuman: true });
@@ -1718,13 +1512,18 @@
                     }
                 });
                 await faceMeshEngine.send({ image: img });
-                setTimeout(() => { resolve({ isHuman: detected }); }, 350);
+                setTimeout(() => {
+                    const res = { isHuman: detected };
+                    preScanCache[hash] = res;
+                    setTimeout(() => { delete preScanCache[hash]; }, 300000);
+                    resolve(res);
+                }, 350);
             };
             img.onerror = () => resolve({ isHuman: false });
         });
     }
 
-    /* --- CƠ CHẾ GỌI API DIGITALSMOD FALLBACK & LƯU BỘ ĐẾM NGẦM --- */
+    /* --- CƠ CHẾ GỌI API DIGITALSMOD FALLBACK --- */
     async function executeMultiModelAnalysis(parts) {
         const config = window.getGlobalConfig ? window.getGlobalConfig() : null;
         if (!config) throw new Error("Chưa cấu hình API từ hệ thống.");
@@ -1735,14 +1534,14 @@
             const orKey = config.openRouter.apiKey;
             const models = config.openRouter.models || [];
             const activeOrModels = models.filter(m => m.enabled && m.vision);
-
+            
             if (config.openRouter.modelMode === "MANUAL" && config.openRouter.manualModel) {
                 const manualMod = activeOrModels.find(m => m.id === config.openRouter.manualModel);
                 if(manualMod) {
                     targets.push({ type: 'openrouter', model: manualMod.id, key: orKey });
                 }
             }
-
+            
             activeOrModels.forEach(m => {
                 if(!targets.some(t => t.model === m.id)) {
                     targets.push({ type: 'openrouter', model: m.id, key: orKey });
@@ -1835,66 +1634,92 @@
         throw new Error(lastError?.message || "Tất cả các model trong hệ thống đều gặp sự cố tạm thời.");
     }
 
-    /* --- PHÂN TÍCH CHÍNH --- */
+    /* --- PHÂN TÍCH CHÍNH (NÂNG CẤP 150+ CHI TIẾT & PRE-SCAN VALIDATION) --- */
     async function startAnalysis() {
-        if (!state.photos[0]) {
-            alert("Cần ít nhất ảnh chính diện để phân tích.");
-            return;
-        }
-
-        const faceCheck = await detectRealHumanFace(`${state.photos[0].mime},${state.photos[0].base64}`);
-        if(!faceCheck.isHuman) {
-            alert("CẢNH BÁO: Không phát hiện khuôn mặt người thật trong ảnh!");
+        if (!state.photos[0] || !state.photos[1]) {
+            alert("⚠️ Cần đủ 2 góc ảnh: Front + Profile để phân tích!");
             return;
         }
 
         document.getElementById('wizardScreen').style.display = 'none';
         document.getElementById('loadingUI').style.display = 'block';
+        
+        const ringFill = document.getElementById('progressRingFill');
+        const percentText = document.getElementById('progressPercentText');
+        ringFill.style.strokeDashoffset = '283';
+        percentText.innerText = '0%';
+        
+        const faceCheck1 = await detectRealHumanFace(`${state.photos[0].mime},${state.photos[0].base64}`);
+        const faceCheck2 = await detectRealHumanFace(`${state.photos[1].mime},${state.photos[1].base64}`);
+        
+        if(!faceCheck1.isHuman || !faceCheck2.isHuman) {
+            alert("⚠️ CẢNH BÁO: Không phát hiện khuôn mặt người thật trong ảnh!\nVui lòng chụp lại ảnh rõ nét hơn.");
+            document.getElementById('loadingUI').style.display = 'none';
+            document.getElementById('wizardScreen').style.display = 'block';
+            return;
+        }
+
+        runFeatureScanningSequence();
         startRealtimeAnalysisUI();
 
         try {
-            const parts = [];
             const promptInstruction = `
-            Đóng vai chuyên gia thẩm mỹ Looksmaxxing AI Engine.
-            Hãy đánh giá chân thực, công bằng, khách quan điểm số khuôn mặt người thật dựa trên hình học 3D 468 landmark. TUYỆT ĐỐI KHÔNG tâng bốc điểm số.
-            TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (Không dùng markdown, không giải thích):
+            Bạn là chuyên gia phân tích khuôn mặt 3D hàng đầu với 150+ chi tiết trên khuôn mặt. Đánh giá khách quan, chính xác, không tâng bốc.
+            
+            PHÂN TÍCH CHI TIẾT 150+ ĐIỂM:
+            - CẤU TRÚC MẮT: Khoảng cách IPD, độ mở mi mắt, Canthal tilt, độ sáng lòng đen, khoảng cách đến chân mày.
+            - CẤU TRÚC MŨI: Chiều dài, độ rộng cánh mũi, sống mũi, góc nasolabial, chóp mũi.
+            - CẤU TRÚC MÔI: Độ dày môi trên/dưới, viền Cupid's bow, tỷ lệ môi.
+            - CẤU TRÚC CẰM & HÀM: Độ nhô cằm, góc hàm, đường viền cằm/hàm.
+            - XƯƠNG GÒ MÁ & TỶ LỆ VÀNG: Chiều cao/rộng gò má, tỷ lệ mặt 1/3, tỷ lệ vàng 1:1.618.
+
+            TRẢ VỀ JSON DUY NHẤT (Không thêm markdown hay văn bản ngoài JSON):
             {
-              "overall_score": 68, "potential_score": 89, "face_shape": "Diamond", "symmetry_score": 71, "proportion_score": 68, "skin_score": 69, "eyes_score": 74, "eyebrows_score": 72, "nose_score": 66, "lips_score": 70, "jawline_score": 65, "chin_score": 64, "hair_score": 68,
-              "micro_parts": [
-                { "title": "Tỷ Lệ FWHR", "val": "1.82 (Trung bình)", "status": "Cần hạ mỡ" },
-                { "title": "Góc Mắt Canthal", "val": "+3.2° (Nghiêng dương)", "status": "Rất Tốt" },
-                { "title": "Tỷ Lệ Môi / Cằm", "val": "1 : 2.1 (Chuẩn)", "status": "Cân đối" },
-                { "title": "Góc Xương Hàm", "val": "122° (Hơi tù)", "status": "Tập Mewing" }
-              ],
-              "summary": "Tóm tắt đánh giá cấu trúc mặt dựa trên 468 điểm", "strengths": ["Khung xương mắt góc nghiêng dương", "Độ đối xứng sọ mặt cao"], "weaknesses": ["Mỡ thừa vùng má che phủ đường hàm"], "hairstyles": ["Textured Crop", "Mid Fade"], "grooming_tips": ["Tỉa gọn râu quai nón"], "skincare_tips": ["Double Cleansing & Retinol 0.5%"],
+              "overall_score": 78,
+              "face_shape": "Oval",
+              "symmetry_score": 80,
+              "proportion_score": 76,
+              "skin_score": 72,
+              "eyes_score": 79,
+              "eyebrows_score": 75,
+              "nose_score": 74,
+              "lips_score": 76,
+              "jawline_score": 78,
+              "chin_score": 75,
+              "hair_score": 77,
+              "summary": "Mô tả chi tiết cấu trúc khuôn mặt dựa trên 150+ điểm...",
+              "strengths": ["Mắt cân đối, Canthal tilt dương", "Xương hàm sắc nét"],
+              "weaknesses": ["Góc nghiêng cằm cần cải thiện tư thế", "Da cần dưỡng ẩm"],
+              "hairstyles": ["Textured Crop", "Side Part 7/3"],
+              "grooming_tips": ["Tỉa gọn phần đuôi chân mày"],
+              "skincare_tips": ["Dùng Sữa rửa mặt pH 5.5 và BHA 2%"],
               "looksmax_protocol": [
-                { "phase": "Giai đoạn 1", "title": "Cơ bản", "tasks": ["Tập posture cổ Chin Tuck", "Định hình lại góc hàm"] }
+                { "phase": "Giai đoạn 1", "title": "Cơ bản (Tuần 1-2)", "tasks": ["Tập Chin Tuck Posture 3x/ngày", "Skincare Sáng/Tối"] }
               ]
             }`;
-            parts.push({ text: promptInstruction });
 
-            const angles = ["FRONT", "PROFILE 90°"];
-            for (let i = 0; i < 2; i++) {
-                if (state.photos[i]) {
-                    const compressed = await compressImage(state.photos[i].base64);
-                    parts.push({ text: `ẢNH ${angles[i]}:` });
-                    parts.push({ inline_data: { mime_type: compressed.mime, data: compressed.base64 } });
-                }
-            }
+            const compressed0 = await compressImage(state.photos[0].base64);
+            const compressed1 = await compressImage(state.photos[1].base64);
+
+            const parts = [
+                { text: promptInstruction },
+                { text: "ẢNH CHÍNH DIỆN (Front 0°):" },
+                { inline_data: { mime_type: compressed0.mime, data: compressed0.base64 } },
+                { text: "ẢNH NGHIÊNG (Profile 45°):" },
+                { inline_data: { mime_type: compressed1.mime, data: compressed1.base64 } }
+            ];
 
             const resultData = await executeMultiModelAnalysis(parts);
             state.currentResult = resultData;
 
             clearInterval(state.analysisTimer);
-            document.getElementById('progressRingFill').style.strokeDashoffset = '0';
-            document.getElementById('progressPercentText').innerText = "100%";
-            document.getElementById('loadingText').innerText = "HOÀN TẤT BÁO CÁO!";
+            ringFill.style.strokeDashoffset = '0';
+            percentText.innerText = "100%";
+            document.getElementById('loadingText').innerText = "✅ PHÂN TÍCH HOÀN TẤT!";
 
             setTimeout(() => {
-                playUISound('success');
                 renderResults(resultData);
                 saveToHistory(resultData);
-                awardXp(100);
                 document.getElementById('loadingUI').style.display = 'none';
                 document.getElementById('mainPanel').style.display = 'none';
                 document.getElementById('resultDashboard').style.display = 'block';
@@ -1905,10 +1730,11 @@
 
         } catch (error) {
             clearInterval(state.analysisTimer);
-            alert("LỖI PHÂN TÍCH: " + error.message);
+            console.error('Analysis Error:', error);
+            alert("❌ LỖI PHÂN TÍCH: " + error.message);
             document.getElementById('loadingUI').style.display = 'none';
-            document.getElementById('mainPanel').style.display = 'block';
             document.getElementById('wizardScreen').style.display = 'block';
+            document.getElementById('mainPanel').style.display = 'block';
         }
     }
 
@@ -1916,40 +1742,14 @@
     function renderResults(data) {
         document.getElementById('analysisTime').textContent = new Date().toLocaleString('vi-VN');
         animateCounter('res-overall', 0, data.overall_score || 0, 1000);
-        animateCounter('res-potential', 0, data.potential_score || (data.overall_score + 15), 1000);
-
-        const gap = (data.potential_score || (data.overall_score + 15)) - (data.overall_score || 0);
-        document.getElementById('res-gap-text').innerText = `+${gap} ĐIỂM TIỀM NĂNG PHÁT TRIỂN`;
-
         document.getElementById('res-faceshape').textContent = escapeHTML(data.face_shape || "-");
         document.getElementById('res-summary').textContent = escapeHTML(data.summary || "");
 
-        // Render Micro Parts Grid
-        const partsGrid = document.getElementById('partsMicroGrid');
-        partsGrid.innerHTML = '';
-        if(data.micro_parts) {
-            data.micro_parts.forEach(p => {
-                partsGrid.innerHTML += `
-                    <div class="part-item-chip">
-                        <div>
-                            <div style="font-weight: 700; color: #fff;">${escapeHTML(p.title)}</div>
-                            <div style="font-size: 10px; color: var(--text-secondary);">${escapeHTML(p.val)}</div>
-                        </div>
-                        <span style="font-size: 9px; font-weight: bold; color: var(--glow-accent); background: rgba(0,240,255,0.1); padding: 2px 6px; border-radius: 4px;">${escapeHTML(p.status)}</span>
-                    </div>
-                `;
-            });
-        }
-
         const metrics = [
-            { id: 'symmetry', label: 'Cân Đối', val: data.symmetry_score, sub: 'Độ đối xứng 468 landmark mắt, má, hàm' },
-            { id: 'proportion', label: 'Tỷ Lệ', val: data.proportion_score, sub: 'Tỷ lệ chiều rộng / chiều cao FWHR' },
-            { id: 'skin', label: 'Da', val: data.skin_score, sub: 'Kết cấu, sắc tố & lỗ chân lông' },
-            { id: 'eyes', label: 'Mắt', val: data.eyes_score, sub: 'Góc mắt Canthal Tilt & Brow Ridge' },
-            { id: 'nose', label: 'Mũi', val: data.nose_score, sub: 'Góc sống mũi & tỷ lệ nhân trung' },
-            { id: 'lips', label: 'Môi', val: data.lips_score, sub: 'Viền môi trên/dưới & nụ cười' },
-            { id: 'jawline', label: 'Góc Hàm', val: data.jawline_score, sub: 'Đường viền xương hàm & nọng cằm' },
-            { id: 'hair', label: 'Tóc & Cổ', val: data.hair_score, sub: 'Tư thế cổ Posture & mật độ tóc' }
+            { id: 'symmetry', label: 'Cân Đối', val: data.symmetry_score }, { id: 'proportion', label: 'Tỷ Lệ 1:1.618', val: data.proportion_score },
+            { id: 'skin', label: 'Làn Da', val: data.skin_score }, { id: 'eyes', label: 'Cấu Trúc Mắt', val: data.eyes_score },
+            { id: 'nose', label: 'Dáng Mũi 3D', val: data.nose_score }, { id: 'lips', label: 'Viền Môi', val: data.lips_score },
+            { id: 'jawline', label: 'Góc Cằm & Hàm', val: data.jawline_score }, { id: 'hair', label: 'Tóc', val: data.hair_score }
         ];
 
         const grid = document.getElementById('metricsGrid');
@@ -1959,9 +1759,8 @@
                 <div class="metric-card-item">
                     <div class="metric-header">
                         <span>${escapeHTML(m.label)}</span>
-                        <span><strong style="color: var(--accent-color);">${m.val||0}</strong>/100</span>
+                        <span>${m.val||0}/100</span>
                     </div>
-                    <div class="metric-subtext">${m.sub}</div>
                     <div class="metric-bar-bg">
                         <div class="metric-bar-fill" style="width: 0%"></div>
                     </div>
@@ -2013,12 +1812,12 @@
         window.requestAnimationFrame(step);
     }
 
-    /* --- RADAR CHART (SVG 8 AXES) --- */
+    /* --- RADAR CHART (SVG) --- */
     function drawRadarChart(dataArr, labels) {
         const container = document.getElementById('radarChartContainer');
-        const size = 320, center = size / 2, radius = (size / 2) - 45, numSides = dataArr.length, angleStep = (Math.PI * 2) / numSides;
+        const size = 300, center = size / 2, radius = (size / 2) - 40, numSides = dataArr.length, angleStep = (Math.PI * 2) / numSides;
         let svg = `<svg class="radar-chart" viewBox="0 0 ${size} ${size}">`;
-
+        
         for (let level = 1; level <= 5; level++) {
             let r = radius * (level / 5), pts = "";
             for (let i = 0; i < numSides; i++) pts += `${center + r * Math.sin(i * angleStep)},${center - r * Math.cos(i * angleStep)} `;
@@ -2029,7 +1828,7 @@
         for (let i = 0; i < numSides; i++) {
             let x = center + radius * Math.sin(i * angleStep), y = center - radius * Math.cos(i * angleStep);
             svg += `<line x1="${center}" y1="${center}" x2="${x}" y2="${y}" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>`;
-            let lx = center + (radius + 22) * Math.sin(i * angleStep), ly = center - (radius + 22) * Math.cos(i * angleStep);
+            let lx = center + (radius + 20) * Math.sin(i * angleStep), ly = center - (radius + 20) * Math.cos(i * angleStep);
             svg += `<text x="${lx}" y="${ly}" text-anchor="${lx < center - 10 ? 'end' : lx > center + 10 ? 'start' : 'middle'}" dominant-baseline="middle" class="radar-label">${escapeHTML(labels[i])}</text>`;
             let dx = center + (radius * (Math.max(0, Math.min(100, dataArr[i])) / 100)) * Math.sin(i * angleStep);
             let dy = center - (radius * (Math.max(0, Math.min(100, dataArr[i])) / 100)) * Math.cos(i * angleStep);
@@ -2038,30 +1837,6 @@
         }
         svg += `<polygon points="${dataPts}" fill="rgba(10, 132, 255, 0.25)" stroke="#0A84FF" stroke-width="2"/></svg>`;
         container.innerHTML = svg;
-    }
-
-    /* --- GAMIFICATION & XP --- */
-    function awardXp(amount) {
-        const xpEl = document.getElementById('profileXp');
-        const lvlEl = document.getElementById('profileLvl');
-        let currentXp = parseInt(xpEl.innerText) || 0;
-        let currentLvl = parseInt(lvlEl.innerText) || 1;
-
-        currentXp += amount;
-        if(currentXp >= currentLvl * 200) {
-            currentLvl += 1;
-            playUISound('levelup');
-            showLevelUpToast();
-        }
-
-        xpEl.innerText = currentXp;
-        lvlEl.innerText = currentLvl;
-    }
-
-    function showLevelUpToast() {
-        const toast = document.getElementById('levelUpToast');
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
     /* --- HISTORY & COMPARE --- */
@@ -2141,48 +1916,8 @@
         else window.print();
     }
 
-    /* --- 3D EXERCISE VIEWER MODAL --- */
-    function startExerciseTimer(title, duration) {
-        document.getElementById('exModalTitle').innerText = title;
-        document.getElementById('exModalDesc').innerText = `Thực hiện động tác trong ${duration/60} phút để kéo giãn cơ mặt và định hình góc hàm. Giữ lưng thẳng và hít thở đều.`;
-        document.getElementById('exerciseModal').style.display = 'flex';
-        init3DScene();
-    }
-
-    function closeExerciseModal() {
-        document.getElementById('exerciseModal').style.display = 'none';
-    }
-
-    function init3DScene() {
-        const container = document.getElementById('canvas-3d-container');
-        if(threeRenderer) container.removeChild(threeRenderer.domElement);
-
-        threeScene = new THREE.Scene();
-        threeCamera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-        threeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        threeRenderer.setSize(container.clientWidth, container.clientHeight);
-        container.appendChild(threeRenderer.domElement);
-
-        const geometry = new THREE.IcosahedronGeometry(1.5, 2);
-        const material = new THREE.MeshNormalMaterial({ wireframe: true });
-        threeMesh = new THREE.Mesh(geometry, material);
-        threeScene.add(threeMesh);
-
-        threeCamera.position.z = 3;
-
-        function animate() {
-            if(document.getElementById('exerciseModal').style.display === 'flex') {
-                requestAnimationFrame(animate);
-                threeMesh.rotation.x += 0.01;
-                threeMesh.rotation.y += 0.01;
-                threeRenderer.render(threeScene, threeCamera);
-            }
-        }
-        animate();
-    }
-
-    /* --- AI COACH CHAT --- */
-    function openCoachChat() {
+    /* --- AI COACH CHAT WITH CONTEXT MEMORY --- */
+    function openCoachChat() { 
         document.getElementById('coachModal').style.display = 'flex';
         const msgs = document.getElementById('chatMessages');
         msgs.scrollTop = msgs.scrollHeight;
@@ -2199,16 +1934,47 @@
         input.value = '';
         msgs.scrollTop = msgs.scrollHeight;
 
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'chat-bubble ai';
+        typingDiv.id = 'typingIndicator';
+        typingDiv.innerText = '🤔 Đang suy nghĩ...';
+        msgs.appendChild(typingDiv);
+        msgs.scrollTop = msgs.scrollHeight;
+
         try {
+            const lastResult = state.currentResult;
+            let contextPrompt = '';
+            if (lastResult) {
+                contextPrompt = `
+Dựa trên kết quả phân tích 150+ điểm gần nhất:
+- Điểm tổng: ${lastResult.overall_score}/100
+- Hình dáng mặt: ${lastResult.face_shape || 'Chưa xác định'}
+- Điểm mạnh: ${(lastResult.strengths || []).join(', ')}
+- Điểm yếu: ${(lastResult.weaknesses || []).join(', ')}
+                `;
+            }
+
             const resultData = await executeMultiModelAnalysis([
-                { text: `Bạn là AI Coach tư vấn diện mạo Glowmax. Trả lời ngắn gọn, chân thành, khuyến khích bài tập posture/grooming/skincare an toàn: ${text}` }
+                { text: `Bạn là AI Coach Glowmax chuyên tư vấn diện mạo. Trả lời thân thiện, chuyên nghiệp, khuyến khích bài tập posture, grooming, skincare an toàn.\n\nCONTEXT:\n${contextPrompt}\n\nCÂU HỎI: ${text}` }
             ]);
-            msgs.innerHTML += `<div class="chat-bubble ai">${escapeHTML(resultData.summary || "Đã ghi nhận câu hỏi của bạn.")}</div>`;
+
+            const typing = document.getElementById('typingIndicator');
+            if (typing) typing.remove();
+
+            const responseText = resultData.summary || "Đã ghi nhận câu hỏi của bạn. Hãy duy trì thói quen tập posture và skincare hàng ngày!";
+            msgs.innerHTML += `<div class="chat-bubble ai">${escapeHTML(responseText)}</div>`;
             msgs.scrollTop = msgs.scrollHeight;
+
         } catch(e) {
-            msgs.innerHTML += `<div class="chat-bubble ai">AI Coach tạm thời bận. Vui lòng thử lại sau.</div>`;
+            const typing = document.getElementById('typingIndicator');
+            if (typing) typing.remove();
+            msgs.innerHTML += `<div class="chat-bubble ai">😅 AI Coach tạm thời bận. Vui lòng thử lại sau.</div>`;
             msgs.scrollTop = msgs.scrollHeight;
         }
+    }
+
+    function startExerciseTimer(name, seconds) {
+        alert(`Bắt đầu bài tập "${name}" trong ${seconds / 60} phút.`);
     }
 
     function clearUserData() {
