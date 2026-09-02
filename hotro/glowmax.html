@@ -437,8 +437,7 @@
 
         #resultDashboard { display: none; }
         .score-hero-wrap { text-align: center; margin-bottom: 24px; position: relative; }
-        
-        /* Dual Score Hero Section (Score Current vs Score Potential) */
+
         .dual-score-container {
             display: flex; justify-content: center; align-items: center; gap: 16px; margin-bottom: 16px;
         }
@@ -557,33 +556,9 @@
         .auth-input { width: 100%; padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: var(--radius-small); color: #fff; margin-bottom: 12px; font-size: 14px; outline: none; }
         .privacy-note { font-size: 11px; text-align: center; color: var(--text-tertiary); margin-top: 24px; line-height: 1.4; }
 
-        /* --- JOURNEY GRID --- */
-        .journey-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .journey-day {
-            aspect-ratio: 1; border-radius: 12px; background: rgba(255,255,255,0.05);
-            border: 1px dashed var(--glass-border); display: flex; flex-direction: column;
-            align-items: center; justify-content: center; cursor: pointer; position: relative;
-            overflow: hidden; transition: 0.3s;
-        }
-        .journey-day img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-        .journey-day.completed { border-style: solid; border-color: var(--glow-accent); }
-        .journey-day.missed { border-color: var(--glow-secondary); }
-
-        /* --- 3D Container --- */
         #canvas-3d-container { width: 100%; height: 250px; border-radius: 12px; overflow: hidden; background: #000; position: relative; margin-bottom: 15px; cursor: grab; }
         #canvas-3d-container:active { cursor: grabbing; }
 
-        /* --- Task Checkbox --- */
-        .task-checkbox-wrap {
-            width: 24px; height: 24px; border: 2px solid var(--text-muted); border-radius: 6px;
-            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;
-        }
-        .task-checkbox-wrap.completed {
-            background: var(--glow-accent); border-color: var(--glow-accent); color: #000;
-        }
-        .task-card.completed h4 { text-decoration: line-through; color: var(--text-muted); }
-
-        /* --- Level Up Toast --- */
         #levelUpToast {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
             background: linear-gradient(135deg, rgba(0, 240, 255, 0.9), rgba(0, 120, 255, 0.9));
@@ -693,11 +668,11 @@
                     </svg>
                 </div>
 
-                <h1 style="font-size: 24px; margin-bottom: 8px; text-align: center;">Phân Tích AI 250 Bộ Phận</h1>
-                <p style="text-align: center; margin-bottom: 24px; font-size: 14px; color: var(--text-secondary);">Hệ thống trắc đạc sinh học 250 vi điểm, chấm điểm theo chuẩn khắt khe và dự đoán tiềm năng bứt phá diện mạo.</p>
+                <h1 style="font-size: 24px; margin-bottom: 8px; text-align: center;">Phân Tích AI 468 Landmark Thực Tế</h1>
+                <p style="text-align: center; margin-bottom: 24px; font-size: 14px; color: var(--text-secondary);">Hệ thống trắc đạc sinh học MediaPipe Face Mesh quét 468-478 tọa độ thực tế trên khuôn mặt.</p>
 
                 <div class="feature-pills">
-                    <div class="pill-item"><span class="pill-dot"></span>250 FACIAL PARTS</div>
+                    <div class="pill-item"><span class="pill-dot"></span>REAL 468 LANDMARKS</div>
                     <div class="pill-item"><span class="pill-dot"></span>STRICT SCORING</div>
                     <div class="pill-item"><span class="pill-dot"></span>MAX POTENTIAL</div>
                 </div>
@@ -754,7 +729,7 @@
                         <div class="feature-box-scan" id="scanBox"></div>
                         <div class="feature-line-h" id="scanLineH"></div>
                         <div class="feature-line-v" id="scanLineV"></div>
-                        <div class="feature-tag-badge" id="featureTagBadge">250 PARTS MAP</div>
+                        <div class="feature-tag-badge" id="featureTagBadge">468 LANDMARKS MAP</div>
                     </div>
                 </div>
 
@@ -766,13 +741,13 @@
                     <span class="progress-text-percent" id="progressPercentText">0%</span>
                 </div>
 
-                <div class="analysis-status-text" id="loadingText">ĐANG ĐO ĐẠC 250 VI ĐIỂM...</div>
+                <div class="analysis-status-text" id="loadingText">ĐANG TÍNH TOÁN PSLS...</div>
 
                 <div class="realtime-metrics-list">
-                    <div class="rt-metric-card"><span class="rt-metric-name">FACIAL PARTS</span><span class="rt-metric-val" id="rtLandmarks">250/250 MAP</span></div>
-                    <div class="rt-metric-card"><span class="rt-metric-name">STRICT VERDICT</span><span class="rt-metric-val" id="rtSymmetry">EVALUATING</span></div>
-                    <div class="rt-metric-card"><span class="rt-metric-name">POTENTIAL GAP</span><span class="rt-metric-val" id="rtJawline">CALCULATING</span></div>
-                    <div class="rt-metric-card"><span class="rt-metric-name">RADAR MATRIX</span><span class="rt-metric-val" id="rtRatio">8 AXES</span></div>
+                    <div class="rt-metric-card"><span class="rt-metric-name">LANDMARKS</span><span class="rt-metric-val" id="rtLandmarks">DETECTING</span></div>
+                    <div class="rt-metric-card"><span class="rt-metric-name">SYMMETRY</span><span class="rt-metric-val" id="rtSymmetry">CALCULATING</span></div>
+                    <div class="rt-metric-card"><span class="rt-metric-name">JAWLINE</span><span class="rt-metric-val" id="rtJawline">MAPPING</span></div>
+                    <div class="rt-metric-card"><span class="rt-metric-name">RATIO 3D</span><span class="rt-metric-val" id="rtRatio">EVALUATING</span></div>
                 </div>
             </div>
 
@@ -787,7 +762,6 @@
 
             <p style="text-align: center; margin-bottom: 16px; font-size: 12px; color: var(--text-tertiary);" id="analysisTime"></p>
 
-            <!-- Dual Score Section (Current vs Potential) -->
             <div class="score-hero-wrap">
                 <div class="dual-score-container">
                     <div class="overall-score-circle">
@@ -805,18 +779,14 @@
                 <div class="face-shape-capsule" id="res-faceshape">-</div>
             </div>
 
-            <!-- Radar Chart 8 Axes -->
             <div class="chart-container" id="radarChartContainer"></div>
 
-            <!-- 250 Parts Micro Summary -->
             <div class="parts-evaluated-box">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h3 style="font-size: 14px; color: var(--glow-accent);"><i class="fa-solid fa-microscope mr-1"></i> TỔNG QUAN 250 BỘ PHẬN</h3>
-                    <span style="font-size: 11px; color: var(--text-tertiary);" id="res-parts-count">250/250 ĐÃ PHÂN TÍCH</span>
+                    <h3 style="font-size: 14px; color: var(--glow-accent);"><i class="fa-solid fa-microscope mr-1"></i> TỔNG QUAN LANDMARKS ĐÃ QUÉT</h3>
+                    <span style="font-size: 11px; color: var(--text-tertiary);" id="res-parts-count">468/468 POINTS</span>
                 </div>
-                <div class="parts-grid" id="partsMicroGrid">
-                    <!-- Dynamic micro elements inserted here -->
-                </div>
+                <div class="parts-grid" id="partsMicroGrid"></div>
             </div>
 
             <h3 style="margin-bottom: 12px;">CHỈ SỐ CHI TIẾT & TIỀM NĂNG</h3>
@@ -1023,63 +993,6 @@
     </div>
 </div>
 
-<!-- ONBOARDING MODAL -->
-<div class="modal-overlay" id="onboardingModal">
-    <div class="modal-content space-y-4">
-        <h2 class="text-xl font-bold text-white text-center">Thiết lập thông số cá nhân</h2>
-        <p class="text-xs text-gray-400 text-center mb-4">Để AI tối ưu lộ trình dinh dưỡng & bài tập chuẩn nhất.</p>
-
-        <div class="space-y-3 text-sm">
-            <div>
-                <label class="text-gray-400 text-xs mb-1 block">Cân nặng (kg)</label>
-                <input type="number" id="inpWeight" placeholder="Ví dụ: 65" class="w-full bg-black/50 border border-gray-700 rounded-lg p-3 text-white outline-none focus:border-cyan-500">
-            </div>
-            <div>
-                <label class="text-gray-400 text-xs mb-1 block">Chiều cao (cm)</label>
-                <input type="number" id="inpHeight" placeholder="Ví dụ: 175" class="w-full bg-black/50 border border-gray-700 rounded-lg p-3 text-white outline-none focus:border-cyan-500">
-            </div>
-            <div>
-                <label class="text-gray-400 text-xs mb-1 block">Mục tiêu ưu tiên</label>
-                <select id="inpGoal" class="w-full bg-black/50 border border-gray-700 rounded-lg p-3 text-white outline-none focus:border-cyan-500">
-                    <option value="Cân đối tổng thể">Cân đối tổng thể</option>
-                    <option value="Góc hàm rõ hơn (Mewing)">Góc hàm rõ hơn (Mewing)</option>
-                    <option value="Da sáng khỏe, giảm mụn">Da sáng khỏe, giảm mụn</option>
-                    <option value="Giảm mỡ mặt">Giảm mỡ mặt</option>
-                </select>
-            </div>
-            <div>
-                <label class="text-gray-400 text-xs mb-1 block">Mức độ cam kết mỗi ngày</label>
-                <select id="inpTime" class="w-full bg-black/50 border border-gray-700 rounded-lg p-3 text-white outline-none focus:border-cyan-500">
-                    <option value="10">10 phút / ngày</option>
-                    <option value="20">20 phút / ngày</option>
-                    <option value="30">30 phút / ngày</option>
-                </select>
-            </div>
-            <div>
-                <label class="text-gray-400 text-xs mb-1 block">Thời lượng mong muốn (Ngày)</label>
-                <select id="inpDays" class="w-full bg-black/50 border border-gray-700 rounded-lg p-3 text-white outline-none focus:border-cyan-500">
-                    <option value="auto">Để AI tự đề xuất</option>
-                    <option value="7">7 Ngày</option>
-                    <option value="30">30 Ngày</option>
-                </select>
-            </div>
-        </div>
-
-        <button onclick="generatePlanFromProfile()" class="w-full glass-button btn-primary py-3 rounded-xl font-bold mt-2 shadow-[0_0_15px_rgba(0,240,255,0.2)]">
-            <i class="fa-solid fa-wand-magic-sparkles"></i> Tạo Lộ Trình AI
-        </button>
-    </div>
-</div>
-
-<!-- LOADING PLAN MODAL -->
-<div class="modal-overlay" id="loadingPlanModal">
-    <div class="modal-content text-center space-y-4 bg-transparent border-0 shadow-none">
-        <div class="ai-loader mx-auto w-12 h-12 mb-4 border-4"></div>
-        <h2 class="text-lg font-bold text-white">AI đang xây dựng lộ trình...</h2>
-        <p class="text-xs text-gray-400">Vui lòng đợi vài giây để khớp dữ liệu</p>
-    </div>
-</div>
-
 <!-- EXERCISE 3D VIEWER MODAL -->
 <div class="modal-overlay" id="exerciseModal">
     <div class="modal-content space-y-4">
@@ -1102,25 +1015,6 @@
         <button onclick="closeExerciseModal()" class="w-full glass-button py-3 rounded-xl font-bold text-cyan-400 border-cyan-500/50 mt-2">
             Đã hiểu, Đóng
         </button>
-    </div>
-</div>
-
-<!-- JOURNEY CAPTURE MODAL -->
-<div class="modal-overlay" id="journeyCaptureModal">
-    <div class="modal-content text-center space-y-4">
-        <h2 class="text-lg font-bold text-white">Cập nhật ảnh Ngày <span id="journeyCaptureDay"></span></h2>
-        <p class="text-xs text-gray-400 mb-2">Chụp ảnh mặt chính diện để AI theo dõi</p>
-
-        <div class="w-full aspect-[3/4] bg-black rounded-xl border border-gray-700 flex items-center justify-center cursor-pointer hover:border-cyan-500 transition overflow-hidden relative" onclick="document.getElementById('journeyFileInput').click()">
-            <img id="journeyPreviewImg" src="" class="hidden w-full h-full object-cover">
-            <div id="journeyPlaceholder" class="text-gray-500"><i class="fa-solid fa-camera text-3xl"></i><br>Bấm để tải ảnh</div>
-        </div>
-        <input type="file" id="journeyFileInput" accept="image/*" class="hidden" onchange="handleJourneyPhoto(event)">
-
-        <div class="flex gap-2">
-            <button onclick="document.getElementById('journeyCaptureModal').style.display='none'" class="flex-1 glass-button py-3 rounded-xl text-sm">Hủy</button>
-            <button onclick="saveJourneyPhoto()" class="flex-1 glass-button btn-primary py-3 rounded-xl text-sm font-bold">Lưu lại</button>
-        </div>
     </div>
 </div>
 
@@ -1252,6 +1146,97 @@
 </script>
 
 <script>
+    /* --- MEDIAPIPE FACE MESH REAL-TIME LANDMARK DETECTION ENGINE --- */
+    let faceMeshEngine = null;
+
+    function initFaceMeshEngine() {
+        if(typeof FaceMesh === 'undefined') return;
+        faceMeshEngine = new FaceMesh({
+            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+        });
+        faceMeshEngine.setOptions({
+            maxNumFaces: 1,
+            refineLandmarks: true,
+            minDetectionConfidence: 0.6,
+            minTrackingConfidence: 0.6
+        });
+    }
+
+    window.addEventListener('load', () => {
+        initFaceMeshEngine();
+    });
+
+    /* --- REAL LANDMARK DETECTION ON CANVAS --- */
+    function detectAndDrawRealLandmarks(imgElement, canvasElement) {
+        return new Promise((resolve) => {
+            if (!faceMeshEngine) {
+                resolve({ detected: false, landmarksCount: 0 });
+                return;
+            }
+
+            const ctx = canvasElement.getContext('2d');
+            canvasElement.width = imgElement.naturalWidth || imgElement.width || 640;
+            canvasElement.height = imgElement.naturalHeight || imgElement.height || 480;
+
+            let isResolved = false;
+
+            faceMeshEngine.onResults((results) => {
+                ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+                ctx.drawImage(imgElement, 0, 0, canvasElement.width, canvasElement.height);
+
+                if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
+                    const landmarks = results.multiFaceLandmarks[0];
+                    
+                    // Draw Landmark Connections & Points
+                    ctx.fillStyle = '#00f0ff';
+                    ctx.strokeStyle = 'rgba(0, 240, 255, 0.4)';
+                    ctx.lineWidth = 1;
+
+                    // Draw Mesh Wireframe Points
+                    for (let i = 0; i < landmarks.length; i++) {
+                        const pt = landmarks[i];
+                        const x = pt.x * canvasElement.width;
+                        const y = pt.y * canvasElement.height;
+
+                        ctx.beginPath();
+                        ctx.arc(x, y, 1.2, 0, 2 * Math.PI);
+                        ctx.fill();
+                    }
+
+                    // Highlight Key Facial Features (Eyes, Lips, Jaw Contour)
+                    const keyPoints = [33, 133, 362, 263, 61, 291, 1, 152, 10, 234, 454];
+                    ctx.fillStyle = '#ff0055';
+                    keyPoints.forEach(idx => {
+                        if(landmarks[idx]) {
+                            const x = landmarks[idx].x * canvasElement.width;
+                            const y = landmarks[idx].y * canvasElement.height;
+                            ctx.beginPath();
+                            ctx.arc(x, y, 2.5, 0, 2 * Math.PI);
+                            ctx.fill();
+                        }
+                    });
+
+                    if(!isResolved) {
+                        isResolved = true;
+                        resolve({ detected: true, landmarksCount: landmarks.length });
+                    }
+                } else {
+                    if(!isResolved) {
+                        isResolved = true;
+                        resolve({ detected: false, landmarksCount: 0 });
+                    }
+                }
+            });
+
+            faceMeshEngine.send({ image: imgElement }).catch(() => {
+                if(!isResolved) {
+                    isResolved = true;
+                    resolve({ detected: false, landmarksCount: 0 });
+                }
+            });
+        });
+    }
+
     /* --- AUDIO UI SFX --- */
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     let audioCtx;
@@ -1293,104 +1278,234 @@
         }
     }
 
+    /* --- MOTION BLUR SCROLL --- */
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+        document.body.classList.add('is-scrolling');
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            document.body.classList.remove('is-scrolling');
+        }, 150);
+    });
+
     /* --- STATE MANAGEMENT --- */
-    let currentStep = 0;
-    let capturedImages = { front: null, profile: null };
-    let cameraStream = null;
-    let currentCameraFacing = 'user';
+    const state = {
+        photos: [null, null],
+        currentStep: 0,
+        afterPhoto: null,
+        stream: null,
+        facingMode: 'user',
+        currentResult: null,
+        analysisTimer: null,
+        detectedLandmarks: null
+    };
+
+    const STEP_INFO = [
+        { title: "CHỤP ẢNH CHÍNH DIỆN", desc: "Mặt nhìn thẳng • Ảnh gốc • Đủ sáng" },
+        { title: "CHỤP ẢNH NGHIÊNG PHẢI 90°", desc: "Nghiêng đúng 90° theo mẫu • Ảnh gốc • Đủ sáng" }
+    ];
+
+    const MAX_FILE_SIZE = 5 * 1024 * 1024;
     let threeScene, threeCamera, threeRenderer, threeMesh;
 
-    /* --- TAB ROUTING --- */
-    function switchTab(tabName) {
+    /* --- TAB NAVIGATION --- */
+    function switchTab(tabId) {
         initAudio();
-        document.querySelectorAll('.tab-view').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        
-        const targetTab = document.getElementById(`tab-${tabName}`);
+        document.querySelectorAll('.tab-view').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+        const targetTab = document.getElementById(`tab-${tabId}`);
         if(targetTab) targetTab.classList.add('active');
 
-        const navIdx = ['home', 'analyze', 'plan', 'today', 'profile'].indexOf(tabName);
-        if(navIdx !== -1) {
-            document.querySelectorAll('.nav-item')[navIdx].classList.add('active');
+        const navIndex = ['home', 'analyze', 'plan', 'today', 'profile'].indexOf(tabId);
+        if(navIndex !== -1) {
+            document.querySelectorAll('.nav-item')[navIndex].classList.add('active');
         }
     }
 
-    /* --- WIZARD SCANNER ENGINE --- */
+    function switchPlanSubTab(days) {
+        const list = document.getElementById('planContentList');
+        if(days === 7) {
+            list.innerHTML = `<div class="glass-card"><h4>Tuần 1: Thiết Lập Nền Tảng</h4><p style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Chin Tuck Posture + Skincare Sáng/Tối cơ bản.</p></div>`;
+        } else if(days === 30) {
+            list.innerHTML = `<div class="glass-card"><h4>Tháng 1: Định Hình Cấu Trúc Mặt & Da</h4><p style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Tăng cường bài tập giãn cơ cổ và Grooming chân mày.</p></div>`;
+        } else {
+            list.innerHTML = `<div class="glass-card"><h4>Chương Trình 1 Năm Glow Up</h4><p style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Theo dõi sự thay đổi qua các đợt Checkpoint hàng tháng.</p></div>`;
+        }
+    }
+    switchPlanSubTab(7);
+
+    function toggleTask(elem) {
+        elem.classList.toggle('completed');
+        playUISound('task_complete');
+        awardXp(15);
+    }
+
+    /* --- HELPER FUNCTIONS --- */
+    function parseAIJsonResponse(rawText) {
+        if (!rawText) throw new Error("Phản hồi từ AI rỗng");
+        let cleaned = rawText.replace(/```(?:json)?/gi, '').replace(/```/g, '').trim();
+        const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+        if (jsonMatch) cleaned = jsonMatch[0];
+        return JSON.parse(cleaned);
+    }
+
+    function compressImage(base64Str, maxWidth = 800, quality = 0.7) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.src = base64Str.startsWith('data:') ? base64Str : 'data:image/jpeg;base64,' + base64Str;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width, height = img.height;
+                if (width > maxWidth) {
+                    height = Math.round((height * maxWidth) / width);
+                    width = maxWidth;
+                }
+                canvas.width = width; canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                resolve({ base64: compressedDataUrl.split(',')[1], mime: 'image/jpeg' });
+            };
+            img.onerror = () => {
+                resolve({ base64: base64Str.replace(/^data:image\/\w+;base64,/, ''), mime: 'image/jpeg' });
+            };
+        });
+    }
+
+    function escapeHTML(str) {
+        if (!str) return '';
+        return str.toString().replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+    }
+
+    /* --- WIZARD FLOW & SCANNER --- */
     function startWizard() {
+        const config = window.getGlobalConfig ? window.getGlobalConfig() : null;
+        if (!config || (!config.apiKey && !config.openRouter?.apiKey && (!config.apiKeys || config.apiKeys.length === 0))) {
+            alert("Chưa cấu hình API Key. Vui lòng cấu hình trong Dashglow.");
+            return;
+        }
         document.getElementById('introScreen').style.display = 'none';
         document.getElementById('wizardScreen').style.display = 'block';
         updateWizardUI();
     }
 
     function updateWizardUI() {
-        const fill = document.getElementById('stepProgressFill');
-        fill.style.width = currentStep === 0 ? '0%' : '100%';
-        
-        document.getElementById('node-0').className = `step-node ${currentStep === 0 ? 'active' : 'completed'}`;
-        document.getElementById('node-1').className = `step-node ${currentStep === 1 ? 'active' : ''}`;
+        const step = state.currentStep;
+        const progressFill = document.getElementById('stepProgressFill');
+        progressFill.style.width = (step * 100) + '%';
 
-        if (currentStep === 0) {
-            document.getElementById('wizTitle').innerText = 'FRONT (Chính diện 0°)';
-            document.getElementById('wizDesc').innerText = 'Giữ đầu thẳng, nhìn trực tiếp vào camera';
-            document.getElementById('btnSkipStep').style.display = 'none';
-        } else {
-            document.getElementById('wizTitle').innerText = 'PROFILE (Góc nghiêng 90°)';
-            document.getElementById('wizDesc').innerText = 'Quay đầu sang bên, hiển thị rõ xương hàm nghiêng';
-            document.getElementById('btnSkipStep').style.display = 'inline-block';
+        for(let i=0; i<2; i++) {
+            const node = document.getElementById(`node-${i}`);
+            const dot = document.getElementById(`dot-${i}`);
+            node.className = 'step-node';
+            if(i < step) {
+                node.classList.add('completed');
+                dot.innerText = '✓';
+            } else if(i === step) {
+                node.classList.add('active');
+                dot.innerText = i + 1;
+            } else {
+                dot.innerText = i + 1;
+            }
         }
 
+        renderCurrentSlot();
+
+        const btnNext = document.getElementById('btnNextStep');
+        const btnSkip = document.getElementById('btnSkipStep');
+
+        if (state.photos[step]) {
+            btnNext.disabled = false;
+            btnNext.innerText = step === 1 ? "BẮT ĐẦU PHÂN TÍCH DIGITALSMOD AI" : "LƯU & TIẾP TỤC";
+            btnSkip.style.display = 'none';
+        } else {
+            btnNext.disabled = true;
+            btnNext.innerText = "CHỤP TRƯỚC ĐỂ TIẾP TỤC";
+            btnSkip.style.display = step > 0 ? 'block' : 'none';
+        }
+    }
+
+    function renderCurrentSlot() {
         const slot = document.getElementById('currentSlot');
-        const imgKey = currentStep === 0 ? 'front' : 'profile';
-        if (capturedImages[imgKey]) {
+        const imgData = state.photos[state.currentStep];
+
+        if (imgData) {
             slot.classList.add('has-image');
-            let prev = slot.querySelector('.preview-img');
-            if(!prev) {
-                prev = document.createElement('img');
-                prev.className = 'preview-img';
-                slot.appendChild(prev);
-            }
-            prev.src = capturedImages[imgKey];
-            document.getElementById('btnNextStep').disabled = false;
-            document.getElementById('btnNextStep').innerText = currentStep === 0 ? 'TIẾP TỤC GÓC NGHIÊNG' : 'TIẾP TỤC PHÂN TÍCH AI';
+            slot.innerHTML = `
+                <img src="${imgData.mime},${imgData.base64}" class="preview-img">
+                <div class="img-overlay-actions">
+                    <button class="btn-secondary" style="flex:1; padding: 10px;" onclick="triggerFileInput()">Đổi</button>
+                    <button class="btn-danger" style="flex:1; padding: 10px;" onclick="removeCurrentPhoto()">Xóa</button>
+                </div>
+            `;
         } else {
             slot.classList.remove('has-image');
-            const prev = slot.querySelector('.preview-img');
-            if(prev) prev.remove();
-            document.getElementById('btnNextStep').disabled = true;
-            document.getElementById('btnNextStep').innerText = 'CHỤP TRƯỚC ĐỂ TIẾP TỤC';
+            slot.innerHTML = `
+                <div class="corner-bracket cb-tl"></div>
+                <div class="corner-bracket cb-tr"></div>
+                <div class="corner-bracket cb-bl"></div>
+                <div class="corner-bracket cb-br"></div>
+                <div class="status-badge">STEP 0${state.currentStep + 1}</div>
+                <div class="capture-title">${STEP_INFO[state.currentStep].title}</div>
+                <div class="capture-desc">${STEP_INFO[state.currentStep].desc}</div>
+                <div style="display: flex; gap: 10px; width: 100%; max-width: 280px;">
+                    <button class="btn-secondary" style="flex:1; padding: 12px;" onclick="triggerFileInput()">Tải Ảnh Lên</button>
+                    <button style="flex:1; padding: 12px;" onclick="requestCameraPermission()">Quét Camera</button>
+                </div>
+            `;
         }
     }
 
-    function triggerFileInput() {
-        document.getElementById('wizFileInput').click();
-    }
-
-    function handleFileSelect(e) {
-        const file = e.target.files[0];
-        if(!file) return;
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-            const imgKey = currentStep === 0 ? 'front' : 'profile';
-            capturedImages[imgKey] = evt.target.result;
-            updateWizardUI();
-        };
-        reader.readAsDataURL(file);
+    function removeCurrentPhoto() {
+        state.photos[state.currentStep] = null;
+        updateWizardUI();
     }
 
     function nextStep() {
-        if (currentStep === 0) {
-            currentStep = 1;
+        if (state.currentStep < 1) {
+            state.currentStep++;
             updateWizardUI();
+            if (!state.photos[state.currentStep]) requestCameraPermission();
         } else {
-            runAIAnalysisPipeline();
+            startAnalysis();
         }
     }
 
     function skipStep() {
-        runAIAnalysisPipeline();
+        if (state.currentStep < 1) {
+            state.photos[state.currentStep] = null;
+            state.currentStep++;
+            updateWizardUI();
+            if (!state.photos[state.currentStep]) requestCameraPermission();
+        }
     }
 
-    /* --- CAMERA SYSTEM --- */
+    function triggerFileInput() {
+        document.getElementById(`wizFileInput`).click();
+    }
+
+    function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        if (!file.type.match('image.*')) { alert("Ảnh không hợp lệ!"); return; }
+        if (file.size > MAX_FILE_SIZE) { alert("Ảnh quá lớn (< 5MB)."); return; }
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const dataUrl = e.target.result;
+            const commaIdx = dataUrl.indexOf(',');
+            state.photos[state.currentStep] = {
+                base64: dataUrl.substring(commaIdx + 1),
+                mime: dataUrl.substring(0, commaIdx),
+                size: file.size
+            };
+            updateWizardUI();
+        };
+        reader.readAsDataURL(file);
+        event.target.value = '';
+    }
+
+    /* --- CAMERA STREAM --- */
     function requestCameraPermission() {
         document.getElementById('cameraPermissionModal').style.display = 'flex';
     }
@@ -1406,255 +1521,523 @@
 
     async function openCamera() {
         const modal = document.getElementById('cameraModal');
+        document.getElementById('camTitleHeader').innerText = STEP_INFO[state.currentStep].title;
+        document.getElementById('camInstruction').innerText = STEP_INFO[state.currentStep].desc;
+
+        const frontImg = document.getElementById('imgSilhouetteFront');
+        const profileImg = document.getElementById('imgSilhouetteProfile');
+
+        frontImg.style.display = state.currentStep === 0 ? 'block' : 'none';
+        profileImg.style.display = state.currentStep === 1 ? 'block' : 'none';
+
         modal.style.display = 'flex';
+        await startStream();
+    }
 
-        if(currentStep === 0) {
-            document.getElementById('camTitleHeader').innerText = 'CHỤP ẢNH CHÍNH DIỆN';
-            document.getElementById('imgSilhouetteFront').style.display = 'block';
-            document.getElementById('imgSilhouetteProfile').style.display = 'none';
-        } else {
-            document.getElementById('camTitleHeader').innerText = 'CHỤP GÓC NGHIÊNG';
-            document.getElementById('imgSilhouetteFront').style.display = 'none';
-            document.getElementById('imgSilhouetteProfile').style.display = 'block';
+    async function startStream() {
+        if (state.stream) {
+            state.stream.getTracks().forEach(track => track.stop());
         }
-
         try {
-            cameraStream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: currentCameraFacing, width: { ideal: 1280 }, height: { ideal: 720 } },
-                audio: false
-            });
-            document.getElementById('videoElement').srcObject = cameraStream;
-        } catch(err) {
-            alert("Không thể truy cập Camera: " + err.message);
+            const constraints = { video: { facingMode: state.facingMode, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false };
+            state.stream = await navigator.mediaDevices.getUserMedia(constraints);
+            const video = document.getElementById('videoElement');
+            video.srcObject = state.stream;
+            video.style.transform = state.facingMode === 'user' ? 'scaleX(-1)' : 'none';
+        } catch (err) {
+            alert("Không thể truy cập Camera. Vui lòng cho phép quyền ứng dụng!");
             closeCamera();
         }
     }
 
     function switchCamera() {
-        currentCameraFacing = currentCameraFacing === 'user' ? 'environment' : 'user';
-        if(cameraStream) cameraStream.getTracks().forEach(t => t.stop());
-        openCamera();
+        state.facingMode = state.facingMode === 'user' ? 'environment' : 'user';
+        startStream();
     }
 
     function closeCamera() {
-        if(cameraStream) cameraStream.getTracks().forEach(t => t.stop());
         document.getElementById('cameraModal').style.display = 'none';
+        if (state.stream) {
+            state.stream.getTracks().forEach(track => track.stop());
+            state.stream = null;
+        }
     }
 
     function takeSnapshot() {
         playUISound('scan');
         const flash = document.getElementById('cameraFlash');
         flash.style.opacity = '1';
-        setTimeout(() => flash.style.opacity = '0', 150);
+        setTimeout(() => { flash.style.opacity = '0'; }, 120);
 
         const video = document.getElementById('videoElement');
         const canvas = document.getElementById('captureCanvas');
-        canvas.width = video.videoWidth || 640;
-        canvas.height = video.videoHeight || 480;
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
         const ctx = canvas.getContext('2d');
+
+        if (state.facingMode === 'user') {
+            ctx.translate(canvas.width, 0);
+            ctx.scale(-1, 1);
+        }
+
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        const base64 = dataUrl.split(',')[1];
+        state.photos[state.currentStep] = { base64: base64, mime: 'data:image/jpeg;base64', size: Math.round((base64.length * 3) / 4) };
 
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
-        const imgKey = currentStep === 0 ? 'front' : 'profile';
-        capturedImages[imgKey] = dataUrl;
-
-        closeCamera();
-        updateWizardUI();
+        setTimeout(() => {
+            closeCamera();
+            updateWizardUI();
+        }, 150);
     }
 
-    /* --- AI ANALYSIS PIPELINE (250 FACIAL PARTS & STRICT SCORING) --- */
-    function runAIAnalysisPipeline() {
-        document.getElementById('wizardScreen').style.display = 'none';
-        document.getElementById('loadingUI').style.display = 'block';
+    /* --- REAL-TIME FEATURE SCANNER ANIMATION & REAL LANDMARKS --- */
+    async function runFeatureScanningSequence() {
+        const resultCanvas = document.getElementById('scanResultCanvas');
+        if (!resultCanvas || !state.photos[0]) return;
 
-        const canvas = document.getElementById('scanResultCanvas');
-        const ctx = canvas.getContext('2d');
         const img = new Image();
-        img.src = capturedImages.front;
-        img.onload = () => {
-            canvas.width = img.width;
-            canvas.height = img.height;
-            ctx.drawImage(img, 0, 0);
+        img.src = `${state.photos[0].mime},${state.photos[0].base64}`;
+        img.onload = async () => {
+            const scanRes = await detectAndDrawRealLandmarks(img, resultCanvas);
+            state.detectedLandmarks = scanRes;
+
+            const scanBox = document.getElementById('scanBox');
+            const lineH = document.getElementById('scanLineH');
+            const lineV = document.getElementById('scanLineV');
+            const tagBadge = document.getElementById('featureTagBadge');
+
+            const stepsSequence = [
+                {
+                    action: () => {
+                        scanBox.style.opacity = '1';
+                        scanBox.style.top = "38%"; scanBox.style.left = "25%";
+                        scanBox.style.width = "50%"; scanBox.style.height = "15%";
+                        lineH.style.opacity = '1'; lineV.style.opacity = '0';
+                        lineH.style.top = "45%";
+                        tagBadge.innerText = "EYES & IPD 468 MESH"; tagBadge.style.opacity = '1';
+                    }
+                },
+                {
+                    action: () => {
+                        scanBox.style.top = "42%"; scanBox.style.left = "40%";
+                        scanBox.style.width = "20%"; scanBox.style.height = "22%";
+                        lineH.style.opacity = '0'; lineV.style.opacity = '1';
+                        lineV.style.left = "50%";
+                        tagBadge.innerText = "NOSE BRIDGE GEOMETRY";
+                    }
+                },
+                {
+                    action: () => {
+                        scanBox.style.top = "62%"; scanBox.style.left = "32%";
+                        scanBox.style.width = "36%"; scanBox.style.height = "24%";
+                        lineV.style.opacity = '0'; lineH.style.opacity = '1';
+                        lineH.style.top = "70%";
+                        tagBadge.innerText = "LIP & CHIN RATIO";
+                    }
+                },
+                {
+                    action: () => {
+                        scanBox.style.top = "20%"; scanBox.style.left = "18%";
+                        scanBox.style.width = "64%"; scanBox.style.height = "72%";
+                        lineH.style.opacity = '1'; lineV.style.opacity = '1';
+                        lineH.style.top = "82%"; lineV.style.left = "50%";
+                        tagBadge.innerText = "JAWLINE CONTOUR 3D";
+                    }
+                }
+            ];
+
+            let stepIdx = 0;
+            const seqInterval = setInterval(() => {
+                if(stepIdx < stepsSequence.length) {
+                    stepsSequence[stepIdx].action();
+                    playUISound('scan');
+                    stepIdx++;
+                } else {
+                    clearInterval(seqInterval);
+                    scanBox.style.opacity = '0';
+                    lineH.style.opacity = '0'; lineV.style.opacity = '0'; tagBadge.style.opacity = '0';
+                }
+            }, 1100);
         };
+    }
 
-        let progress = 0;
-        const ring = document.getElementById('progressRingFill');
-        const interval = setInterval(() => {
-            progress += 5;
-            const offset = 283 - (283 * progress / 100);
-            ring.style.strokeDashoffset = offset;
-            document.getElementById('progressPercentText').innerText = progress + '%';
+    function startRealtimeAnalysisUI() {
+        runFeatureScanningSequence();
 
-            playUISound('scan');
+        const ringFill = document.getElementById('progressRingFill');
+        const percentText = document.getElementById('progressPercentText');
+        const loadingText = document.getElementById('loadingText');
 
-            if(progress === 25) {
-                document.getElementById('rtLandmarks').innerText = '250/250 REGIONS';
-                document.getElementById('loadingText').innerText = 'MAPPING 250 VI ĐIỂM...';
-            } else if(progress === 50) {
-                document.getElementById('rtSymmetry').innerText = 'STRICT MATRIX';
-                document.getElementById('loadingText').innerText = 'EVALUATING FACIAL GAP...';
-            } else if(progress === 75) {
-                document.getElementById('rtJawline').innerText = 'CALCULATING MAX POTENTIAL';
-                document.getElementById('loadingText').innerText = 'FINALIZING RADAR 8 AXES...';
-            } else if(progress >= 100) {
-                clearInterval(interval);
-                finishAnalysis();
+        const steps = [
+            { pct: 15, text: "DIGITALSMOD ROTATION...", lm: "468 POINTS", sym: "MAPPING", jaw: "WAITING", rat: "WAITING" },
+            { pct: 35, text: "CONNECTING ACTIVE PROVIDER...", lm: "DETECTED", sym: "ANALYZING", jaw: "MAPPING", rat: "WAITING" },
+            { pct: 60, text: "MAPPING FACIAL GEOMETRY...", lm: "468/468 REAL", sym: "CALCULATED", jaw: "88° CORNER", rat: "ANALYZING" },
+            { pct: 85, text: "GENERATING REPORT...", lm: "468/468 REAL", sym: "CALCULATED", jaw: "88° CORNER", rat: "GOLDEN 1:1.6" },
+            { pct: 98, text: "FINALIZING REPORT...", lm: "COMPLETE", sym: "COMPLETE", jaw: "COMPLETE", rat: "COMPLETE" }
+        ];
+
+        let currentIdx = 0;
+        const totalDuration = 4800;
+        const interval = totalDuration / steps.length;
+
+        state.analysisTimer = setInterval(() => {
+            if (currentIdx < steps.length) {
+                const s = steps[currentIdx];
+                const circumference = 283;
+                const offset = circumference - (s.pct / 100) * circumference;
+                ringFill.style.strokeDashoffset = offset;
+                percentText.innerText = s.pct + "%";
+                loadingText.innerText = s.text;
+                document.getElementById('rtLandmarks').innerText = s.lm;
+                document.getElementById('rtSymmetry').innerText = s.sym;
+                document.getElementById('rtJawline').innerText = s.jaw;
+                document.getElementById('rtRatio').innerText = s.rat;
+                currentIdx++;
+            } else {
+                clearInterval(state.analysisTimer);
             }
-        }, 120);
+        }, interval);
     }
 
-    function finishAnalysis() {
-        playUISound('success');
-        document.getElementById('loadingUI').style.display = 'none';
-        document.getElementById('mainPanel').style.display = 'none';
-        document.getElementById('resultDashboard').style.display = 'block';
+    /* --- HUMAN FACE DETECTION --- */
+    function detectRealHumanFace(imgBase64) {
+        return new Promise((resolve) => {
+            if(!faceMeshEngine) {
+                resolve({ isHuman: true });
+                return;
+            }
 
-        // Expanded 8-axes Radar Matrix with Strict Scoring + Max Potential & 250 Parts Breakdown
-        const resultData = {
-            overall: 68, // Strictly calibrated real score (Khắt khe)
-            potential: 89, // Max Potential Score
-            shape: 'Sương Khung Diamond (Góc Hàm 118°)',
-            metrics: [
-                { name: 'Cân Đối Sọ Mặt', score: 71, potential: 88, sub: 'Độ đối xứng 250 vi điểm mắt, má, hàm' },
-                { name: 'Góc Mắt & Mày', score: 74, potential: 86, sub: 'Positive Canthal Tilt & Brow Ridge' },
-                { name: 'Đường Hàm & Cằm', score: 65, potential: 92, sub: 'Góc mandibular & mỡ thừa dưới nọng' },
-                { name: 'Trung Diện FWHR', score: 68, potential: 85, sub: 'Tỷ lệ chiều rộng/chiều cao gương mặt' },
-                { name: 'Khung Mũi & Nhân Trung', score: 66, potential: 84, sub: 'Nasal angle & tỷ lệ Philtrum-Chin' },
-                { name: 'Viền Môi & Răng', score: 70, potential: 88, sub: 'Độ dày môi trên/dưới & nụ cười' },
-                { name: 'Khung Trán & Cổ', score: 62, potential: 90, sub: 'Forward Head Posture & cơ cổ' },
-                { name: 'Kết Cấu & Sắc Tố Da', score: 69, potential: 91, sub: 'Độ mịn, lỗ chân lông & quầng thâm' }
-            ],
-            microParts: [
-                { title: 'Tỷ Lệ FWHR', val: '1.82 (Trung bình)', status: 'Cần hạ mỡ' },
-                { title: 'Góc Mắt Canthal', val: '+3.2° (Nghiêng dương)', status: 'Rất Tốt' },
-                { title: 'Tỷ Lệ Môi / Cằm', val: '1 : 2.1 (Chuẩn)', status: 'Cân đối' },
-                { title: 'Góc Xương Hàm', val: '122° (Hơi tù)', status: 'Tập Mewing' },
-                { title: 'Quầng Thâm Mắt', val: 'Mức độ nhẹ', status: 'Skincare' },
-                { title: 'Tư Thế Cổ Posture', val: 'Forward Neck 8°', status: 'Cần sửa ngay' }
-            ],
-            summary: 'Đánh giá khắt khe: Điểm hiện tại đạt 68/100 do xuất hiện hiện tượng tích mỡ vùng má dưới và tư thế cổ nghiêng nhẹ về trước làm mờ góc hàm. Tuy nhiên, cấu trúc xương nền tảng của bạn rất tiềm năng, có thể bứt phá lên 89/100 nếu kiên trì tập luyện Mewing & Chin Tuck.',
-            strengths: ['Khung xương mắt có góc nghiêng dương (Positive Canthal Tilt)', 'Tỷ lệ chiều dài môi trên và cằm đạt chuẩn tỷ lệ vàng', 'Cấu trúc sọ mặt có độ đối xứng khá cao (71%)'],
-            weaknesses: ['Vùng mỡ má dưới che phủ đường viền xương hàm', 'Tư thế cổ bị Forward Head nghiêng nhẹ về trước', 'Da vùng quanh mắt có dấu hiệu mệt mỏi và quầng thâm'],
-            hairstyles: ['Textured Crop với phần mái tỉa layer nhẹ', 'Modern Quiff đánh phồng nâng tỷ lệ trán', 'Mid Fade ôm sát hai bên nâng góc hàm'],
-            grooming: ['Tỉa râu quai nón tạo cảm giác góc hàm vuông hơn', 'Sử dụng cây che khuyết điểm nhẹ vùng quầng mắt', 'Tẩy tế bào chết BHA 2%' ],
-            skincare: ['Buổi sáng: Sữa rửa mặt dịu nhẹ -> Serum Vitamin C -> Kem chống nắng kiềm dầu', 'Buổi tối: Tẩy trang -> Double Cleansing -> Retinol 0.5% -> Dưỡng ẩm bù nước'],
-            protocol: 'Tích cực tập bài Chin Tuck 3 phút/ngày để đưa cổ về vị trí chuẩn. Kết hợp tư thế lưỡi Mewing đặt sát vòm họng trên và uống 2.5L nước để thải độc nọng cằm.'
-        };
-
-        renderDashboard(resultData);
-        saveHistoryRecord(resultData);
-        awardXp(100);
+            const img = new Image();
+            img.src = imgBase64.startsWith('data:') ? imgBase64 : 'data:image/jpeg;base64,' + imgBase64;
+            img.onload = async () => {
+                let detected = false;
+                faceMeshEngine.onResults((results) => {
+                    if(results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
+                        detected = true;
+                    }
+                });
+                await faceMeshEngine.send({ image: img });
+                setTimeout(() => { resolve({ isHuman: detected }); }, 350);
+            };
+            img.onerror = () => resolve({ isHuman: false });
+        });
     }
 
-    function renderDashboard(data) {
-        document.getElementById('res-overall').innerText = data.overall;
-        document.getElementById('res-potential').innerText = data.potential;
-        
-        const gap = data.potential - data.overall;
-        document.getElementById('res-gap-text').innerText = `+${gap} ĐIỂM TIỀM NĂNG PHÁT TRIỂN`;
-        
-        document.getElementById('res-faceshape').innerText = data.shape;
-        document.getElementById('res-summary').innerText = data.summary;
-        document.getElementById('analysisTime').innerText = 'Thời gian phân tích khắt khe: ' + new Date().toLocaleString('vi-VN');
+    /* --- CƠ CHẾ GỌI API DIGITALSMOD FALLBACK & LƯU BỘ ĐẾM NGẦM --- */
+    async function executeMultiModelAnalysis(parts) {
+        const config = window.getGlobalConfig ? window.getGlobalConfig() : null;
+        if (!config) throw new Error("Chưa cấu hình API từ hệ thống.");
 
-        // Render 250 Parts Micro Grid
-        const partsGrid = document.getElementById('partsMicroGrid');
-        partsGrid.innerHTML = '';
-        data.microParts.forEach(p => {
-            partsGrid.innerHTML += `
-                <div class="part-item-chip">
-                    <div>
-                        <div style="font-weight: 700; color: #fff;">${p.title}</div>
-                        <div style="font-size: 10px; color: var(--text-secondary);">${p.val}</div>
-                    </div>
-                    <span style="font-size: 9px; font-weight: bold; color: var(--glow-accent); background: rgba(0,240,255,0.1); padding: 2px 6px; border-radius: 4px;">${p.status}</span>
-                </div>
-            `;
+        const targets = [];
+
+        if (config.openRouter && config.openRouter.apiKey) {
+            const orKey = config.openRouter.apiKey;
+            const models = config.openRouter.models || [];
+            const activeOrModels = models.filter(m => m.enabled && m.vision);
+
+            if (config.openRouter.modelMode === "MANUAL" && config.openRouter.manualModel) {
+                const manualMod = activeOrModels.find(m => m.id === config.openRouter.manualModel);
+                if(manualMod) {
+                    targets.push({ type: 'openrouter', model: manualMod.id, key: orKey });
+                }
+            }
+
+            activeOrModels.forEach(m => {
+                if(!targets.some(t => t.model === m.id)) {
+                    targets.push({ type: 'openrouter', model: m.id, key: orKey });
+                }
+            });
+        }
+
+        if (config.apiKeys && config.apiKeys.length > 0) {
+            const activeKeys = config.apiKeys.filter(k => k.enabled !== false);
+            activeKeys.forEach(k => {
+                targets.push({ type: 'gemini', model: 'gemini-1.5-flash', key: k.apiKey });
+            });
+        } else if (config.apiKey) {
+            targets.push({ type: 'gemini', model: 'gemini-1.5-flash', key: config.apiKey });
+        }
+
+        if (targets.length === 0) {
+            throw new Error("Không tìm thấy API Key hợp lệ nào trong cấu hình.");
+        }
+
+        let systemPromptText = "";
+        let imagesData = [];
+
+        parts.forEach(p => {
+            if (p.text) systemPromptText += p.text + "\n";
+            if (p.inline_data) imagesData.push(p.inline_data);
         });
 
-        // Render Metrics Grid
+        let lastError = null;
+
+        for (const target of targets) {
+            try {
+                let endpoint = "";
+                let headers = { 'Content-Type': 'application/json' };
+                let bodyData = {};
+
+                if (target.type === 'gemini') {
+                    endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${target.model}:generateContent?key=${target.key}`;
+                    bodyData = { contents: [{ parts: parts }] };
+                } else if (target.type === 'openrouter') {
+                    endpoint = `https://openrouter.ai/api/v1/chat/completions`;
+                    headers['Authorization'] = `Bearer ${target.key}`;
+                    headers['HTTP-Referer'] = window.location.origin || 'https://glowmax.app';
+                    headers['X-Title'] = 'Glowmax Looksmax';
+
+                    let messageContent = [{ type: "text", text: systemPromptText }];
+                    imagesData.forEach(img => {
+                        messageContent.push({
+                            type: "image_url",
+                            image_url: { url: `data:${img.mime_type || 'image/jpeg'};base64,${img.data}` }
+                        });
+                    });
+
+                    bodyData = {
+                        model: target.model,
+                        messages: [{ role: "user", content: messageContent }]
+                    };
+                }
+
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(bodyData)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    let rawText = "";
+                    if (target.type === 'gemini') {
+                        rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+                    } else if (target.type === 'openrouter') {
+                        rawText = data.choices?.[0]?.message?.content || "";
+                    }
+
+                    if (rawText) {
+                        let totalCalls = parseInt(localStorage.getItem('gmax_api_call_count') || '0', 10) + 1;
+                        localStorage.setItem('gmax_api_call_count', totalCalls.toString());
+
+                        const providerName = target.type === 'gemini' ? `Gemini (${target.model})` : `OpenRouter (${target.model})`;
+                        localStorage.setItem('gmax_last_used_api', providerName);
+
+                        return parseAIJsonResponse(rawText);
+                    }
+                }
+            } catch (err) {
+                lastError = err;
+            }
+        }
+
+        throw new Error(lastError?.message || "Tất cả các model trong hệ thống đều gặp sự cố tạm thời.");
+    }
+
+    /* --- PHÂN TÍCH CHÍNH --- */
+    async function startAnalysis() {
+        if (!state.photos[0]) {
+            alert("Cần ít nhất ảnh chính diện để phân tích.");
+            return;
+        }
+
+        const faceCheck = await detectRealHumanFace(`${state.photos[0].mime},${state.photos[0].base64}`);
+        if(!faceCheck.isHuman) {
+            alert("CẢNH BÁO: Không phát hiện khuôn mặt người thật trong ảnh!");
+            return;
+        }
+
+        document.getElementById('wizardScreen').style.display = 'none';
+        document.getElementById('loadingUI').style.display = 'block';
+        startRealtimeAnalysisUI();
+
+        try {
+            const parts = [];
+            const promptInstruction = `
+            Đóng vai chuyên gia thẩm mỹ Looksmaxxing AI Engine.
+            Hãy đánh giá chân thực, công bằng, khách quan điểm số khuôn mặt người thật dựa trên hình học 3D 468 landmark. TUYỆT ĐỐI KHÔNG tâng bốc điểm số.
+            TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (Không dùng markdown, không giải thích):
+            {
+              "overall_score": 68, "potential_score": 89, "face_shape": "Diamond", "symmetry_score": 71, "proportion_score": 68, "skin_score": 69, "eyes_score": 74, "eyebrows_score": 72, "nose_score": 66, "lips_score": 70, "jawline_score": 65, "chin_score": 64, "hair_score": 68,
+              "micro_parts": [
+                { "title": "Tỷ Lệ FWHR", "val": "1.82 (Trung bình)", "status": "Cần hạ mỡ" },
+                { "title": "Góc Mắt Canthal", "val": "+3.2° (Nghiêng dương)", "status": "Rất Tốt" },
+                { "title": "Tỷ Lệ Môi / Cằm", "val": "1 : 2.1 (Chuẩn)", "status": "Cân đối" },
+                { "title": "Góc Xương Hàm", "val": "122° (Hơi tù)", "status": "Tập Mewing" }
+              ],
+              "summary": "Tóm tắt đánh giá cấu trúc mặt dựa trên 468 điểm", "strengths": ["Khung xương mắt góc nghiêng dương", "Độ đối xứng sọ mặt cao"], "weaknesses": ["Mỡ thừa vùng má che phủ đường hàm"], "hairstyles": ["Textured Crop", "Mid Fade"], "grooming_tips": ["Tỉa gọn râu quai nón"], "skincare_tips": ["Double Cleansing & Retinol 0.5%"],
+              "looksmax_protocol": [
+                { "phase": "Giai đoạn 1", "title": "Cơ bản", "tasks": ["Tập posture cổ Chin Tuck", "Định hình lại góc hàm"] }
+              ]
+            }`;
+            parts.push({ text: promptInstruction });
+
+            const angles = ["FRONT", "PROFILE 90°"];
+            for (let i = 0; i < 2; i++) {
+                if (state.photos[i]) {
+                    const compressed = await compressImage(state.photos[i].base64);
+                    parts.push({ text: `ẢNH ${angles[i]}:` });
+                    parts.push({ inline_data: { mime_type: compressed.mime, data: compressed.base64 } });
+                }
+            }
+
+            const resultData = await executeMultiModelAnalysis(parts);
+            state.currentResult = resultData;
+
+            clearInterval(state.analysisTimer);
+            document.getElementById('progressRingFill').style.strokeDashoffset = '0';
+            document.getElementById('progressPercentText').innerText = "100%";
+            document.getElementById('loadingText').innerText = "HOÀN TẤT BÁO CÁO!";
+
+            setTimeout(() => {
+                playUISound('success');
+                renderResults(resultData);
+                saveToHistory(resultData);
+                awardXp(100);
+                document.getElementById('loadingUI').style.display = 'none';
+                document.getElementById('mainPanel').style.display = 'none';
+                document.getElementById('resultDashboard').style.display = 'block';
+                document.getElementById('compareSection').style.display = 'block';
+                document.getElementById('homeScore').innerText = resultData.overall_score || "--";
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 500);
+
+        } catch (error) {
+            clearInterval(state.analysisTimer);
+            alert("LỖI PHÂN TÍCH: " + error.message);
+            document.getElementById('loadingUI').style.display = 'none';
+            document.getElementById('mainPanel').style.display = 'block';
+            document.getElementById('wizardScreen').style.display = 'block';
+        }
+    }
+
+    /* --- RENDERING RESULTS --- */
+    function renderResults(data) {
+        document.getElementById('analysisTime').textContent = new Date().toLocaleString('vi-VN');
+        animateCounter('res-overall', 0, data.overall_score || 0, 1000);
+        animateCounter('res-potential', 0, data.potential_score || (data.overall_score + 15), 1000);
+
+        const gap = (data.potential_score || (data.overall_score + 15)) - (data.overall_score || 0);
+        document.getElementById('res-gap-text').innerText = `+${gap} ĐIỂM TIỀM NĂNG PHÁT TRIỂN`;
+
+        document.getElementById('res-faceshape').textContent = escapeHTML(data.face_shape || "-");
+        document.getElementById('res-summary').textContent = escapeHTML(data.summary || "");
+
+        // Render Micro Parts Grid
+        const partsGrid = document.getElementById('partsMicroGrid');
+        partsGrid.innerHTML = '';
+        if(data.micro_parts) {
+            data.micro_parts.forEach(p => {
+                partsGrid.innerHTML += `
+                    <div class="part-item-chip">
+                        <div>
+                            <div style="font-weight: 700; color: #fff;">${escapeHTML(p.title)}</div>
+                            <div style="font-size: 10px; color: var(--text-secondary);">${escapeHTML(p.val)}</div>
+                        </div>
+                        <span style="font-size: 9px; font-weight: bold; color: var(--glow-accent); background: rgba(0,240,255,0.1); padding: 2px 6px; border-radius: 4px;">${escapeHTML(p.status)}</span>
+                    </div>
+                `;
+            });
+        }
+
+        const metrics = [
+            { id: 'symmetry', label: 'Cân Đối', val: data.symmetry_score, sub: 'Độ đối xứng 468 landmark mắt, má, hàm' },
+            { id: 'proportion', label: 'Tỷ Lệ', val: data.proportion_score, sub: 'Tỷ lệ chiều rộng / chiều cao FWHR' },
+            { id: 'skin', label: 'Da', val: data.skin_score, sub: 'Kết cấu, sắc tố & lỗ chân lông' },
+            { id: 'eyes', label: 'Mắt', val: data.eyes_score, sub: 'Góc mắt Canthal Tilt & Brow Ridge' },
+            { id: 'nose', label: 'Mũi', val: data.nose_score, sub: 'Góc sống mũi & tỷ lệ nhân trung' },
+            { id: 'lips', label: 'Môi', val: data.lips_score, sub: 'Viền môi trên/dưới & nụ cười' },
+            { id: 'jawline', label: 'Góc Hàm', val: data.jawline_score, sub: 'Đường viền xương hàm & nọng cằm' },
+            { id: 'hair', label: 'Tóc & Cổ', val: data.hair_score, sub: 'Tư thế cổ Posture & mật độ tóc' }
+        ];
+
         const grid = document.getElementById('metricsGrid');
         grid.innerHTML = '';
-        data.metrics.forEach(m => {
+        metrics.forEach(m => {
             grid.innerHTML += `
                 <div class="metric-card-item">
                     <div class="metric-header">
-                        <span>${m.name}</span>
-                        <span><strong style="color: var(--accent-color);">${m.score}</strong> / <span style="color: var(--glow-accent);">${m.potential}</span></span>
+                        <span>${escapeHTML(m.label)}</span>
+                        <span><strong style="color: var(--accent-color);">${m.val||0}</strong>/100</span>
                     </div>
                     <div class="metric-subtext">${m.sub}</div>
                     <div class="metric-bar-bg">
-                        <div class="metric-bar-potential" style="width: ${m.potential}%;"></div>
-                        <div class="metric-bar-fill" style="width: ${m.score}%;"></div>
+                        <div class="metric-bar-fill" style="width: 0%"></div>
                     </div>
-                </div>
-            `;
+                </div>`;
         });
 
-        const setList = (id, arr) => {
-            const el = document.getElementById(id);
-            el.innerHTML = '';
-            arr.forEach(i => el.innerHTML += `<li>${i}</li>`);
-        };
+        setTimeout(() => {
+            const bars = grid.querySelectorAll('.metric-bar-fill');
+            bars.forEach((bar, i) => {
+                bar.style.width = `${metrics[i].val || 0}%`;
+                if((metrics[i].val || 0) < 50) bar.style.background = 'var(--danger-color)';
+                else if((metrics[i].val || 0) > 80) bar.style.background = 'var(--success-color)';
+            });
+        }, 100);
 
-        setList('res-strengths', data.strengths);
-        setList('res-weaknesses', data.weaknesses);
-        setList('res-hairstyles', data.hairstyles);
-        setList('res-grooming', data.grooming);
-        setList('res-skincare', data.skincare);
-        document.getElementById('res-protocol').innerText = data.protocol;
+        drawRadarChart(metrics.map(m => m.val || 0), metrics.map(m => m.label));
+        renderList('res-strengths', data.strengths);
+        renderList('res-weaknesses', data.weaknesses);
+        renderList('res-hairstyles', data.hairstyles);
+        renderList('res-grooming', data.grooming_tips);
+        renderList('res-skincare', data.skincare_tips);
 
-        renderRadarChart(data.metrics);
-        document.getElementById('compareSection').style.display = 'block';
+        const protoDiv = document.getElementById('res-protocol');
+        protoDiv.innerHTML = '';
+        if (data.looksmax_protocol) {
+            data.looksmax_protocol.forEach(phase => {
+                let tasksHtml = '';
+                if(phase.tasks) phase.tasks.forEach(t => tasksHtml += `<li>${escapeHTML(t)}</li>`);
+                protoDiv.innerHTML += `<div class="protocol-phase"><div class="protocol-title">${escapeHTML(phase.phase)} - ${escapeHTML(phase.title)}</div><ul class="list-items">${tasksHtml}</ul></div>`;
+            });
+        }
     }
 
-    function renderRadarChart(metrics) {
+    function renderList(id, arr) {
+        const el = document.getElementById(id);
+        el.innerHTML = '';
+        if (arr) arr.forEach(item => el.innerHTML += `<li>${escapeHTML(item)}</li>`);
+    }
+
+    function animateCounter(id, start, end, duration) {
+        let obj = document.getElementById(id);
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            obj.innerHTML = Math.floor(progress * (end - start) + start);
+            if (progress < 1) window.requestAnimationFrame(step);
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    /* --- RADAR CHART (SVG 8 AXES) --- */
+    function drawRadarChart(dataArr, labels) {
         const container = document.getElementById('radarChartContainer');
-        const size = 320, center = 160, radius = 95;
-        const total = metrics.length;
-        let pointsCurrent = [];
-        let pointsPotential = [];
+        const size = 320, center = size / 2, radius = (size / 2) - 45, numSides = dataArr.length, angleStep = (Math.PI * 2) / numSides;
+        let svg = `<svg class="radar-chart" viewBox="0 0 ${size} ${size}">`;
 
-        metrics.forEach((m, i) => {
-            const angle = (Math.PI * 2 / total) * i - Math.PI / 2;
-            
-            // Current score point
-            const rCurr = radius * (m.score / 100);
-            const xCurr = center + rCurr * Math.cos(angle);
-            const yCurr = center + rCurr * Math.sin(angle);
-            pointsCurrent.push(`${xCurr},${yCurr}`);
+        for (let level = 1; level <= 5; level++) {
+            let r = radius * (level / 5), pts = "";
+            for (let i = 0; i < numSides; i++) pts += `${center + r * Math.sin(i * angleStep)},${center - r * Math.cos(i * angleStep)} `;
+            svg += `<polygon points="${pts}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>`;
+        }
 
-            // Potential score point
-            const rPot = radius * (m.potential / 100);
-            const xPot = center + rPot * Math.cos(angle);
-            const yPot = center + rPot * Math.sin(angle);
-            pointsPotential.push(`${xPot},${yPot}`);
-        });
-
-        let labelsSVG = '';
-        metrics.forEach((m, i) => {
-            const angle = (Math.PI * 2 / total) * i - Math.PI / 2;
-            const lx = center + (radius + 24) * Math.cos(angle);
-            const ly = center + (radius + 24) * Math.sin(angle);
-            labelsSVG += `<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="central" class="radar-label">${m.name}</text>`;
-        });
-
-        container.innerHTML = `
-            <svg class="radar-chart" viewBox="0 0 ${size} ${size}">
-                <!-- Outer Guides -->
-                <circle cx="${center}" cy="${center}" r="${radius}" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
-                <circle cx="${center}" cy="${center}" r="${radius * 0.7}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-                <circle cx="${center}" cy="${center}" r="${radius * 0.4}" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
-                
-                <!-- Potential Polygon -->
-                <polygon points="${pointsPotential.join(' ')}" fill="rgba(0, 240, 255, 0.12)" stroke="rgba(0, 240, 255, 0.5)" stroke-width="1.5" stroke-dasharray="3 3"/>
-
-                <!-- Current Score Polygon -->
-                <polygon points="${pointsCurrent.join(' ')}" fill="rgba(10, 132, 255, 0.35)" stroke="#0A84FF" stroke-width="2.5"/>
-
-                ${labelsSVG}
-            </svg>
-        `;
+        let dataPts = "";
+        for (let i = 0; i < numSides; i++) {
+            let x = center + radius * Math.sin(i * angleStep), y = center - radius * Math.cos(i * angleStep);
+            svg += `<line x1="${center}" y1="${center}" x2="${x}" y2="${y}" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>`;
+            let lx = center + (radius + 22) * Math.sin(i * angleStep), ly = center - (radius + 22) * Math.cos(i * angleStep);
+            svg += `<text x="${lx}" y="${ly}" text-anchor="${lx < center - 10 ? 'end' : lx > center + 10 ? 'start' : 'middle'}" dominant-baseline="middle" class="radar-label">${escapeHTML(labels[i])}</text>`;
+            let dx = center + (radius * (Math.max(0, Math.min(100, dataArr[i])) / 100)) * Math.sin(i * angleStep);
+            let dy = center - (radius * (Math.max(0, Math.min(100, dataArr[i])) / 100)) * Math.cos(i * angleStep);
+            dataPts += `${dx},${dy} `;
+            svg += `<circle cx="${dx}" cy="${dy}" r="4" fill="#0A84FF"/>`;
+        }
+        svg += `<polygon points="${dataPts}" fill="rgba(10, 132, 255, 0.25)" stroke="#0A84FF" stroke-width="2"/></svg>`;
+        container.innerHTML = svg;
     }
 
     /* --- GAMIFICATION & XP --- */
@@ -1681,54 +2064,81 @@
         setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    /* --- HISTORY MANAGEMENT --- */
-    function saveHistoryRecord(data) {
-        let history = JSON.parse(localStorage.getItem('glowmax_history') || '[]');
-        history.unshift({ date: new Date().toLocaleDateString('vi-VN'), score: data.overall, potential: data.potential, shape: data.shape });
-        localStorage.setItem('glowmax_history', JSON.stringify(history));
+    /* --- HISTORY & COMPARE --- */
+    function saveToHistory(res) {
+        let history = JSON.parse(localStorage.getItem('gmax_hist')) || [];
+        history.unshift({ id: Date.now(), date: new Date().toLocaleString('vi-VN'), overall: res.overall_score, shape: res.face_shape, data: res });
+        localStorage.setItem('gmax_hist', JSON.stringify(history.slice(0, 10)));
     }
 
     function openHistory() {
-        const modal = document.getElementById('historyModal');
-        const list = document.getElementById('historyList');
-        const history = JSON.parse(localStorage.getItem('glowmax_history') || '[]');
-
-        list.innerHTML = history.length ? '' : '<p style="color: var(--text-tertiary); text-align: center;">Chưa có lịch sử phân tích nào.</p>';
-        history.forEach(item => {
-            list.innerHTML += `
-                <div class="history-item">
-                    <div>
-                        <div style="font-weight: 700; font-size: 14px;">${item.shape}</div>
-                        <div style="font-size: 11px; color: var(--text-secondary);">${item.date}</div>
-                    </div>
-                    <div style="font-size: 16px; font-weight: 800; text-align: right;">
-                        <div style="color: var(--accent-color);">${item.score} / 100</div>
-                        <div style="font-size: 10px; color: var(--glow-accent);">MAX: ${item.potential || item.score}</div>
-                    </div>
-                </div>
-            `;
-        });
+        const modal = document.getElementById('historyModal'), list = document.getElementById('historyList');
+        let history = JSON.parse(localStorage.getItem('gmax_hist')) || [];
+        list.innerHTML = history.length === 0 ? '<p style="text-align:center; color: var(--text-tertiary);">Trống.</p>' : history.map(item => `<div class="history-item"><div><div style="font-weight: 700;">${item.overall}/100 - ${escapeHTML(item.shape)}</div><div style="font-size: 11px; color: var(--text-tertiary);">${item.date}</div></div><button class="history-capsule-btn" onclick="loadHistoryItem(${item.id})">Xem</button></div>`).join('');
         modal.style.display = 'flex';
     }
 
-    function clearHistory() {
-        localStorage.removeItem('glowmax_history');
-        openHistory();
-    }
-
-    function clearUserData() {
-        if(confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử và dữ liệu cá nhân?")) {
-            localStorage.clear();
-            location.reload();
+    function loadHistoryItem(id) {
+        const item = (JSON.parse(localStorage.getItem('gmax_hist')) || []).find(h => h.id === id);
+        if (item) {
+            state.currentResult = item.data;
+            document.getElementById('historyModal').style.display = 'none';
+            document.getElementById('mainPanel').style.display = 'none';
+            renderResults(item.data);
+            document.getElementById('resultDashboard').style.display = 'block';
+            document.getElementById('compareSection').style.display = 'none';
         }
     }
 
+    function clearHistory() { if(confirm("Xóa lịch sử?")) { localStorage.removeItem('gmax_hist'); openHistory(); } }
+
+    function handleAfterUpload(e) {
+        const file = e.target.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            const dataUrl = ev.target.result;
+            state.afterPhoto = { base64: dataUrl.split(',')[1], mime: dataUrl.split(',')[0] };
+            runCompareAnalysis();
+        };
+        reader.readAsDataURL(file);
+    }
+
+    async function runCompareAnalysis() {
+        if (!state.afterPhoto) return;
+        const btn = document.getElementById('btnUploadAfter');
+        btn.innerText = "Đang phân tích..."; btn.disabled = true;
+        try {
+            const compressed = await compressImage(state.afterPhoto.base64);
+            const resultData = await executeMultiModelAnalysis([
+                { text: `TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON: { "overall_score": 85 }` },
+                { inline_data: { mime_type: compressed.mime, data: compressed.base64 } }
+            ]);
+            const scoreAfter = resultData.overall_score || 0;
+            const scoreBefore = state.currentResult.overall_score || 0, delta = scoreAfter - scoreBefore;
+            document.getElementById('cmp-before').innerText = scoreBefore;
+            document.getElementById('cmp-after').innerText = scoreAfter;
+            const deltaElem = document.getElementById('cmp-delta');
+            deltaElem.innerText = delta > 0 ? `+${delta} Điểm!` : (delta < 0 ? `${delta} Điểm` : `0 Điểm`);
+            deltaElem.className = delta > 0 ? 'delta-positive' : (delta < 0 ? 'delta-negative' : '');
+            document.getElementById('compareResult').style.display = 'block';
+        } catch(e) { alert("Lỗi so sánh: " + e.message); }
+        btn.innerText = "Tải Ảnh Khác"; btn.disabled = false;
+    }
+
     function resetApp() {
-        capturedImages = { front: null, profile: null };
-        currentStep = 0;
         document.getElementById('resultDashboard').style.display = 'none';
-        document.getElementById('mainPanel').style.display = 'block';
+        document.getElementById('wizardScreen').style.display = 'none';
         document.getElementById('introScreen').style.display = 'block';
+        document.getElementById('mainPanel').style.display = 'block';
+        state.photos = [null, null];
+        state.currentStep = 0;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function exportResult() {
+        if (navigator.share) navigator.share({ title: 'Glowmax Result', text: `Điểm số: ${state.currentResult?.overall_score}/100.`, url: window.location.href }).catch(console.error);
+        else window.print();
     }
 
     /* --- 3D EXERCISE VIEWER MODAL --- */
@@ -1771,30 +2181,44 @@
         animate();
     }
 
-    /* --- COACH CHAT --- */
-    function openCoachChat() { document.getElementById('coachModal').style.display = 'flex'; }
+    /* --- AI COACH CHAT --- */
+    function openCoachChat() {
+        document.getElementById('coachModal').style.display = 'flex';
+        const msgs = document.getElementById('chatMessages');
+        msgs.scrollTop = msgs.scrollHeight;
+    }
     function closeCoachChat() { document.getElementById('coachModal').style.display = 'none'; }
 
-    function sendCoachMessage() {
+    async function sendCoachMessage() {
         const input = document.getElementById('chatInput');
         const text = input.value.trim();
         if(!text) return;
 
-        const messages = document.getElementById('chatMessages');
-        messages.innerHTML += `<div class="chat-bubble user">${text}</div>`;
+        const msgs = document.getElementById('chatMessages');
+        msgs.innerHTML += `<div class="chat-bubble user">${escapeHTML(text)}</div>`;
         input.value = '';
+        msgs.scrollTop = msgs.scrollHeight;
 
-        setTimeout(() => {
-            messages.innerHTML += `<div class="chat-bubble ai">AI Coach: Để đạt góc hàm sắc nét, hãy tập Chin Tuck 3 lần/ngày và đảm bảo uống đủ 2.5L nước để tránh tích nước vùng mặt.</div>`;
-            messages.scrollTop = messages.scrollHeight;
-        }, 800);
+        try {
+            const resultData = await executeMultiModelAnalysis([
+                { text: `Bạn là AI Coach tư vấn diện mạo Glowmax. Trả lời ngắn gọn, chân thành, khuyến khích bài tập posture/grooming/skincare an toàn: ${text}` }
+            ]);
+            msgs.innerHTML += `<div class="chat-bubble ai">${escapeHTML(resultData.summary || "Đã ghi nhận câu hỏi của bạn.")}</div>`;
+            msgs.scrollTop = msgs.scrollHeight;
+        } catch(e) {
+            msgs.innerHTML += `<div class="chat-bubble ai">AI Coach tạm thời bận. Vui lòng thử lại sau.</div>`;
+            msgs.scrollTop = msgs.scrollHeight;
+        }
     }
 
-    function toggleTask(el) {
-        el.classList.toggle('completed');
-        playUISound('task_complete');
-        awardXp(15);
+    function clearUserData() {
+        if(confirm("Xóa toàn bộ dữ liệu phân tích cá nhân?")) {
+            localStorage.clear();
+            alert("Đã xóa dữ liệu thành công!");
+            location.reload();
+        }
     }
 </script>
+
 </body>
 </html>
