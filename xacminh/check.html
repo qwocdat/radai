@@ -253,12 +253,13 @@ header.top .titles p{font-size:14px; color:var(--text-secondary); margin:0;}
   transition:transform .4s cubic-bezier(.22,1,.36,1);
   backdrop-filter:blur(var(--blur));
   -webkit-backdrop-filter:blur(var(--blur));
+  touch-action:none;
 }
 .sheet.open{transform:translateY(0);}
 .sheet .handle{
   width:38px; height:5px; border-radius:var(--radius-pill);
   background:var(--text-tertiary); opacity:.5;
-  margin:6px auto 16px;
+  margin:6px auto 16px; cursor:grab;
 }
 .sheet h3{font-size:18px; font-weight:700; margin:0 0 6px;}
 .sheet p.desc{font-size:14px; color:var(--text-secondary); line-height:1.5; margin:0 0 16px;}
@@ -273,7 +274,7 @@ header.top .titles p{font-size:14px; color:var(--text-secondary); margin:0;}
   border-radius:16px; border:1px solid var(--glass-border);
   background:var(--glass); color:var(--text);
   padding:12px 14px; font-size:14px; line-height:1.4;
-  margin-bottom:14px; outline:none;
+  margin-bottom:14px; outline:none; touch-action:pan-y;
 }
 .sheet textarea:focus{border-color:var(--accent);}
 .sheet .sheet-actions{display:flex; gap:10px;}
@@ -311,6 +312,15 @@ header.top .titles p{font-size:14px; color:var(--text-secondary); margin:0;}
 .success-overlay h2{font-size:22px; font-weight:700; margin:0;}
 .success-overlay p{font-size:14.5px; color:var(--text-secondary); margin:0; max-width:280px;}
 .success-overlay .unlock-btn{max-width:280px;}
+
+#netStatus{
+  position:fixed; top:12px; right:12px; z-index:250;
+  padding:4px 10px; border-radius:12px; font-size:11px; font-weight:600;
+  background:var(--glass-strong); border:1px solid var(--glass-border);
+  backdrop-filter:blur(10px); display:flex; align-items:center; gap:6px;
+}
+#netStatus .dot{width:6px; height:6px; border-radius:50%; background:var(--success);}
+#netStatus.offline .dot{background:var(--error);}
 
 #toast-host{
   position:fixed; left:0; right:0; bottom:calc(20px + var(--safe-bottom));
@@ -356,79 +366,82 @@ footer.foot{text-align:center; margin-top:26px; font-size:11.5px; color:var(--te
 </head>
 <body>
 
+<div id="netStatus"><span class="dot"></span><span id="netText">Đang kết nối</span></div>
+
 <div id="splash">
   <div class="logo-mark">
     <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12a10 10 0 1 1-3-7.1"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
   </div>
   <h1>YouTube Checker</h1>
-  <p>Dang ket noi den he thong...</p>
+  <p>Đang tải dữ liệu...</p>
 </div>
 
 <div id="app">
   <header class="top">
     <div class="titles">
       <h1>YouTube Checker</h1>
-      <p>Xac minh nhiem vu YouTube</p>
+      <p>Xác minh nhiệm vụ YouTube</p>
     </div>
-    <button class="theme-toggle" id="themeToggle" aria-label="Doi giao dien">
+    <button class="theme-toggle" id="themeToggle" aria-label="Đổi giao diện">
       <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
     </button>
   </header>
 
   <section class="glass progress-card">
     <div class="row-top">
-      <h2>Tien trinh</h2>
-      <span class="count" id="progressCount">0 / 0 nhiem vu hoan thanh</span>
+      <h2>Tiến trình</h2>
+      <span class="count" id="progressCount">0 / 0 nhiệm vụ hoàn thành</span>
     </div>
     <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-    <p class="progress-caption" id="progressCaption">Hoan thanh cac nhiem vu ben duoi de mo khoa.</p>
+    <p class="progress-caption" id="progressCaption">Hoàn thành các nhiệm vụ bên dưới để mở khóa.</p>
   </section>
 
-  <div class="section-label">Nhiem vu cua ban</div>
+  <div class="section-label">Nhiệm vụ của bạn</div>
   <section class="glass task-list" id="taskList"></section>
 
   <div class="unlock-wrap">
-    <button class="unlock-btn" id="unlockBtn" disabled>MO KHOA</button>
-    <p class="unlock-hint" id="unlockHint">Hoan thanh tat ca nhiem vu de mo khoa</p>
+    <button class="unlock-btn" id="unlockBtn" disabled>MỞ KHÓA</button>
+    <p class="unlock-hint" id="unlockHint">Hoàn thành tất cả nhiệm vụ để mở khóa</p>
   </div>
 
-  <div class="section-label">Thong ke he thong</div>
+  <div class="section-label">Thống kê hệ thống</div>
   <div class="stats-grid" id="statsGrid">
     <div class="glass stat-card">
-      <p class="s-label">Nguoi dang ky</p>
+      <p class="s-label">Người đăng ký</p>
       <p class="s-value" id="statSubs">---</p>
     </div>
     <div class="glass stat-card">
-      <p class="s-label">Luot thich</p>
+      <p class="s-label">Lượt thích</p>
       <p class="s-value" id="statLikes">---</p>
     </div>
     <div class="glass stat-card">
-      <p class="s-label">Binh luan</p>
+      <p class="s-label">Bình luận</p>
       <p class="s-value" id="statComments">---</p>
     </div>
     <div class="glass stat-card">
-      <p class="s-label">Nhiem vu hoan thanh</p>
+      <p class="s-label">Nhiệm vụ hoàn thành</p>
       <p class="s-value" id="statTasksDone">0 / 0</p>
     </div>
   </div>
 
-  <footer class="foot">Xac minh duoc thuc hien qua he thong quan ly backend Firebase.</footer>
+  <footer class="foot">Xác minh được thực hiện qua hệ thống quản lý backend.</footer>
 </div>
 
 <div class="sheet-backdrop" id="sheetBackdrop"></div>
 <div class="sheet" id="sheet">
   <div class="handle" id="sheetHandle"></div>
-  <h3 id="sheetTitle">Tieu de nhiem vu</h3>
-  <p class="desc" id="sheetDesc">Mo ta nhiem vu.</p>
+  <h3 id="sheetTitle">Tiêu đề nhiệm vụ</h3>
+  <p class="desc" id="sheetDesc">Mô tả nhiệm vụ.</p>
   <div class="sheet-status" id="sheetStatus">
-    <span>Chua xac minh</span>
+    <span>Chưa xác minh</span>
   </div>
   <div id="sheetCommentBox" style="display:none;">
-    <textarea id="commentInput" placeholder="Nhap noi dung binh luan cua ban"></textarea>
+    <p style="font-size:12px; color:var(--text-secondary); margin-bottom:6px;" id="commentRequiredLabel">Nội dung bình luận yêu cầu:</p>
+    <textarea id="commentInput" placeholder="Nhập nội dung bình luận để đối chiếu (nếu có)"></textarea>
   </div>
   <div class="sheet-actions">
-    <button class="btn-secondary" id="sheetCancel">Dong</button>
-    <button class="btn-primary" id="sheetVerify">Kiem tra</button>
+    <button class="btn-secondary" id="sheetCancel">Đóng</button>
+    <button class="btn-primary" id="sheetVerify">Kiểm tra</button>
   </div>
 </div>
 
@@ -436,16 +449,16 @@ footer.foot{text-align:center; margin-top:26px; font-size:11.5px; color:var(--te
   <div class="success-check">
     <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
   </div>
-  <h2>Xac minh thanh cong</h2>
-  <p>Ban da hoan thanh tat ca nhiem vu.</p>
-  <button class="unlock-btn" id="finalUnlockBtn">MO KHOA</button>
+  <h2>Xác minh thành công</h2>
+  <p>Bạn đã hoàn thành tất cả nhiệm vụ.</p>
+  <button class="unlock-btn" id="finalUnlockBtn">MỞ KHÓA TRUY CẬP</button>
 </div>
 
 <div id="toast-host"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getDatabase, ref, get, set, push, onValue, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { getDatabase, ref, get, set, push, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
@@ -457,66 +470,95 @@ const firebaseConfig = {
   appId: "1:685476439350:web:949054ecba7f0a0c383f97"
 };
 
-const YT_API_KEY = "AIzaSyAR-zsFqyZag3TDlSUecY696E757fLQxAo";
+const CONFIG = {
+  verificationApi: "", // Địa chỉ Backend Verification API thực tế của bạn
+  verificationTimeout: 10000
+};
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 let TASKS = [];
-let initialSubCounts = {};
-let userId = localStorage.getItem("yt_checker_uid");
-if (!userId) {
-  userId = "usr_" + Math.random().toString(36).substring(2, 9);
-  localStorage.setItem("yt_checker_uid", userId);
-}
+const userId = getOrCreateUserId();
 
 const state = {
   results: {},
   activeTaskId: null,
-  sheetBusy: false
+  sheetBusy: false,
+  userCompleted: false
 };
 
-function extractChannelId(url) {
-  if (!url) return null;
-  const match = url.match(/youtube\.com\/channel\/([a-zA-Z0-9_-]+)/);
-  if (match) return match[1];
-  return null;
+function escapeHtml(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
-async function fetchYoutubeSubCount(channelId) {
-  if (!channelId) return null;
-  try {
-    const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${channelId}&key=${YT_API_KEY}`);
-    const data = await res.json();
-    if (data.items && data.items.length > 0) {
-      return parseInt(data.items[0].statistics.subscriberCount, 10);
-    }
-  } catch (err) {
-    console.error("Loi ket noi YouTube API:", err);
+function sanitizeUrl(url) {
+  if (!url) return "#";
+  const trimmed = String(url).trim();
+  if (trimmed.startsWith("https://") || trimmed.startsWith("http://")) {
+    return trimmed;
   }
-  return null;
+  return "#";
+}
+
+function getOrCreateUserId() {
+  let uid = localStorage.getItem("yt_checker_uid");
+  if (!uid || !uid.startsWith("usr_")) {
+    uid = "usr_" + Math.random().toString(36).substring(2, 11);
+    localStorage.setItem("yt_checker_uid", uid);
+  }
+  return uid;
+}
+
+function fetchWithTimeout(url, options = {}, timeoutMs = 10000) {
+  return new Promise((resolve, reject) => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      controller.abort();
+      reject(new Error("TIMEOUT"));
+    }, timeoutMs);
+
+    fetch(url, { ...options, signal: controller.signal })
+      .then(res => {
+        clearTimeout(timer);
+        resolve(res);
+      })
+      .catch(err => {
+        clearTimeout(timer);
+        if (err.name === "AbortError") reject(new Error("TIMEOUT"));
+        else reject(err);
+      });
+  });
 }
 
 function trackUserVisit() {
-  set(ref(db, `users/${userId}/lastActive`), Date.now());
-  set(ref(db, `users/${userId}/device`), navigator.userAgent);
+  set(ref(db, `users/${userId}/lastActive`), Date.now()).catch(()=>{});
+  set(ref(db, `users/${userId}/device`), navigator.userAgent).catch(()=>{});
 }
 
 function logBypassAttempt(reason, taskId = "none") {
+  const allowedReasons = ["premature_unlock", "invalid_task", "verification_failed", "invalid_comment", "api_error", "rate_limit", "tampered_state"];
+  if (!allowedReasons.includes(reason)) reason = "verification_failed";
   push(ref(db, "bypassLogs"), {
     userId: userId,
     taskId: taskId,
     reason: reason,
     timestamp: Date.now(),
     userAgent: navigator.userAgent
-  });
+  }).catch(()=>{});
 }
 
 function showToast(message, type = "info", duration = 3000) {
   const host = document.getElementById("toast-host");
   const el = document.createElement("div");
   el.className = `toast ${type}`;
-  el.innerHTML = `<span class="dot"></span><span>${message}</span>`;
+  el.innerHTML = `<span class="dot"></span><span>${escapeHtml(message)}</span>`;
   host.appendChild(el);
   setTimeout(() => {
     el.classList.add("out");
@@ -528,31 +570,38 @@ const taskListEl = document.getElementById("taskList");
 
 function renderTasks() {
   taskListEl.innerHTML = "";
-  if (TASKS.length === 0) {
-    taskListEl.innerHTML = `<div style="padding:15px; text-align:center; color:var(--text-tertiary);">Chua co nhiem vu nao duoc cau hinh.</div>`;
+  const activeTasks = TASKS.filter(t => t.status !== "disabled" && t.status !== "maintenance");
+
+  if (activeTasks.length === 0) {
+    taskListEl.innerHTML = `<div style="padding:20px; text-align:center; color:var(--text-tertiary);">Chưa có nhiệm vụ nào được cấu hình.</div>`;
     updateProgress();
     return;
   }
 
-  TASKS.forEach(task => {
+  activeTasks.forEach(task => {
     const verified = state.results[task.id] === true;
     const row = document.createElement("div");
     row.className = `task-row${verified ? " verified" : ""}`;
     row.dataset.taskId = task.id;
+
+    let defaultIcon = `<path d="M22 12a10 10 0 1 1-3-7.1"/><polyline points="22 4 12 14.01 9 11.01"/>`;
+    if (task.type === "like") defaultIcon = `<path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>`;
+    if (task.type === "comment") defaultIcon = `<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>`;
+
     row.innerHTML = `
       <div class="task-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          ${verified ? '<polyline points="20 6 9 17 4 12"/>' : task.icon}
+          ${verified ? '<polyline points="20 6 9 17 4 12"/>' : defaultIcon}
         </svg>
       </div>
       <div class="task-body">
-        <p class="t-title">${task.title}</p>
+        <p class="t-title">${escapeHtml(task.title)}</p>
         <p class="t-status ${verified ? "verified" : ""}" id="status-${task.id}">
-          ${verified ? "Da xac minh" : "Chua xac minh"}
+          ${verified ? "Đã xác minh" : "Chưa xác minh"}
         </p>
       </div>
       <button class="task-btn ${verified ? "done" : ""}" id="btn-${task.id}">
-        ${verified ? "Da xong" : "Kiem tra"}
+        ${verified ? "Đã xong" : "Kiểm tra"}
       </button>
     `;
     taskListEl.appendChild(row);
@@ -588,9 +637,11 @@ function addRipple(e) {
 }
 
 function updateProgress() {
-  const total = TASKS.length;
-  const done = TASKS.filter(t => state.results[t.id] === true).length;
-  document.getElementById("progressCount").textContent = `${done} / ${total} nhiem vu hoan thanh`;
+  const activeTasks = TASKS.filter(t => t.status !== "disabled" && t.status !== "maintenance");
+  const total = activeTasks.length;
+  const done = activeTasks.filter(t => state.results[t.id] === true).length;
+  
+  document.getElementById("progressCount").textContent = `${done} / ${total} nhiệm vụ hoàn thành`;
   document.getElementById("progressFill").style.width = total > 0 ? `${(done / total) * 100}%` : "0%";
   document.getElementById("statTasksDone").textContent = `${done} / ${total}`;
 
@@ -599,14 +650,28 @@ function updateProgress() {
   const unlockHint = document.getElementById("unlockHint");
 
   if (total > 0 && done === total) {
-    caption.textContent = "Tat ca nhiem vu da hoan thanh";
+    caption.textContent = "Tất cả nhiệm vụ đã hoàn thành";
     unlockBtn.disabled = false;
-    unlockHint.textContent = "Ban co the mo khoa ngay bay gio";
+    unlockHint.textContent = "Bạn có thể mở khóa ngay bây giờ";
+    markUserCompletedOnce();
   } else {
-    caption.textContent = "Hoan thanh cac nhiem vu ben duoi de mo khoa.";
+    caption.textContent = "Hoàn thành các nhiệm vụ bên dưới để mở khóa.";
     unlockBtn.disabled = true;
-    unlockHint.textContent = "Hoan thanh tat ca nhiem vu de mo khoa";
+    unlockHint.textContent = "Hoàn thành tất cả nhiệm vụ để mở khóa";
   }
+}
+
+function markUserCompletedOnce() {
+  if (state.userCompleted) return;
+  get(ref(db, `users/${userId}/completed`)).then(snapshot => {
+    if (!snapshot.exists() || snapshot.val() !== true) {
+      set(ref(db, `users/${userId}/completed`), true);
+      state.userCompleted = true;
+      runTransaction(ref(db, "stats/completedUsers"), (current) => (current || 0) + 1);
+    } else {
+      state.userCompleted = true;
+    }
+  }).catch(()=>{});
 }
 
 const sheet = document.getElementById("sheet");
@@ -616,36 +681,40 @@ const sheetDesc = document.getElementById("sheetDesc");
 const sheetStatus = document.getElementById("sheetStatus");
 const sheetCommentBox = document.getElementById("sheetCommentBox");
 const commentInput = document.getElementById("commentInput");
+const commentRequiredLabel = document.getElementById("commentRequiredLabel");
 const sheetVerifyBtn = document.getElementById("sheetVerify");
 const sheetCancelBtn = document.getElementById("sheetCancel");
 
-async function openSheet(taskId) {
+function openSheet(taskId) {
   const task = TASKS.find(t => t.id === taskId);
   if (!task) return;
   state.activeTaskId = taskId;
   sheetTitle.textContent = task.title;
   sheetDesc.textContent = task.desc;
-  sheetCommentBox.style.display = task.hasComment ? "block" : "none";
-  commentInput.value = "";
+
+  if (task.type === "comment" || task.hasComment || task.commentRequired) {
+    sheetCommentBox.style.display = "block";
+    commentInput.value = "";
+    if (task.commentText) {
+      commentRequiredLabel.textContent = `Nội dung bình luận yêu cầu: "${task.commentText}"`;
+    } else {
+      commentRequiredLabel.textContent = "Yêu cầu bình luận vào bài viết/video.";
+    }
+  } else {
+    sheetCommentBox.style.display = "none";
+  }
 
   const verified = state.results[taskId] === true;
-  setSheetStatus(verified ? "Da xac minh" : "Chua xac minh", verified ? "success" : "");
-  sheetVerifyBtn.textContent = task.hasComment ? "Xac minh binh luan" : "Kiem tra";
+  setSheetStatus(verified ? "Đã xác minh" : "Chưa xác minh", verified ? "success" : "");
+  sheetVerifyBtn.textContent = (task.type === "comment" || task.hasComment) ? "Xác minh bình luận" : "Kiểm tra";
   sheetVerifyBtn.disabled = false;
 
   sheetBackdrop.classList.add("open");
   sheet.classList.add("open");
 
-  const channelId = extractChannelId(task.url);
-  if (channelId && !initialSubCounts[taskId]) {
-    const currentSubs = await fetchYoutubeSubCount(channelId);
-    if (currentSubs !== null) {
-      initialSubCounts[taskId] = currentSubs;
-    }
-  }
-
-  if (task.url) {
-    window.open(task.url, "_blank");
+  if (task.url && task.url !== "#") {
+    const cleanUrl = sanitizeUrl(task.url);
+    if (cleanUrl !== "#") window.open(cleanUrl, "_blank");
   }
 }
 
@@ -657,7 +726,7 @@ function closeSheet() {
 }
 
 function setSheetStatus(text, type = "") {
-  sheetStatus.innerHTML = `<span>${text}</span>`;
+  sheetStatus.innerHTML = `<span>${escapeHtml(text)}</span>`;
   sheetStatus.style.color = type === "success" ? "var(--success)" : type === "error" ? "var(--error)" : "var(--text)";
 }
 
@@ -668,54 +737,73 @@ sheetVerifyBtn.addEventListener("click", async () => {
   const task = TASKS.find(t => t.id === state.activeTaskId);
   if (!task) return;
 
-  if (task.hasComment && commentInput.value.trim().length === 0) {
-    setSheetStatus("Vui long nhap noi dung binh luan", "error");
-    logBypassAttempt("Gui xac minh binh luan trong", task.id);
+  if (!navigator.onLine) {
+    setSheetStatus("Không có kết nối Internet", "error");
+    showToast("Không có kết nối Internet", "error");
+    return;
+  }
+
+  if (!CONFIG.verificationApi || CONFIG.verificationApi.trim().length === 0) {
+    setSheetStatus("Chưa cấu hình hệ thống xác minh", "error");
+    showToast("Chưa cấu hình hệ thống xác minh", "error");
+    logBypassAttempt("verification_failed", task.id);
     return;
   }
 
   state.sheetBusy = true;
   sheetVerifyBtn.disabled = true;
-  setSheetStatus(`<span class="spinner"></span> Dang quet va xac minh du lieu tu YouTube...`);
+  setSheetStatus(`Đang xác minh...`);
 
-  const startTime = Date.now();
-  let isSuccess = false;
+  let verified = false;
+  let message = "Xác minh thất bại";
 
-  const channelId = extractChannelId(task.url);
-  if (channelId) {
-    const latestSubCount = await fetchYoutubeSubCount(channelId);
-    const startSubCount = initialSubCounts[task.id];
-    
-    if (latestSubCount !== null && startSubCount !== undefined) {
-      if (latestSubCount > startSubCount) {
-        isSuccess = true;
+  try {
+    const payload = {
+      action: "verify",
+      taskId: task.id,
+      taskType: task.type || "subscribe",
+      channelId: task.channelId || "",
+      videoId: task.videoId || "",
+      userId: userId,
+      commentInput: commentInput.value.trim()
+    };
+
+    const res = await fetchWithTimeout(CONFIG.verificationApi, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    }, CONFIG.verificationTimeout);
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.verified === true) {
+        verified = true;
+        message = data.message || "Xác minh thành công";
       } else {
-        isSuccess = false;
+        verified = false;
+        message = (data && data.message) ? data.message : "Chưa hoàn thành nhiệm vụ";
       }
     } else {
-      isSuccess = true;
+      verified = false;
+      message = `Lỗi máy chủ (${res.status})`;
     }
-  } else {
-    isSuccess = true;
+  } catch (err) {
+    verified = false;
+    message = err.message === "TIMEOUT" ? "Hết thời gian chờ máy chủ" : "Không thể kết nối máy chủ xác minh";
   }
 
-  const elapsedTime = Date.now() - startTime;
-  const minDelay = 2200;
-  const remainingDelay = Math.max(0, minDelay - elapsedTime);
+  if (verified === true) {
+    setSheetStatus(message, "success");
+    markTaskResult(task.id, true);
+    showToast(message, "success");
+    setTimeout(closeSheet, 800);
+  } else {
+    setSheetStatus(message, "error");
+    logBypassAttempt("verification_failed", task.id);
+  }
 
-  setTimeout(() => {
-    if (isSuccess) {
-      setSheetStatus("Xac minh thanh cong", "success");
-      markTaskResult(task.id, true);
-      showToast("Xac minh thanh cong", "success");
-      setTimeout(closeSheet, 850);
-    } else {
-      setSheetStatus("Chua phat hien tang Dang ky/Thich. Vui long kiem tra lai!", "error");
-      logBypassAttempt("Chua tang Sub/Like tren YouTube", task.id);
-    }
-    state.sheetBusy = false;
-    sheetVerifyBtn.disabled = false;
-  }, remainingDelay);
+  state.sheetBusy = false;
+  sheetVerifyBtn.disabled = false;
 });
 
 function markTaskResult(taskId, verified) {
@@ -727,26 +815,15 @@ function markTaskResult(taskId, verified) {
     void taskListEl.offsetWidth;
     taskListEl.classList.add("pulse");
   }
-  maybeShowSuccess();
-}
-
-function maybeShowSuccess() {
-  const total = TASKS.length;
-  const done = TASKS.filter(t => state.results[t.id] === true).length;
-  if (total > 0 && done === total) {
-    set(ref(db, `stats/completedUsers`), increment(1));
-    setTimeout(() => {
-      document.getElementById("successOverlay").classList.add("open");
-    }, 450);
-  }
 }
 
 document.getElementById("unlockBtn").addEventListener("click", (e) => {
   addRipple(e);
-  const done = TASKS.filter(t => state.results[t.id] === true).length;
-  if (done < TASKS.length) {
-    logBypassAttempt("Co tinh bam MO KHOA khi chua xong het", "global");
-    showToast("Ban chua hoan thanh tat ca nhiem vu!", "error");
+  const activeTasks = TASKS.filter(t => t.status !== "disabled" && t.status !== "maintenance");
+  const done = activeTasks.filter(t => state.results[t.id] === true).length;
+  if (activeTasks.length === 0 || done < activeTasks.length) {
+    logBypassAttempt("premature_unlock", "global");
+    showToast("Bạn chưa hoàn thành tất cả nhiệm vụ!", "error");
     return;
   }
   document.getElementById("successOverlay").classList.add("open");
@@ -756,14 +833,41 @@ document.getElementById("finalUnlockBtn").addEventListener("click", (e) => {
   addRipple(e);
   get(ref(db, "systemConfig")).then(snapshot => {
     const config = snapshot.val();
-    if (config && config.isMaintenance) {
-      showToast("He thong dang bao tri link. Vui long quay lai sau!", "error");
-    } else if (config && config.targetUrl) {
+    if (config && config.isMaintenance === true) {
+      showToast("Hệ thống đang bảo trì. Vui lòng quay lại sau!", "error");
+    } else if (config && config.targetUrl && config.targetUrl.startsWith("http")) {
       window.location.href = config.targetUrl;
     } else {
-      showToast("Da mo khoa thanh cong", "success");
+      showToast("Chưa cấu hình link mở khóa an toàn", "info");
     }
+  }).catch(()=>{
+    showToast("Lỗi kết nối khi lấy link mở khóa", "error");
   });
+});
+
+let touchStartY = 0, touchCurrentY = 0, dragging = false;
+sheet.addEventListener("touchstart", (e) => {
+  if (state.sheetBusy || e.target.tagName === "TEXTAREA") return;
+  touchStartY = e.touches[0].clientY;
+  dragging = true;
+  sheet.style.transition = "none";
+}, { passive: true });
+
+sheet.addEventListener("touchmove", (e) => {
+  if (!dragging || state.sheetBusy) return;
+  touchCurrentY = e.touches[0].clientY;
+  const delta = touchCurrentY - touchStartY;
+  if (delta > 0) sheet.style.transform = `translateY(${delta}px)`;
+}, { passive: true });
+
+sheet.addEventListener("touchend", () => {
+  if (!dragging) return;
+  dragging = false;
+  sheet.style.transition = "";
+  const delta = touchCurrentY - touchStartY;
+  sheet.style.transform = "";
+  if (delta > 100 && !state.sheetBusy) closeSheet();
+  touchStartY = 0; touchCurrentY = 0;
 });
 
 function loadConfigAndTasks() {
@@ -772,25 +876,32 @@ function loadConfigAndTasks() {
     TASKS = [];
     if (data) {
       Object.keys(data).forEach(key => {
+        const item = data[key];
+        let taskType = item.type || item.actionType || "subscribe";
+        if (!item.type && item.hasComment) taskType = "comment";
+
         TASKS.push({
           id: key,
-          title: data[key].title,
-          desc: data[key].desc,
-          url: data[key].url,
-          hasComment: data[key].hasComment || false,
-          icon: data[key].hasComment 
-            ? `<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>`
-            : `<path d="M22 12a10 10 0 1 1-3-7.1"/><polyline points="22 4 12 14.01 9 11.01"/>`
+          type: taskType,
+          title: item.title || "Nhiệm vụ",
+          desc: item.desc || "",
+          url: item.url || "#",
+          channelId: item.channelId || "",
+          videoId: item.videoId || "",
+          hasComment: item.hasComment || false,
+          commentRequired: item.commentRequired || false,
+          commentText: item.commentText || "",
+          status: item.status || "active"
         });
       });
     }
-    
+
     get(ref(db, `users/${userId}/tasks`)).then((userSnapshot) => {
-      if (userSnapshot.exists()) {
-        state.results = userSnapshot.val();
-      }
+      if (userSnapshot.exists()) state.results = userSnapshot.val() || {};
       renderTasks();
     });
+  }, (err) => {
+    showToast("Lỗi kết nối Firebase", "error");
   });
 
   onValue(ref(db, "stats/youtubeStats"), (snapshot) => {
@@ -802,6 +913,21 @@ function loadConfigAndTasks() {
     }
   });
 }
+
+function updateNetworkStatus() {
+  const el = document.getElementById("netStatus");
+  const txt = document.getElementById("netText");
+  if (navigator.onLine) {
+    el.classList.remove("offline");
+    txt.textContent = "Đang kết nối";
+  } else {
+    el.classList.add("offline");
+    txt.textContent = "Mất kết nối";
+  }
+}
+
+window.addEventListener("online", updateNetworkStatus);
+window.addEventListener("offline", updateNetworkStatus);
 
 function applyTheme(theme) {
   document.documentElement.setAttribute("data-theme", theme === "light" ? "light" : "dark");
@@ -820,6 +946,7 @@ document.getElementById("themeToggle").addEventListener("click", (e) => {
 });
 
 function init() {
+  updateNetworkStatus();
   trackUserVisit();
   loadConfigAndTasks();
 
@@ -827,9 +954,9 @@ function init() {
     const splash = document.getElementById("splash");
     if (splash) {
       splash.classList.add("hide");
-      setTimeout(() => splash.remove(), 600);
+      setTimeout(() => splash.remove(), 500);
     }
-  }, 1200);
+  }, 600);
 }
 
 document.addEventListener("DOMContentLoaded", init);
