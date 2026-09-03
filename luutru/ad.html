@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Tải File - Admin</title>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --panel: #1e293b;
+            --border: rgba(255, 255, 255, 0.1);
+            --primary: #3b82f6;
+            --danger: #ef4444;
+            --text: #f8fafc;
+            --text-sub: #94a3b8;
+        }
+        * { box-sizing: border-box; margin:0; padding:0; font-family: system-ui, sans-serif; }
+        body { background: var(--bg); color: var(--text); padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+
+        /* Auth Form */
+        .auth-card { max-width: 400px; margin: 80px auto; background: var(--panel); padding: 30px; border-radius: 16px; border: 1px solid var(--border); }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; font-size: 13px; color: var(--text-sub); }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: #0f172a; color: white; }
+
+        /* Dashboard */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+        .stat-card div { font-size: 12px; color: var(--text-sub); text-transform: uppercase; }
+        .stat-card h2 { font-size: 24px; margin-top: 8px; }
+
+        /* Section Panel */
+        .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+
+        /* Buttons */
+        .btn { padding: 10px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; font-size: 14px; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+        /* File Progress */
+        .upload-progress { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; margin-top: 10px; display: none; }
+        .upload-bar { height: 100%; width: 0%; background: var(--primary); transition: width 0.2s; }
+
+        /* Table */
+        table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
+        th { color: var(--text-sub); font-size: 12px; text-transform: uppercase; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 100; }
+        .modal-content { background: var(--panel); width: 100%; max-width: 500px; padding: 24px; border-radius: 16px; border: 1px solid var(--border); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="authSection" class="auth-card">
+        <h2 style="margin-bottom: 20px; text-align: center;">Xác thực Admin</h2>
+        <div class="form-group">
+            <label>Email Admin</label>
+            <input type="email" id="adminEmail" placeholder="admin@domain.com">
+        </div>
+        <div class="form-group">
+            <label>Mật khẩu</label>
+            <input type="password" id="adminPassword">
+        </div>
+        <button class="btn btn-primary" style="width: 100%;" onclick="loginAdmin()">Đăng Nhập</button>
+    </div>
+
+    <div id="adminSection" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h1>Dashboard Quản Lý File</h1>
+            <button class="btn btn-danger btn-sm" onclick="logoutAdmin()">Đăng xuất</button>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="stat-card">
+                <div>Tổng File</div>
+                <h2 id="statTotalFiles">0</h2>
+            </div>
+            <div class="stat-card">
+                <div>Tổng Lượt Tải</div>
+                <h2 id="statTotalDownloads">0</h2>
+            </div>
+            <div class="stat-card">
+                <div>Dung Lượng Đã Dùng</div>
+                <h2 id="statTotalSize">0 MB</h2>
+            </div>
+            <div class="stat-card">
+                <div>File Đang Hoạt Động</div>
+                <h2 id="statActiveFiles">0</h2>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h3>Upload File Mới</h3>
+            <div style="margin-top: 16px;">
+                <div class="form-group">
+                    <label>Chọn File từ thiết bị</label>
+                    <input type="file" id="fileInput" onchange="handleFileSelect()">
+                </div>
+                <div class="form-group">
+                    <label>Mô tả File</label>
+                    <textarea id="fileDescription" rows="2" placeholder="Nhập mô tả ngắn..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Link Thumbnail (Optional)</label>
+                    <input type="text" id="fileThumbnail" placeholder="https://...">
+                </div>
+
+                <div id="uploadInfo" style="font-size: 13px; color: var(--text-sub); display:none; margin-bottom: 10px;">
+                    File: <span id="infoName" style="color:white;"></span> | Dung lượng: <span id="infoSize" style="color:white;"></span>
+                </div>
+
+                <button class="btn btn-primary" id="uploadBtn" onclick="startUpload()" disabled>Bắt đầu Upload</button>
+
+                <div class="upload-progress" id="uploadProgress">
+                    <div class="upload-bar" id="uploadBar"></div>
+                </div>
+                <div id="uploadStatusText" style="font-size: 12px; color: var(--text-sub); margin-top: 6px;"></div>
+            </div>
+
+            <div id="linkOutput" style="display: none; margin-top: 20px; padding: 16px; background: rgba(59,130,246,0.1); border: 1px solid var(--primary); border-radius: 8px;">
+                <label style="font-size: 12px; color: var(--text-sub);">LINK TẢI XUỐNG:</label>
+                <div style="display: flex; gap: 8px; margin-top: 6px;">
+                    <input type="text" id="generatedLink" readonly style="flex:1; padding: 8px; background: #0f172a; border: 1px solid var(--border); color: white; border-radius: 4px;">
+                    <button class="btn btn-primary btn-sm" onclick="copyGeneratedLink()">COPY LINK</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <h3>Danh Sách File</h3>
+                <input type="text" id="searchInput" placeholder="Tìm kiếm file..." onkeyup="renderFileList()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: #0f172a; color: white; width: 250px;">
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tên File</th>
+                        <th>Dung Lượng</th>
+                        <th>Lượt Tải</th>
+                        <th>Trạng Thái</th>
+                        <th>Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody id="fileTableBody">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="editModal">
+    <div class="modal-content">
+        <h3 style="margin-bottom: 16px;">Sửa Thông Tin File</h3>
+        <input type="hidden" id="editFileId">
+        <div class="form-group">
+            <label>Tên hiển thị</label>
+            <input type="text" id="editFileName">
+        </div>
+        <div class="form-group">
+            <label>Mô tả</label>
+            <textarea id="editFileDesc" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Thumbnail Link</label>
+            <input type="text" id="editFileThumb">
+        </div>
+        <div class="form-group">
+            <label>Trạng Thái</label>
+            <select id="editFileStatus" style="width: 100%; padding: 10px; background: #0f172a; color: white; border-radius: 8px; border: 1px solid var(--border);">
+                <option value="true">Hoạt động (Enabled)</option>
+                <option value="false">Tạm khóa (Disabled)</option>
+            </select>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px;">
+            <button class="btn btn-sm" onclick="closeEditModal()">Hủy</button>
+            <button class="btn btn-primary btn-sm" onclick="saveFileEdit()">Lưu Cập Nhật</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Config Firebase
+    // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
+  authDomain: "quocdat-396fe.firebaseapp.com",
+  databaseURL: "https://quocdat-396fe-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "quocdat-396fe",
+  storageBucket: "quocdat-396fe.firebasestorage.app",
+  messagingSenderId: "685476439350",
+  appId: "1:685476439350:web:949054ecba7f0a0c383f97"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
+    let allFiles = [];
+    let selectedFile = null;
+
+    function formatBytes(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // XÁC THỰC BẢO MẬT
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('adminSection').style.display = 'block';
+            loadFiles();
+        } else {
+            document.getElementById('authSection').style.display = 'block';
+            document.getElementById('adminSection').style.display = 'none';
+        }
+    });
+
+    async function loginAdmin() {
+        const e = document.getElementById('adminEmail').value;
+        const p = document.getElementById('adminPassword').value;
+        try {
+            await auth.signInWithEmailAndPassword(e, p);
+        } catch (err) {
+            alert("Lỗi đăng nhập: " + err.message);
+        }
+    }
+
+    function logoutAdmin() {
+        auth.signOut();
+    }
+
+    // LOAD & FILTER FILE LIST
+    function loadFiles() {
+        db.collection('downloads').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+            allFiles = [];
+            snapshot.forEach(doc => {
+                allFiles.push({ id: doc.id, ...doc.data() });
+            });
+            updateDashboard();
+            renderFileList();
+        });
+    }
+
+    function updateDashboard() {
+        let totalDownloads = 0;
+        let totalSize = 0;
+        let activeFiles = 0;
+
+        allFiles.forEach(f => {
+            totalDownloads += (f.downloadCount || 0);
+            totalSize += (f.size || 0);
+            if (f.enabled !== false) activeFiles++;
+        });
+
+        document.getElementById('statTotalFiles').innerText = allFiles.length;
+        document.getElementById('statTotalDownloads').innerText = totalDownloads;
+        document.getElementById('statTotalSize').innerText = formatBytes(totalSize);
+        document.getElementById('statActiveFiles').innerText = activeFiles;
+    }
+
+    function renderFileList() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const tbody = document.getElementById('fileTableBody');
+        tbody.innerHTML = '';
+
+        const filtered = allFiles.filter(f => 
+            (f.name && f.name.toLowerCase().includes(query)) || 
+            (f.id && f.id.toLowerCase().includes(query))
+        );
+
+        filtered.forEach(f => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>
+                    <strong>${f.name}</strong><br>
+                    <small style="color: var(--text-sub); font-size:11px;">ID: ${f.id}</small>
+                </td>
+                <td>${formatBytes(f.size || 0)}</td>
+                <td>${f.downloadCount || 0}</td>
+                <td>
+                    <span style="color: ${f.enabled !== false ? '#10b981' : '#ef4444'}">
+                        ${f.enabled !== false ? 'Hoạt động' : 'Đã khóa'}
+                    </span>
+                </td>
+                <td>
+                    <button class="btn btn-primary btn-sm" onclick="copyLink('${f.id}')">Copy Link</button>
+                    <button class="btn btn-sm" onclick="openEditModal('${f.id}')">Sửa</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteFile('${f.id}', '${f.storagePath}')">Xóa</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // UPLOAD TẢI FILE NÂNG CAO
+    function handleFileSelect() {
+        const input = document.getElementById('fileInput');
+        if (input.files.length > 0) {
+            selectedFile = input.files[0];
+            document.getElementById('infoName').innerText = selectedFile.name;
+            document.getElementById('infoSize').innerText = formatBytes(selectedFile.size);
+            document.getElementById('uploadInfo').style.display = 'block';
+            document.getElementById('uploadBtn').disabled = false;
+        }
+    }
+
+    function startUpload() {
+        if (!selectedFile) return;
+
+        const uploadBtn = document.getElementById('uploadBtn');
+        const progressBar = document.getElementById('uploadProgress');
+        const bar = document.getElementById('uploadBar');
+        const statusText = document.getElementById('uploadStatusText');
+
+        uploadBtn.disabled = true;
+        progressBar.style.display = 'block';
+
+        const fileId = db.collection('downloads').doc().id;
+        const storagePath = `downloads/${fileId}_${selectedFile.name}`;
+        const storageRef = storage.ref(storagePath);
+
+        const uploadTask = storageRef.put(selectedFile);
+        let startTime = Date.now();
+
+        uploadTask.on('state_changed', 
+            (snapshot) => {
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                bar.style.width = progress + '%';
+                
+                const elapsedTime = (Date.now() - startTime) / 1000;
+                const speed = snapshot.bytesTransferred / elapsedTime;
+                statusText.innerText = `Đang tải lên... ${Math.round(progress)}% (${formatBytes(speed)}/s)`;
+            }, 
+            (error) => {
+                alert("Upload thất bại: " + error.message);
+                uploadBtn.disabled = false;
+                progressBar.style.display = 'none';
+            }, 
+            async () => {
+                // Thành công -> Lưu metadata Firestore
+                await db.collection('downloads').doc(fileId).set({
+                    name: selectedFile.name,
+                    description: document.getElementById('fileDescription').value,
+                    storagePath: storagePath,
+                    size: selectedFile.size,
+                    type: selectedFile.type || 'application/octet-stream',
+                    thumbnail: document.getElementById('fileThumbnail').value || '',
+                    downloadCount: 0,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    enabled: true
+                });
+
+                statusText.innerText = "Upload hoàn tất 100%!";
+                uploadBtn.disabled = false;
+
+                // Xuất link
+                const fullLink = `${window.location.origin}/taixuong.html?id=${fileId}`;
+                document.getElementById('generatedLink').value = fullLink;
+                document.getElementById('linkOutput').style.display = 'block';
+                
+                // Reset Form
+                document.getElementById('fileInput').value = '';
+                document.getElementById('fileDescription').value = '';
+                document.getElementById('fileThumbnail').value = '';
+                document.getElementById('uploadInfo').style.display = 'none';
+                selectedFile = null;
+            }
+        );
+    }
+
+    function copyLink(id) {
+        const url = `${window.location.origin}/taixuong.html?id=${id}`;
+        navigator.clipboard.writeText(url);
+        alert("Đã sao chép link!");
+    }
+
+    function copyGeneratedLink() {
+        const linkInput = document.getElementById('generatedLink');
+        linkInput.select();
+        document.execCommand('copy');
+        alert("Đã sao chép link!");
+    }
+
+    // UPDATE & DELETE FILE
+    function openEditModal(id) {
+        const file = allFiles.find(f => f.id === id);
+        if (!file) return;
+
+        document.getElementById('editFileId').value = file.id;
+        document.getElementById('editFileName').value = file.name || '';
+        document.getElementById('editFileDesc').value = file.description || '';
+        document.getElementById('editFileThumb').value = file.thumbnail || '';
+        document.getElementById('editFileStatus').value = (file.enabled !== false).toString();
+        
+        document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+
+    async function saveFileEdit() {
+        const id = document.getElementById('editFileId').value;
+        await db.collection('downloads').doc(id).update({
+            name: document.getElementById('editFileName').value,
+            description: document.getElementById('editFileDesc').value,
+            thumbnail: document.getElementById('editFileThumb').value,
+            enabled: document.getElementById('editFileStatus').value === 'true'
+        });
+        closeEditModal();
+    }
+
+    async function deleteFile(id, storagePath) {
+        if (!confirm("Bạn có chắc chắn muốn xóa file này? Thao tác này sẽ xóa vĩnh viễn cả thông tin và file lưu trữ.")) return;
+
+        try {
+            // Xóa Storage file
+            if (storagePath) {
+                await storage.ref(storagePath).delete().catch(e => console.warn("Lỗi xóa file trên Storage:", e));
+            }
+            // Xóa Firestore doc
+            await db.collection('downloads').doc(id).delete();
+            alert("Đã xóa file thành công.");
+        } catch (err) {
+            alert("Không thể xóa file: " + err.message);
+        }
+    }
+</script>
+</body>
+</html>
