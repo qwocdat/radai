@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản Lý Tải File - Admin</title>
+    <!-- Chỉ nhúng Firebase Compat SDK (Phiên bản v9 Compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
     <style>
@@ -14,134 +14,156 @@
             --panel: #1e293b;
             --border: rgba(255, 255, 255, 0.1);
             --primary: #3b82f6;
+            --primary-hover: #2563eb;
             --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --success: #10b981;
             --text: #f8fafc;
             --text-sub: #94a3b8;
         }
-        * { box-sizing: border-box; margin:0; padding:0; font-family: system-ui, sans-serif; }
-        body { background: var(--bg); color: var(--text); padding: 20px; }
+        * { box-sizing: border-box; margin:0; padding:0; font-family: system-ui, -apple-system, sans-serif; }
+        body { background: var(--bg); color: var(--text); padding: 20px 12px; }
         .container { max-width: 1000px; margin: 0 auto; }
 
-        /* Auth Form */
-        .auth-card { max-width: 400px; margin: 80px auto; background: var(--panel); padding: 30px; border-radius: 16px; border: 1px solid var(--border); }
+        /* Banner thông báo lỗi / thành công hệ thống */
+        .alert-toast {
+            position: fixed; top: 20px; right: 20px; z-index: 1000;
+            padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 500;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5); display: none;
+            max-width: 90vw; animation: fadeIn 0.3s ease;
+        }
+        .alert-toast.error { background: #7f1d1d; color: #fca5a5; border: 1px solid #ef4444; }
+        .alert-toast.success { background: #064e3b; color: #6ee7b7; border: 1px solid #10b981; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Dashboard Header & Cards */
+        .header-title { font-size: 22px; font-weight: 700; margin-bottom: 20px; }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+        .stat-card div { font-size: 11px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-card h2 { font-size: 24px; margin-top: 8px; color: var(--text); }
+
+        /* Panels */
+        .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+
+        /* Form Controls */
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; margin-bottom: 6px; font-size: 13px; color: var(--text-sub); }
-        .form-group input, .form-group textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: #0f172a; color: white; }
-
-        /* Dashboard */
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
-        .stat-card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
-        .stat-card div { font-size: 12px; color: var(--text-sub); text-transform: uppercase; }
-        .stat-card h2 { font-size: 24px; margin-top: 8px; }
-
-        /* Section Panel */
-        .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; }
-        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .form-group input, .form-group textarea, .form-group select { 
+            width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background: #0f172a; color: white; font-size: 14px;
+        }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: 1px solid var(--primary); }
 
         /* Buttons */
-        .btn { padding: 10px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; font-size: 14px; }
+        .btn { padding: 10px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; font-size: 14px; transition: background 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
         .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); }
         .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: var(--danger-hover); }
+        .btn-secondary { background: #334155; color: white; }
+        .btn-secondary:hover { background: #475569; }
         .btn-sm { padding: 6px 12px; font-size: 12px; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         /* File Progress */
-        .upload-progress { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; margin-top: 10px; display: none; }
-        .upload-bar { height: 100%; width: 0%; background: var(--primary); transition: width 0.2s; }
+        .upload-progress { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; margin-top: 12px; display: none; }
+        .upload-bar { height: 100%; width: 0%; background: var(--primary); transition: width 0.2s ease; }
 
-        /* Table */
-        table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        /* Responsive Table */
+        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; margin-top: 8px; min-width: 600px; }
         th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
-        th { color: var(--text-sub); font-size: 12px; text-transform: uppercase; }
+        th { color: var(--text-sub); font-size: 12px; text-transform: uppercase; white-space: nowrap; }
+
+        /* Helper status badges */
+        .badge { padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+        .badge-success { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+        .badge-danger { background: rgba(239, 68, 68, 0.15); color: #f87171; }
 
         /* Modal */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 100; }
-        .modal-content { background: var(--panel); width: 100%; max-width: 500px; padding: 24px; border-radius: 16px; border: 1px solid var(--border); }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 100; padding: 16px; }
+        .modal-content { background: var(--panel); width: 100%; max-width: 500px; padding: 24px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
+
+        /* Empty & Loading states */
+        .state-container { text-align: center; padding: 32px 16px; color: var(--text-sub); font-size: 14px; }
     </style>
 </head>
 <body>
 
+<div class="alert-toast" id="toastMessage"></div>
+
 <div class="container">
-    <div id="authSection" class="auth-card">
-        <h2 style="margin-bottom: 20px; text-align: center;">Xác thực Admin</h2>
-        <div class="form-group">
-            <label>Email Admin</label>
-            <input type="email" id="adminEmail" placeholder="admin@domain.com">
+    <div class="header-title">Dashboard Quản Lý File</div>
+
+    <!-- DASHBOARD THỐNG KÊ -->
+    <div class="dashboard-grid">
+        <div class="stat-card">
+            <div>TỔNG FILE</div>
+            <h2 id="statTotalFiles">0</h2>
         </div>
-        <div class="form-group">
-            <label>Mật khẩu</label>
-            <input type="password" id="adminPassword">
+        <div class="stat-card">
+            <div>TỔNG LƯỢT TẢI</div>
+            <h2 id="statTotalDownloads">0</h2>
         </div>
-        <button class="btn btn-primary" style="width: 100%;" onclick="loginAdmin()">Đăng Nhập</button>
+        <div class="stat-card">
+            <div>DUNG LƯỢNG ĐÃ DÙNG</div>
+            <h2 id="statTotalSize">0 B</h2>
+        </div>
+        <div class="stat-card">
+            <div>FILE ĐANG HOẠT ĐỘNG</div>
+            <h2 id="statActiveFiles">0</h2>
+        </div>
     </div>
 
-    <div id="adminSection" style="display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h1>Dashboard Quản Lý File</h1>
-            <button class="btn btn-danger btn-sm" onclick="logoutAdmin()">Đăng xuất</button>
+    <!-- UPLOAD FILE PANEL -->
+    <div class="panel">
+        <h3 style="font-size: 16px;">Upload File Mới</h3>
+        <div style="margin-top: 16px;">
+            <div class="form-group">
+                <label>Chọn file từ thiết bị</label>
+                <input type="file" id="fileInput" onchange="handleFileSelect()">
+            </div>
+            <div class="form-group">
+                <label>Mô tả File</label>
+                <textarea id="fileDescription" rows="2" placeholder="Nhập mô tả ngắn cho file..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Link Thumbnail (Không bắt buộc)</label>
+                <input type="text" id="fileThumbnail" placeholder="https://domain.com/image.png">
+            </div>
+
+            <div id="uploadInfo" style="font-size: 13px; color: var(--text-sub); display:none; margin-bottom: 12px;">
+                Tên file: <span id="infoName" style="color:white; font-weight: 600;"></span> | Dung lượng: <span id="infoSize" style="color:white; font-weight: 600;"></span>
+            </div>
+
+            <button class="btn btn-primary" id="uploadBtn" onclick="startUpload()" disabled>Bắt đầu Upload</button>
+
+            <div class="upload-progress" id="uploadProgress">
+                <div class="upload-bar" id="uploadBar"></div>
+            </div>
+            <div id="uploadStatusText" style="font-size: 12px; color: var(--text-sub); margin-top: 6px;"></div>
         </div>
 
-        <div class="dashboard-grid">
-            <div class="stat-card">
-                <div>Tổng File</div>
-                <h2 id="statTotalFiles">0</h2>
-            </div>
-            <div class="stat-card">
-                <div>Tổng Lượt Tải</div>
-                <h2 id="statTotalDownloads">0</h2>
-            </div>
-            <div class="stat-card">
-                <div>Dung Lượng Đã Dùng</div>
-                <h2 id="statTotalSize">0 MB</h2>
-            </div>
-            <div class="stat-card">
-                <div>File Đang Hoạt Động</div>
-                <h2 id="statActiveFiles">0</h2>
+        <!-- HIỂN THỊ LINK SAU KHI UPLOAD -->
+        <div id="linkOutput" style="display: none; margin-top: 20px; padding: 16px; background: rgba(59,130,246,0.1); border: 1px solid var(--primary); border-radius: 8px;">
+            <label style="font-size: 12px; color: var(--text-sub); font-weight: 600;">LINK TẢI XUỐNG CỦA FILE:</label>
+            <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
+                <input type="text" id="generatedLink" readonly style="flex:1; min-width: 220px; padding: 8px 12px; background: #0f172a; border: 1px solid var(--border); color: white; border-radius: 6px; font-size: 13px;">
+                <button class="btn btn-primary btn-sm" onclick="copyGeneratedLink()">COPY LINK</button>
             </div>
         </div>
+    </div>
 
-        <div class="panel">
-            <h3>Upload File Mới</h3>
-            <div style="margin-top: 16px;">
-                <div class="form-group">
-                    <label>Chọn File từ thiết bị</label>
-                    <input type="file" id="fileInput" onchange="handleFileSelect()">
-                </div>
-                <div class="form-group">
-                    <label>Mô tả File</label>
-                    <textarea id="fileDescription" rows="2" placeholder="Nhập mô tả ngắn..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Link Thumbnail (Optional)</label>
-                    <input type="text" id="fileThumbnail" placeholder="https://...">
-                </div>
-
-                <div id="uploadInfo" style="font-size: 13px; color: var(--text-sub); display:none; margin-bottom: 10px;">
-                    File: <span id="infoName" style="color:white;"></span> | Dung lượng: <span id="infoSize" style="color:white;"></span>
-                </div>
-
-                <button class="btn btn-primary" id="uploadBtn" onclick="startUpload()" disabled>Bắt đầu Upload</button>
-
-                <div class="upload-progress" id="uploadProgress">
-                    <div class="upload-bar" id="uploadBar"></div>
-                </div>
-                <div id="uploadStatusText" style="font-size: 12px; color: var(--text-sub); margin-top: 6px;"></div>
-            </div>
-
-            <div id="linkOutput" style="display: none; margin-top: 20px; padding: 16px; background: rgba(59,130,246,0.1); border: 1px solid var(--primary); border-radius: 8px;">
-                <label style="font-size: 12px; color: var(--text-sub);">LINK TẢI XUỐNG:</label>
-                <div style="display: flex; gap: 8px; margin-top: 6px;">
-                    <input type="text" id="generatedLink" readonly style="flex:1; padding: 8px; background: #0f172a; border: 1px solid var(--border); color: white; border-radius: 4px;">
-                    <button class="btn btn-primary btn-sm" onclick="copyGeneratedLink()">COPY LINK</button>
-                </div>
-            </div>
+    <!-- DANH SÁCH FILE & TÌM KIẾM -->
+    <div class="panel">
+        <div class="panel-header">
+            <h3 style="font-size: 16px;">Danh Sách File</h3>
+            <input type="text" id="searchInput" placeholder="Tìm kiếm theo tên file hoặc ID..." onkeyup="renderFileList()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: #0f172a; color: white; width: 260px; max-width: 100%;">
         </div>
 
-        <div class="panel">
-            <div class="panel-header">
-                <h3>Danh Sách File</h3>
-                <input type="text" id="searchInput" placeholder="Tìm kiếm file..." onkeyup="renderFileList()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: #0f172a; color: white; width: 250px;">
-            </div>
-
+        <div class="table-responsive">
             <table>
                 <thead>
                     <tr>
@@ -153,15 +175,21 @@
                     </tr>
                 </thead>
                 <tbody id="fileTableBody">
-                    </tbody>
+                    <tr>
+                        <td colspan="5">
+                            <div class="state-container">Đang tải danh sách file...</div>
+                        </td>
+                    </tr>
+                </tbody>
             </table>
         </div>
     </div>
 </div>
 
+<!-- MODAL EDIT FILE -->
 <div class="modal" id="editModal">
     <div class="modal-content">
-        <h3 style="margin-bottom: 16px;">Sửa Thông Tin File</h3>
+        <h3 style="margin-bottom: 16px; font-size: 18px;">Sửa Thông Tin File</h3>
         <input type="hidden" id="editFileId">
         <div class="form-group">
             <label>Tên hiển thị</label>
@@ -172,89 +200,90 @@
             <textarea id="editFileDesc" rows="3"></textarea>
         </div>
         <div class="form-group">
-            <label>Thumbnail Link</label>
+            <label>Link Thumbnail</label>
             <input type="text" id="editFileThumb">
         </div>
         <div class="form-group">
-            <label>Trạng Thái</label>
-            <select id="editFileStatus" style="width: 100%; padding: 10px; background: #0f172a; color: white; border-radius: 8px; border: 1px solid var(--border);">
-                <option value="true">Hoạt động (Enabled)</option>
-                <option value="false">Tạm khóa (Disabled)</option>
+            <label>Trạng Thái Tải Xuống</label>
+            <select id="editFileStatus">
+                <option value="true">Hoạt động (Cho phép tải)</option>
+                <option value="false">Tạm khóa (Chặn tải xuống)</option>
             </select>
         </div>
         <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px;">
-            <button class="btn btn-sm" onclick="closeEditModal()">Hủy</button>
-            <button class="btn btn-primary btn-sm" onclick="saveFileEdit()">Lưu Cập Nhật</button>
+            <button class="btn btn-secondary btn-sm" onclick="closeEditModal()">Hủy</button>
+            <button class="btn btn-primary btn-sm" id="saveEditBtn" onclick="saveFileEdit()">Lưu Cập Nhật</button>
         </div>
     </div>
 </div>
 
 <script>
-    // Config Firebase
-    // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+    // 1. Cấu hình Firebase Config Giữ Nguyên
+    const firebaseConfig = {
+      apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
+      authDomain: "quocdat-396fe.firebaseapp.com",
+      databaseURL: "https://quocdat-396fe-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "quocdat-396fe",
+      storageBucket: "quocdat-396fe.firebasestorage.app",
+      messagingSenderId: "685476439350",
+      appId: "1:685476439350:web:949054ecba7f0a0c383f97"
+    };
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
-  authDomain: "quocdat-396fe.firebaseapp.com",
-  databaseURL: "https://quocdat-396fe-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "quocdat-396fe",
-  storageBucket: "quocdat-396fe.firebasestorage.app",
-  messagingSenderId: "685476439350",
-  appId: "1:685476439350:web:949054ecba7f0a0c383f97"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
+    // 2. Khởi tạo duy nhất Firebase Compat SDK
+    let db, storage;
+    try {
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        db = firebase.firestore();
+        storage = firebase.storage();
+    } catch (err) {
+        showToast("Lỗi khởi tạo Firebase: " + err.message, "error");
     }
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const storage = firebase.storage();
 
     let allFiles = [];
     let selectedFile = null;
 
+    // Helper Toast notification
+    function showToast(msg, type = "success") {
+        const toast = document.getElementById('toastMessage');
+        toast.className = `alert-toast ${type}`;
+        toast.innerText = msg;
+        toast.style.display = 'block';
+        setTimeout(() => { toast.style.display = 'none'; }, 4000);
+    }
+
+    // Helper Chống HTML Injection khi render text
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    // Helper định dạng Dung lượng
     function formatBytes(bytes) {
-        if (bytes === 0) return '0 Bytes';
+        if (!bytes || bytes === 0) return '0 Bytes';
         const k = 1024;
         const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
 
-    // XÁC THỰC BẢO MẬT
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            document.getElementById('authSection').style.display = 'none';
-            document.getElementById('adminSection').style.display = 'block';
+    // 3. Khởi chạy tự động load danh sách từ Firestore khi mở trang (Không cần Auth)
+    window.addEventListener('DOMContentLoaded', () => {
+        if (db) {
             loadFiles();
         } else {
-            document.getElementById('authSection').style.display = 'block';
-            document.getElementById('adminSection').style.display = 'none';
+            document.getElementById('fileTableBody').innerHTML = `
+                <tr><td colspan="5"><div class="state-container" style="color:var(--danger);">Không thể kết nối đến Firebase Firestore!</div></td></tr>
+            `;
         }
     });
 
-    async function loginAdmin() {
-        const e = document.getElementById('adminEmail').value;
-        const p = document.getElementById('adminPassword').value;
-        try {
-            await auth.signInWithEmailAndPassword(e, p);
-        } catch (err) {
-            alert("Lỗi đăng nhập: " + err.message);
-        }
-    }
-
-    function logoutAdmin() {
-        auth.signOut();
-    }
-
-    // LOAD & FILTER FILE LIST
     function loadFiles() {
         db.collection('downloads').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
             allFiles = [];
@@ -263,6 +292,12 @@ const app = initializeApp(firebaseConfig);
             });
             updateDashboard();
             renderFileList();
+        }, error => {
+            console.error("Lỗi Firestore:", error);
+            showToast("Lỗi kết nối CSDL Firestore: " + error.message, "error");
+            document.getElementById('fileTableBody').innerHTML = `
+                <tr><td colspan="5"><div class="state-container" style="color:var(--danger);">Không thể lấy dữ liệu. Kiểm tra Firestore Rules!</div></td></tr>
+            `;
         });
     }
 
@@ -284,7 +319,7 @@ const app = initializeApp(firebaseConfig);
     }
 
     function renderFileList() {
-        const query = document.getElementById('searchInput').value.toLowerCase();
+        const query = (document.getElementById('searchInput').value || '').toLowerCase().trim();
         const tbody = document.getElementById('fileTableBody');
         tbody.innerHTML = '';
 
@@ -293,31 +328,48 @@ const app = initializeApp(firebaseConfig);
             (f.id && f.id.toLowerCase().includes(query))
         );
 
+        if (filtered.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5">
+                        <div class="state-container">${allFiles.length === 0 ? 'Chưa có file nào được upload.' : 'Không tìm thấy file phù hợp.'}</div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
         filtered.forEach(f => {
             const tr = document.createElement('tr');
+            const safeName = escapeHtml(f.name || 'File không tên');
+            const safeId = escapeHtml(f.id);
+            const isEnabled = f.enabled !== false;
+
             tr.innerHTML = `
                 <td>
-                    <strong>${f.name}</strong><br>
-                    <small style="color: var(--text-sub); font-size:11px;">ID: ${f.id}</small>
+                    <strong style="color: white;">${safeName}</strong><br>
+                    <small style="color: var(--text-sub); font-size:11px;">ID: ${safeId}</small>
                 </td>
                 <td>${formatBytes(f.size || 0)}</td>
                 <td>${f.downloadCount || 0}</td>
                 <td>
-                    <span style="color: ${f.enabled !== false ? '#10b981' : '#ef4444'}">
-                        ${f.enabled !== false ? 'Hoạt động' : 'Đã khóa'}
+                    <span class="badge ${isEnabled ? 'badge-success' : 'badge-danger'}">
+                        ${isEnabled ? 'Hoạt động' : 'Đã khóa'}
                     </span>
                 </td>
                 <td>
-                    <button class="btn btn-primary btn-sm" onclick="copyLink('${f.id}')">Copy Link</button>
-                    <button class="btn btn-sm" onclick="openEditModal('${f.id}')">Sửa</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteFile('${f.id}', '${f.storagePath}')">Xóa</button>
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                        <button class="btn btn-primary btn-sm" onclick="copyLink('${safeId}')">Copy Link</button>
+                        <button class="btn btn-secondary btn-sm" onclick="openEditModal('${safeId}')">Sửa</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteFile('${safeId}', '${escapeHtml(f.storagePath)}')">Xóa</button>
+                    </div>
                 </td>
             `;
             tbody.appendChild(tr);
         });
     }
 
-    // UPLOAD TẢI FILE NÂNG CAO
+    // 4. Xử lý Upload File qua Firebase Storage
     function handleFileSelect() {
         const input = document.getElementById('fileInput');
         if (input.files.length > 0) {
@@ -339,6 +391,7 @@ const app = initializeApp(firebaseConfig);
 
         uploadBtn.disabled = true;
         progressBar.style.display = 'block';
+        statusText.innerText = "Đang bắt đầu tải lên...";
 
         const fileId = db.collection('downloads').doc().id;
         const storagePath = `downloads/${fileId}_${selectedFile.name}`;
@@ -353,60 +406,97 @@ const app = initializeApp(firebaseConfig);
                 bar.style.width = progress + '%';
                 
                 const elapsedTime = (Date.now() - startTime) / 1000;
-                const speed = snapshot.bytesTransferred / elapsedTime;
+                const speed = elapsedTime > 0 ? (snapshot.bytesTransferred / elapsedTime) : 0;
                 statusText.innerText = `Đang tải lên... ${Math.round(progress)}% (${formatBytes(speed)}/s)`;
             }, 
             (error) => {
-                alert("Upload thất bại: " + error.message);
+                console.error("Lỗi Upload Storage:", error);
+                showToast("Upload thất bại: " + error.message, "error");
                 uploadBtn.disabled = false;
                 progressBar.style.display = 'none';
+                statusText.innerText = "";
             }, 
             async () => {
-                // Thành công -> Lưu metadata Firestore
-                await db.collection('downloads').doc(fileId).set({
-                    name: selectedFile.name,
-                    description: document.getElementById('fileDescription').value,
-                    storagePath: storagePath,
-                    size: selectedFile.size,
-                    type: selectedFile.type || 'application/octet-stream',
-                    thumbnail: document.getElementById('fileThumbnail').value || '',
-                    downloadCount: 0,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    enabled: true
-                });
+                try {
+                    // Tạo Firestore document
+                    await db.collection('downloads').doc(fileId).set({
+                        name: selectedFile.name,
+                        description: document.getElementById('fileDescription').value || '',
+                        storagePath: storagePath,
+                        size: selectedFile.size,
+                        type: selectedFile.type || 'application/octet-stream',
+                        thumbnail: document.getElementById('fileThumbnail').value || '',
+                        downloadCount: 0,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        enabled: true
+                    });
 
-                statusText.innerText = "Upload hoàn tất 100%!";
-                uploadBtn.disabled = false;
+                    statusText.innerText = "Upload thành công 100%!";
+                    showToast("Upload và lưu metadata file thành công!");
+                    uploadBtn.disabled = false;
 
-                // Xuất link
-                const fullLink = `${window.location.origin}/taixuong.html?id=${fileId}`;
-                document.getElementById('generatedLink').value = fullLink;
-                document.getElementById('linkOutput').style.display = 'block';
-                
-                // Reset Form
-                document.getElementById('fileInput').value = '';
-                document.getElementById('fileDescription').value = '';
-                document.getElementById('fileThumbnail').value = '';
-                document.getElementById('uploadInfo').style.display = 'none';
-                selectedFile = null;
+                    // Xuất link
+                    const fullLink = `${window.location.origin}/taixuong.html?id=${fileId}`;
+                    document.getElementById('generatedLink').value = fullLink;
+                    document.getElementById('linkOutput').style.display = 'block';
+                    
+                    // Reset Form
+                    document.getElementById('fileInput').value = '';
+                    document.getElementById('fileDescription').value = '';
+                    document.getElementById('fileThumbnail').value = '';
+                    document.getElementById('uploadInfo').style.display = 'none';
+                    selectedFile = null;
+
+                } catch (err) {
+                    console.error("Lỗi tạo Firestore document:", err);
+                    showToast("Lỗi lưu thông tin file vào Firestore: " + err.message, "error");
+                    uploadBtn.disabled = false;
+                }
             }
         );
     }
 
+    // 5. Copy Link Helper
+    function executeCopy(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast("Đã sao chép link!");
+            }).catch(() => {
+                fallbackCopy(text);
+            });
+        } else {
+            fallbackCopy(text);
+        }
+    }
+
+    function fallbackCopy(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            showToast("Đã sao chép link!");
+        } catch (err) {
+            showToast("Không thể sao chép tự động!", "error");
+        }
+        document.body.removeChild(textArea);
+    }
+
     function copyLink(id) {
         const url = `${window.location.origin}/taixuong.html?id=${id}`;
-        navigator.clipboard.writeText(url);
-        alert("Đã sao chép link!");
+        executeCopy(url);
     }
 
     function copyGeneratedLink() {
-        const linkInput = document.getElementById('generatedLink');
-        linkInput.select();
-        document.execCommand('copy');
-        alert("Đã sao chép link!");
+        const link = document.getElementById('generatedLink').value;
+        if (link) executeCopy(link);
     }
 
-    // UPDATE & DELETE FILE
+    // 6. Chỉnh sửa File
     function openEditModal(id) {
         const file = allFiles.find(f => f.id === id);
         if (!file) return;
@@ -426,28 +516,43 @@ const app = initializeApp(firebaseConfig);
 
     async function saveFileEdit() {
         const id = document.getElementById('editFileId').value;
-        await db.collection('downloads').doc(id).update({
-            name: document.getElementById('editFileName').value,
-            description: document.getElementById('editFileDesc').value,
-            thumbnail: document.getElementById('editFileThumb').value,
-            enabled: document.getElementById('editFileStatus').value === 'true'
-        });
-        closeEditModal();
-    }
-
-    async function deleteFile(id, storagePath) {
-        if (!confirm("Bạn có chắc chắn muốn xóa file này? Thao tác này sẽ xóa vĩnh viễn cả thông tin và file lưu trữ.")) return;
+        const btn = document.getElementById('saveEditBtn');
+        btn.disabled = true;
 
         try {
-            // Xóa Storage file
-            if (storagePath) {
-                await storage.ref(storagePath).delete().catch(e => console.warn("Lỗi xóa file trên Storage:", e));
-            }
-            // Xóa Firestore doc
-            await db.collection('downloads').doc(id).delete();
-            alert("Đã xóa file thành công.");
+            await db.collection('downloads').doc(id).update({
+                name: document.getElementById('editFileName').value,
+                description: document.getElementById('editFileDesc').value,
+                thumbnail: document.getElementById('editFileThumb').value,
+                enabled: document.getElementById('editFileStatus').value === 'true'
+            });
+            showToast("Cập nhật thông tin file thành công!");
+            closeEditModal();
         } catch (err) {
-            alert("Không thể xóa file: " + err.message);
+            console.error("Lỗi cập nhật:", err);
+            showToast("Không thể cập nhật: " + err.message, "error");
+        } finally {
+            btn.disabled = false;
+        }
+    }
+
+    // 7. Xóa File Đồng Bộ Storage & Firestore
+    async function deleteFile(id, storagePath) {
+        if (!confirm("Bạn có chắc chắn muốn xóa file này? Thao tác sẽ xóa cả file lưu trữ và dữ liệu.")) return;
+
+        try {
+            // Xóa file khỏi Storage nếu tồn tại path
+            if (storagePath) {
+                await storage.ref(storagePath).delete().catch(e => {
+                    console.warn("Storage file không tồn tại hoặc lỗi xóa:", e);
+                });
+            }
+            // Xóa document khỏi Firestore
+            await db.collection('downloads').doc(id).delete();
+            showToast("Đã xóa file thành công.");
+        } catch (err) {
+            console.error("Lỗi xóa file:", err);
+            showToast("Xóa thất bại: " + err.message, "error");
         }
     }
 </script>
