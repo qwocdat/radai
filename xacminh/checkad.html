@@ -53,8 +53,6 @@ button:hover{opacity:0.9;}
 .btn-secondary{background:var(--glass-border); color:var(--text);}
 .btn-sm{padding:6px 10px; font-size:12px; border-radius:6px; margin-right:4px;}
 
-.channel-status-info{font-size:12px; margin-top:6px; color:var(--warning); display:none;}
-
 table{width:100%; border-collapse:collapse; margin-top:10px;}
 th, td{padding:12px; text-align:left; border-bottom:1px solid var(--glass-border); font-size:13px;}
 th{color:var(--text-secondary);}
@@ -73,40 +71,28 @@ th{color:var(--text-secondary);}
   max-height:90vh; overflow-y:auto;
 }
 
-#authSection{max-width:400px; margin:80px auto; text-align:center;}
-#adminSection{display:none;}
 .table-responsive{overflow-x:auto;}
 .task-item-builder{
   background:rgba(0,0,0,0.25); border:1px dashed var(--glass-border);
   border-radius:12px; padding:12px; margin-bottom:12px; position:relative;
 }
 .remove-task-btn{position:absolute; top:8px; right:8px; background:var(--error); padding:4px 8px; font-size:11px; border-radius:4px;}
+
+.success-link-card{
+  background:rgba(51,209,122,0.1); border:1px solid var(--success);
+  border-radius:var(--radius); padding:20px; margin-bottom:25px; display:none;
+}
+.success-link-card h3{color:var(--success); margin-bottom:10px;}
+.success-link-card .link-input-group{display:flex; gap:10px; margin-top:10px;}
 </style>
 </head>
 <body>
 
 <div class="container">
   
-  <!-- ADMIN AUTHENTICATION -->
-  <div id="authSection" class="card">
-    <h2>Đăng Nhập Admin</h2>
-    <div class="form-group" style="text-align:left;">
-      <label>Email Admin</label>
-      <input type="email" id="adminEmail" placeholder="admin@example.com">
-    </div>
-    <div class="form-group" style="text-align:left;">
-      <label>Mật Khẩu</label>
-      <input type="password" id="adminPassword" placeholder="••••••••">
-    </div>
-    <button id="loginBtn" style="width:100%;">Đăng Nhập</button>
-    <p id="authError" style="color:var(--error); font-size:13px; margin-top:10px; display:none;"></p>
-  </div>
-
-  <!-- MAIN ADMIN DASHBOARD -->
   <div id="adminSection">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-      <h1>Trang Quản Lý Hệ Thống Link</h1>
-      <button id="logoutBtn" class="btn-danger">Đăng Xuất</button>
+      <h1>Trang Quản Lý Hệ Thống Link Nhiệm Vụ</h1>
     </div>
 
     <!-- STATS -->
@@ -126,6 +112,38 @@ th{color:var(--text-secondary);}
       <div class="card">
         <div>Lượt Bypass / Lỗi</div>
         <div class="val" id="bypassCount" style="color:var(--error);">0</div>
+      </div>
+    </div>
+
+    <!-- CẤU HÌNH BẢO TRÌ & RESET HỆ THỐNG -->
+    <div class="card" style="margin-bottom:25px;">
+      <h2>Cấu Hình Hệ Thống & Bảo Trì Chung</h2>
+      <div class="grid" style="grid-template-columns: 1fr 1fr; margin-bottom:0;">
+        <div>
+          <strong>Chế Độ Bảo Trì Toàn Hệ Thống:</strong>
+          <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;" id="maintenanceText">Trạng thái: Đang hoạt động</div>
+          <button id="toggleMaintenanceBtn" style="margin-top:10px;">Bật Bảo Trì Chung</button>
+        </div>
+        <div class="form-group">
+          <label>Link Mở Khóa Đích Mặc Định (Target URL Mặc Định)</label>
+          <input type="text" id="targetDestinationUrl" placeholder="https://example.com/file">
+          <button id="saveTargetBtn" style="margin-top:10px;">Lưu Link Mặc Định</button>
+        </div>
+      </div>
+      <div style="margin-top:15px; border-top:1px solid var(--glass-border); padding-top:15px; display:flex; gap:10px;">
+        <button id="resetAllUsersBtn" class="btn-warning">Reset Tiến Trình Tất Cả Người Dùng</button>
+        <button id="syncStatsBtn" class="btn-success">Đồng Bộ Lại Thống Kê</button>
+      </div>
+    </div>
+
+    <!-- KHU VỰC THÔNG BÁO TẠO LINK THÀNH CÔNG -->
+    <div id="successLinkBox" class="success-link-card">
+      <h3>🎉 TẠO LINK NHIỆM VỤ THÀNH CÔNG!</h3>
+      <div>ID Nhiệm Vụ: <strong id="createdLinkId" style="color:var(--accent);">---</strong></div>
+      <div class="link-input-group">
+        <input type="text" id="createdLinkUrl" readonly>
+        <button id="copyCreatedLinkBtn" class="btn-success">SAO CHÉP LINK</button>
+        <button id="openCreatedLinkBtn" class="btn-secondary">MỞ LINK</button>
       </div>
     </div>
 
@@ -156,10 +174,11 @@ th{color:var(--text-secondary);}
         <table>
           <thead>
             <tr>
-              <th>Mã Alias / Link Rút Gọn</th>
+              <th>ID Nhiệm Vụ</th>
               <th>Tên Link</th>
               <th>Số Nhiệm Vụ</th>
               <th>Trạng Thái</th>
+              <th>Link Nhiệm Vụ</th>
               <th>Thao Tác</th>
             </tr>
           </thead>
@@ -167,6 +186,51 @@ th{color:var(--text-secondary);}
         </table>
       </div>
     </div>
+
+    <!-- QUẢN LÝ NGƯỜI DÙNG -->
+    <div class="card" style="margin-bottom:25px;">
+      <h2>Danh Sách Người Dùng</h2>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>User ID</th>
+              <th>Hoạt động cuối</th>
+              <th>Thiết bị</th>
+              <th>Thao Tác</th>
+            </tr>
+          </thead>
+          <tbody id="userListTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CẢNH BÁO BYPASS / LOGS -->
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h2 style="color:var(--error); margin:0;">Nhật Ký Cố Tình Bypass / Lỗi</h2>
+        <select id="bypassFilter" style="width:180px;">
+          <option value="all">Tất cả nhật ký</option>
+          <option value="verification_failed">Verification Failed</option>
+          <option value="api_error">API Error</option>
+        </select>
+      </div>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Thời Gian</th>
+              <th>User ID</th>
+              <th>Link ID</th>
+              <th>Nhiệm Vụ ID</th>
+              <th>Hành Vi</th>
+            </tr>
+          </thead>
+          <tbody id="bypassTable"></tbody>
+        </table>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -185,7 +249,6 @@ th{color:var(--text-secondary);}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getDatabase, ref, set, push, onValue, remove, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
@@ -201,9 +264,9 @@ const YT_API_KEY = "AIzaSyAR-zsFqyZag3TDlSUecY696E757fLQxAo";
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-const auth = getAuth(app);
 
 let confirmCallback = null;
+let isMaintenance = false;
 
 function cleanUrl(raw) {
   if (!raw) return "";
@@ -215,13 +278,33 @@ function cleanUrl(raw) {
   return s;
 }
 
-function generateShortAlias() {
-  return Math.random().toString(36).substring(2, 8);
+function generateUniqueId() {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID().replace(/-/g, "").substring(0, 10);
+  }
+  const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let result = "";
+  for (let i = 0; i < 10; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
 }
 
 function escapeHtml(str) {
   if (!str) return "";
   return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function getCheckPageBaseUrl() {
+  const loc = window.location;
+  let path = loc.pathname;
+  if (path.includes("checkad")) {
+    path = path.replace("checkad.html", "check").replace("checkad", "check");
+  } else if (!path.endsWith("/check")) {
+    const idx = path.lastIndexOf("/");
+    path = path.substring(0, idx + 1) + "check";
+  }
+  return `${loc.origin}${path}`;
 }
 
 function showConfirm(title, message, onConfirm) {
@@ -241,40 +324,6 @@ document.getElementById("modalConfirmBtn").addEventListener("click", () => {
   document.getElementById("confirmModal").classList.remove("open");
 });
 
-// AUTHENTICATION
-document.getElementById("loginBtn").addEventListener("click", () => {
-  const email = document.getElementById("adminEmail").value.trim();
-  const password = document.getElementById("adminPassword").value.trim();
-  const errEl = document.getElementById("authError");
-  errEl.style.display = "none";
-
-  if (!email || !password) {
-    errEl.textContent = "Vui lòng nhập Email và Mật khẩu";
-    errEl.style.display = "block";
-    return;
-  }
-
-  signInWithEmailAndPassword(auth, email, password)
-    .catch(err => {
-      errEl.textContent = "Đăng nhập thất bại: " + err.message;
-      errEl.style.display = "block";
-    });
-});
-
-document.getElementById("logoutBtn").addEventListener("click", () => signOut(auth));
-
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    document.getElementById("authSection").style.display = "none";
-    document.getElementById("adminSection").style.display = "block";
-    initListeners();
-  } else {
-    document.getElementById("authSection").style.display = "block";
-    document.getElementById("adminSection").style.display = "none";
-  }
-});
-
-// YOUTUBE DATA PARSER
 async function resolveYoutubeUrl(urlStr) {
   if (!urlStr) return { channelId: "", videoId: "" };
   let channelId = "", videoId = "";
@@ -289,7 +338,7 @@ async function resolveYoutubeUrl(urlStr) {
   if (handleMatch && !channelId) {
     try {
       const handle = handleMatch[1];
-      const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=id&forHandle=${handle}&key=${YT_API_KEY}`);
+      const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=id&forHandle=${encodeURIComponent(handle)}&key=${YT_API_KEY}`);
       const data = await res.json();
       if (data.items && data.items.length > 0) channelId = data.items[0].id;
     } catch(e) {}
@@ -297,7 +346,7 @@ async function resolveYoutubeUrl(urlStr) {
 
   if (videoId && !channelId) {
     try {
-      const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${YT_API_KEY}`);
+      const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${encodeURIComponent(videoId)}&key=${YT_API_KEY}`);
       const data = await res.json();
       if (data.items && data.items.length > 0) channelId = data.items[0].snippet.channelId;
     } catch(e) {}
@@ -306,7 +355,6 @@ async function resolveYoutubeUrl(urlStr) {
   return { channelId, videoId };
 }
 
-// BUILDER THÊM NHIỀU NHIỆM VỤ VÀO LINK
 const tasksContainer = document.getElementById("tasksContainer");
 
 function createTaskItemDOM() {
@@ -347,10 +395,29 @@ function createTaskItemDOM() {
 
 document.getElementById("addTaskBtn").addEventListener("click", createTaskItemDOM);
 
-// KHỞI TẠO DỮ LIỆU THỐNG KÊ & LISTENERS
 function initListeners() {
-  // Tự động thêm 1 task mẫu
   if(tasksContainer.children.length === 0) createTaskItemDOM();
+
+  onValue(ref(db, "systemConfig"), (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      isMaintenance = data.isMaintenance || false;
+      document.getElementById("targetDestinationUrl").value = data.targetUrl || "";
+      const text = document.getElementById("maintenanceText");
+      const btn = document.getElementById("toggleMaintenanceBtn");
+      if (isMaintenance) {
+        text.textContent = "Trạng thái: ĐANG BẢO TRÌ CHUNG (Khóa toàn bộ)";
+        text.style.color = "var(--error)";
+        btn.textContent = "Tắt Bảo Trì Chung";
+        btn.className = "btn-warning";
+      } else {
+        text.textContent = "Trạng thái: Đang hoạt động bình thường";
+        text.style.color = "var(--success)";
+        btn.textContent = "Bật Bảo Trì Chung";
+        btn.className = "";
+      }
+    }
+  });
 
   onValue(ref(db, "links"), (snapshot) => {
     const data = snapshot.val();
@@ -364,34 +431,41 @@ function initListeners() {
     const keys = Object.keys(data);
     document.getElementById("totalLinks").textContent = keys.length;
 
-    const origin = window.location.origin + window.location.pathname.replace("checkad.html", "check.html");
+    const baseUrl = getCheckPageBaseUrl();
 
-    keys.forEach(alias => {
-      const item = data[alias];
+    keys.forEach(linkId => {
+      const item = data[linkId];
       const tr = document.createElement("tr");
-      const shortUrl = `${origin}?id=${alias}`;
-      const taskCount = item.tasks ? item.tasks.length : 0;
+      const shortUrl = `${baseUrl}?id=${encodeURIComponent(linkId)}`;
+      const taskCount = item.tasks ? (Array.isArray(item.tasks) ? item.tasks.length : Object.keys(item.tasks).length) : 0;
       const isMaint = item.status === "maintenance";
 
       tr.innerHTML = `
-        <td><a href="${shortUrl}" target="_blank" style="color:var(--accent); font-weight:bold;">${alias}</a></td>
+        <td><strong style="color:var(--accent);">${escapeHtml(linkId)}</strong></td>
         <td><b>${escapeHtml(item.title)}</b><br><small style="color:var(--text-secondary)">Đích: ${escapeHtml(item.targetUrl)}</small></td>
         <td><span class="badge badge-info">${taskCount} Nhiệm vụ</span></td>
         <td>${isMaint ? '<span class="badge badge-warning">Bảo trì</span>' : '<span class="badge badge-info">Hoạt động</span>'}</td>
+        <td><a href="${shortUrl}" target="_blank" style="color:var(--accent); font-size:12px;">${shortUrl}</a></td>
         <td>
-          <button class="btn-warning btn-sm" data-maint="${alias}">${isMaint ? 'Mở lại' : 'Bảo trì'}</button>
-          <button class="btn-danger btn-sm" data-del="${alias}">Xóa Link</button>
+          <button class="btn-success btn-sm" data-copy="${shortUrl}">Copy</button>
+          <button class="btn-warning btn-sm" data-maint="${linkId}">${isMaint ? 'Mở lại' : 'Bảo trì'}</button>
+          <button class="btn-danger btn-sm" data-del="${linkId}">Xóa</button>
         </td>
       `;
 
-      tr.querySelector(`[data-maint="${alias}"]`).addEventListener("click", () => {
-        const nextStatus = isMaint ? "active" : "maintenance";
-        set(ref(db, `links/${alias}/status`), nextStatus);
+      tr.querySelector(`[data-copy="${shortUrl}"]`).addEventListener("click", () => {
+        navigator.clipboard.writeText(shortUrl);
+        alert("Đã sao chép link nhiệm vụ!");
       });
 
-      tr.querySelector(`[data-del="${alias}"]`).addEventListener("click", () => {
-        showConfirm("Xóa Link", `Xóa link rút gọn "${alias}"?`, () => {
-          remove(ref(db, `links/${alias}`));
+      tr.querySelector(`[data-maint="${linkId}"]`).addEventListener("click", () => {
+        const nextStatus = isMaint ? "active" : "maintenance";
+        set(ref(db, `links/${linkId}/status`), nextStatus);
+      });
+
+      tr.querySelector(`[data-del="${linkId}"]`).addEventListener("click", () => {
+        showConfirm("Xóa Link", `Xóa link nhiệm vụ ID "${linkId}"?`, () => {
+          remove(ref(db, `links/${linkId}`));
         });
       });
 
@@ -400,16 +474,84 @@ function initListeners() {
   });
 
   onValue(ref(db, "users"), (snapshot) => {
-    const data = snapshot.val();
-    document.getElementById("totalUsers").textContent = data ? Object.keys(data).length : 0;
+    const usersData = snapshot.val();
+    document.getElementById("totalUsers").textContent = usersData ? Object.keys(usersData).length : 0;
+    renderUsersTable(usersData);
   });
 
   onValue(ref(db, "stats/completedUsers"), (snapshot) => {
     document.getElementById("completedUsers").textContent = snapshot.val() || 0;
   });
+
+  onValue(ref(db, "bypassLogs"), (snapshot) => {
+    renderBypassLogs(snapshot.val());
+  });
 }
 
-// LƯU LINK RÚT GỌN CHỨA NHIỀU NHIỆM VỤ
+function renderUsersTable(usersData) {
+  const table = document.getElementById("userListTable");
+  table.innerHTML = "";
+  if (!usersData) return;
+
+  Object.keys(usersData).forEach(uid => {
+    const u = usersData[uid];
+    const tr = document.createElement("tr");
+    const lastActive = u.lastActive ? new Date(u.lastActive).toLocaleString("vi-VN") : "N/A";
+
+    tr.innerHTML = `
+      <td><code>${escapeHtml(uid)}</code></td>
+      <td>${lastActive}</td>
+      <td><small>${escapeHtml(u.device || 'Mobile')}</small></td>
+      <td>
+        <button class="btn-warning btn-sm" data-resetusr="${uid}">Reset User</button>
+      </td>
+    `;
+
+    tr.querySelector(`[data-resetusr="${uid}"]`).addEventListener("click", () => {
+      showConfirm("Reset User", `Bạn muốn xóa toàn bộ tiến trình của user ${uid}?`, () => {
+        set(ref(db, `users/${uid}`), null);
+      });
+    });
+
+    table.appendChild(tr);
+  });
+}
+
+function renderBypassLogs(data) {
+  const table = document.getElementById("bypassTable");
+  const filter = document.getElementById("bypassFilter").value;
+  table.innerHTML = "";
+  if (!data) {
+    document.getElementById("bypassCount").textContent = 0;
+    return;
+  }
+
+  let keys = Object.keys(data).reverse();
+  if (filter !== "all") {
+    keys = keys.filter(k => data[k].reason === filter);
+  }
+
+  document.getElementById("bypassCount").textContent = keys.length;
+
+  keys.slice(0, 15).forEach(key => {
+    const log = data[key];
+    const date = new Date(log.timestamp).toLocaleString("vi-VN");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${date}</td>
+      <td><code>${escapeHtml(log.userId)}</code></td>
+      <td><code>${escapeHtml(log.linkId || "N/A")}</code></td>
+      <td><code>${escapeHtml(log.taskId || "N/A")}</code></td>
+      <td><span class="badge">${escapeHtml(log.reason)}</span></td>
+    `;
+    table.appendChild(tr);
+  });
+}
+
+document.getElementById("bypassFilter").addEventListener("change", () => {
+  get(ref(db, "bypassLogs")).then(snapshot => renderBypassLogs(snapshot.val()));
+});
+
 document.getElementById("saveLinkBtn").addEventListener("click", async () => {
   const title = document.getElementById("linkTitleName").value.trim();
   const rawTargetUrl = document.getElementById("linkTargetUrl").value.trim();
@@ -442,19 +584,25 @@ document.getElementById("saveLinkBtn").addEventListener("click", async () => {
     const resolved = await resolveYoutubeUrl(tUrl);
 
     tasksList.push({
-      id: "t_" + Math.random().toString(36).substring(2, 9),
+      id: "t_" + generateUniqueId().substring(0, 8),
       type: tType,
       title: tTitle,
       url: tUrl,
-      channelId: resolved.channelId,
-      videoId: resolved.videoId,
+      channelId: resolved.channelId || "",
+      videoId: resolved.videoId || "",
       commentText: tComment
     });
   }
 
-  const newAlias = generateShortAlias();
+  let linkId = generateUniqueId();
+  let snap = await get(ref(db, `links/${linkId}`));
+  while (snap.exists()) {
+    linkId = generateUniqueId();
+    snap = await get(ref(db, `links/${linkId}`));
+  }
+
   const linkData = {
-    alias: newAlias,
+    alias: linkId,
     title: title,
     targetUrl: targetUrl,
     tasks: tasksList,
@@ -462,14 +610,79 @@ document.getElementById("saveLinkBtn").addEventListener("click", async () => {
     createdAt: Date.now()
   };
 
-  set(ref(db, `links/${newAlias}`), linkData).then(() => {
-    alert(`Tạo Link thành công! Mã Alias: ${newAlias}`);
-    document.getElementById("linkTitleName").value = "";
-    document.getElementById("linkTargetUrl").value = "";
-    tasksContainer.innerHTML = "";
-    createTaskItemDOM();
+  await set(ref(db, `links/${linkId}`), linkData);
+
+  const fullTaskUrl = `${getCheckPageBaseUrl()}?id=${encodeURIComponent(linkId)}`;
+
+  document.getElementById("createdLinkId").textContent = linkId;
+  const urlInput = document.getElementById("createdLinkUrl");
+  urlInput.value = fullTaskUrl;
+
+  const box = document.getElementById("successLinkBox");
+  box.style.display = "block";
+
+  document.getElementById("copyCreatedLinkBtn").onclick = () => {
+    navigator.clipboard.writeText(fullTaskUrl);
+    alert("Đã sao chép link!");
+  };
+
+  document.getElementById("openCreatedLinkBtn").onclick = () => {
+    window.open(fullTaskUrl, "_blank");
+  };
+
+  document.getElementById("linkTitleName").value = "";
+  document.getElementById("linkTargetUrl").value = "";
+  tasksContainer.innerHTML = "";
+  createTaskItemDOM();
+
+  box.scrollIntoView({ behavior: 'smooth' });
+});
+
+document.getElementById("toggleMaintenanceBtn").addEventListener("click", () => {
+  showConfirm("Đổi Trạng Thái Bảo Trì", "Bạn muốn chuyển đổi trạng thái bảo trì hệ thống?", () => {
+    isMaintenance = !isMaintenance;
+    set(ref(db, "systemConfig/isMaintenance"), isMaintenance);
   });
 });
+
+document.getElementById("saveTargetBtn").addEventListener("click", () => {
+  const targetUrl = document.getElementById("targetDestinationUrl").value.trim();
+  if (!targetUrl.startsWith("http")) {
+    alert("Đường dẫn phải bắt đầu bằng https:// hoặc http://");
+    return;
+  }
+  set(ref(db, "systemConfig/targetUrl"), targetUrl).then(() => {
+    alert("Đã lưu Link Đích mặc định thành công!");
+  });
+});
+
+document.getElementById("resetAllUsersBtn").addEventListener("click", () => {
+  showConfirm("Reset Tất Cả User", "Bạn có chắc muốn xóa toàn bộ tiến trình của tất cả người dùng?", () => {
+    Promise.all([
+      set(ref(db, "users"), null),
+      set(ref(db, "stats/completedUsers"), 0)
+    ]).then(() => {
+      alert("Đã reset hoàn tất!");
+    });
+  });
+});
+
+document.getElementById("syncStatsBtn").addEventListener("click", () => {
+  get(ref(db, "users")).then(snapshot => {
+    const users = snapshot.val();
+    let actualCompleted = 0;
+    if (users) {
+      Object.keys(users).forEach(uid => {
+        if (users[uid].completed === true) actualCompleted++;
+      });
+    }
+    set(ref(db, "stats/completedUsers"), actualCompleted).then(() => {
+      alert(`Đã đồng bộ lại! Số user hoàn thành thực tế: ${actualCompleted}`);
+    });
+  });
+});
+
+document.addEventListener("DOMContentLoaded", initListeners);
 </script>
 </body>
 </html>
