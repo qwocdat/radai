@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản Lý Tải File - Admin</title>
-    <!-- Chỉ nhúng Firebase Compat SDK (Phiên bản v9 Compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
     <style>
         :root {
             --bg: #0f172a;
@@ -16,8 +14,6 @@
             --primary: #3b82f6;
             --primary-hover: #2563eb;
             --danger: #ef4444;
-            --danger-hover: #dc2626;
-            --success: #10b981;
             --text: #f8fafc;
             --text-sub: #94a3b8;
         }
@@ -25,68 +21,47 @@
         body { background: var(--bg); color: var(--text); padding: 20px 12px; }
         .container { max-width: 1000px; margin: 0 auto; }
 
-        /* Banner thông báo lỗi / thành công hệ thống */
         .alert-toast {
             position: fixed; top: 20px; right: 20px; z-index: 1000;
             padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 500;
             box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5); display: none;
-            max-width: 90vw; animation: fadeIn 0.3s ease;
         }
         .alert-toast.error { background: #7f1d1d; color: #fca5a5; border: 1px solid #ef4444; }
         .alert-toast.success { background: #064e3b; color: #6ee7b7; border: 1px solid #10b981; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Dashboard Header & Cards */
         .header-title { font-size: 22px; font-weight: 700; margin-bottom: 20px; }
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
         .stat-card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
         .stat-card div { font-size: 11px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; }
         .stat-card h2 { font-size: 24px; margin-top: 8px; color: var(--text); }
 
-        /* Panels */
         .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; }
         .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
 
-        /* Form Controls */
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; margin-bottom: 6px; font-size: 13px; color: var(--text-sub); }
         .form-group input, .form-group textarea, .form-group select { 
             width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background: #0f172a; color: white; font-size: 14px;
         }
-        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: 1px solid var(--primary); }
 
-        /* Buttons */
         .btn { padding: 10px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; font-size: 14px; transition: background 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-primary:hover { background: var(--primary-hover); }
         .btn-danger { background: var(--danger); color: white; }
-        .btn-danger:hover { background: var(--danger-hover); }
         .btn-secondary { background: #334155; color: white; }
-        .btn-secondary:hover { background: #475569; }
         .btn-sm { padding: 6px 12px; font-size: 12px; }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* File Progress */
-        .upload-progress { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; margin-top: 12px; display: none; }
-        .upload-bar { height: 100%; width: 0%; background: var(--primary); transition: width 0.2s ease; }
-
-        /* Responsive Table */
-        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .table-responsive { width: 100%; overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; margin-top: 8px; min-width: 600px; }
         th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
-        th { color: var(--text-sub); font-size: 12px; text-transform: uppercase; white-space: nowrap; }
+        th { color: var(--text-sub); font-size: 12px; text-transform: uppercase; }
 
-        /* Helper status badges */
         .badge { padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
         .badge-success { background: rgba(16, 185, 129, 0.15); color: #34d399; }
         .badge-danger { background: rgba(239, 68, 68, 0.15); color: #f87171; }
 
-        /* Modal */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 100; padding: 16px; }
-        .modal-content { background: var(--panel); width: 100%; max-width: 500px; padding: 24px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
-
-        /* Empty & Loading states */
+        .modal-content { background: var(--panel); width: 100%; max-width: 500px; padding: 24px; border-radius: 16px; border: 1px solid var(--border); }
         .state-container { text-align: center; padding: 32px 16px; color: var(--text-sub); font-size: 14px; }
     </style>
 </head>
@@ -95,9 +70,8 @@
 <div class="alert-toast" id="toastMessage"></div>
 
 <div class="container">
-    <div class="header-title">Dashboard Quản Lý File</div>
+    <div class="header-title">Dashboard Quản Lý File (MediaFire)</div>
 
-    <!-- DASHBOARD THỐNG KÊ -->
     <div class="dashboard-grid">
         <div class="stat-card">
             <div>TỔNG FILE</div>
@@ -108,7 +82,7 @@
             <h2 id="statTotalDownloads">0</h2>
         </div>
         <div class="stat-card">
-            <div>DUNG LƯỢNG ĐÃ DÙNG</div>
+            <div>DUNG LƯỢNG TỔNG</div>
             <h2 id="statTotalSize">0 B</h2>
         </div>
         <div class="stat-card">
@@ -117,36 +91,40 @@
         </div>
     </div>
 
-    <!-- UPLOAD FILE PANEL -->
     <div class="panel">
-        <h3 style="font-size: 16px;">Upload File Mới</h3>
-        <div style="margin-top: 16px;">
-            <div class="form-group">
-                <label>Chọn file từ thiết bị</label>
-                <input type="file" id="fileInput" onchange="handleFileSelect()">
-            </div>
-            <div class="form-group">
-                <label>Mô tả File</label>
-                <textarea id="fileDescription" rows="2" placeholder="Nhập mô tả ngắn cho file..."></textarea>
-            </div>
-            <div class="form-group">
-                <label>Link Thumbnail (Không bắt buộc)</label>
-                <input type="text" id="fileThumbnail" placeholder="https://domain.com/image.png">
-            </div>
-
-            <div id="uploadInfo" style="font-size: 13px; color: var(--text-sub); display:none; margin-bottom: 12px;">
-                Tên file: <span id="infoName" style="color:white; font-weight: 600;"></span> | Dung lượng: <span id="infoSize" style="color:white; font-weight: 600;"></span>
-            </div>
-
-            <button class="btn btn-primary" id="uploadBtn" onclick="startUpload()" disabled>Bắt đầu Upload</button>
-
-            <div class="upload-progress" id="uploadProgress">
-                <div class="upload-bar" id="uploadBar"></div>
-            </div>
-            <div id="uploadStatusText" style="font-size: 12px; color: var(--text-sub); margin-top: 6px;"></div>
+        <h3 style="font-size: 16px;">Thêm File Từ MediaFire</h3>
+        <p style="font-size: 12px; color: var(--text-sub); margin-top: 4px; margin-bottom: 16px;">
+            Dán đường dẫn MediaFire (Ví dụ: <code>https://www.mediafire.com/file/xxx/file.zip</code>)
+        </p>
+        
+        <div class="form-group">
+            <label>Link MediaFire gốc</label>
+            <input type="text" id="mediafireUrl" placeholder="https://www.mediafire.com/file/..." oninput="autoFillName()">
         </div>
 
-        <!-- HIỂN THỊ LINK SAU KHI UPLOAD -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+            <div class="form-group">
+                <label>Tên hiển thị file</label>
+                <input type="text" id="fileName" placeholder="Nhập tên hiển thị...">
+            </div>
+            <div class="form-group">
+                <label>Dung lượng (Bytes, ví dụ: 419430400 cho 400MB)</label>
+                <input type="number" id="fileSize" placeholder="419430400">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Mô tả File</label>
+            <textarea id="fileDescription" rows="2" placeholder="Nhập mô tả ngắn..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Link Thumbnail (Optional)</label>
+            <input type="text" id="fileThumbnail" placeholder="https://...">
+        </div>
+
+        <button class="btn btn-primary" id="saveBtn" onclick="saveMediaFireFile()">Tạo Link Tải Xuống</button>
+
         <div id="linkOutput" style="display: none; margin-top: 20px; padding: 16px; background: rgba(59,130,246,0.1); border: 1px solid var(--primary); border-radius: 8px;">
             <label style="font-size: 12px; color: var(--text-sub); font-weight: 600;">LINK TẢI XUỐNG CỦA FILE:</label>
             <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
@@ -156,11 +134,10 @@
         </div>
     </div>
 
-    <!-- DANH SÁCH FILE & TÌM KIẾM -->
     <div class="panel">
         <div class="panel-header">
             <h3 style="font-size: 16px;">Danh Sách File</h3>
-            <input type="text" id="searchInput" placeholder="Tìm kiếm theo tên file hoặc ID..." onkeyup="renderFileList()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: #0f172a; color: white; width: 260px; max-width: 100%;">
+            <input type="text" id="searchInput" placeholder="Tìm kiếm file..." onkeyup="renderFileList()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: #0f172a; color: white; width: 260px; max-width: 100%;">
         </div>
 
         <div class="table-responsive">
@@ -175,18 +152,13 @@
                     </tr>
                 </thead>
                 <tbody id="fileTableBody">
-                    <tr>
-                        <td colspan="5">
-                            <div class="state-container">Đang tải danh sách file...</div>
-                        </td>
-                    </tr>
+                    <tr><td colspan="5"><div class="state-container">Đang tải danh sách...</div></td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 </div>
 
-<!-- MODAL EDIT FILE -->
 <div class="modal" id="editModal">
     <div class="modal-content">
         <h3 style="margin-bottom: 16px; font-size: 18px;">Sửa Thông Tin File</h3>
@@ -196,18 +168,22 @@
             <input type="text" id="editFileName">
         </div>
         <div class="form-group">
+            <label>Link MediaFire</label>
+            <input type="text" id="editFileUrl">
+        </div>
+        <div class="form-group">
             <label>Mô tả</label>
             <textarea id="editFileDesc" rows="3"></textarea>
         </div>
         <div class="form-group">
-            <label>Link Thumbnail</label>
+            <label>Thumbnail Link</label>
             <input type="text" id="editFileThumb">
         </div>
         <div class="form-group">
-            <label>Trạng Thái Tải Xuống</label>
+            <label>Trạng Thái</label>
             <select id="editFileStatus">
-                <option value="true">Hoạt động (Cho phép tải)</option>
-                <option value="false">Tạm khóa (Chặn tải xuống)</option>
+                <option value="true">Hoạt động (Enabled)</option>
+                <option value="false">Tạm khóa (Disabled)</option>
             </select>
         </div>
         <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px;">
@@ -218,7 +194,6 @@
 </div>
 
 <script>
-    // 1. Cấu hình Firebase Config Giữ Nguyên
     const firebaseConfig = {
       apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
       authDomain: "quocdat-396fe.firebaseapp.com",
@@ -229,22 +204,16 @@
       appId: "1:685476439350:web:949054ecba7f0a0c383f97"
     };
 
-    // 2. Khởi tạo duy nhất Firebase Compat SDK
-    let db, storage;
+    let db;
     try {
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
-        storage = firebase.storage();
     } catch (err) {
-        showToast("Lỗi khởi tạo Firebase: " + err.message, "error");
+        showToast("Lỗi Firebase: " + err.message, "error");
     }
 
     let allFiles = [];
-    let selectedFile = null;
 
-    // Helper Toast notification
     function showToast(msg, type = "success") {
         const toast = document.getElementById('toastMessage');
         toast.className = `alert-toast ${type}`;
@@ -253,18 +222,11 @@
         setTimeout(() => { toast.style.display = 'none'; }, 4000);
     }
 
-    // Helper Chống HTML Injection khi render text
     function escapeHtml(str) {
         if (!str) return '';
-        return String(str)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
+        return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
-    // Helper định dạng Dung lượng
     function formatBytes(bytes) {
         if (!bytes || bytes === 0) return '0 Bytes';
         const k = 1024;
@@ -273,45 +235,35 @@
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
 
-    // 3. Khởi chạy tự động load danh sách từ Firestore khi mở trang (Không cần Auth)
-    window.addEventListener('DOMContentLoaded', () => {
-        if (db) {
-            loadFiles();
-        } else {
-            document.getElementById('fileTableBody').innerHTML = `
-                <tr><td colspan="5"><div class="state-container" style="color:var(--danger);">Không thể kết nối đến Firebase Firestore!</div></td></tr>
-            `;
+    function autoFillName() {
+        const url = document.getElementById('mediafireUrl').value.trim();
+        if (url && !document.getElementById('fileName').value) {
+            const parts = url.split('/');
+            const possibleName = parts[parts.length - 2] || parts[parts.length - 1];
+            if (possibleName && possibleName !== 'file') {
+                document.getElementById('fileName').value = decodeURIComponent(possibleName);
+            }
         }
-    });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => { if (db) loadFiles(); });
 
     function loadFiles() {
         db.collection('downloads').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
             allFiles = [];
-            snapshot.forEach(doc => {
-                allFiles.push({ id: doc.id, ...doc.data() });
-            });
+            snapshot.forEach(doc => allFiles.push({ id: doc.id, ...doc.data() }));
             updateDashboard();
             renderFileList();
-        }, error => {
-            console.error("Lỗi Firestore:", error);
-            showToast("Lỗi kết nối CSDL Firestore: " + error.message, "error");
-            document.getElementById('fileTableBody').innerHTML = `
-                <tr><td colspan="5"><div class="state-container" style="color:var(--danger);">Không thể lấy dữ liệu. Kiểm tra Firestore Rules!</div></td></tr>
-            `;
         });
     }
 
     function updateDashboard() {
-        let totalDownloads = 0;
-        let totalSize = 0;
-        let activeFiles = 0;
-
+        let totalDownloads = 0, totalSize = 0, activeFiles = 0;
         allFiles.forEach(f => {
             totalDownloads += (f.downloadCount || 0);
             totalSize += (f.size || 0);
             if (f.enabled !== false) activeFiles++;
         });
-
         document.getElementById('statTotalFiles').innerText = allFiles.length;
         document.getElementById('statTotalDownloads').innerText = totalDownloads;
         document.getElementById('statTotalSize').innerText = formatBytes(totalSize);
@@ -323,19 +275,10 @@
         const tbody = document.getElementById('fileTableBody');
         tbody.innerHTML = '';
 
-        const filtered = allFiles.filter(f => 
-            (f.name && f.name.toLowerCase().includes(query)) || 
-            (f.id && f.id.toLowerCase().includes(query))
-        );
+        const filtered = allFiles.filter(f => (f.name && f.name.toLowerCase().includes(query)) || (f.id && f.id.toLowerCase().includes(query)));
 
         if (filtered.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="5">
-                        <div class="state-container">${allFiles.length === 0 ? 'Chưa có file nào được upload.' : 'Không tìm thấy file phù hợp.'}</div>
-                    </td>
-                </tr>
-            `;
+            tbody.innerHTML = `<tr><td colspan="5"><div class="state-container">Không có dữ liệu file.</div></td></tr>`;
             return;
         }
 
@@ -352,16 +295,12 @@
                 </td>
                 <td>${formatBytes(f.size || 0)}</td>
                 <td>${f.downloadCount || 0}</td>
+                <td><span class="badge ${isEnabled ? 'badge-success' : 'badge-danger'}">${isEnabled ? 'Hoạt động' : 'Đã khóa'}</span></td>
                 <td>
-                    <span class="badge ${isEnabled ? 'badge-success' : 'badge-danger'}">
-                        ${isEnabled ? 'Hoạt động' : 'Đã khóa'}
-                    </span>
-                </td>
-                <td>
-                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                    <div style="display: flex; gap: 6px;">
                         <button class="btn btn-primary btn-sm" onclick="copyLink('${safeId}')">Copy Link</button>
                         <button class="btn btn-secondary btn-sm" onclick="openEditModal('${safeId}')">Sửa</button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteFile('${safeId}', '${escapeHtml(f.storagePath)}')">Xóa</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteFile('${safeId}')">Xóa</button>
                     </div>
                 </td>
             `;
@@ -369,190 +308,93 @@
         });
     }
 
-    // 4. Xử lý Upload File qua Firebase Storage
-    function handleFileSelect() {
-        const input = document.getElementById('fileInput');
-        if (input.files.length > 0) {
-            selectedFile = input.files[0];
-            document.getElementById('infoName').innerText = selectedFile.name;
-            document.getElementById('infoSize').innerText = formatBytes(selectedFile.size);
-            document.getElementById('uploadInfo').style.display = 'block';
-            document.getElementById('uploadBtn').disabled = false;
+    async function saveMediaFireFile() {
+        const mfUrl = document.getElementById('mediafireUrl').value.trim();
+        const fileName = document.getElementById('fileName').value.trim();
+        const fileSize = parseInt(document.getElementById('fileSize').value) || 0;
+
+        if (!mfUrl) {
+            showToast("Vui lòng nhập link MediaFire!", "error");
+            return;
         }
-    }
 
-    function startUpload() {
-        if (!selectedFile) return;
-
-        const uploadBtn = document.getElementById('uploadBtn');
-        const progressBar = document.getElementById('uploadProgress');
-        const bar = document.getElementById('uploadBar');
-        const statusText = document.getElementById('uploadStatusText');
-
-        uploadBtn.disabled = true;
-        progressBar.style.display = 'block';
-        statusText.innerText = "Đang bắt đầu tải lên...";
-
-        const fileId = db.collection('downloads').doc().id;
-        const storagePath = `downloads/${fileId}_${selectedFile.name}`;
-        const storageRef = storage.ref(storagePath);
-
-        const uploadTask = storageRef.put(selectedFile);
-        let startTime = Date.now();
-
-        uploadTask.on('state_changed', 
-            (snapshot) => {
-                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                bar.style.width = progress + '%';
-                
-                const elapsedTime = (Date.now() - startTime) / 1000;
-                const speed = elapsedTime > 0 ? (snapshot.bytesTransferred / elapsedTime) : 0;
-                statusText.innerText = `Đang tải lên... ${Math.round(progress)}% (${formatBytes(speed)}/s)`;
-            }, 
-            (error) => {
-                console.error("Lỗi Upload Storage:", error);
-                showToast("Upload thất bại: " + error.message, "error");
-                uploadBtn.disabled = false;
-                progressBar.style.display = 'none';
-                statusText.innerText = "";
-            }, 
-            async () => {
-                try {
-                    // Tạo Firestore document
-                    await db.collection('downloads').doc(fileId).set({
-                        name: selectedFile.name,
-                        description: document.getElementById('fileDescription').value || '',
-                        storagePath: storagePath,
-                        size: selectedFile.size,
-                        type: selectedFile.type || 'application/octet-stream',
-                        thumbnail: document.getElementById('fileThumbnail').value || '',
-                        downloadCount: 0,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        enabled: true
-                    });
-
-                    statusText.innerText = "Upload thành công 100%!";
-                    showToast("Upload và lưu metadata file thành công!");
-                    uploadBtn.disabled = false;
-
-                    // Xuất link
-                    const fullLink = `${window.location.origin}/taixuong.html?id=${fileId}`;
-                    document.getElementById('generatedLink').value = fullLink;
-                    document.getElementById('linkOutput').style.display = 'block';
-                    
-                    // Reset Form
-                    document.getElementById('fileInput').value = '';
-                    document.getElementById('fileDescription').value = '';
-                    document.getElementById('fileThumbnail').value = '';
-                    document.getElementById('uploadInfo').style.display = 'none';
-                    selectedFile = null;
-
-                } catch (err) {
-                    console.error("Lỗi tạo Firestore document:", err);
-                    showToast("Lỗi lưu thông tin file vào Firestore: " + err.message, "error");
-                    uploadBtn.disabled = false;
-                }
-            }
-        );
-    }
-
-    // 5. Copy Link Helper
-    function executeCopy(text) {
-        if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(text).then(() => {
-                showToast("Đã sao chép link!");
-            }).catch(() => {
-                fallbackCopy(text);
-            });
-        } else {
-            fallbackCopy(text);
-        }
-    }
-
-    function fallbackCopy(text) {
-        const textArea = document.createElement("textarea");
-        textArea.value = text;
-        textArea.style.position = "fixed";
-        textArea.style.left = "-999999px";
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        try {
-            document.execCommand('copy');
-            showToast("Đã sao chép link!");
-        } catch (err) {
-            showToast("Không thể sao chép tự động!", "error");
-        }
-        document.body.removeChild(textArea);
-    }
-
-    function copyLink(id) {
-        const url = `${window.location.origin}/taixuong.html?id=${id}`;
-        executeCopy(url);
-    }
-
-    function copyGeneratedLink() {
-        const link = document.getElementById('generatedLink').value;
-        if (link) executeCopy(link);
-    }
-
-    // 6. Chỉnh sửa File
-    function openEditModal(id) {
-        const file = allFiles.find(f => f.id === id);
-        if (!file) return;
-
-        document.getElementById('editFileId').value = file.id;
-        document.getElementById('editFileName').value = file.name || '';
-        document.getElementById('editFileDesc').value = file.description || '';
-        document.getElementById('editFileThumb').value = file.thumbnail || '';
-        document.getElementById('editFileStatus').value = (file.enabled !== false).toString();
-        
-        document.getElementById('editModal').style.display = 'flex';
-    }
-
-    function closeEditModal() {
-        document.getElementById('editModal').style.display = 'none';
-    }
-
-    async function saveFileEdit() {
-        const id = document.getElementById('editFileId').value;
-        const btn = document.getElementById('saveEditBtn');
+        const btn = document.getElementById('saveBtn');
         btn.disabled = true;
 
         try {
-            await db.collection('downloads').doc(id).update({
-                name: document.getElementById('editFileName').value,
-                description: document.getElementById('editFileDesc').value,
-                thumbnail: document.getElementById('editFileThumb').value,
-                enabled: document.getElementById('editFileStatus').value === 'true'
+            const fileId = db.collection('downloads').doc().id;
+            await db.collection('downloads').doc(fileId).set({
+                name: fileName || 'MediaFire File',
+                description: document.getElementById('fileDescription').value || '',
+                storagePath: mfUrl, // Lưu URL MediaFire gốc
+                size: fileSize,
+                type: 'application/octet-stream',
+                thumbnail: document.getElementById('fileThumbnail').value || '',
+                downloadCount: 0,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                enabled: true
             });
-            showToast("Cập nhật thông tin file thành công!");
-            closeEditModal();
+
+            showToast("Tạo link tải xuống thành công!");
+            btn.disabled = false;
+
+            const fullLink = `${window.location.origin}/taixuong.html?id=${fileId}`;
+            document.getElementById('generatedLink').value = fullLink;
+            document.getElementById('linkOutput').style.display = 'block';
+
+            document.getElementById('mediafireUrl').value = '';
+            document.getElementById('fileName').value = '';
+            document.getElementById('fileSize').value = '';
+            document.getElementById('fileDescription').value = '';
+            document.getElementById('fileThumbnail').value = '';
+
         } catch (err) {
-            console.error("Lỗi cập nhật:", err);
-            showToast("Không thể cập nhật: " + err.message, "error");
-        } finally {
+            showToast("Lỗi: " + err.message, "error");
             btn.disabled = false;
         }
     }
 
-    // 7. Xóa File Đồng Bộ Storage & Firestore
-    async function deleteFile(id, storagePath) {
-        if (!confirm("Bạn có chắc chắn muốn xóa file này? Thao tác sẽ xóa cả file lưu trữ và dữ liệu.")) return;
+    function copyLink(id) {
+        const url = `${window.location.origin}/taixuong.html?id=${id}`;
+        navigator.clipboard.writeText(url).then(() => showToast("Đã copy link!"));
+    }
 
-        try {
-            // Xóa file khỏi Storage nếu tồn tại path
-            if (storagePath) {
-                await storage.ref(storagePath).delete().catch(e => {
-                    console.warn("Storage file không tồn tại hoặc lỗi xóa:", e);
-                });
-            }
-            // Xóa document khỏi Firestore
+    function copyGeneratedLink() {
+        const link = document.getElementById('generatedLink').value;
+        if (link) navigator.clipboard.writeText(link).then(() => showToast("Đã copy link!"));
+    }
+
+    function openEditModal(id) {
+        const file = allFiles.find(f => f.id === id);
+        if (!file) return;
+        document.getElementById('editFileId').value = file.id;
+        document.getElementById('editFileName').value = file.name || '';
+        document.getElementById('editFileUrl').value = file.storagePath || '';
+        document.getElementById('editFileDesc').value = file.description || '';
+        document.getElementById('editFileThumb').value = file.thumbnail || '';
+        document.getElementById('editFileStatus').value = (file.enabled !== false).toString();
+        document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
+
+    async function saveFileEdit() {
+        const id = document.getElementById('editFileId').value;
+        await db.collection('downloads').doc(id).update({
+            name: document.getElementById('editFileName').value,
+            storagePath: document.getElementById('editFileUrl').value,
+            description: document.getElementById('editFileDesc').value,
+            thumbnail: document.getElementById('editFileThumb').value,
+            enabled: document.getElementById('editFileStatus').value === 'true'
+        });
+        showToast("Cập nhật thành công!");
+        closeEditModal();
+    }
+
+    async function deleteFile(id) {
+        if (confirm("Bạn có chắc muốn xóa file này?")) {
             await db.collection('downloads').doc(id).delete();
-            showToast("Đã xóa file thành công.");
-        } catch (err) {
-            console.error("Lỗi xóa file:", err);
-            showToast("Xóa thất bại: " + err.message, "error");
+            showToast("Đã xóa file!");
         }
     }
 </script>
