@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard - YouTube Checker</title>
+<style>
+:root{
+  --bg-1:#0b0d14;
+  --bg-2:#141824;
+  --glass:rgba(255,255,255,0.06);
+  --glass-border:rgba(255,255,255,0.14);
+  --text:#f2f4f8;
+  --text-secondary:rgba(242,244,248,0.62);
+  --accent:#ff3b5c;
+  --success:#33d17a;
+  --error:#ff5c5c;
+  --radius:16px;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; padding:20px;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Roboto,sans-serif;
+  background:linear-gradient(180deg, var(--bg-1), var(--bg-2));
+  color:var(--text);
+  min-height:100vh;
+}
+.container{max-width:900px; margin:0 auto;}
+h1, h2, h3{margin-top:0;}
+.grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:15px; margin-bottom:25px;}
+.card{
+  background:var(--glass);
+  border:1px solid var(--glass-border);
+  border-radius:var(--radius);
+  padding:20px;
+  backdrop-filter:blur(10px);
+}
+.card .val{font-size:28px; font-weight:bold; margin-top:10px; color:var(--accent);}
+.form-group{margin-bottom:15px;}
+label{display:block; margin-bottom:5px; font-size:13px; color:var(--text-secondary);}
+input, textarea, select{
+  width:100%; padding:10px; border-radius:8px;
+  border:1px solid var(--glass-border); background:rgba(0,0,0,0.2);
+  color:var(--text); outline:none;
+}
+button{
+  padding:10px 20px; border:none; border-radius:8px;
+  background:var(--accent); color:#fff; font-weight:bold; cursor:pointer;
+}
+button:hover{opacity:0.9;}
+.btn-danger{background:var(--error);}
+table{width:100%; border-collapse:collapse; margin-top:10px;}
+th, td{padding:10px; text-align:left; border-bottom:1px solid var(--glass-border); font-size:13px;}
+th{color:var(--text-secondary);}
+.badge{padding:3px 8px; border-radius:4px; font-size:11px; background:rgba(255,92,92,0.2); color:var(--error);}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Trang Quan Ly System</h1>
+  
+  <div class="grid">
+    <div class="card">
+      <div>Tong so nhiem vu</div>
+      <div class="val" id="totalTasks">0</div>
+    </div>
+    <div class="card">
+      <div>Tong nguoi dung</div>
+      <div class="val" id="totalUsers">0</div>
+    </div>
+    <div class="card">
+      <div>Da hoan thanh</div>
+      <div class="val" id="completedUsers">0</div>
+    </div>
+    <div class="card">
+      <div>Luot co tin Bypass</div>
+      <div class="val" id="bypassCount" style="color:var(--error);">0</div>
+    </div>
+  </div>
+
+  <div class="grid" style="grid-template-columns: 1fr 1fr;">
+    <div class="card">
+      <h2>Cap Nhat Thong Ke Kênh</h2>
+      <div class="form-group">
+        <label>So nguoi dang ky (Subscribers)</label>
+        <input type="number" id="subCount" placeholder="Vi du: 15000">
+      </div>
+      <div class="form-group">
+        <label>So luot thich (Likes)</label>
+        <input type="number" id="likeCount" placeholder="Vi du: 3200">
+      </div>
+      <div class="form-group">
+        <label>So binh luan (Comments)</label>
+        <input type="number" id="commentCount" placeholder="Vi du: 450">
+      </div>
+      <button id="saveStatsBtn">Luu Thong Ke</button>
+    </div>
+
+    <div class="card">
+      <h2>Them Nhiem Vu Moi</h2>
+      <div class="form-group">
+        <label>Tieu de nhiem vu</label>
+        <input type="text" id="taskTitle" placeholder="Vi du: Dang ky kenh YouTube Official">
+      </div>
+      <div class="form-group">
+        <label>Mo ta nhiem vu</label>
+        <input type="text" id="taskDesc" placeholder="Vi du: Nhap dang ky va bat thong bao">
+      </div>
+      <div class="form-group">
+        <label>Đuong dan (URL YouTube)</label>
+        <input type="text" id="taskUrl" placeholder="https://youtube.com/...">
+      </div>
+      <div class="form-group">
+        <label>
+          <input type="checkbox" id="taskHasComment" style="width:auto;"> Yeu cau kiem tra noi dung binh luan
+        </label>
+      </div>
+      <button id="addTaskBtn">Them Nhiem Vu</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:25px;">
+    <h2>Danh Sach Nhiem Vu Hien Tai</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Tieu De</th>
+          <th>Mo Ta</th>
+          <th>Link</th>
+          <th>Binh Luan</th>
+          <th>Thao Tac</th>
+        </tr>
+      </thead>
+      <tbody id="taskListTable"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2 style="color:var(--error);">Nhat Ky Co Tinh Bypass (Canh Bao)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Thoi Gian</th>
+          <th>User ID</th>
+          <th>Hanh Vi Bypass</th>
+          <th>Nhiem Vu</th>
+        </tr>
+      </thead>
+      <tbody id="bypassTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getDatabase, ref, set, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
+  authDomain: "quocdat-396fe.firebaseapp.com",
+  databaseURL: "https://quocdat-396fe-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "quocdat-396fe",
+  storageBucket: "quocdat-396fe.firebasestorage.app",
+  messagingSenderId: "685476439350",
+  appId: "1:685476439350:web:949054ecba7f0a0c383f97"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+function listenStats() {
+  onValue(ref(db, "users"), (snapshot) => {
+    const data = snapshot.val();
+    document.getElementById("totalUsers").textContent = data ? Object.keys(data).length : 0;
+  });
+
+  onValue(ref(db, "stats/completedUsers"), (snapshot) => {
+    document.getElementById("completedUsers").textContent = snapshot.val() || 0;
+  });
+
+  onValue(ref(db, "stats/youtubeStats"), (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      document.getElementById("subCount").value = data.subscribers || 0;
+      document.getElementById("likeCount").value = data.likes || 0;
+      document.getElementById("commentCount").value = data.comments || 0;
+    }
+  });
+
+  onValue(ref(db, "tasks"), (snapshot) => {
+    const data = snapshot.val();
+    const table = document.getElementById("taskListTable");
+    table.innerHTML = "";
+    if (!data) {
+      document.getElementById("totalTasks").textContent = 0;
+      return;
+    }
+    const keys = Object.keys(data);
+    document.getElementById("totalTasks").textContent = keys.length;
+    
+    keys.forEach(key => {
+      const item = data[key];
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><b>${item.title}</b></td>
+        <td>${item.desc}</td>
+        <td><a href="${item.url}" target="_blank" style="color:var(--accent);">Mo Link</a></td>
+        <td>${item.hasComment ? "Co" : "Khong"}</td>
+        <td><button class="btn-danger" data-id="${key}">Xoa</button></td>
+      `;
+      tr.querySelector("button").addEventListener("click", () => {
+        remove(ref(db, `tasks/${key}`));
+      });
+      table.appendChild(tr);
+    });
+  });
+
+  onValue(ref(db, "bypassLogs"), (snapshot) => {
+    const data = snapshot.val();
+    const table = document.getElementById("bypassTable");
+    table.innerHTML = "";
+    if (!data) {
+      document.getElementById("bypassCount").textContent = 0;
+      return;
+    }
+    const keys = Object.keys(data).reverse();
+    document.getElementById("bypassCount").textContent = keys.length;
+
+    keys.slice(0, 15).forEach(key => {
+      const log = data[key];
+      const date = new Date(log.timestamp).toLocaleString("vi-VN");
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${date}</td>
+        <td><code>${log.userId}</code></td>
+        <td><span class="badge">${log.reason}</span></td>
+        <td>${log.taskId}</td>
+      `;
+      table.appendChild(tr);
+    });
+  });
+}
+
+document.getElementById("saveStatsBtn").addEventListener("click", () => {
+  const subs = Number(document.getElementById("subCount").value);
+  const likes = Number(document.getElementById("likeCount").value);
+  const comments = Number(document.getElementById("commentCount").value);
+
+  set(ref(db, "stats/youtubeStats"), {
+    subscribers: subs,
+    likes: likes,
+    comments: comments
+  }).then(() => {
+    alert("Da cap nhat thong ke YouTube thanh cong!");
+  });
+});
+
+document.getElementById("addTaskBtn").addEventListener("click", () => {
+  const title = document.getElementById("taskTitle").value.trim();
+  const desc = document.getElementById("taskDesc").value.trim();
+  const url = document.getElementById("taskUrl").value.trim();
+  const hasComment = document.getElementById("taskHasComment").checked;
+
+  if (!title || !url) {
+    alert("Vui long nhap day du Tieu de va Link URL!");
+    return;
+  }
+
+  push(ref(db, "tasks"), {
+    title: title,
+    desc: desc,
+    url: url,
+    hasComment: hasComment
+  }).then(() => {
+    document.getElementById("taskTitle").value = "";
+    document.getElementById("taskDesc").value = "";
+    document.getElementById("taskUrl").value = "";
+    document.getElementById("taskHasComment").checked = false;
+    alert("Them nhiem vu thanh cong!");
+  });
+});
+
+document.addEventListener("DOMContentLoaded", listenStats);
+</script>
+</body>
+</html>
