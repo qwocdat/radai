@@ -217,14 +217,6 @@ header.top .titles p{font-size:13.5px; color:var(--text-secondary); margin:0;}
 .unlock-btn:disabled{opacity:.4; box-shadow:none; cursor:not-allowed;}
 .unlock-hint{margin-top:10px; font-size:12.5px; color:var(--text-tertiary);}
 
-.stats-grid{
-  display:grid; grid-template-columns:1fr 1fr;
-  gap:10px; margin-top:10px;
-}
-.stat-card{padding:16px 16px 14px;}
-.stat-card .s-label{font-size:12px; color:var(--text-tertiary); margin:0 0 6px; display:flex; align-items:center; gap:6px;}
-.stat-card .s-value{font-size:21px; font-weight:700; letter-spacing:-0.3px; margin:0; font-variant-numeric:tabular-nums;}
-
 .sheet-backdrop{
   position:fixed; inset:0; z-index:80;
   background:rgba(0,0,0,0.45);
@@ -337,6 +329,12 @@ header.top .titles p{font-size:13.5px; color:var(--text-secondary); margin:0;}
 @keyframes rippleAnim{to{transform:scale(2.5); opacity:0;}}
 
 footer.foot{text-align:center; margin-top:26px; font-size:11.5px; color:var(--text-tertiary); padding-bottom:6px;}
+
+.error-card-state{
+  padding:36px 20px; text-align:center;
+}
+.error-card-state h3{font-size:17px; color:var(--error); margin:0 0 8px;}
+.error-card-state p{font-size:13.5px; color:var(--text-secondary); margin:0;}
 </style>
 </head>
 <body>
@@ -352,8 +350,8 @@ footer.foot{text-align:center; margin-top:26px; font-size:11.5px; color:var(--te
 <div id="app">
   <header class="top">
     <div class="titles">
-      <h1>Sub Checker</h1>
-      <p>Xác minh nhiệm vụ SubUnlock</p>
+      <h1 id="appMainTitle">YouTube Checker</h1>
+      <p id="appSubTitle">Xác minh nhiệm vụ YouTube</p>
     </div>
     <div class="header-actions">
       <div id="netStatus"><span class="dot"></span><span id="netText">Đang kết nối</span></div>
@@ -380,27 +378,7 @@ footer.foot{text-align:center; margin-top:26px; font-size:11.5px; color:var(--te
     <p class="unlock-hint" id="unlockHint">Hoàn thành tất cả nhiệm vụ để mở khóa</p>
   </div>
 
-  <div class="section-label">Thống kê hệ thống</div>
-  <div class="stats-grid" id="statsGrid">
-    <div class="glass stat-card">
-      <p class="s-label">Người đăng ký</p>
-      <p class="s-value" id="statSubs">---</p>
-    </div>
-    <div class="glass stat-card">
-      <p class="s-label">Lượt thích</p>
-      <p class="s-value" id="statLikes">---</p>
-    </div>
-    <div class="glass stat-card">
-      <p class="s-label">Bình luận</p>
-      <p class="s-value" id="statComments">---</p>
-    </div>
-    <div class="glass stat-card">
-      <p class="s-label">Nhiệm vụ hoàn thành</p>
-      <p class="s-value" id="statTasksDone">0 / 0</p>
-    </div>
-  </div>
-
-  <footer class="foot">Xác minh trực tiếp qua API Youtube/TikTok</footer>
+  <footer class="foot">Xác minh trực tiếp qua YouTube Data API v3.</footer>
 </div>
 
 <div class="sheet-backdrop" id="sheetBackdrop"></div>
@@ -436,7 +414,7 @@ footer.foot{text-align:center; margin-top:26px; font-size:11.5px; color:var(--te
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getDatabase, ref, get, set, push, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { getDatabase, ref, get, set, push, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
@@ -455,16 +433,18 @@ const VERIFICATION_TIMEOUT = 60000;
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+let currentLinkId = null;
+let currentLinkData = null;
 let TASKS = [];
-let targetAliasTask = null;
-let hasAliasInUrl = false;
+
 const userId = getOrCreateUserId();
 
 const state = {
   results: {},
   activeTaskId: null,
   sheetBusy: false,
-  userCompleted: false
+  userCompleted: false,
+  urlState: "VALID" // "INVALID_URL", "NOT_FOUND", "DISABLED", "VALID"
 };
 
 let verificationSession = null;
@@ -500,7 +480,7 @@ function getOrCreateUserId() {
 
 async function getChannelSubCount(channelId) {
   if (!channelId) throw new Error("Thiếu Channel ID.");
-  const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${channelId}&key=${YT_API_KEY}`);
+  const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${encodeURIComponent(channelId)}&key=${YT_API_KEY}`);
   if (!res.ok) throw new Error("Không thể đọc dữ liệu kênh từ YouTube.");
   const data = await res.json();
   if (!data.items || data.items.length === 0) throw new Error("Không tìm thấy kênh YouTube.");
@@ -509,7 +489,7 @@ async function getChannelSubCount(channelId) {
 
 async function getVideoLikeCount(videoId) {
   if (!videoId) throw new Error("Thiếu Video ID.");
-  const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoId}&key=${YT_API_KEY}`);
+  const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${encodeURIComponent(videoId)}&key=${YT_API_KEY}`);
   if (!res.ok) throw new Error("Không thể đọc dữ liệu video từ YouTube.");
   const data = await res.json();
   if (!data.items || data.items.length === 0) throw new Error("Không tìm thấy Video YouTube.");
@@ -518,7 +498,7 @@ async function getVideoLikeCount(videoId) {
 
 async function checkRecentComments(videoId, targetLines) {
   if (!videoId) return false;
-  const res = await fetch(`https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=${videoId}&maxResults=20&key=${YT_API_KEY}`);
+  const res = await fetch(`https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=${encodeURIComponent(videoId)}&maxResults=20&key=${YT_API_KEY}`);
   if (!res.ok) return false;
   const data = await res.json();
   if (!data.items) return false;
@@ -534,6 +514,7 @@ async function checkRecentComments(videoId, targetLines) {
 }
 
 function trackUserVisit() {
+  if (!currentLinkId) return;
   set(ref(db, `users/${userId}/lastActive`), Date.now()).catch(()=>{});
   set(ref(db, `users/${userId}/device`), navigator.userAgent).catch(()=>{});
 }
@@ -541,6 +522,7 @@ function trackUserVisit() {
 function logBypassAttempt(reason, taskId = "none") {
   push(ref(db, "bypassLogs"), {
     userId: userId,
+    linkId: currentLinkId || "none",
     taskId: taskId,
     reason: reason,
     timestamp: Date.now(),
@@ -572,51 +554,76 @@ const taskListEl = document.getElementById("taskList");
 function renderTasks() {
   taskListEl.innerHTML = "";
 
-  // BÁO KHÔNG CÓ NHIỆM VỤ NẾU VÀO TRỰC TIẾP KHÔNG CÓ LINK RÚT GỌN TẠO TỪ CHECKAD
-  if (!hasAliasInUrl || !targetAliasTask) {
-    taskListEl.innerHTML = `<div style="padding:32px 20px; text-align:center; color:var(--text-tertiary); font-size:15px; font-weight:500;">Bạn không có nhiệm vụ gì ở đây cả.</div>`;
+  if (state.urlState === "INVALID_URL") {
+    taskListEl.innerHTML = `
+      <div class="error-card-state">
+        <h3>Địa chỉ nhiệm vụ không hợp lệ</h3>
+        <p>Vui lòng sử dụng link nhiệm vụ được tạo từ hệ thống.</p>
+      </div>`;
     updateProgress();
     return;
   }
 
-  const task = targetAliasTask;
-  if (task.status === "disabled") {
-    taskListEl.innerHTML = `<div style="padding:32px 20px; text-align:center; color:var(--text-tertiary); font-size:15px; font-weight:500;">Nhiệm vụ này đã bị vô hiệu hóa.</div>`;
+  if (state.urlState === "NOT_FOUND") {
+    taskListEl.innerHTML = `
+      <div class="error-card-state">
+        <h3>Không tìm thấy nhiệm vụ</h3>
+        <p>Nhiệm vụ này không tồn tại hoặc đã bị xóa khỏi hệ thống.</p>
+      </div>`;
     updateProgress();
     return;
   }
 
-  const verified = state.results[task.id] === true;
-  const isMaint = task.status === "maintenance";
-  const row = document.createElement("div");
-  row.className = `task-row${verified ? " verified" : ""}${isMaint ? " maintenance" : ""}`;
+  if (state.urlState === "DISABLED") {
+    taskListEl.innerHTML = `
+      <div class="error-card-state">
+        <h3>Nhiệm vụ này đã bị vô hiệu hóa</h3>
+        <p>Vui lòng liên hệ người chia sẻ link để biết thêm chi tiết.</p>
+      </div>`;
+    updateProgress();
+    return;
+  }
 
-  let iconSvg = `<path d="M22 12a10 10 0 1 1-3-7.1"/><polyline points="22 4 12 14.01 9 11.01"/>`;
-  if (task.type === "like") iconSvg = `<path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>`;
-  if (task.type === "comment") iconSvg = `<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>`;
+  if (!TASKS || TASKS.length === 0) {
+    taskListEl.innerHTML = `<div style="padding:20px; text-align:center; color:var(--text-tertiary);">Link này chưa có nhiệm vụ nào.</div>`;
+    updateProgress();
+    return;
+  }
 
-  row.innerHTML = `
-    <div class="task-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        ${verified ? '<polyline points="20 6 9 17 4 12"/>' : iconSvg}
-      </svg>
-    </div>
-    <div class="task-body">
-      <p class="t-title">${escapeHtml(task.title)}</p>
-      <p class="t-status ${verified ? "verified" : ""}">
-        ${isMaint ? "Đang bảo trì" : verified ? "Đã xác minh" : "Chưa xác minh"}
-      </p>
-    </div>
-    <button class="task-btn ${verified ? "done" : isMaint ? "maint" : ""}">
-      ${isMaint ? "Bảo trì" : verified ? "Đã xong" : "Kiểm tra"}
-    </button>
-  `;
+  TASKS.forEach(task => {
+    const verified = state.results[task.id] === true;
+    const isMaint = currentLinkData && currentLinkData.status === "maintenance";
+    const row = document.createElement("div");
+    row.className = `task-row${verified ? " verified" : ""}${isMaint ? " maintenance" : ""}`;
 
-  row.addEventListener("click", () => {
-    if (!isMaint) openSheet(task.id);
+    let iconSvg = `<path d="M22 12a10 10 0 1 1-3-7.1"/><polyline points="22 4 12 14.01 9 11.01"/>`;
+    if (task.type === "like") iconSvg = `<path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>`;
+    if (task.type === "comment") iconSvg = `<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>`;
+
+    row.innerHTML = `
+      <div class="task-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          ${verified ? '<polyline points="20 6 9 17 4 12"/>' : iconSvg}
+        </svg>
+      </div>
+      <div class="task-body">
+        <p class="t-title">${escapeHtml(task.title)}</p>
+        <p class="t-status ${verified ? "verified" : ""}">
+          ${isMaint ? "Đang bảo trì" : verified ? "Đã xác minh" : "Chưa xác minh"}
+        </p>
+      </div>
+      <button class="task-btn ${verified ? "done" : isMaint ? "maint" : ""}">
+        ${isMaint ? "Bảo trì" : verified ? "Đã xong" : "Kiểm tra"}
+      </button>
+    `;
+
+    row.addEventListener("click", () => {
+      if (!isMaint) openSheet(task.id);
+    });
+
+    taskListEl.appendChild(row);
   });
 
-  taskListEl.appendChild(row);
   updateProgress();
 }
 
@@ -639,13 +646,19 @@ function addRipple(e) {
 }
 
 function updateProgress() {
-  const activeTasks = (hasAliasInUrl && targetAliasTask && targetAliasTask.status === "active") ? [targetAliasTask] : [];
-  const total = activeTasks.length;
-  const done = activeTasks.filter(t => state.results[t.id] === true).length;
+  if (state.urlState !== "VALID" || !TASKS) {
+    document.getElementById("progressCount").textContent = "0 / 0 nhiệm vụ hoàn thành";
+    document.getElementById("progressFill").style.width = "0%";
+    document.getElementById("unlockBtn").disabled = true;
+    document.getElementById("unlockHint").textContent = "Vui lòng truy cập qua link nhiệm vụ hợp lệ";
+    return;
+  }
+
+  const total = TASKS.length;
+  const done = TASKS.filter(t => state.results[t.id] === true).length;
   
   document.getElementById("progressCount").textContent = `${done} / ${total} nhiệm vụ hoàn thành`;
   document.getElementById("progressFill").style.width = total > 0 ? `${(done / total) * 100}%` : "0%";
-  document.getElementById("statTasksDone").textContent = `${done} / ${total}`;
 
   const caption = document.getElementById("progressCaption");
   const unlockBtn = document.getElementById("unlockBtn");
@@ -656,17 +669,17 @@ function updateProgress() {
     document.getElementById("unlockHint").textContent = "Nhấn MỞ KHÓA để chuyển đến trang đích";
     markUserCompletedOnce();
   } else {
-    caption.textContent = hasAliasInUrl ? "Hoàn thành nhiệm vụ bên dưới để mở khóa." : "Vui lòng truy cập qua link nhiệm vụ hợp lệ.";
+    caption.textContent = "Hoàn thành các nhiệm vụ bên dưới để mở khóa.";
     unlockBtn.disabled = true;
     document.getElementById("unlockHint").textContent = "Hoàn thành tất cả nhiệm vụ để mở khóa";
   }
 }
 
 function markUserCompletedOnce() {
-  if (state.userCompleted) return;
-  get(ref(db, `users/${userId}/completed`)).then(snapshot => {
+  if (state.userCompleted || !currentLinkId) return;
+  get(ref(db, `users/${userId}/links/${currentLinkId}/completed`)).then(snapshot => {
     if (!snapshot.exists() || snapshot.val() !== true) {
-      set(ref(db, `users/${userId}/completed`), true);
+      set(ref(db, `users/${userId}/links/${currentLinkId}/completed`), true);
       state.userCompleted = true;
       runTransaction(ref(db, "stats/completedUsers"), (current) => (current || 0) + 1);
     } else {
@@ -679,15 +692,24 @@ const sheet = document.getElementById("sheet");
 const sheetBackdrop = document.getElementById("sheetBackdrop");
 const sheetVerifyBtn = document.getElementById("sheetVerify");
 
+function stopVerificationSession() {
+  if (verificationSession) {
+    if (verificationSession.timer) clearInterval(verificationSession.timer);
+    if (verificationSession.poll) clearInterval(verificationSession.poll);
+    verificationSession = null;
+  }
+  state.sheetBusy = false;
+}
+
 function openSheet(taskId) {
+  stopVerificationSession();
+
   const task = TASKS.find(t => t.id === taskId);
   if (!task) return;
-  
-  stopVerificationSession();
 
   state.activeTaskId = taskId;
   document.getElementById("sheetTitle").textContent = task.title;
-  document.getElementById("sheetDesc").textContent = task.desc;
+  document.getElementById("sheetDesc").textContent = task.desc || "Hoàn thành tương tác bên dưới để mở khóa.";
 
   const commentBox = document.getElementById("commentBoxSection");
   const commentContainer = document.getElementById("commentListContainer");
@@ -733,35 +755,27 @@ function setSheetStatus(text, type = "") {
   statusEl.style.color = type === "success" ? "var(--success)" : type === "error" ? "var(--error)" : "var(--text)";
 }
 
-function stopVerificationSession() {
-  if (verificationSession) {
-    if (verificationSession.timer) clearInterval(verificationSession.timer);
-    if (verificationSession.poll) clearInterval(verificationSession.poll);
-    verificationSession = null;
-  }
-}
-
 document.getElementById("sheetCancel").addEventListener("click", closeSheet);
 sheetBackdrop.addEventListener("click", closeSheet);
 
 sheetVerifyBtn.addEventListener("click", async (e) => {
   addRipple(e);
   const task = TASKS.find(t => t.id === state.activeTaskId);
-  if (!task) return;
+  if (!task || state.sheetBusy) return;
 
   if (!navigator.onLine) {
     showToast("Không có kết nối Internet", "error");
     return;
   }
 
+  stopVerificationSession();
+  state.sheetBusy = true;
+  sheetVerifyBtn.disabled = true;
+
   if (task.url && task.url !== "#") {
     const cleanUrl = sanitizeUrl(task.url);
     if (cleanUrl !== "#") window.open(cleanUrl, "_blank");
   }
-
-  stopVerificationSession();
-  state.sheetBusy = true;
-  sheetVerifyBtn.disabled = true;
 
   try {
     let startVal = 0;
@@ -775,7 +789,6 @@ sheetVerifyBtn.addEventListener("click", async (e) => {
 
     verificationSession = {
       taskId: task.id,
-      running: true,
       timer: setInterval(() => {
         const remaining = Math.max(0, Math.ceil((expiresAt - Date.now()) / 1000));
         sheetVerifyBtn.textContent = `ĐANG KIỂM TRA... ${remaining}s`;
@@ -823,15 +836,15 @@ function finishSession(isSuccess, message) {
   const currentTaskId = verificationSession.taskId;
   stopVerificationSession();
 
-  state.sheetBusy = false;
-
   if (isSuccess) {
     setSheetStatus("✓ " + message, "success");
     sheetVerifyBtn.textContent = "✓ THÀNH CÔNG";
     sheetVerifyBtn.disabled = true;
 
     state.results[currentTaskId] = true;
-    set(ref(db, `users/${userId}/tasks/${currentTaskId}`), true);
+    if (currentLinkId) {
+      set(ref(db, `users/${userId}/links/${currentLinkId}/tasks/${currentTaskId}`), true);
+    }
     renderTasks();
     showToast("Xác minh thành công!", "success");
 
@@ -849,22 +862,15 @@ function finishSession(isSuccess, message) {
 }
 
 function checkAndRedirectTarget() {
-  const activeTasks = (hasAliasInUrl && targetAliasTask && targetAliasTask.status === "active") ? [targetAliasTask] : [];
-  const done = activeTasks.filter(t => state.results[t.id] === true).length;
+  if (state.urlState !== "VALID" || !TASKS || TASKS.length === 0) return;
+  const done = TASKS.filter(t => state.results[t.id] === true).length;
 
-  if (activeTasks.length > 0 && done === activeTasks.length) {
-    const rawTargetUrl = targetAliasTask ? targetAliasTask.targetUrl : null;
+  if (done === TASKS.length) {
+    const rawTargetUrl = currentLinkData ? currentLinkData.targetUrl : null;
     if (rawTargetUrl) {
       window.location.href = sanitizeUrl(rawTargetUrl);
     } else {
-      get(ref(db, "systemConfig")).then(snapshot => {
-        const config = snapshot.val();
-        if (config && config.targetUrl) {
-          window.location.href = sanitizeUrl(config.targetUrl);
-        } else {
-          showToast("Đã mở khóa hoàn tất!", "success");
-        }
-      });
+      showToast("Đã mở khóa hoàn tất!", "success");
     }
   }
 }
@@ -879,53 +885,76 @@ document.getElementById("finalUnlockBtn").addEventListener("click", (e) => {
   checkAndRedirectTarget();
 });
 
-function loadConfigAndTasks() {
+async function loadConfigAndTasks() {
   const urlParams = new URLSearchParams(window.location.search);
-  const aliasParam = urlParams.get("id");
-  hasAliasInUrl = !!aliasParam;
+  const rawId = urlParams.get("id");
 
-  onValue(ref(db, "tasks"), (snapshot) => {
-    const data = snapshot.val();
-    TASKS = [];
-    if (data) {
-      Object.keys(data).forEach(key => {
-        const item = data[key];
-        TASKS.push({
-          id: key,
-          type: item.type || "subscribe",
-          title: item.title || "Nhiệm vụ",
-          desc: item.desc || "",
-          url: item.url || "#",
-          channelId: item.channelId || "",
-          videoId: item.videoId || "",
-          targetUrl: item.targetUrl || "",
-          shortAlias: item.shortAlias || "",
-          commentLines: item.commentText ? item.commentText.split("\n") : [],
-          status: item.status || "active"
-        });
-      });
-    }
+  if (!rawId || !rawId.trim()) {
+    state.urlState = "INVALID_URL";
+    renderTasks();
+    return;
+  }
 
-    if (aliasParam) {
-      targetAliasTask = TASKS.find(t => t.shortAlias === aliasParam || t.id === aliasParam);
-    } else {
-      targetAliasTask = null;
-    }
+  currentLinkId = decodeURIComponent(rawId.trim());
 
-    get(ref(db, `users/${userId}/tasks`)).then((userSnapshot) => {
-      if (userSnapshot.exists()) state.results = userSnapshot.val() || {};
+  try {
+    const snapshot = await get(ref(db, `links/${currentLinkId}`));
+    if (!snapshot.exists()) {
+      state.urlState = "NOT_FOUND";
       renderTasks();
-    });
-  });
-
-  onValue(ref(db, "stats/youtubeStats"), (snapshot) => {
-    const stats = snapshot.val();
-    if (stats) {
-      document.getElementById("statSubs").textContent = Number(stats.subscribers || 0).toLocaleString("vi-VN");
-      document.getElementById("statLikes").textContent = Number(stats.likes || 0).toLocaleString("vi-VN");
-      document.getElementById("statComments").textContent = Number(stats.comments || 0).toLocaleString("vi-VN");
+      return;
     }
-  });
+
+    currentLinkData = snapshot.val();
+
+    if (currentLinkData.status === "disabled") {
+      state.urlState = "DISABLED";
+      renderTasks();
+      return;
+    }
+
+    document.getElementById("appMainTitle").textContent = currentLinkData.title || "YouTube Checker";
+
+    const rawTasks = currentLinkData.tasks;
+    TASKS = [];
+
+    if (Array.isArray(rawTasks)) {
+      TASKS = rawTasks.map((item, index) => ({
+        id: item.id || `t_${index}`,
+        type: item.type || "subscribe",
+        title: item.title || `Nhiệm vụ ${index + 1}`,
+        desc: item.desc || "Hoàn thành tương tác để mở khóa",
+        url: item.url || "#",
+        channelId: item.channelId || "",
+        videoId: item.videoId || "",
+        commentLines: item.commentText ? item.commentText.split("\n").filter(Boolean) : []
+      }));
+    } else if (typeof rawTasks === "object" && rawTasks !== null) {
+      TASKS = Object.entries(rawTasks).map(([key, item]) => ({
+        id: item.id || key,
+        type: item.type || "subscribe",
+        title: item.title || "Nhiệm vụ",
+        desc: item.desc || "Hoàn thành tương tác để mở khóa",
+        url: item.url || "#",
+        channelId: item.channelId || "",
+        videoId: item.videoId || "",
+        commentLines: item.commentText ? item.commentText.split("\n").filter(Boolean) : []
+      }));
+    }
+
+    const userSnapshot = await get(ref(db, `users/${userId}/links/${currentLinkId}/tasks`));
+    if (userSnapshot.exists()) {
+      state.results = userSnapshot.val() || {};
+    }
+
+    state.urlState = "VALID";
+    trackUserVisit();
+    renderTasks();
+
+  } catch (err) {
+    state.urlState = "NOT_FOUND";
+    renderTasks();
+  }
 }
 
 function updateNetworkStatus() {
@@ -961,7 +990,6 @@ document.getElementById("themeToggle").addEventListener("click", (e) => {
 
 function init() {
   updateNetworkStatus();
-  trackUserVisit();
   loadConfigAndTasks();
 
   setTimeout(() => {
