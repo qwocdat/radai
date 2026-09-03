@@ -6,6 +6,10 @@
     <title>DIGITALSHOP - Hệ Thống Quản Trị Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Face-API.js Local Browser Library -->
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+
     <style>
         body { background: #0b0f19; color: #e2e8f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .sidebar { background: #151e32; min-height: 100vh; border-right: 1px solid #1e293b; }
@@ -20,9 +24,105 @@
         .thumb-preview { width: 50px; height: 35px; object-fit: cover; border-radius: 4px; border: 1px solid #334155; }
         .tab-pane { display: none; }
         .tab-pane.active { display: block; }
+
+        /* FACE AI OVERLAY STYLES */
+        #faceai-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(11, 15, 25, 0.98);
+            backdrop-filter: blur(10px);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .faceai-card {
+            background: #151e32;
+            border: 2px solid #ea580c;
+            border-radius: 16px;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 0 30px rgba(234, 88, 12, 0.3);
+        }
+        .webcam-wrapper {
+            position: relative;
+            width: 100%;
+            height: 260px;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #334155;
+        }
+        #webcam-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+        #face-canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            transform: scaleX(-1);
+        }
+        .scan-line {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: #ea580c;
+            box-shadow: 0 0 15px #ea580c;
+            animation: scan 2s infinite ease-in-out;
+            display: none;
+        }
+        @keyframes scan {
+            0% { top: 0%; }
+            50% { top: 95%; }
+            100% { top: 0%; }
+        }
     </style>
 </head>
 <body>
+
+<!-- FACE AI AUTHENTICATION MODAL OVERLAY -->
+<div id="faceai-overlay">
+    <div class="faceai-card p-4 text-center">
+        <h4 class="text-warning fw-bold mb-2">
+            <i class="fa-solid fa-shield-halved me-2"></i>XÁC THỰC BẢO MẬT ADMIN
+        </h4>
+        <p class="text-muted small mb-3">Hệ thống yêu cầu xác thực SĐT Quản trị & Nhận diện FaceAI Local</p>
+        
+        <div id="step-phone-box">
+            <div class="mb-3 text-start">
+                <label class="form-label text-warning small fw-bold">Nhập Số Điện Thoại Quản Trị Viên:</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-dark border-secondary text-warning"><i class="fa-solid fa-phone"></i></span>
+                    <input type="text" id="auth_phone" class="form-control" placeholder="0989249990" autocomplete="off">
+                </div>
+            </div>
+            <button onclick="verifyPhone()" class="btn btn-warning fw-bold w-100 py-2">
+                <i class="fa-solid fa-arrow-right me-1"></i> Tiếp Tục Quét Khuôn Mặt
+            </button>
+        </div>
+
+        <div id="step-face-box" class="d-none">
+            <div class="webcam-wrapper mb-3">
+                <video id="webcam-video" autoplay playsinline muted></video>
+                <canvas id="face-canvas"></canvas>
+                <div class="scan-line" id="scan-line"></div>
+            </div>
+            
+            <div id="face-status" class="alert alert-info py-2 small mb-3">
+                <i class="fa-solid fa-spinner fa-spin me-1"></i> Đang khởi tạo mô hình FaceAI...
+            </div>
+
+            <button id="btn-start-scan" onclick="startFaceAuth()" class="btn btn-warning fw-bold w-100 py-2" disabled>
+                <i class="fa-solid fa-camera me-1"></i> Bắt Đầu Quét FaceAI
+            </button>
+        </div>
+
+        <div id="auth-error-msg" class="text-danger small mt-2"></div>
+    </div>
+</div>
 
 <div class="d-md-none mobile-header p-3 d-flex justify-content-between align-items-center sticky-top">
     <h5 class="text-warning fw-bold mb-0"><i class="fa-solid fa-shield-halved me-2"></i>DIGITALSHOP ADMIN</h5>
@@ -668,8 +768,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- JAVASCRIPT DIRECT FIREBASE & IMGBB CORE ENGINE -->
+<!-- JAVASCRIPT DIRECT FIREBASE & IMGBB CORE ENGINE WITH FACE AI SYSTEM -->
 <script>
+    const TARGET_PHONE = "0989249990";
     const FIREBASE_PROJECT_ID = "quocdat-396fe";
     const BASE_URL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
     const DEFAULT_PLACEHOLDER = "https://i.ibb.co/M8P23sV/placeholder.png";
@@ -691,6 +792,108 @@
         deposits: [],
         orders: []
     };
+
+    /* --- LOCAL FACE AI ENGINE --- */
+    let isModelsLoaded = false;
+    let localStream = null;
+
+    async function initFaceAI() {
+        const statusBox = document.getElementById('face-status');
+        const btnScan = document.getElementById('btn-start-scan');
+        try {
+            const MODEL_URL = 'https://cdn.jsdelivr.net/gh/catenoid-oss/face-api.js@master/weights';
+            await Promise.all([
+                faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+                faceapi.nets.faceLandmark64Net.loadFromUri(MODEL_URL)
+            ]);
+            isModelsLoaded = true;
+            statusBox.className = 'alert alert-success py-2 small mb-3';
+            statusBox.innerHTML = '<i class="fa-solid fa-check-circle me-1"></i> FaceAI Local đã sẵn sàng!';
+            btnScan.disabled = false;
+        } catch (e) {
+            statusBox.className = 'alert alert-danger py-2 small mb-3';
+            statusBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation me-1"></i> Lỗi khởi tạo FaceAI Local!';
+        }
+    }
+
+    function verifyPhone() {
+        const phoneInput = document.getElementById('auth_phone').value.trim();
+        const errBox = document.getElementById('auth-error-msg');
+        errBox.innerText = '';
+
+        if (phoneInput !== TARGET_PHONE) {
+            errBox.innerText = 'Số điện thoại Quản trị không hợp lệ!';
+            return;
+        }
+
+        document.getElementById('step-phone-box').classList.add('d-none');
+        document.getElementById('step-face-box').classList.remove('d-none');
+        startCamera();
+        initFaceAI();
+    }
+
+    async function startCamera() {
+        try {
+            const video = document.getElementById('webcam-video');
+            localStream = await navigator.mediaDevices.getUserMedia({ video: { width: 400, height: 300 } });
+            video.srcObject = localStream;
+        } catch (err) {
+            document.getElementById('auth-error-msg').innerText = 'Vui lòng cấp quyền truy cập Camera để xác thực FaceAI!';
+        }
+    }
+
+    async function startFaceAuth() {
+        if (!isModelsLoaded) return;
+        
+        const video = document.getElementById('webcam-video');
+        const canvas = document.getElementById('face-canvas');
+        const statusBox = document.getElementById('face-status');
+        const scanLine = document.getElementById('scan-line');
+        const btnScan = document.getElementById('btn-start-scan');
+
+        btnScan.disabled = true;
+        scanLine.style.display = 'block';
+        statusBox.className = 'alert alert-warning py-2 small mb-3';
+        statusBox.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Đang phân tích khuôn mặt...';
+
+        let attempts = 0;
+        const maxAttempts = 20;
+
+        const timer = setInterval(async () => {
+            attempts++;
+            const displaySize = { width: video.clientWidth, height: video.clientHeight };
+            faceapi.matchDimensions(canvas, displaySize);
+
+            const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
+            
+            const resizedDetections = faceapi.resizeResults(detections, displaySize);
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            faceapi.draw.drawDetections(canvas, resizedDetections);
+
+            if (detections && detections.length > 0) {
+                clearInterval(timer);
+                scanLine.style.display = 'none';
+                statusBox.className = 'alert alert-success py-2 small mb-3';
+                statusBox.innerHTML = '<i class="fa-solid fa-circle-check me-1"></i> Xác thực FaceAI Thành Công!';
+                
+                setTimeout(() => {
+                    if (localStream) {
+                        localStream.getTracks().forEach(track => track.stop());
+                    }
+                    sessionStorage.setItem('admin_face_auth', 'true');
+                    document.getElementById('faceai-overlay').remove();
+                    loadAllDashboardData();
+                }, 1000);
+            } else if (attempts >= maxAttempts) {
+                clearInterval(timer);
+                scanLine.style.display = 'none';
+                statusBox.className = 'alert alert-danger py-2 small mb-3';
+                statusBox.innerHTML = '<i class="fa-solid fa-circle-xmark me-1"></i> Không tìm thấy khuôn mặt hợp lệ!';
+                btnScan.disabled = false;
+            }
+        }, 300);
+    }
 
     function escapeHtml(str) {
         if (!str) return '';
@@ -1567,7 +1770,11 @@
     }
 
     window.onload = function() {
-        loadAllDashboardData();
+        if (sessionStorage.getItem('admin_face_auth') === 'true') {
+            const overlay = document.getElementById('faceai-overlay');
+            if (overlay) overlay.remove();
+            loadAllDashboardData();
+        }
     };
 </script>
 </body>
