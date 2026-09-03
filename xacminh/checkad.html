@@ -40,7 +40,7 @@ input, textarea, select{
   border:1px solid var(--glass-border); background:rgba(0,0,0,0.3);
   color:var(--text); outline:none; font-size:14px;
 }
-input:focus, select:focus{border-color:var(--accent);}
+input:focus, select:focus, textarea:focus{border-color:var(--accent);}
 button{
   padding:12px 20px; border:none; border-radius:8px;
   background:var(--accent); color:#fff; font-weight:bold; cursor:pointer;
@@ -61,6 +61,7 @@ th, td{padding:12px; text-align:left; border-bottom:1px solid var(--glass-border
 th{color:var(--text-secondary);}
 .badge{padding:3px 8px; border-radius:4px; font-size:11px; background:rgba(255,92,92,0.2); color:var(--error);}
 .badge-info{background:rgba(51,209,122,0.2); color:var(--success);}
+.badge-warning{background:rgba(255,184,77,0.2); color:var(--warning);}
 
 .modal-backdrop{
   position:fixed; inset:0; z-index:300; background:rgba(0,0,0,0.7);
@@ -69,7 +70,7 @@ th{color:var(--text-secondary);}
 .modal-backdrop.open{display:flex;}
 .modal-box{
   background:var(--bg-2); border:1px solid var(--glass-border);
-  border-radius:20px; padding:24px; max-width:440px; width:100%; text-align:center;
+  border-radius:20px; padding:24px; max-width:480px; width:100%; text-align:center;
 }
 
 #authSection{max-width:400px; margin:80px auto;}
@@ -128,19 +129,19 @@ th{color:var(--text-secondary);}
       </div>
     </div>
 
-    <!-- CẤU HÌNH BẢO TRÌ & LINK ĐÍCH -->
+    <!-- CẤU HÌNH BẢO TRÌ & LINK ĐÍCH CHUNG -->
     <div class="card" style="margin-bottom:25px;">
-      <h2>Cấu Hình Hệ Thống & Bảo Trì</h2>
+      <h2>Cấu Hình Hệ Thống & Bảo Trì Chung</h2>
       <div class="grid" style="grid-template-columns: 1fr 1fr; margin-bottom:0;">
         <div>
-          <strong>Chế Độ Bảo Trì:</strong>
+          <strong>Chế Độ Bảo Trì Toàn Hệ Thống:</strong>
           <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;" id="maintenanceText">Trạng thái: Đang hoạt động</div>
-          <button id="toggleMaintenanceBtn" style="margin-top:10px;">Bật Bảo Trì</button>
+          <button id="toggleMaintenanceBtn" style="margin-top:10px;">Bật Bảo Trì Chung</button>
         </div>
         <div class="form-group">
-          <label>Link Mở Khóa Đích (Target URL)</label>
+          <label>Link Mở Khóa Đích Mặc Định (Target URL Mặc Định)</label>
           <input type="text" id="targetDestinationUrl" placeholder="https://example.com/file">
-          <button id="saveTargetBtn" style="margin-top:10px;">Lưu Link Đích</button>
+          <button id="saveTargetBtn" style="margin-top:10px;">Lưu Link Mặc Định</button>
         </div>
       </div>
       <div style="margin-top:15px; border-top:1px solid var(--glass-border); padding-top:15px; display:flex; gap:10px;">
@@ -151,7 +152,7 @@ th{color:var(--text-secondary);}
 
     <!-- THÊM NHIỆM VỤ MỚI -->
     <div class="card" style="margin-bottom:25px;">
-      <h2>Thêm Nhiệm Vụ Mới (Tự Động Lấy ID Từ URL)</h2>
+      <h2>Thêm Nhiệm Vụ Mới (Tự Động Sinh Link Rút Gọn & Trang Đích)</h2>
       <div class="grid" style="grid-template-columns: 1fr 1fr;">
         <div>
           <div class="form-group">
@@ -172,17 +173,21 @@ th{color:var(--text-secondary);}
             <label>Mô tả nhiệm vụ</label>
             <input type="text" id="taskDesc" placeholder="Nhấn Đăng ký và bật chuông">
           </div>
+          <div class="form-group">
+            <label>Trang Đích Riêng Cho Nhiệm Vụ Này (Target URL)</label>
+            <input type="text" id="taskTargetUrl" placeholder="https://trang-dich-rieng.com/file">
+          </div>
         </div>
 
         <div>
           <div class="form-group">
-            <label>Đường dẫn Liên kết Kênh / Video (URL)</label>
+            <label>Đường dẫn Liên kết Kênh / Video (URL YouTube)</label>
             <input type="text" id="taskUrl" placeholder="Dán link YouTube (Kênh hoặc Video) vào đây...">
             <div id="urlParsingStatus" class="channel-status-info"></div>
           </div>
           <div class="form-group" id="fieldCommentText" style="display:none;">
-            <label>Nội dung bình luận yêu cầu</label>
-            <input type="text" id="taskCommentText" placeholder="Tuyệt vời quá admin ơi!">
+            <label>Nội dung bình luận mẫu (Mỗi dòng là 1 câu bình luận)</label>
+            <textarea id="taskCommentText" rows="4" placeholder="Tuyệt vời quá admin ơi!&#10;Video rất hay và bổ ích.&#10;Hóng clip tiếp theo."></textarea>
           </div>
           <button id="addTaskBtn" style="width:100%; margin-top:10px;">Thêm Nhiệm Vụ Ngay</button>
         </div>
@@ -197,8 +202,8 @@ th{color:var(--text-secondary);}
           <thead>
             <tr>
               <th>Loại</th>
-              <th>Tiêu Đề</th>
-              <th>Link / Channel ID</th>
+              <th>Tiêu Đề / Link Rút Gọn</th>
+              <th>Link YouTube</th>
               <th>Trạng Thái</th>
               <th>Thao Tác</th>
             </tr>
@@ -267,18 +272,26 @@ th{color:var(--text-secondary);}
   </div>
 </div>
 
-<!-- EDIT LINK MODAL (BÚT CHÌ) -->
+<!-- EDIT LINK & TARGET MODAL (BÚT CHÌ) -->
 <div class="modal-backdrop" id="editModal">
   <div class="modal-box">
-    <h3>Sửa Đường Dẫn Nhiệm Vụ ✏️</h3>
+    <h3>Sửa Nhiệm Vụ & Trang Đích ✏️</h3>
     <div class="form-group" style="text-align:left; margin-top:15px;">
       <label>Tiêu đề nhiệm vụ</label>
-      <input type="text" id="editTaskTitle" readonly style="opacity:0.6;">
+      <input type="text" id="editTaskTitle">
     </div>
     <div class="form-group" style="text-align:left;">
-      <label>URL Mới (Kênh hoặc Video)</label>
+      <label>URL YouTube Mới (Kênh hoặc Video)</label>
       <input type="text" id="editTaskUrl" placeholder="https://youtube.com/...">
       <div id="editUrlParsingStatus" class="channel-status-info"></div>
+    </div>
+    <div class="form-group" style="text-align:left;">
+      <label>Trang Đích Riêng (Target URL)</label>
+      <input type="text" id="editTargetUrl" placeholder="https://trang-dich-rieng.com/file">
+    </div>
+    <div class="form-group" style="text-align:left;">
+      <label>Danh sách bình luận mẫu (Mỗi dòng 1 câu)</label>
+      <textarea id="editCommentText" rows="3" placeholder="Bình luận dòng 1&#10;Bình luận dòng 2"></textarea>
     </div>
     <div style="display:flex; gap:10px; margin-top:20px;">
       <button id="editModalCancelBtn" class="btn-secondary" style="flex:1;">Hủy</button>
@@ -316,6 +329,10 @@ let currentAutoVideoId = "";
 let editingTaskId = null;
 let editAutoChannelId = "";
 let editAutoVideoId = "";
+
+function generateShortAlias() {
+  return Math.random().toString(36).substring(2, 8);
+}
 
 function escapeHtml(str) {
   if (!str) return "";
@@ -415,7 +432,6 @@ async function resolveYoutubeUrl(urlStr) {
   return { channelId, videoId };
 }
 
-// Xử lý tự động khi dán link ở ô Thêm mới
 document.getElementById("taskUrl").addEventListener("change", async (e) => {
   const statusEl = document.getElementById("urlParsingStatus");
   statusEl.style.display = "block";
@@ -434,7 +450,6 @@ document.getElementById("taskUrl").addEventListener("change", async (e) => {
   }
 });
 
-// Xử lý tự động khi dán link ở Modal Bút Chì
 document.getElementById("editTaskUrl").addEventListener("change", async (e) => {
   const statusEl = document.getElementById("editUrlParsingStatus");
   statusEl.style.display = "block";
@@ -478,14 +493,14 @@ function initListeners() {
       const text = document.getElementById("maintenanceText");
       const btn = document.getElementById("toggleMaintenanceBtn");
       if (isMaintenance) {
-        text.textContent = "Trạng thái: ĐANG BẢO TRÌ (Đã khóa Link)";
+        text.textContent = "Trạng thái: ĐANG BẢO TRÌ CHUNG (Khóa toàn bộ)";
         text.style.color = "var(--error)";
-        btn.textContent = "Tắt Bảo Trì";
+        btn.textContent = "Tắt Bảo Trì Chung";
         btn.className = "btn-warning";
       } else {
         text.textContent = "Trạng thái: Đang hoạt động bình thường";
         text.style.color = "var(--success)";
-        btn.textContent = "Bật Bảo Trì";
+        btn.textContent = "Bật Bảo Trì Chung";
         btn.className = "";
       }
     }
@@ -505,25 +520,33 @@ function initListeners() {
     keys.forEach(key => {
       const item = data[key];
       const tr = document.createElement("tr");
-      const isDevDisabled = item.status === "disabled";
+      const alias = item.shortAlias || key;
+      const shortUrl = `${window.location.origin}/check.html?id=${alias}`;
+
+      let statusBadge = '<span class="badge badge-info">Hoạt động</span>';
+      if (item.status === "disabled") statusBadge = '<span class="badge">Đã ẩn</span>';
+      if (item.status === "maintenance") statusBadge = '<span class="badge badge-warning">Bảo trì</span>';
 
       tr.innerHTML = `
         <td><span class="badge badge-info">${escapeHtml(item.type || 'subscribe')}</span></td>
-        <td><b>${escapeHtml(item.title)}</b></td>
         <td>
-          <small id="url-display-${key}">${escapeHtml(item.url || item.channelId || 'N/A')}</small>
-          <button class="edit-btn-icon" data-edit="${key}" title="Sửa Link Nhiệm Vụ">✏️</button>
+          <b>${escapeHtml(item.title)}</b><br>
+          <small><a href="${shortUrl}" target="_blank" style="color:var(--accent);">${shortUrl}</a></small>
         </td>
-        <td>${isDevDisabled ? '<span class="badge">Đã ẩn</span>' : '<span class="badge badge-info">Hoạt động</span>'}</td>
         <td>
-          <button class="btn-warning btn-sm" data-toggle="${key}">${isDevDisabled ? 'Hiện' : 'Ẩn'}</button>
+          <small>${escapeHtml(item.url || 'N/A')}</small>
+          <button class="edit-btn-icon" data-edit="${key}" title="Sửa Link Nhiệm Vụ & Trang Đích">✏️</button>
+        </td>
+        <td>${statusBadge}</td>
+        <td>
+          <button class="btn-warning btn-sm" data-maint="${key}">${item.status === 'maintenance' ? 'Mở lại' : 'Bảo trì'}</button>
           <button class="btn-danger btn-sm" data-del="${key}">Xóa</button>
         </td>
       `;
 
-      tr.querySelector(`[data-toggle="${key}"]`).addEventListener("click", () => {
-        const newStatus = isDevDisabled ? "active" : "disabled";
-        set(ref(db, `tasks/${key}/status`), newStatus);
+      tr.querySelector(`[data-maint="${key}"]`).addEventListener("click", () => {
+        const nextStatus = item.status === "maintenance" ? "active" : "maintenance";
+        set(ref(db, `tasks/${key}/status`), nextStatus);
       });
 
       tr.querySelector(`[data-del="${key}"]`).addEventListener("click", () => {
@@ -532,11 +555,12 @@ function initListeners() {
         });
       });
 
-      // Mở Modal Bút Chì Sửa Link
       tr.querySelector(`[data-edit="${key}"]`).addEventListener("click", () => {
         editingTaskId = key;
         document.getElementById("editTaskTitle").value = item.title || "";
         document.getElementById("editTaskUrl").value = item.url || "";
+        document.getElementById("editTargetUrl").value = item.targetUrl || "";
+        document.getElementById("editCommentText").value = item.commentText || "";
         editAutoChannelId = item.channelId || "";
         editAutoVideoId = item.videoId || "";
         document.getElementById("editUrlParsingStatus").style.display = "none";
@@ -553,7 +577,6 @@ function initListeners() {
   });
 }
 
-// Lưu sửa link nhiệm vụ từ Modal Bút Chì
 document.getElementById("editModalCancelBtn").addEventListener("click", () => {
   document.getElementById("editModal").classList.remove("open");
   editingTaskId = null;
@@ -561,7 +584,11 @@ document.getElementById("editModalCancelBtn").addEventListener("click", () => {
 
 document.getElementById("editModalSaveBtn").addEventListener("click", async () => {
   if (!editingTaskId) return;
+  const newTitle = document.getElementById("editTaskTitle").value.trim();
   const newUrl = document.getElementById("editTaskUrl").value.trim();
+  const targetUrl = document.getElementById("editTargetUrl").value.trim();
+  const commentText = document.getElementById("editCommentText").value.trim();
+
   if (!newUrl) {
     alert("Vui lòng nhập đường dẫn URL!");
     return;
@@ -569,16 +596,13 @@ document.getElementById("editModalSaveBtn").addEventListener("click", async () =
 
   const result = await resolveYoutubeUrl(newUrl);
 
-  const updates = {
-    url: newUrl,
-    channelId: result.channelId || editAutoChannelId,
-    videoId: result.videoId || editAutoVideoId
-  };
-
-  set(ref(db, `tasks/${editingTaskId}/url`), updates.url);
-  set(ref(db, `tasks/${editingTaskId}/channelId`), updates.channelId);
-  set(ref(db, `tasks/${editingTaskId}/videoId`), updates.videoId).then(() => {
-    alert("Cập nhật đường dẫn nhiệm vụ thành công!");
+  set(ref(db, `tasks/${editingTaskId}/title`), newTitle);
+  set(ref(db, `tasks/${editingTaskId}/url`), newUrl);
+  set(ref(db, `tasks/${editingTaskId}/targetUrl`), targetUrl);
+  set(ref(db, `tasks/${editingTaskId}/commentText`), commentText);
+  set(ref(db, `tasks/${editingTaskId}/channelId`), result.channelId || editAutoChannelId);
+  set(ref(db, `tasks/${editingTaskId}/videoId`), result.videoId || editAutoVideoId).then(() => {
+    alert("Cập nhật nhiệm vụ thành công!");
     document.getElementById("editModal").classList.remove("open");
     editingTaskId = null;
   });
@@ -656,6 +680,7 @@ document.getElementById("addTaskBtn").addEventListener("click", async () => {
   const title = document.getElementById("taskTitle").value.trim();
   const desc = document.getElementById("taskDesc").value.trim();
   const url = document.getElementById("taskUrl").value.trim();
+  const targetUrl = document.getElementById("taskTargetUrl").value.trim();
   const commentText = document.getElementById("taskCommentText").value.trim();
 
   if (!title || !url) {
@@ -670,6 +695,8 @@ document.getElementById("addTaskBtn").addEventListener("click", async () => {
     title: title,
     desc: desc || "Hoàn thành nhiệm vụ",
     url: url,
+    targetUrl: targetUrl,
+    shortAlias: generateShortAlias(),
     channelId: result.channelId || currentAutoChannelId,
     videoId: result.videoId || currentAutoVideoId,
     commentText: commentText,
@@ -683,6 +710,8 @@ document.getElementById("addTaskBtn").addEventListener("click", async () => {
     document.getElementById("taskTitle").value = "";
     document.getElementById("taskDesc").value = "";
     document.getElementById("taskUrl").value = "";
+    document.getElementById("taskTargetUrl").value = "";
+    document.getElementById("taskCommentText").value = "";
     document.getElementById("urlParsingStatus").style.display = "none";
     currentAutoChannelId = "";
     currentAutoVideoId = "";
@@ -732,7 +761,7 @@ document.getElementById("saveTargetBtn").addEventListener("click", () => {
     return;
   }
   set(ref(db, "systemConfig/targetUrl"), targetUrl).then(() => {
-    alert("Đã lưu Link Đích thành công!");
+    alert("Đã lưu Link Đích mặc định thành công!");
   });
 });
 </script>
