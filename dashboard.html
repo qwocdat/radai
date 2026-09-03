@@ -7,6 +7,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Face-API.js CDN chuẩn không bị lỗi -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+
     <style>
         body { background: #0b0f19; color: #e2e8f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .sidebar { background: #151e32; min-height: 100vh; border-right: 1px solid #1e293b; }
@@ -86,14 +89,14 @@
         <h4 class="text-warning fw-bold mb-2">
             <i class="fa-solid fa-shield-halved me-2"></i>XÁC THỰC BẢO MẬT ADMIN
         </h4>
-        <p class="text-muted small mb-3">Hệ thống yêu cầu xác thực SĐT Quản trị & Nhận diện FaceAI Local</p>
+        <p class="text-muted small mb-3">Hệ thống yêu cầu xác thực SĐT Quản trị & Nhận diện FaceID Chính Thức</p>
         
         <div id="step-phone-box">
             <div class="mb-3 text-start">
                 <label class="form-label text-warning small fw-bold">Nhập Số Điện Thoại Quản Trị Viên:</label>
                 <div class="input-group">
                     <span class="input-group-text bg-dark border-secondary text-warning"><i class="fa-solid fa-phone"></i></span>
-                    <input type="text" id="auth_phone" class="form-control text-warning fw-bold" value="0989249990" placeholder="0989249990" autocomplete="off">
+                    <input type="text" id="auth_phone" class="form-control text-warning fw-bold" placeholder="Nhập số điện thoại..." autocomplete="off">
                 </div>
             </div>
             <button onclick="verifyPhone()" class="btn btn-warning fw-bold w-100 py-2">
@@ -109,11 +112,14 @@
             </div>
             
             <div id="face-status" class="alert alert-info py-2 small mb-3">
-                <i class="fa-solid fa-camera me-1"></i> Camera đã sẵn sàng! Nhấn nút bên dưới để quét.
+                <i class="fa-solid fa-spinner fa-spin me-1"></i> Đang tải mô hình sinh trắc học...
             </div>
 
-            <button id="btn-start-scan" onclick="startFaceAuth()" class="btn btn-warning fw-bold w-100 py-2">
-                <i class="fa-solid fa-camera me-1"></i> Bắt Đầu Quét FaceAI
+            <button id="btn-start-scan" onclick="startFaceAuth()" class="btn btn-warning fw-bold w-100 py-2" disabled>
+                <i class="fa-solid fa-camera me-1"></i> Bắt Đầu Quét FaceID
+            </button>
+            <button id="btn-reset-faceid" onclick="resetMasterFaceID()" class="btn btn-outline-danger btn-sm w-100 mt-2 d-none">
+                <i class="fa-solid fa-rotate-left me-1"></i> Đăng Ký Lại FaceID Gốc
             </button>
         </div>
 
@@ -765,7 +771,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- JAVASCRIPT DIRECT FIREBASE & IMGBB CORE ENGINE WITH LIGHTWEIGHT LOCAL FACE AUTH -->
+<!-- JAVASCRIPT DIRECT FIREBASE & REAL STRICT FACEID AUTHENTICATION -->
 <script>
     const TARGET_PHONE = "0989249990";
     const FIREBASE_PROJECT_ID = "quocdat-396fe";
@@ -790,8 +796,35 @@
         orders: []
     };
 
-    /* --- LIGHTWEIGHT LOCAL FACE AI CAMERA ENGINE --- */
+    /* --- STRICT REAL FACEID RECOGNITION ENGINE --- */
     let localStream = null;
+    let isModelLoaded = false;
+
+    async function loadFaceModels() {
+        const statusBox = document.getElementById('face-status');
+        const btnScan = document.getElementById('btn-start-scan');
+        try {
+            const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
+            await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
+            await faceapi.nets.faceLandmark64Net.loadFromUri(MODEL_URL);
+            await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+            
+            isModelLoaded = true;
+            statusBox.className = 'alert alert-success py-2 small mb-3';
+            
+            const savedFace = localStorage.getItem('admin_master_face');
+            if (savedFace) {
+                statusBox.innerHTML = '<i class="fa-solid fa-shield-halved me-1"></i> FaceID Đã Đăng Ký. Nhấn Bắt Đầu để Quét!';
+                document.getElementById('btn-reset-faceid').classList.remove('d-none');
+            } else {
+                statusBox.innerHTML = '<i class="fa-solid fa-user-plus me-1"></i> Chưa có FaceID Gốc. Quét lần đầu sẽ lưu FaceID Chính Thức!';
+            }
+            btnScan.disabled = false;
+        } catch (e) {
+            statusBox.className = 'alert alert-danger py-2 small mb-3';
+            statusBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation me-1"></i> Lỗi kết nối mô hình FaceID!';
+        }
+    }
 
     function verifyPhone() {
         const phoneInput = document.getElementById('auth_phone').value.trim();
@@ -799,13 +832,14 @@
         errBox.innerText = '';
 
         if (phoneInput !== TARGET_PHONE) {
-            errBox.innerText = 'Số điện thoại Quản trị không hợp lệ!';
+            errBox.innerText = 'Số điện thoại Quản trị không chính xác!';
             return;
         }
 
         document.getElementById('step-phone-box').classList.add('d-none');
         document.getElementById('step-face-box').classList.remove('d-none');
         startCamera();
+        loadFaceModels();
     }
 
     async function startCamera() {
@@ -816,65 +850,105 @@
                 video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } 
             });
             video.srcObject = localStream;
-            statusBox.className = 'alert alert-success py-2 small mb-3';
-            statusBox.innerHTML = '<i class="fa-solid fa-check-circle me-1"></i> Camera đã bật thành công! Sẵn sàng quét.';
         } catch (err) {
             statusBox.className = 'alert alert-danger py-2 small mb-3';
-            statusBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation me-1"></i> Lỗi cấp quyền Camera! Vui lòng cho phép truy cập Camera.';
+            statusBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation me-1"></i> Lỗi cấp quyền Camera!';
             document.getElementById('auth-error-msg').innerText = 'Không thể bật Camera trên thiết bị này.';
         }
     }
 
-    function startFaceAuth() {
+    async function startFaceAuth() {
+        if (!isModelLoaded) return;
+
         const video = document.getElementById('webcam-video');
         const canvas = document.getElementById('face-canvas');
         const statusBox = document.getElementById('face-status');
         const scanLine = document.getElementById('scan-line');
         const btnScan = document.getElementById('btn-start-scan');
 
-        if (!localStream) {
-            startCamera();
-            return;
-        }
-
         btnScan.disabled = true;
         scanLine.style.display = 'block';
         statusBox.className = 'alert alert-warning py-2 small mb-3';
-        statusBox.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Đang phân tích sinh trắc học khuôn mặt...';
+        statusBox.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Đang quét đặc trưng khuôn mặt...';
 
-        let duration = 0;
-        const scanInterval = setInterval(() => {
-            duration += 200;
-            const ctx = canvas.getContext('2d');
-            canvas.width = video.clientWidth;
-            canvas.height = video.clientHeight;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const displaySize = { width: video.clientWidth, height: video.clientHeight };
+        faceapi.matchDimensions(canvas, displaySize);
 
-            // Vẽ khung nhận diện Face AI giả lập cực chuẩn
-            ctx.strokeStyle = '#ea580c';
-            ctx.lineWidth = 3;
-            const size = Math.min(canvas.width, canvas.height) * 0.55;
-            const x = (canvas.width - size) / 2;
-            const y = (canvas.height - size) / 2;
-            
-            ctx.strokeRect(x, y, size, size);
+        let attempts = 0;
+        const maxAttempts = 35;
 
-            if (duration >= 2500) {
-                clearInterval(scanInterval);
-                scanLine.style.display = 'none';
-                statusBox.className = 'alert alert-success py-2 small mb-3';
-                statusBox.innerHTML = '<i class="fa-solid fa-circle-check me-1"></i> Nhận Diện FaceAI Thành Công!';
+        const timer = setInterval(async () => {
+            attempts++;
+            const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
 
-                setTimeout(() => {
-                    if (localStream) {
-                        localStream.getTracks().forEach(track => track.stop());
+            if (detection) {
+                const resizedDetections = faceapi.resizeResults(detection, displaySize);
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                faceapi.draw.drawDetections(canvas, resizedDetections);
+
+                const currentDescriptor = Array.from(detection.descriptor);
+                const savedFaceStr = localStorage.getItem('admin_master_face');
+
+                if (!savedFaceStr) {
+                    // LẦN ĐẦU TIÊN: LƯU MẶT NÀY LÀM FACEID CHÍNH THỨC GỐC
+                    localStorage.setItem('admin_master_face', JSON.stringify(currentDescriptor));
+                    clearInterval(timer);
+                    scanLine.style.display = 'none';
+                    statusBox.className = 'alert alert-success py-2 small mb-3';
+                    statusBox.innerHTML = '<i class="fa-solid fa-circle-check me-1"></i> ĐÃ LƯU FACEID GỐC CHÍNH THỨC!';
+
+                    unlockAdminPanel();
+                } else {
+                    // CÁC LẦN SAU: SO SÁNH CHÍNH XÁC VỚI MẶT GỐC
+                    const masterDescriptor = new Float32Array(JSON.parse(savedFaceStr));
+                    const distance = faceapi.euclideanDistance(detection.descriptor, masterDescriptor);
+
+                    // Khoảng cách <= 0.5 là cùng 1 người chính xác
+                    if (distance < 0.5) {
+                        clearInterval(timer);
+                        scanLine.style.display = 'none';
+                        statusBox.className = 'alert alert-success py-2 small mb-3';
+                        statusBox.innerHTML = `<i class="fa-solid fa-circle-check me-1"></i> Khớp FaceID Quản Trị Viên! (${(100 - distance*100).toFixed(1)}%)`;
+
+                        unlockAdminPanel();
+                    } else {
+                        // NẾU ĐƯA MẶT KHÁC VÀO SẼ BỊ KHÔNG KHỚP
+                        statusBox.className = 'alert alert-danger py-2 small mb-3';
+                        statusBox.innerHTML = '<i class="fa-solid fa-circle-xmark me-1"></i> KHÔNG KHỚP FACEID CHÍNH THỨC!';
                     }
-                    sessionStorage.setItem('admin_face_auth', 'true');
-                    document.getElementById('faceai-overlay').remove();
-                    loadAllDashboardData();
-                }, 800);
+                }
             }
-        }, 200);
+
+            if (attempts >= maxAttempts) {
+                clearInterval(timer);
+                scanLine.style.display = 'none';
+                if (!statusBox.className.includes('alert-success')) {
+                    statusBox.className = 'alert alert-danger py-2 small mb-3';
+                    statusBox.innerHTML = '<i class="fa-solid fa-circle-xmark me-1"></i> Không nhận diện được FaceID hợp lệ!';
+                }
+                btnScan.disabled = false;
+            }
+        }, 300);
+    }
+
+    function unlockAdminPanel() {
+        setTimeout(() => {
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+            }
+            sessionStorage.setItem('admin_face_auth', 'true');
+            document.getElementById('faceai-overlay').remove();
+            loadAllDashboardData();
+        }, 1200);
+    }
+
+    function resetMasterFaceID() {
+        if (confirm('Bạn có chắc chắn muốn XÓA FaceID Gốc hiện tại để đăng ký lại mặt mới?')) {
+            localStorage.removeItem('admin_master_face');
+            alert('Đã xóa FaceID Gốc. Hãy quét mặt mới của bạn để làm FaceID Chính Thức!');
+            location.reload();
+        }
     }
 
     function escapeHtml(str) {
