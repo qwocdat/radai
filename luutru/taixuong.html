@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tải xuống File - Liquid Glass</title>
+    <title>Tải xuống File - Samsung S23 Ultra Storage</title>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
@@ -134,7 +134,7 @@
             </div>
             <div class="info-item">
                 <label>Nguồn lưu trữ</label>
-                <span>MediaFire</span>
+                <span style="color: #38bdf8; font-weight: 700;">Samsung S23 Ultra</span>
             </div>
             <div class="info-item">
                 <label>Ngày đăng</label>
@@ -184,7 +184,7 @@
     }
 
     async function initPage() {
-        showStatus('Đang tải dữ liệu...', 'info');
+        showStatus('Đang kết nối hệ thống...', 'info');
         const urlParams = new URLSearchParams(window.location.search);
         currentFileId = urlParams.get('id');
 
@@ -209,7 +209,7 @@
                 return;
             }
 
-            document.getElementById('fileName').innerText = currentFileData.name || 'MediaFire File';
+            document.getElementById('fileName').innerText = currentFileData.name || 'File tải xuống';
             document.getElementById('fileDesc').innerText = currentFileData.description || 'Không có mô tả.';
             document.getElementById('fileSize').innerText = formatBytes(currentFileData.size || 0);
 
@@ -237,10 +237,10 @@
     async function handleDownload() {
         const btn = document.getElementById('downloadBtn');
         btn.disabled = true;
-        btn.innerHTML = `<span class="spinner"></span> <span>Đang lấy link tải trực tiếp...</span>`;
+        btn.innerHTML = `<span class="spinner"></span> <span>Đang bắt đầu tải...</span>`;
 
         try {
-            // Tăng downloadCount bằng Firestore Transaction
+            // Tăng lượt tải an toàn qua Firestore Transaction
             const docRef = db.collection('downloads').doc(currentFileId);
             db.runTransaction(async (transaction) => {
                 const sfDoc = await transaction.get(docRef);
@@ -253,46 +253,33 @@
                 document.getElementById('fileDownloads').innerText = currentCount + 1;
             }).catch(e => console.error(e));
 
-            const rawMediafireUrl = currentFileData.storagePath;
+            let downloadUrl = currentFileData.storagePath;
 
-            // Xử lý tự động bóc tách link tải trực tiếp MediaFire bằng Proxy API
-            let directDownloadUrl = rawMediafireUrl;
-
-            // Kiểm tra nếu là link MediaFire gốc dạng https://www.mediafire.com/file/...
-            if (rawMediafireUrl.includes('mediafire.com/file/') || rawMediafireUrl.includes('mediafire.com/download/')) {
-                try {
-                    // Gọi API miễn phí bóc tách link MediaFire
-                    const apiRes = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(rawMediafireUrl)}`);
-                    const apiData = await apiRes.json();
-                    
-                    if (apiData.contents) {
-                        // Tìm đoạn link trực tiếp downloadXXXX.mediafire.com trong HTML
-                        const match = apiData.contents.match(/href="(https?:\/\/download\d+\.mediafire\.com\/[^"]+)"/i);
-                        if (match && match[1]) {
-                            directDownloadUrl = match[1];
-                        }
-                    }
-                } catch (e) {
-                    console.warn("Không thể giải mã link trực tiếp tự động, sử dụng link gốc:", e);
+            // Đảm bảo chuẩn hóa đuôi dl=1 cho Dropbox
+            if (downloadUrl.includes('dropbox.com')) {
+                downloadUrl = downloadUrl.replace('dl=0', 'dl=1');
+                if (!downloadUrl.includes('dl=1')) {
+                    downloadUrl += (downloadUrl.includes('?') ? '&' : '?') + 'dl=1';
                 }
             }
 
-            // Tiến hành kích hoạt tải trực tiếp về máy người dùng
-            const a = document.createElement('a');
-            a.href = directDownloadUrl;
-            a.target = '_blank';
-            a.download = currentFileData.name || 'download';
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
+            // Kích hoạt luồng tải ngầm không chuyển trang
+            let hiddenIframe = document.getElementById('dl_iframe');
+            if (!hiddenIframe) {
+                hiddenIframe = document.createElement('iframe');
+                hiddenIframe.id = 'dl_iframe';
+                hiddenIframe.style.display = 'none';
+                document.body.appendChild(hiddenIframe);
+            }
+            hiddenIframe.src = downloadUrl;
 
             setTimeout(() => {
                 btn.disabled = false;
                 btn.innerHTML = `<span>TẢI XUỐNG</span>`;
-            }, 2000);
+            }, 3000);
 
         } catch (err) {
-            alert("Lỗi tải file. Vui lòng thử lại!");
+            alert("Không thể tải file!");
             btn.disabled = false;
             btn.innerHTML = `<span>TẢI XUỐNG</span>`;
         }
