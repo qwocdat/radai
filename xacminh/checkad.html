@@ -86,7 +86,7 @@ th{color:var(--text-secondary);}
     </div>
   </div>
 
-  <!-- CAU HINH BAO TRAI & LINK NGUOI DUNG -->
+  <!-- CAU HINH BAO TRI & CONG CU RESET -->
   <div class="card" style="margin-bottom:25px;">
     <h2>Cai Dat He Thong & Khoa Bao Tri</h2>
     <div class="grid" style="grid-template-columns: 1fr 1fr; margin-bottom:0;">
@@ -102,7 +102,10 @@ th{color:var(--text-secondary);}
         <input type="text" id="targetDestinationUrl" placeholder="https://example.com/file-download">
       </div>
     </div>
-    <button id="saveSystemConfigBtn" style="margin-top:10px;">Luu Cai Dat He Thong</button>
+    <div style="display:flex; gap:10px; margin-top:10px;">
+      <button id="saveSystemConfigBtn">Luu Cai Dat He Thong</button>
+      <button id="resetAllUserTasksBtn" class="btn-warning">Reset Tien Trinh Tat Ca User (De Lam Lai)</button>
+    </div>
   </div>
 
   <!-- THONG KE KENH & THEM NHIEM VU -->
@@ -133,7 +136,7 @@ th{color:var(--text-secondary);}
           <option value="Facebook">Facebook</option>
           <option value="TikTok">TikTok</option>
           <option value="Telegram">Telegram</option>
-          <option value="Website">Website khác</option>
+          <option value="Website">Website khac</option>
         </select>
       </div>
       <div class="form-group">
@@ -147,15 +150,15 @@ th{color:var(--text-secondary);}
       </div>
       <div class="form-group">
         <label>Tieu de nhiem vu</label>
-        <input type="text" id="taskTitle" placeholder="Vi du: Thich va Dang ky kenh YouTube">
+        <input type="text" id="taskTitle" placeholder="Vi du: Dang ky kenh YouTube Official">
       </div>
       <div class="form-group">
         <label>Mo ta chi tiet</label>
-        <input type="text" id="taskDesc" placeholder="Vi du: Bấm Thích video và để lại 1 bình luận">
+        <input type="text" id="taskDesc" placeholder="Vi du: Bấm Đăng ký kênh để hệ thống kiểm tra">
       </div>
       <div class="form-group">
-        <label>Duong dan Lien ket (URL)</label>
-        <input type="text" id="taskUrl" placeholder="https://...">
+        <label>Duong dan Lien ket (URL Kênh hoac Video)</label>
+        <input type="text" id="taskUrl" placeholder="https://www.youtube.com/channel/...">
       </div>
       <div class="form-group">
         <label>
@@ -244,18 +247,15 @@ function logTaskHistory(action, details) {
 }
 
 function listenStats() {
-  // 1. Thống kê số user
   onValue(ref(db, "users"), (snapshot) => {
     const data = snapshot.val();
     document.getElementById("totalUsers").textContent = data ? Object.keys(data).length : 0;
   });
 
-  // 2. Thống kê số người hoàn thành
   onValue(ref(db, "stats/completedUsers"), (snapshot) => {
     document.getElementById("completedUsers").textContent = snapshot.val() || 0;
   });
 
-  // 3. Thông số MXH
   onValue(ref(db, "stats/youtubeStats"), (snapshot) => {
     const data = snapshot.val();
     if (data) {
@@ -265,7 +265,6 @@ function listenStats() {
     }
   });
 
-  // 4. Cấu hình hệ thống & Bảo trì
   onValue(ref(db, "systemConfig"), (snapshot) => {
     const data = snapshot.val();
     if (data) {
@@ -288,7 +287,6 @@ function listenStats() {
     }
   });
 
-  // 5. Danh sách nhiệm vụ hiện tại
   onValue(ref(db, "tasks"), (snapshot) => {
     const data = snapshot.val();
     const table = document.getElementById("taskListTable");
@@ -326,7 +324,6 @@ function listenStats() {
     });
   });
 
-  // 6. Lịch sử Thêm / Xóa nhiệm vụ
   onValue(ref(db, "taskHistory"), (snapshot) => {
     const data = snapshot.val();
     const table = document.getElementById("taskHistoryTable");
@@ -347,7 +344,6 @@ function listenStats() {
     });
   });
 
-  // 7. Lịch sử Bypass
   onValue(ref(db, "bypassLogs"), (snapshot) => {
     const data = snapshot.val();
     const table = document.getElementById("bypassTable");
@@ -374,7 +370,6 @@ function listenStats() {
   });
 }
 
-// LƯU CẤU HÌNH BẢO TRÌ & LINK ĐÍCH
 document.getElementById("saveSystemConfigBtn").addEventListener("click", () => {
   const targetUrl = document.getElementById("targetDestinationUrl").value.trim();
   set(ref(db, "systemConfig"), {
@@ -385,7 +380,6 @@ document.getElementById("saveSystemConfigBtn").addEventListener("click", () => {
   });
 });
 
-// BẬT / TẮT BẢO TRÌ
 document.getElementById("toggleMaintenanceBtn").addEventListener("click", () => {
   isMaintenance = !isMaintenance;
   const targetUrl = document.getElementById("targetDestinationUrl").value.trim();
@@ -397,7 +391,16 @@ document.getElementById("toggleMaintenanceBtn").addEventListener("click", () => 
   });
 });
 
-// LƯU THỐNG KÊ MXH
+// XÓA SẠCH TIẾN TRÌNH USER ĐỂ LÀM LẠI BÀI TEST NHIỆM VỤ
+document.getElementById("resetAllUserTasksBtn").addEventListener("click", () => {
+  if (confirm("Ban co chac muon reset tat ca tien trinh hoan thanh cua nguoi dung de test lai tu dau?")) {
+    set(ref(db, "users"), null).then(() => {
+      set(ref(db, "stats/completedUsers"), 0);
+      alert("Da reset toan bo tien trinh! Bây gio nguoi dung co the lam lai tat ca nhiem vu.");
+    });
+  }
+});
+
 document.getElementById("saveStatsBtn").addEventListener("click", () => {
   const subs = Number(document.getElementById("subCount").value);
   const likes = Number(document.getElementById("likeCount").value);
@@ -412,7 +415,6 @@ document.getElementById("saveStatsBtn").addEventListener("click", () => {
   });
 });
 
-// THÊM NHIỆM VỤ MỚI (FIX SỰ CỐ KHÔNG THÊM ĐƯỢC)
 document.getElementById("addTaskBtn").addEventListener("click", () => {
   const platform = document.getElementById("taskPlatform").value;
   const actionType = document.getElementById("taskActionType").value;
