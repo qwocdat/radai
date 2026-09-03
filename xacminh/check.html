@@ -264,10 +264,11 @@ header.top .titles p{font-size:14px; color:var(--text-secondary); margin:0;}
 .sheet h3{font-size:18px; font-weight:700; margin:0 0 6px;}
 .sheet p.desc{font-size:14px; color:var(--text-secondary); line-height:1.5; margin:0 0 16px;}
 .sheet .sheet-status{
-  display:flex; align-items:center; gap:9px;
+  display:flex; flex-direction:column; gap:6px;
   padding:12px 14px; border-radius:14px;
   background:var(--glass); border:1px solid var(--glass-border);
-  font-size:13.5px; margin-bottom:16px; min-height:22px;
+  font-size:13.5px; margin-bottom:16px; min-height:48px;
+  justify-content:center;
 }
 .sheet textarea{
   width:100%; resize:none; min-height:76px;
@@ -424,7 +425,7 @@ footer.foot{text-align:center; margin-top:26px; font-size:11.5px; color:var(--te
     </div>
   </div>
 
-  <footer class="foot">Xác minh được thực hiện qua hệ thống quản lý backend.</footer>
+  <footer class="foot">Xác minh trực tiếp qua YouTube Data API v3.</footer>
 </div>
 
 <div class="sheet-backdrop" id="sheetBackdrop"></div>
@@ -433,15 +434,15 @@ footer.foot{text-align:center; margin-top:26px; font-size:11.5px; color:var(--te
   <h3 id="sheetTitle">Tiêu đề nhiệm vụ</h3>
   <p class="desc" id="sheetDesc">Mô tả nhiệm vụ.</p>
   <div class="sheet-status" id="sheetStatus">
-    <span>Chưa xác minh</span>
+    <span>Chưa kiểm tra</span>
   </div>
   <div id="sheetCommentBox" style="display:none;">
     <p style="font-size:12px; color:var(--text-secondary); margin-bottom:6px;" id="commentRequiredLabel">Nội dung bình luận yêu cầu:</p>
-    <textarea id="commentInput" placeholder="Nhập nội dung bình luận để đối chiếu (nếu có)"></textarea>
+    <textarea id="commentInput" placeholder="Nhập nội dung bình luận để đối chiếu"></textarea>
   </div>
   <div class="sheet-actions">
     <button class="btn-secondary" id="sheetCancel">Đóng</button>
-    <button class="btn-primary" id="sheetVerify">Kiểm tra</button>
+    <button class="btn-primary" id="sheetVerify">KIỂM TRA</button>
   </div>
 </div>
 
@@ -470,10 +471,9 @@ const firebaseConfig = {
   appId: "1:685476439350:web:949054ecba7f0a0c383f97"
 };
 
-const CONFIG = {
-  verificationApi: "", // Địa chỉ Backend Verification API thực tế của bạn
-  verificationTimeout: 10000
-};
+const YT_API_KEY = "AIzaSyAR-zsFqyZag3TDlSUecY696E757fLQxAo";
+const POLL_INTERVAL = 5000;
+const VERIFICATION_TIMEOUT = 60000;
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
@@ -487,6 +487,9 @@ const state = {
   sheetBusy: false,
   userCompleted: false
 };
+
+// Phiên xác minh 60s duy nhất
+let verificationSession = null;
 
 function escapeHtml(str) {
   if (!str) return "";
@@ -507,6 +510,13 @@ function sanitizeUrl(url) {
   return "#";
 }
 
+function extractChannelId(url) {
+  if (!url) return null;
+  const match = url.match(/youtube\.com\/channel\/([a-zA-Z0-9_-]+)/);
+  if (match) return match[1];
+  return null;
+}
+
 function getOrCreateUserId() {
   let uid = localStorage.getItem("yt_checker_uid");
   if (!uid || !uid.startsWith("usr_")) {
@@ -516,25 +526,27 @@ function getOrCreateUserId() {
   return uid;
 }
 
-function fetchWithTimeout(url, options = {}, timeoutMs = 10000) {
-  return new Promise((resolve, reject) => {
-    const controller = new AbortController();
-    const timer = setTimeout(() => {
-      controller.abort();
-      reject(new Error("TIMEOUT"));
-    }, timeoutMs);
-
-    fetch(url, { ...options, signal: controller.signal })
-      .then(res => {
-        clearTimeout(timer);
-        resolve(res);
-      })
-      .catch(err => {
-        clearTimeout(timer);
-        if (err.name === "AbortError") reject(new Error("TIMEOUT"));
-        else reject(err);
-      });
-  });
+// Gọi YouTube Data API v3 chính thống
+async function getChannelStats(channelId) {
+  if (!channelId) throw new Error("Missing channelId");
+  const endpoint = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${channelId}&key=${YT_API_KEY}`;
+  const res = await fetch(endpoint);
+  if (!res.ok) {
+    if (res.status === 403) throw new Error("YouTube API hiện đang hết quota.");
+    throw new Error(`YouTube API Error (${res.status})`);
+  }
+  const data = await res.json();
+  if (!data.items || data.items.length === 0) {
+    throw new Error("Không tìm thấy dữ liệu kênh YouTube.");
+  }
+  const item = data.items[0];
+  if (!item.statistics || item.statistics.subscriberCount === undefined) {
+    throw new Error("Không thể đọc số người đăng ký từ kênh.");
+  }
+  return {
+    title: item.snippet ? item.snippet.title : "Kênh YouTube",
+    subscriberCount: parseInt(item.statistics.subscriberCount, 10)
+  };
 }
 
 function trackUserVisit() {
@@ -554,7 +566,15 @@ function logBypassAttempt(reason, taskId = "none") {
   }).catch(()=>{});
 }
 
+// Chống Toast Spam
+let lastToastMsg = "";
+let lastToastTime = 0;
 function showToast(message, type = "info", duration = 3000) {
+  const now = Date.now();
+  if (message === lastToastMsg && (now - lastToastTime) < 1500) return;
+  lastToastMsg = message;
+  lastToastTime = now;
+
   const host = document.getElementById("toast-host");
   const el = document.createElement("div");
   el.className = `toast ${type}`;
@@ -688,6 +708,9 @@ const sheetCancelBtn = document.getElementById("sheetCancel");
 function openSheet(taskId) {
   const task = TASKS.find(t => t.id === taskId);
   if (!task) return;
+  
+  stopVerificationSession();
+
   state.activeTaskId = taskId;
   sheetTitle.textContent = task.title;
   sheetDesc.textContent = task.desc;
@@ -695,44 +718,45 @@ function openSheet(taskId) {
   if (task.type === "comment" || task.hasComment || task.commentRequired) {
     sheetCommentBox.style.display = "block";
     commentInput.value = "";
-    if (task.commentText) {
-      commentRequiredLabel.textContent = `Nội dung bình luận yêu cầu: "${task.commentText}"`;
-    } else {
-      commentRequiredLabel.textContent = "Yêu cầu bình luận vào bài viết/video.";
-    }
+    commentRequiredLabel.textContent = task.commentText ? `Nội dung bình luận yêu cầu: "${task.commentText}"` : "Yêu cầu bình luận vào bài viết/video.";
   } else {
     sheetCommentBox.style.display = "none";
   }
 
   const verified = state.results[taskId] === true;
-  setSheetStatus(verified ? "Đã xác minh" : "Chưa xác minh", verified ? "success" : "");
-  sheetVerifyBtn.textContent = (task.type === "comment" || task.hasComment) ? "Xác minh bình luận" : "Kiểm tra";
-  sheetVerifyBtn.disabled = false;
+  setSheetStatus(verified ? "Đã xác minh thành công" : "Nhấn 'KIỂM TRA' để đọc dữ liệu kênh...", verified ? "success" : "");
+  sheetVerifyBtn.textContent = verified ? "ĐÃ XÁC MINH" : "KIỂM TRA";
+  sheetVerifyBtn.disabled = verified;
 
   sheetBackdrop.classList.add("open");
   sheet.classList.add("open");
-
-  if (task.url && task.url !== "#") {
-    const cleanUrl = sanitizeUrl(task.url);
-    if (cleanUrl !== "#") window.open(cleanUrl, "_blank");
-  }
 }
 
 function closeSheet() {
   if (state.sheetBusy) return;
+  stopVerificationSession();
   sheetBackdrop.classList.remove("open");
   sheet.classList.remove("open");
   state.activeTaskId = null;
 }
 
 function setSheetStatus(text, type = "") {
-  sheetStatus.innerHTML = `<span>${escapeHtml(text)}</span>`;
+  sheetStatus.innerHTML = `<div>${escapeHtml(text)}</div>`;
   sheetStatus.style.color = type === "success" ? "var(--success)" : type === "error" ? "var(--error)" : "var(--text)";
+}
+
+function stopVerificationSession() {
+  if (verificationSession) {
+    if (verificationSession.countdownTimer) clearInterval(verificationSession.countdownTimer);
+    if (verificationSession.pollTimer) clearInterval(verificationSession.pollTimer);
+    verificationSession = null;
+  }
 }
 
 sheetCancelBtn.addEventListener("click", closeSheet);
 sheetBackdrop.addEventListener("click", closeSheet);
 
+// BƯỚC 1 & 2 & 3: Xử lý nút KIỂM TRA & Phiên xác minh 60s Polling
 sheetVerifyBtn.addEventListener("click", async () => {
   const task = TASKS.find(t => t.id === state.activeTaskId);
   if (!task) return;
@@ -743,68 +767,125 @@ sheetVerifyBtn.addEventListener("click", async () => {
     return;
   }
 
-  if (!CONFIG.verificationApi || CONFIG.verificationApi.trim().length === 0) {
-    setSheetStatus("Chưa cấu hình hệ thống xác minh", "error");
-    showToast("Chưa cấu hình hệ thống xác minh", "error");
-    logBypassAttempt("verification_failed", task.id);
+  const channelId = task.channelId || extractChannelId(task.url);
+  if (!channelId && task.type === "subscribe") {
+    setSheetStatus("Nhiệm vụ thiếu Channel ID hợp lệ.", "error");
+    logBypassAttempt("invalid_task", task.id);
     return;
   }
 
+  // Nếu đã có session đang chạy thì tránh bấm trùng
+  if (verificationSession && verificationSession.running) return;
+
   state.sheetBusy = true;
   sheetVerifyBtn.disabled = true;
-  setSheetStatus(`Đang xác minh...`);
-
-  let verified = false;
-  let message = "Xác minh thất bại";
+  setSheetStatus("Đang đọc dữ liệu YouTube lần đầu...");
 
   try {
-    const payload = {
-      action: "verify",
+    // BƯỚC 1: Gọi YouTube Data API v3 lần đầu lấy startSubCount
+    const initialStats = await getChannelStats(channelId);
+    const startSubCount = initialStats.subscriberCount;
+
+    // Mở trang YouTube cho user thực hiện đăng ký
+    if (task.url && task.url !== "#") {
+      const cleanUrl = sanitizeUrl(task.url);
+      if (cleanUrl !== "#") window.open(cleanUrl, "_blank");
+    }
+
+    // BƯỚC 2: Khởi tạo phiên xác minh 60s
+    stopVerificationSession();
+
+    const now = Date.now();
+    verificationSession = {
       taskId: task.id,
-      taskType: task.type || "subscribe",
-      channelId: task.channelId || "",
-      videoId: task.videoId || "",
-      userId: userId,
-      commentInput: commentInput.value.trim()
+      channelId: channelId,
+      startSubCount: startSubCount,
+      startedAt: now,
+      expiresAt: now + VERIFICATION_TIMEOUT,
+      running: true,
+      countdownTimer: null,
+      pollTimer: null
     };
 
-    const res = await fetchWithTimeout(CONFIG.verificationApi, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    }, CONFIG.verificationTimeout);
+    setSheetStatus(`Kênh: ${initialStats.title} | Mốc ban đầu: ${startSubCount.toLocaleString()} subs\nĐang chờ subscriber tăng...`, "info");
 
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.verified === true) {
-        verified = true;
-        message = data.message || "Xác minh thành công";
-      } else {
-        verified = false;
-        message = (data && data.message) ? data.message : "Chưa hoàn thành nhiệm vụ";
+    // BƯỚC 3 & 4 & 21: Countdown Timer real-time
+    const updateCountdownUI = () => {
+      if (!verificationSession || !verificationSession.running) return;
+      const remaining = Math.max(0, Math.ceil((verificationSession.expiresAt - Date.now()) / 1000));
+      sheetVerifyBtn.textContent = `ĐANG XÁC MINH... ${remaining}s`;
+
+      if (remaining <= 0) {
+        // BƯỚC 6: Hết 60 giây không tăng
+        finishSession(false, "Không phát hiện subscriber tăng trong 60 giây.");
       }
-    } else {
-      verified = false;
-      message = `Lỗi máy chủ (${res.status})`;
-    }
-  } catch (err) {
-    verified = false;
-    message = err.message === "TIMEOUT" ? "Hết thời gian chờ máy chủ" : "Không thể kết nối máy chủ xác minh";
-  }
+    };
 
-  if (verified === true) {
-    setSheetStatus(message, "success");
-    markTaskResult(task.id, true);
-    showToast(message, "success");
-    setTimeout(closeSheet, 800);
-  } else {
-    setSheetStatus(message, "error");
-    logBypassAttempt("verification_failed", task.id);
+    updateCountdownUI();
+    verificationSession.countdownTimer = setInterval(updateCountdownUI, 1000);
+
+    // BƯỚC 3 & 4: Polling YouTube API mỗi 5 giây
+    const pollSubscriberCheck = async () => {
+      if (!verificationSession || !verificationSession.running) return;
+      if (Date.now() >= verificationSession.expiresAt) return;
+
+      try {
+        const latestStats = await getChannelStats(channelId);
+        const latestSubCount = latestStats.subscriberCount;
+
+        // BƯỚC 5: ĐIỀU KIỆN THÀNH CÔNG (latestSubCount > startSubCount)
+        if (latestSubCount > startSubCount) {
+          finishSession(true, `Đã xác minh! Subscriber tăng từ ${startSubCount} -> ${latestSubCount}`);
+        }
+      } catch (err) {
+        // BƯỚC 26: Lỗi tạm thời khi polling thì retry lần sau nếu còn thời gian
+        console.warn("Polling cycle error:", err.message);
+      }
+    };
+
+    verificationSession.pollTimer = setInterval(pollSubscriberCheck, POLL_INTERVAL);
+
+  } catch (err) {
+    // BƯỚC 8: Xử lý lỗi YouTube API lần đầu
+    state.sheetBusy = false;
+    sheetVerifyBtn.disabled = false;
+    sheetVerifyBtn.textContent = "KIỂM TRA LẠI";
+    setSheetStatus(`Lỗi: ${err.message}`, "error");
+    showToast(err.message, "error");
+    logBypassAttempt("api_error", task.id);
   }
+});
+
+// Kết thúc phiên xác minh
+function finishSession(isSuccess, message) {
+  if (!verificationSession) return;
+
+  const currentTaskId = verificationSession.taskId;
+  stopVerificationSession();
 
   state.sheetBusy = false;
-  sheetVerifyBtn.disabled = false;
-});
+
+  if (isSuccess) {
+    setSheetStatus("✓ " + message, "success");
+    sheetVerifyBtn.textContent = "✓ ĐÃ XÁC MINH";
+    sheetVerifyBtn.disabled = true;
+
+    markTaskResult(currentTaskId, true);
+    showToast("Xác minh thành công!", "success");
+
+    // Chuyển sang Target URL ngay lập tức
+    setTimeout(() => {
+      closeSheet();
+      redirectToTargetUrl();
+    }, 1200);
+  } else {
+    setSheetStatus("✕ " + message, "error");
+    sheetVerifyBtn.textContent = "XÁC MINH THẤT BẠI";
+    sheetVerifyBtn.disabled = false;
+    showToast(message, "error");
+    logBypassAttempt("verification_failed", currentTaskId);
+  }
+}
 
 function markTaskResult(taskId, verified) {
   state.results[taskId] = verified;
@@ -815,6 +896,21 @@ function markTaskResult(taskId, verified) {
     void taskListEl.offsetWidth;
     taskListEl.classList.add("pulse");
   }
+}
+
+function redirectToTargetUrl() {
+  get(ref(db, "systemConfig")).then(snapshot => {
+    const config = snapshot.val();
+    if (config && config.isMaintenance === true) {
+      showToast("Hệ thống đang bảo trì. Vui lòng quay lại sau!", "error");
+    } else if (config && config.targetUrl && config.targetUrl.startsWith("http")) {
+      window.location.href = config.targetUrl;
+    } else {
+      showToast("Đã hoàn thành xác minh nhiệm vụ!", "success");
+    }
+  }).catch(()=>{
+    showToast("Lỗi khi kết nối lấy trang đích", "error");
+  });
 }
 
 document.getElementById("unlockBtn").addEventListener("click", (e) => {
@@ -831,20 +927,10 @@ document.getElementById("unlockBtn").addEventListener("click", (e) => {
 
 document.getElementById("finalUnlockBtn").addEventListener("click", (e) => {
   addRipple(e);
-  get(ref(db, "systemConfig")).then(snapshot => {
-    const config = snapshot.val();
-    if (config && config.isMaintenance === true) {
-      showToast("Hệ thống đang bảo trì. Vui lòng quay lại sau!", "error");
-    } else if (config && config.targetUrl && config.targetUrl.startsWith("http")) {
-      window.location.href = config.targetUrl;
-    } else {
-      showToast("Chưa cấu hình link mở khóa an toàn", "info");
-    }
-  }).catch(()=>{
-    showToast("Lỗi kết nối khi lấy link mở khóa", "error");
-  });
+  redirectToTargetUrl();
 });
 
+// Vuốt Bottom Sheet bằng cảm ứng
 let touchStartY = 0, touchCurrentY = 0, dragging = false;
 sheet.addEventListener("touchstart", (e) => {
   if (state.sheetBusy || e.target.tagName === "TEXTAREA") return;
