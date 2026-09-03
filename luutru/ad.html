@@ -70,7 +70,7 @@
 <div class="alert-toast" id="toastMessage"></div>
 
 <div class="container">
-    <div class="header-title">Dashboard Quản Lý File (MediaFire)</div>
+    <div class="header-title">Dashboard Quản Lý File (Samsung S23 Ultra Storage)</div>
 
     <div class="dashboard-grid">
         <div class="stat-card">
@@ -92,38 +92,38 @@
     </div>
 
     <div class="panel">
-        <h3 style="font-size: 16px;">Thêm File Từ MediaFire</h3>
+        <h3 style="font-size: 16px;">Thêm File Mới Từ Dropbox</h3>
         <p style="font-size: 12px; color: var(--text-sub); margin-top: 4px; margin-bottom: 16px;">
-            Dán đường dẫn MediaFire (Ví dụ: <code>https://www.mediafire.com/file/xxx/file.zip</code>)
+            Dán link chia sẻ Dropbox (Ví dụ: <code>https://www.dropbox.com/scl/fi/.../file.zip?dl=0</code>)
         </p>
         
         <div class="form-group">
-            <label>Link MediaFire gốc</label>
-            <input type="text" id="mediafireUrl" placeholder="https://www.mediafire.com/file/..." oninput="autoFillName()">
+            <label>Link Dropbox chia sẻ</label>
+            <input type="text" id="dropboxUrl" placeholder="https://www.dropbox.com/..." oninput="autoFillName()">
         </div>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
             <div class="form-group">
                 <label>Tên hiển thị file</label>
-                <input type="text" id="fileName" placeholder="Nhập tên hiển thị...">
+                <input type="text" id="fileName" placeholder="Nhập tên hiển thị file...">
             </div>
             <div class="form-group">
-                <label>Dung lượng (Bytes, ví dụ: 419430400 cho 400MB)</label>
+                <label>Dung lượng (Bytes, ví dụ 419430400 cho 400MB)</label>
                 <input type="number" id="fileSize" placeholder="419430400">
             </div>
         </div>
 
         <div class="form-group">
             <label>Mô tả File</label>
-            <textarea id="fileDescription" rows="2" placeholder="Nhập mô tả ngắn..."></textarea>
+            <textarea id="fileDescription" rows="2" placeholder="Nhập mô tả cho file..."></textarea>
         </div>
 
         <div class="form-group">
-            <label>Link Thumbnail (Optional)</label>
+            <label>Link Thumbnail (Không bắt buộc)</label>
             <input type="text" id="fileThumbnail" placeholder="https://...">
         </div>
 
-        <button class="btn btn-primary" id="saveBtn" onclick="saveMediaFireFile()">Tạo Link Tải Xuống</button>
+        <button class="btn btn-primary" id="saveBtn" onclick="saveDropboxFile()">Tạo Link Tải Xuống</button>
 
         <div id="linkOutput" style="display: none; margin-top: 20px; padding: 16px; background: rgba(59,130,246,0.1); border: 1px solid var(--primary); border-radius: 8px;">
             <label style="font-size: 12px; color: var(--text-sub); font-weight: 600;">LINK TẢI XUỐNG CỦA FILE:</label>
@@ -168,7 +168,7 @@
             <input type="text" id="editFileName">
         </div>
         <div class="form-group">
-            <label>Link MediaFire</label>
+            <label>Link Dropbox gốc</label>
             <input type="text" id="editFileUrl">
         </div>
         <div class="form-group">
@@ -209,7 +209,7 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
     } catch (err) {
-        showToast("Lỗi Firebase: " + err.message, "error");
+        showToast("Lỗi kết nối Firebase: " + err.message, "error");
     }
 
     let allFiles = [];
@@ -236,11 +236,12 @@
     }
 
     function autoFillName() {
-        const url = document.getElementById('mediafireUrl').value.trim();
+        const url = document.getElementById('dropboxUrl').value.trim();
         if (url && !document.getElementById('fileName').value) {
-            const parts = url.split('/');
-            const possibleName = parts[parts.length - 2] || parts[parts.length - 1];
-            if (possibleName && possibleName !== 'file') {
+            const cleanUrl = url.split('?')[0];
+            const parts = cleanUrl.split('/');
+            const possibleName = parts[parts.length - 1];
+            if (possibleName) {
                 document.getElementById('fileName').value = decodeURIComponent(possibleName);
             }
         }
@@ -308,14 +309,22 @@
         });
     }
 
-    async function saveMediaFireFile() {
-        const mfUrl = document.getElementById('mediafireUrl').value.trim();
+    async function saveDropboxFile() {
+        let dbUrl = document.getElementById('dropboxUrl').value.trim();
         const fileName = document.getElementById('fileName').value.trim();
         const fileSize = parseInt(document.getElementById('fileSize').value) || 0;
 
-        if (!mfUrl) {
-            showToast("Vui lòng nhập link MediaFire!", "error");
+        if (!dbUrl) {
+            showToast("Vui lòng nhập link Dropbox!", "error");
             return;
+        }
+
+        // Tự động chuẩn hóa link Dropbox cho phép tải trực tiếp
+        if (dbUrl.includes('dropbox.com')) {
+            dbUrl = dbUrl.replace('dl=0', 'dl=1');
+            if (!dbUrl.includes('dl=1')) {
+                dbUrl += (dbUrl.includes('?') ? '&' : '?') + 'dl=1';
+            }
         }
 
         const btn = document.getElementById('saveBtn');
@@ -324,9 +333,9 @@
         try {
             const fileId = db.collection('downloads').doc().id;
             await db.collection('downloads').doc(fileId).set({
-                name: fileName || 'MediaFire File',
+                name: fileName || 'Dropbox File',
                 description: document.getElementById('fileDescription').value || '',
-                storagePath: mfUrl, // Lưu URL MediaFire gốc
+                storagePath: dbUrl,
                 size: fileSize,
                 type: 'application/octet-stream',
                 thumbnail: document.getElementById('fileThumbnail').value || '',
@@ -342,7 +351,7 @@
             document.getElementById('generatedLink').value = fullLink;
             document.getElementById('linkOutput').style.display = 'block';
 
-            document.getElementById('mediafireUrl').value = '';
+            document.getElementById('dropboxUrl').value = '';
             document.getElementById('fileName').value = '';
             document.getElementById('fileSize').value = '';
             document.getElementById('fileDescription').value = '';
@@ -380,9 +389,18 @@
 
     async function saveFileEdit() {
         const id = document.getElementById('editFileId').value;
+        let dbUrl = document.getElementById('editFileUrl').value.trim();
+
+        if (dbUrl.includes('dropbox.com')) {
+            dbUrl = dbUrl.replace('dl=0', 'dl=1');
+            if (!dbUrl.includes('dl=1')) {
+                dbUrl += (dbUrl.includes('?') ? '&' : '?') + 'dl=1';
+            }
+        }
+
         await db.collection('downloads').doc(id).update({
             name: document.getElementById('editFileName').value,
-            storagePath: document.getElementById('editFileUrl').value,
+            storagePath: dbUrl,
             description: document.getElementById('editFileDesc').value,
             thumbnail: document.getElementById('editFileThumb').value,
             enabled: document.getElementById('editFileStatus').value === 'true'
