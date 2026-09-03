@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard - YouTube Checker</title>
+<title>Admin Dashboard - Task Checker</title>
 <style>
 :root{
   --bg-1:#0b0d14;
@@ -15,6 +15,7 @@
   --accent:#ff3b5c;
   --success:#33d17a;
   --error:#ff5c5c;
+  --warning:#ffb84d;
   --radius:16px;
 }
 *{box-sizing:border-box;}
@@ -25,7 +26,7 @@ body{
   color:var(--text);
   min-height:100vh;
 }
-.container{max-width:900px; margin:0 auto;}
+.container{max-width:960px; margin:0 auto;}
 h1, h2, h3{margin-top:0;}
 .grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:15px; margin-bottom:25px;}
 .card{
@@ -40,19 +41,24 @@ h1, h2, h3{margin-top:0;}
 label{display:block; margin-bottom:5px; font-size:13px; color:var(--text-secondary);}
 input, textarea, select{
   width:100%; padding:10px; border-radius:8px;
-  border:1px solid var(--glass-border); background:rgba(0,0,0,0.2);
-  color:var(--text); outline:none;
+  border:1px solid var(--glass-border); background:rgba(0,0,0,0.3);
+  color:var(--text); outline:none; font-size:14px;
 }
+input:focus, select:focus, textarea:focus{border-color:var(--accent);}
 button{
-  padding:10px 20px; border:none; border-radius:8px;
+  padding:11px 20px; border:none; border-radius:8px;
   background:var(--accent); color:#fff; font-weight:bold; cursor:pointer;
+  transition:opacity 0.2s ease;
 }
 button:hover{opacity:0.9;}
 .btn-danger{background:var(--error);}
+.btn-warning{background:var(--warning); color:#000;}
 table{width:100%; border-collapse:collapse; margin-top:10px;}
 th, td{padding:10px; text-align:left; border-bottom:1px solid var(--glass-border); font-size:13px;}
 th{color:var(--text-secondary);}
 .badge{padding:3px 8px; border-radius:4px; font-size:11px; background:rgba(255,92,92,0.2); color:var(--error);}
+.badge-info{background:rgba(51,209,122,0.2); color:var(--success);}
+.switch-wrap{display:flex; align-items:center; justify-content:space-between; padding:10px 0;}
 </style>
 </head>
 <body>
@@ -60,6 +66,7 @@ th{color:var(--text-secondary);}
 <div class="container">
   <h1>Trang Quan Ly System</h1>
   
+  <!-- DASHBOARD STATS -->
   <div class="grid">
     <div class="card">
       <div>Tong so nhiem vu</div>
@@ -74,16 +81,36 @@ th{color:var(--text-secondary);}
       <div class="val" id="completedUsers">0</div>
     </div>
     <div class="card">
-      <div>Luot co tin Bypass</div>
+      <div>Luot co tinh Bypass</div>
       <div class="val" id="bypassCount" style="color:var(--error);">0</div>
     </div>
   </div>
 
+  <!-- CAU HINH BAO TRAI & LINK NGUOI DUNG -->
+  <div class="card" style="margin-bottom:25px;">
+    <h2>Cai Dat He Thong & Khoa Bao Tri</h2>
+    <div class="grid" style="grid-template-columns: 1fr 1fr; margin-bottom:0;">
+      <div class="switch-wrap">
+        <div>
+          <strong>Che Do Bao Tri Link:</strong>
+          <div style="font-size:12px; color:var(--text-secondary);" id="maintenanceStatusText">Trang thai: Dang hoat dong</div>
+        </div>
+        <button id="toggleMaintenanceBtn">Bat Bao Tri</button>
+      </div>
+      <div class="form-group">
+        <label>Link Mo Khoa Dich (Target URL sau khi xong task)</label>
+        <input type="text" id="targetDestinationUrl" placeholder="https://example.com/file-download">
+      </div>
+    </div>
+    <button id="saveSystemConfigBtn" style="margin-top:10px;">Luu Cai Dat He Thong</button>
+  </div>
+
+  <!-- THONG KE KENH & THEM NHIEM VU -->
   <div class="grid" style="grid-template-columns: 1fr 1fr;">
     <div class="card">
-      <h2>Cap Nhat Thong Ke Kênh</h2>
+      <h2>Cap Nhat Thong Ke Mang Xa Hoi</h2>
       <div class="form-group">
-        <label>So nguoi dang ky (Subscribers)</label>
+        <label>So nguoi theo doi / Dang ky</label>
         <input type="number" id="subCount" placeholder="Vi du: 15000">
       </div>
       <div class="form-group">
@@ -98,35 +125,56 @@ th{color:var(--text-secondary);}
     </div>
 
     <div class="card">
-      <h2>Them Nhiem Vu Moi</h2>
+      <h2>Them Nhiem Vu Moi (Da Nen Tang)</h2>
+      <div class="form-group">
+        <label>Nen tang Mang xa hoi</label>
+        <select id="taskPlatform">
+          <option value="YouTube">YouTube</option>
+          <option value="Facebook">Facebook</option>
+          <option value="TikTok">TikTok</option>
+          <option value="Telegram">Telegram</option>
+          <option value="Website">Website khác</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Loai hanh vi (Hanh dong chinh)</label>
+        <select id="taskActionType">
+          <option value="sub">Dang ky / Follow kenh</option>
+          <option value="like">Thich video / Bai viet</option>
+          <option value="comment">Binh luan vao bai viet</option>
+          <option value="join">Tham gia Nhom / Channel</option>
+        </select>
+      </div>
       <div class="form-group">
         <label>Tieu de nhiem vu</label>
-        <input type="text" id="taskTitle" placeholder="Vi du: Dang ky kenh YouTube Official">
+        <input type="text" id="taskTitle" placeholder="Vi du: Thich va Dang ky kenh YouTube">
       </div>
       <div class="form-group">
-        <label>Mo ta nhiem vu</label>
-        <input type="text" id="taskDesc" placeholder="Vi du: Nhap dang ky va bat thong bao">
+        <label>Mo ta chi tiet</label>
+        <input type="text" id="taskDesc" placeholder="Vi du: Bấm Thích video và để lại 1 bình luận">
       </div>
       <div class="form-group">
-        <label>Đuong dan (URL YouTube)</label>
-        <input type="text" id="taskUrl" placeholder="https://youtube.com/...">
+        <label>Duong dan Lien ket (URL)</label>
+        <input type="text" id="taskUrl" placeholder="https://...">
       </div>
       <div class="form-group">
         <label>
           <input type="checkbox" id="taskHasComment" style="width:auto;"> Yeu cau kiem tra noi dung binh luan
         </label>
       </div>
-      <button id="addTaskBtn">Them Nhiem Vu</button>
+      <button id="addTaskBtn">Them Nhiem Vu ngay</button>
     </div>
   </div>
 
+  <!-- DANH SACH NHIEM VU HIEN TAI -->
   <div class="card" style="margin-bottom:25px;">
     <h2>Danh Sach Nhiem Vu Hien Tai</h2>
     <table>
       <thead>
         <tr>
+          <th>Nen Tang</th>
           <th>Tieu De</th>
-          <th>Mo Ta</th>
+          <th>Hanh Dong</th>
           <th>Link</th>
           <th>Binh Luan</th>
           <th>Thao Tac</th>
@@ -136,6 +184,22 @@ th{color:var(--text-secondary);}
     </table>
   </div>
 
+  <!-- LICH SU THEI VA XOA NHIEM VU -->
+  <div class="card" style="margin-bottom:25px;">
+    <h2>Lich Su Quan Ly Nhiem Vu</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Thoi Gian</th>
+          <th>Hanh Dong</th>
+          <th>Chi Tiet Nhiem Vu</th>
+        </tr>
+      </thead>
+      <tbody id="taskHistoryTable"></tbody>
+    </table>
+  </div>
+
+  <!-- CANH BAO BYPASS -->
   <div class="card">
     <h2 style="color:var(--error);">Nhat Ky Co Tinh Bypass (Canh Bao)</h2>
     <table>
@@ -154,7 +218,7 @@ th{color:var(--text-secondary);}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getDatabase, ref, set, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { getDatabase, ref, set, push, onValue, remove, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
@@ -169,16 +233,29 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+let isMaintenance = false;
+
+function logTaskHistory(action, details) {
+  push(ref(db, "taskHistory"), {
+    timestamp: Date.now(),
+    action: action,
+    details: details
+  });
+}
+
 function listenStats() {
+  // 1. Thống kê số user
   onValue(ref(db, "users"), (snapshot) => {
     const data = snapshot.val();
     document.getElementById("totalUsers").textContent = data ? Object.keys(data).length : 0;
   });
 
+  // 2. Thống kê số người hoàn thành
   onValue(ref(db, "stats/completedUsers"), (snapshot) => {
     document.getElementById("completedUsers").textContent = snapshot.val() || 0;
   });
 
+  // 3. Thông số MXH
   onValue(ref(db, "stats/youtubeStats"), (snapshot) => {
     const data = snapshot.val();
     if (data) {
@@ -188,6 +265,30 @@ function listenStats() {
     }
   });
 
+  // 4. Cấu hình hệ thống & Bảo trì
+  onValue(ref(db, "systemConfig"), (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      isMaintenance = data.isMaintenance || false;
+      document.getElementById("targetDestinationUrl").value = data.targetUrl || "";
+      const statusText = document.getElementById("maintenanceStatusText");
+      const toggleBtn = document.getElementById("toggleMaintenanceBtn");
+      
+      if (isMaintenance) {
+        statusText.textContent = "Trang thai: DANG BAO TRI (Da khoa link)";
+        statusText.style.color = "var(--error)";
+        toggleBtn.textContent = "Tat Bao Tri";
+        toggleBtn.className = "btn-warning";
+      } else {
+        statusText.textContent = "Trang thai: DANG HOAT DONG (Binh thuong)";
+        statusText.style.color = "var(--success)";
+        toggleBtn.textContent = "Bat Bao Tri";
+        toggleBtn.className = "";
+      }
+    }
+  });
+
+  // 5. Danh sách nhiệm vụ hiện tại
   onValue(ref(db, "tasks"), (snapshot) => {
     const data = snapshot.val();
     const table = document.getElementById("taskListTable");
@@ -203,19 +304,50 @@ function listenStats() {
       const item = data[key];
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td><b>${item.title}</b></td>
-        <td>${item.desc}</td>
+        <td><span class="badge badge-info">${item.platform || 'YouTube'}</span></td>
+        <td><b>${item.title}</b><br><small style="color:var(--text-secondary);">${item.desc}</small></td>
+        <td>${item.actionType || 'N/A'}</td>
         <td><a href="${item.url}" target="_blank" style="color:var(--accent);">Mo Link</a></td>
         <td>${item.hasComment ? "Co" : "Khong"}</td>
-        <td><button class="btn-danger" data-id="${key}">Xoa</button></td>
+        <td><button class="btn-danger" data-id="${key}" data-title="${item.title}">Xoa</button></td>
       `;
-      tr.querySelector("button").addEventListener("click", () => {
-        remove(ref(db, `tasks/${key}`));
+      
+      tr.querySelector(".btn-danger").addEventListener("click", (e) => {
+        const taskId = e.target.getAttribute("data-id");
+        const taskTitle = e.target.getAttribute("data-title");
+        if (confirm(`Ban co thuc su muon xoa nhiem vu: "${taskTitle}"?`)) {
+          remove(ref(db, `tasks/${taskId}`)).then(() => {
+            logTaskHistory("XOA_NHIEM_VU", `Da xoa nhiem vu: ${taskTitle}`);
+            alert("Da xoa nhiem vu thanh cong!");
+          });
+        }
       });
       table.appendChild(tr);
     });
   });
 
+  // 6. Lịch sử Thêm / Xóa nhiệm vụ
+  onValue(ref(db, "taskHistory"), (snapshot) => {
+    const data = snapshot.val();
+    const table = document.getElementById("taskHistoryTable");
+    table.innerHTML = "";
+    if (!data) return;
+
+    const keys = Object.keys(data).reverse();
+    keys.slice(0, 10).forEach(key => {
+      const item = data[key];
+      const date = new Date(item.timestamp).toLocaleString("vi-VN");
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${date}</td>
+        <td><span class="badge ${item.action === 'THEM_NHIEM_VU' ? 'badge-info' : ''}">${item.action}</span></td>
+        <td>${item.details}</td>
+      `;
+      table.appendChild(tr);
+    });
+  });
+
+  // 7. Lịch sử Bypass
   onValue(ref(db, "bypassLogs"), (snapshot) => {
     const data = snapshot.val();
     const table = document.getElementById("bypassTable");
@@ -242,6 +374,30 @@ function listenStats() {
   });
 }
 
+// LƯU CẤU HÌNH BẢO TRÌ & LINK ĐÍCH
+document.getElementById("saveSystemConfigBtn").addEventListener("click", () => {
+  const targetUrl = document.getElementById("targetDestinationUrl").value.trim();
+  set(ref(db, "systemConfig"), {
+    isMaintenance: isMaintenance,
+    targetUrl: targetUrl
+  }).then(() => {
+    alert("Da luu cai dat he thong thanh cong!");
+  });
+});
+
+// BẬT / TẮT BẢO TRÌ
+document.getElementById("toggleMaintenanceBtn").addEventListener("click", () => {
+  isMaintenance = !isMaintenance;
+  const targetUrl = document.getElementById("targetDestinationUrl").value.trim();
+  set(ref(db, "systemConfig"), {
+    isMaintenance: isMaintenance,
+    targetUrl: targetUrl
+  }).then(() => {
+    alert(isMaintenance ? "Da BAT che do bao tri!" : "Da TAT che do bao tri!");
+  });
+});
+
+// LƯU THỐNG KÊ MXH
 document.getElementById("saveStatsBtn").addEventListener("click", () => {
   const subs = Number(document.getElementById("subCount").value);
   const likes = Number(document.getElementById("likeCount").value);
@@ -252,33 +408,46 @@ document.getElementById("saveStatsBtn").addEventListener("click", () => {
     likes: likes,
     comments: comments
   }).then(() => {
-    alert("Da cap nhat thong ke YouTube thanh cong!");
+    alert("Da cap nhat thong ke thanh cong!");
   });
 });
 
+// THÊM NHIỆM VỤ MỚI (FIX SỰ CỐ KHÔNG THÊM ĐƯỢC)
 document.getElementById("addTaskBtn").addEventListener("click", () => {
+  const platform = document.getElementById("taskPlatform").value;
+  const actionType = document.getElementById("taskActionType").value;
   const title = document.getElementById("taskTitle").value.trim();
   const desc = document.getElementById("taskDesc").value.trim();
   const url = document.getElementById("taskUrl").value.trim();
   const hasComment = document.getElementById("taskHasComment").checked;
 
   if (!title || !url) {
-    alert("Vui long nhap day du Tieu de va Link URL!");
+    alert("Vui long nhap day du Tieu de va Duong dan URL!");
     return;
   }
 
-  push(ref(db, "tasks"), {
+  const newTask = {
+    platform: platform,
+    actionType: actionType,
     title: title,
-    desc: desc,
+    desc: desc || "Hoan thanh nhiem vu theo yeu cau",
     url: url,
-    hasComment: hasComment
-  }).then(() => {
-    document.getElementById("taskTitle").value = "";
-    document.getElementById("taskDesc").value = "";
-    document.getElementById("taskUrl").value = "";
-    document.getElementById("taskHasComment").checked = false;
-    alert("Them nhiem vu thanh cong!");
-  });
+    hasComment: hasComment,
+    createdAt: Date.now()
+  };
+
+  push(ref(db, "tasks"), newTask)
+    .then(() => {
+      logTaskHistory("THEM_NHIEM_VU", `Da them nhiem vu [${platform}]: ${title}`);
+      document.getElementById("taskTitle").value = "";
+      document.getElementById("taskDesc").value = "";
+      document.getElementById("taskUrl").value = "";
+      document.getElementById("taskHasComment").checked = false;
+      alert("Them nhiem vu moi thanh cong!");
+    })
+    .catch((error) => {
+      alert("Loi khi them nhiem vu: " + error.message);
+    });
 });
 
 document.addEventListener("DOMContentLoaded", listenStats);
