@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<title>YouTube Checker</title>
+<style>
+:root{
+  --bg-1:#0b0d14;
+  --bg-2:#141824;
+  --bg-3:#1c2233;
+  --glass:rgba(255,255,255,0.06);
+  --glass-strong:rgba(255,255,255,0.10);
+  --glass-border:rgba(255,255,255,0.14);
+  --text:#f2f4f8;
+  --text-secondary:rgba(242,244,248,0.62);
+  --text-tertiary:rgba(242,244,248,0.38);
+  --accent:#ff3b5c;
+  --accent-2:#ff7a45;
+  --success:#33d17a;
+  --error:#ff5c5c;
+  --warning:#ffb84d;
+  --shadow-soft:0 20px 60px rgba(0,0,0,0.45);
+  --shadow-card:0 10px 30px rgba(0,0,0,0.35);
+  --radius-xl:28px;
+  --radius-lg:22px;
+  --radius-pill:999px;
+  --blur:22px;
+  --safe-top:env(safe-area-inset-top, 0px);
+  --safe-bottom:env(safe-area-inset-bottom, 0px);
+  --safe-left:env(safe-area-inset-left, 0px);
+  --safe-right:env(safe-area-inset-right, 0px);
+}
+
+[data-theme="light"]{
+  --bg-1:#eef0f4;
+  --bg-2:#e4e7ee;
+  --bg-3:#dadfe8;
+  --glass:rgba(255,255,255,0.55);
+  --glass-strong:rgba(255,255,255,0.72);
+  --glass-border:rgba(20,24,36,0.10);
+  --text:#12141c;
+  --text-secondary:rgba(18,20,28,0.62);
+  --text-tertiary:rgba(18,20,28,0.40);
+  --shadow-soft:0 20px 50px rgba(20,24,40,0.14);
+  --shadow-card:0 8px 24px rgba(20,24,40,0.10);
+}
+
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0; padding:0; height:100%;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Segoe UI",Roboto,sans-serif;
+  background:
+    radial-gradient(1200px 800px at 15% -10%, rgba(255,59,92,0.16), transparent 60%),
+    radial-gradient(1000px 700px at 100% 10%, rgba(120,90,255,0.10), transparent 55%),
+    linear-gradient(180deg, var(--bg-1), var(--bg-2) 45%, var(--bg-3));
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+  transition:background-color .4s ease, color .4s ease;
+  -webkit-font-smoothing:antialiased;
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important;}
+}
+
+button, input, textarea{font-family:inherit;}
+
+#app{
+  max-width:520px;
+  margin:0 auto;
+  padding:
+    calc(var(--safe-top) + 18px)
+    calc(var(--safe-right) + 16px)
+    calc(var(--safe-bottom) + 32px)
+    calc(var(--safe-left) + 16px);
+  position:relative;
+}
+
+#splash{
+  position:fixed; inset:0; z-index:999;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:14px;
+  background:linear-gradient(180deg, var(--bg-1), var(--bg-2));
+}
+#splash .logo-mark{
+  width:72px; height:72px; border-radius:22px;
+  background:linear-gradient(145deg, var(--accent), var(--accent-2));
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 16px 40px rgba(255,59,92,0.35);
+  animation:splashPop .6s cubic-bezier(.34,1.56,.64,1) both;
+}
+#splash .logo-mark svg{width:34px; height:34px;}
+#splash h1{font-size:19px; font-weight:600; letter-spacing:-0.2px; margin:0; opacity:0; animation:splashFade .5s ease .15s forwards;}
+#splash p{font-size:13px; color:var(--text-tertiary); margin:0; opacity:0; animation:splashFade .5s ease .25s forwards;}
+@keyframes splashPop{from{transform:scale(.55) rotate(-8deg); opacity:0;} to{transform:scale(1) rotate(0); opacity:1;}}
+@keyframes splashFade{to{opacity:1;}}
+#splash.hide{animation:splashOut .45s ease forwards;}
+@keyframes splashOut{to{opacity:0; transform:scale(1.03); visibility:hidden;}}
+
+.glass{
+  background:var(--glass);
+  border:1px solid var(--glass-border);
+  border-radius:var(--radius-xl);
+  backdrop-filter:blur(var(--blur)) saturate(150%);
+  -webkit-backdrop-filter:blur(var(--blur)) saturate(150%);
+  box-shadow:var(--shadow-card);
+  position:relative;
+  overflow:hidden;
+}
+.glass::before{
+  content:"";
+  position:absolute; inset:0 0 auto 0; height:1px;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent);
+  opacity:.5;
+}
+
+header.top{display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:18px; padding:4px 2px;}
+header.top .titles h1{font-size:26px; font-weight:700; letter-spacing:-0.4px; margin:0 0 3px;}
+header.top .titles p{font-size:14px; color:var(--text-secondary); margin:0;}
+.theme-toggle{
+  width:44px; height:44px; border-radius:var(--radius-pill);
+  display:flex; align-items:center; justify-content:center;
+  border:1px solid var(--glass-border); background:var(--glass);
+  backdrop-filter:blur(var(--blur));
+  cursor:pointer; flex-shrink:0;
+  transition:transform .15s ease;
+}
+.theme-toggle:active{transform:scale(.9);}
+.theme-toggle svg{width:19px; height:19px; stroke:var(--text);}
+
+.progress-card{padding:20px 20px 18px; margin-bottom:16px;}
+.progress-card .row-top{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;}
+.progress-card h2{font-size:15px; font-weight:600; margin:0; color:var(--text-secondary);}
+.progress-card .count{font-size:14px; font-weight:600; color:var(--text);}
+.progress-track{
+  height:10px; border-radius:var(--radius-pill);
+  background:rgba(127,127,127,0.22);
+  overflow:hidden;
+}
+.progress-fill{
+  height:100%; border-radius:var(--radius-pill);
+  background:linear-gradient(90deg, var(--accent), var(--accent-2));
+  width:0%;
+  transition:width .6s cubic-bezier(.22,1,.36,1);
+}
+.progress-caption{margin-top:10px; font-size:12.5px; color:var(--text-tertiary);}
+
+.section-label{font-size:13px; font-weight:600; color:var(--text-secondary); margin:22px 4px 10px; letter-spacing:0.1px;}
+.task-list{padding:6px; margin-bottom:8px;}
+.task-row{
+  display:flex; align-items:center; gap:13px;
+  padding:14px 10px;
+  border-radius:var(--radius-lg);
+  cursor:pointer;
+  transition:background-color .2s ease, transform .12s ease;
+}
+.task-row:not(:last-child){border-bottom:1px solid var(--glass-border);}
+.task-row:active{transform:scale(.985); background:var(--glass-strong);}
+.task-icon{
+  width:42px; height:42px; border-radius:13px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(145deg, rgba(255,59,92,0.22), rgba(255,122,69,0.12));
+  transition:background .3s ease, transform .35s cubic-bezier(.34,1.56,.64,1);
+}
+.task-icon svg{width:21px; height:21px; stroke:var(--accent); fill:none;}
+.task-row.verified .task-icon{background:linear-gradient(145deg, rgba(51,209,122,0.28), rgba(51,209,122,0.10)); transform:scale(1.05);}
+.task-row.verified .task-icon svg{stroke:var(--success);}
+.task-body{flex:1; min-width:0;}
+.task-body .t-title{font-size:15.5px; font-weight:600; margin:0 0 2px;}
+.task-body .t-status{font-size:12.5px; color:var(--text-tertiary); display:flex; align-items:center; gap:5px;}
+.task-body .t-status.verified{color:var(--success);}
+.task-body .t-status.error{color:var(--error);}
+.task-btn{
+  padding:9px 18px;
+  border-radius:var(--radius-pill);
+  border:1px solid var(--glass-border);
+  background:var(--glass-strong);
+  color:var(--text);
+  font-size:13.5px; font-weight:600;
+  cursor:pointer; flex-shrink:0;
+  transition:transform .12s ease, background .2s ease, opacity .2s ease;
+  min-width:78px;
+  text-align:center;
+}
+.task-btn:active{transform:scale(.94);}
+.task-btn.done{background:rgba(51,209,122,0.16); border-color:rgba(51,209,122,0.35); color:var(--success);}
+.task-btn.loading{pointer-events:none; opacity:.75;}
+.spinner{
+  width:14px; height:14px; border-radius:50%;
+  border:2px solid rgba(255,255,255,0.25); border-top-color:var(--text);
+  display:inline-block; animation:spin .7s linear infinite; vertical-align:middle;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+@keyframes checkPop{
+  0%{transform:scale(0.4); opacity:0;}
+  60%{transform:scale(1.15); opacity:1;}
+  100%{transform:scale(1); opacity:1;}
+}
+.task-row.verified .task-icon svg{animation:checkPop .4s cubic-bezier(.34,1.56,.64,1);}
+
+@keyframes glowPulse{
+  0%{box-shadow:0 0 0 rgba(51,209,122,0);}
+  40%{box-shadow:0 0 26px rgba(51,209,122,0.35);}
+  100%{box-shadow:var(--shadow-card);}
+}
+.task-list.pulse{animation:glowPulse .8s ease;}
+
+.stats-grid{
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:10px; margin-top:10px;
+}
+.stat-card{padding:16px 16px 14px;}
+.stat-card .s-label{font-size:12px; color:var(--text-tertiary); margin:0 0 6px; display:flex; align-items:center; gap:6px;}
+.stat-card .s-value{font-size:21px; font-weight:700; letter-spacing:-0.3px; margin:0; font-variant-numeric:tabular-nums;}
+.stat-card .s-value.err{font-size:13px; font-weight:500; color:var(--text-tertiary);}
+
+.unlock-wrap{margin-top:22px; text-align:center;}
+.unlock-btn{
+  width:100%; padding:18px;
+  border:none; border-radius:var(--radius-pill);
+  background:linear-gradient(120deg, var(--accent), var(--accent-2));
+  color:#fff; font-size:16.5px; font-weight:700; letter-spacing:0.2px;
+  box-shadow:0 14px 34px rgba(255,59,92,0.35);
+  cursor:pointer;
+  transition:transform .15s cubic-bezier(.34,1.56,.64,1), box-shadow .2s ease, opacity .2s ease;
+}
+.unlock-btn:disabled{opacity:.4; box-shadow:none; cursor:not-allowed;}
+.unlock-btn:not(:disabled):active{transform:scale(.96);}
+.unlock-hint{margin-top:10px; font-size:12.5px; color:var(--text-tertiary);}
+
+.sheet-backdrop{
+  position:fixed; inset:0; z-index:80;
+  background:rgba(0,0,0,0.45);
+  backdrop-filter:blur(6px);
+  opacity:0; pointer-events:none;
+  transition:opacity .3s ease;
+}
+.sheet-backdrop.open{opacity:1; pointer-events:auto;}
+
+.sheet{
+  position:fixed; left:0; right:0; bottom:0; z-index:90;
+  max-width:520px; margin:0 auto;
+  background:var(--bg-2);
+  border:1px solid var(--glass-border);
+  border-bottom:none;
+  border-radius:28px 28px 0 0;
+  box-shadow:var(--shadow-soft);
+  padding:10px 20px calc(24px + var(--safe-bottom));
+  transform:translateY(100%);
+  transition:transform .4s cubic-bezier(.22,1,.36,1);
+  backdrop-filter:blur(var(--blur));
+  -webkit-backdrop-filter:blur(var(--blur));
+}
+.sheet.open{transform:translateY(0);}
+.sheet .handle{
+  width:38px; height:5px; border-radius:var(--radius-pill);
+  background:var(--text-tertiary); opacity:.5;
+  margin:6px auto 16px;
+}
+.sheet h3{font-size:18px; font-weight:700; margin:0 0 6px;}
+.sheet p.desc{font-size:14px; color:var(--text-secondary); line-height:1.5; margin:0 0 16px;}
+.sheet .sheet-status{
+  display:flex; align-items:center; gap:9px;
+  padding:12px 14px; border-radius:14px;
+  background:var(--glass); border:1px solid var(--glass-border);
+  font-size:13.5px; margin-bottom:16px; min-height:22px;
+}
+.sheet textarea{
+  width:100%; resize:none; min-height:76px;
+  border-radius:16px; border:1px solid var(--glass-border);
+  background:var(--glass); color:var(--text);
+  padding:12px 14px; font-size:14px; line-height:1.4;
+  margin-bottom:14px; outline:none;
+}
+.sheet textarea:focus{border-color:var(--accent);}
+.sheet .sheet-actions{display:flex; gap:10px;}
+.sheet .sheet-actions button{flex:1;}
+.btn-primary, .btn-secondary{
+  padding:14px; border-radius:var(--radius-pill); border:none;
+  font-size:14.5px; font-weight:600; cursor:pointer;
+  transition:transform .12s ease, opacity .2s ease;
+}
+.btn-primary{background:linear-gradient(120deg, var(--accent), var(--accent-2)); color:#fff;}
+.btn-secondary{background:var(--glass-strong); color:var(--text); border:1px solid var(--glass-border);}
+.btn-primary:active, .btn-secondary:active{transform:scale(.96);}
+.btn-primary:disabled{opacity:.5; pointer-events:none;}
+
+.success-overlay{
+  position:fixed; inset:0; z-index:120;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:18px; text-align:center; padding:24px;
+  background:rgba(8,10,16,0.72);
+  backdrop-filter:blur(24px);
+  opacity:0; pointer-events:none;
+  transition:opacity .35s ease;
+}
+.success-overlay.open{opacity:1; pointer-events:auto;}
+.success-check{
+  width:88px; height:88px; border-radius:50%;
+  background:linear-gradient(145deg, var(--success), #29b567);
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 18px 46px rgba(51,209,122,0.4);
+  transform:scale(0.5);
+  transition:transform .5s cubic-bezier(.34,1.56,.64,1);
+}
+.success-overlay.open .success-check{transform:scale(1);}
+.success-check svg{width:42px; height:42px;}
+.success-overlay h2{font-size:22px; font-weight:700; margin:0;}
+.success-overlay p{font-size:14.5px; color:var(--text-secondary); margin:0; max-width:280px;}
+.success-overlay .unlock-btn{max-width:280px;}
+
+#toast-host{
+  position:fixed; left:0; right:0; bottom:calc(20px + var(--safe-bottom));
+  z-index:200; display:flex; flex-direction:column; align-items:center; gap:8px;
+  pointer-events:none; padding:0 20px;
+}
+.toast{
+  max-width:340px; width:100%;
+  padding:13px 18px; border-radius:var(--radius-pill);
+  background:var(--glass-strong); border:1px solid var(--glass-border);
+  backdrop-filter:blur(var(--blur));
+  color:var(--text); font-size:13.5px; font-weight:500;
+  box-shadow:var(--shadow-soft);
+  display:flex; align-items:center; gap:8px;
+  opacity:0; transform:translateY(14px) scale(.96);
+  animation:toastIn .35s cubic-bezier(.22,1,.36,1) forwards;
+}
+.toast.out{animation:toastOut .3s ease forwards;}
+@keyframes toastIn{to{opacity:1; transform:translateY(0) scale(1);}}
+@keyframes toastOut{to{opacity:0; transform:translateY(10px) scale(.96);}}
+.toast.error .dot{background:var(--error);}
+.toast.success .dot{background:var(--success);}
+.toast.info .dot{background:var(--warning);}
+.toast .dot{width:7px; height:7px; border-radius:50%; flex-shrink:0;}
+
+.ripple{
+  position:absolute; border-radius:50%;
+  background:rgba(255,255,255,0.35);
+  transform:scale(0); animation:rippleAnim .55s ease-out forwards;
+  pointer-events:none;
+}
+@keyframes rippleAnim{to{transform:scale(2.6); opacity:0;}}
+
+@media (hover:hover) and (pointer:fine){
+  .task-row:hover{background:var(--glass-strong);}
+  .task-btn:hover{filter:brightness(1.08);}
+  .unlock-btn:not(:disabled):hover{transform:translateY(-1px); box-shadow:0 18px 40px rgba(255,59,92,0.42);}
+  .theme-toggle:hover{filter:brightness(1.1);}
+}
+
+footer.foot{text-align:center; margin-top:26px; font-size:11.5px; color:var(--text-tertiary); padding-bottom:6px;}
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <div class="logo-mark">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12a10 10 0 1 1-3-7.1"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+  </div>
+  <h1>YouTube Checker</h1>
+  <p>Dang tai...</p>
+</div>
+
+<div id="app">
+  <header class="top">
+    <div class="titles">
+      <h1>YouTube Checker</h1>
+      <p>Xac minh nhiem vu YouTube</p>
+    </div>
+    <button class="theme-toggle" id="themeToggle" aria-label="Doi giao dien">
+      <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+    </button>
+  </header>
+
+  <section class="glass progress-card">
+    <div class="row-top">
+      <h2>Tien trinh</h2>
+      <span class="count" id="progressCount">0 / 0 nhiem vu hoan thanh</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <p class="progress-caption" id="progressCaption">Hoan thanh cac nhiem vu ben duoi de mo khoa.</p>
+  </section>
+
+  <div class="section-label">Nhiem vu cua ban</div>
+  <section class="glass task-list" id="taskList"></section>
+
+  <div class="unlock-wrap">
+    <button class="unlock-btn" id="unlockBtn" disabled>MO KHOA</button>
+    <p class="unlock-hint" id="unlockHint">Hoan thanh tat ca nhiem vu de mo khoa</p>
+  </div>
+
+  <div class="section-label">Thong ke he thong</div>
+  <div class="stats-grid" id="statsGrid">
+    <div class="glass stat-card">
+      <p class="s-label">Nguoi dang ky</p>
+      <p class="s-value" id="statSubs">---</p>
+    </div>
+    <div class="glass stat-card">
+      <p class="s-label">Luot thich</p>
+      <p class="s-value" id="statLikes">---</p>
+    </div>
+    <div class="glass stat-card">
+      <p class="s-label">Binh luan</p>
+      <p class="s-value" id="statComments">---</p>
+    </div>
+    <div class="glass stat-card">
+      <p class="s-label">Nhiem vu hoan thanh</p>
+      <p class="s-value" id="statTasksDone">0 / 0</p>
+    </div>
+  </div>
+
+  <footer class="foot">Xac minh duoc thuc hien qua he thong quan ly backend Firebase.</footer>
+</div>
+
+<div class="sheet-backdrop" id="sheetBackdrop"></div>
+<div class="sheet" id="sheet">
+  <div class="handle" id="sheetHandle"></div>
+  <h3 id="sheetTitle">Tieu de nhiem vu</h3>
+  <p class="desc" id="sheetDesc">Mo ta nhiem vu.</p>
+  <div class="sheet-status" id="sheetStatus">
+    <span>Chua xac minh</span>
+  </div>
+  <div id="sheetCommentBox" style="display:none;">
+    <textarea id="commentInput" placeholder="Nhap noi dung binh luan cua ban"></textarea>
+  </div>
+  <div class="sheet-actions">
+    <button class="btn-secondary" id="sheetCancel">Dong</button>
+    <button class="btn-primary" id="sheetVerify">Kiem tra</button>
+  </div>
+</div>
+
+<div class="success-overlay" id="successOverlay">
+  <div class="success-check">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  </div>
+  <h2>Xac minh thanh cong</h2>
+  <p>Ban da hoan thanh tat ca nhiem vu.</p>
+  <button class="unlock-btn" id="finalUnlockBtn">MO KHOA</button>
+</div>
+
+<div id="toast-host"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getDatabase, ref, get, set, push, onValue, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
+  authDomain: "quocdat-396fe.firebaseapp.com",
+  databaseURL: "https://quocdat-396fe-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "quocdat-396fe",
+  storageBucket: "quocdat-396fe.firebasestorage.app",
+  messagingSenderId: "685476439350",
+  appId: "1:685476439350:web:949054ecba7f0a0c383f97"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+let TASKS = [];
+let userId = localStorage.getItem("yt_checker_uid");
+if (!userId) {
+  userId = "usr_" + Math.random().toString(36).substring(2, 9);
+  localStorage.setItem("yt_checker_uid", userId);
+}
+
+const state = {
+  results: {},
+  activeTaskId: null,
+  sheetBusy: false
+};
+
+function trackUserVisit() {
+  set(ref(db, `users/${userId}/lastActive`), Date.now());
+  set(ref(db, `users/${userId}/device`), navigator.userAgent);
+}
+
+function logBypassAttempt(reason, taskId = "none") {
+  push(ref(db, "bypassLogs"), {
+    userId: userId,
+    taskId: taskId,
+    reason: reason,
+    timestamp: Date.now(),
+    userAgent: navigator.userAgent
+  });
+}
+
+function showToast(message, type = "info", duration = 3000) {
+  const host = document.getElementById("toast-host");
+  const el = document.createElement("div");
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span class="dot"></span><span>${message}</span>`;
+  host.appendChild(el);
+  setTimeout(() => {
+    el.classList.add("out");
+    setTimeout(() => el.remove(), 320);
+  }, duration);
+}
+
+const taskListEl = document.getElementById("taskList");
+
+function renderTasks() {
+  taskListEl.innerHTML = "";
+  if (TASKS.length === 0) {
+    taskListEl.innerHTML = `<div style="padding:15px; text-align:center; color:var(--text-tertiary);">Chua co nhiem vu nao duoc cau hinh.</div>`;
+    updateProgress();
+    return;
+  }
+
+  TASKS.forEach(task => {
+    const verified = state.results[task.id] === true;
+    const row = document.createElement("div");
+    row.className = `task-row${verified ? " verified" : ""}`;
+    row.dataset.taskId = task.id;
+    row.innerHTML = `
+      <div class="task-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          ${verified ? '<polyline points="20 6 9 17 4 12"/>' : task.icon}
+        </svg>
+      </div>
+      <div class="task-body">
+        <p class="t-title">${task.title}</p>
+        <p class="t-status ${verified ? "verified" : ""}" id="status-${task.id}">
+          ${verified ? "Da xac minh" : "Chua xac minh"}
+        </p>
+      </div>
+      <button class="task-btn ${verified ? "done" : ""}" id="btn-${task.id}">
+        ${verified ? "Da xong" : "Kiem tra"}
+      </button>
+    `;
+    taskListEl.appendChild(row);
+
+    row.addEventListener("click", (e) => {
+      if (e.target.closest(".task-btn")) return;
+      openSheet(task.id);
+    });
+    row.querySelector(".task-btn").addEventListener("click", (e) => {
+      addRipple(e);
+      if (verified) return;
+      openSheet(task.id);
+    });
+  });
+  updateProgress();
+}
+
+function addRipple(e) {
+  const btn = e.currentTarget;
+  const rect = btn.getBoundingClientRect();
+  const ripple = document.createElement("span");
+  const size = Math.max(rect.width, rect.height);
+  ripple.className = "ripple";
+  ripple.style.width = ripple.style.height = size + "px";
+  const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left - size / 2;
+  const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top - size / 2;
+  ripple.style.left = x + "px";
+  ripple.style.top = y + "px";
+  btn.style.position = btn.style.position || "relative";
+  btn.style.overflow = "hidden";
+  btn.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 600);
+}
+
+function updateProgress() {
+  const total = TASKS.length;
+  const done = TASKS.filter(t => state.results[t.id] === true).length;
+  document.getElementById("progressCount").textContent = `${done} / ${total} nhiem vu hoan thanh`;
+  document.getElementById("progressFill").style.width = total > 0 ? `${(done / total) * 100}%` : "0%";
+  document.getElementById("statTasksDone").textContent = `${done} / ${total}`;
+
+  const caption = document.getElementById("progressCaption");
+  const unlockBtn = document.getElementById("unlockBtn");
+  const unlockHint = document.getElementById("unlockHint");
+
+  if (total > 0 && done === total) {
+    caption.textContent = "Tat ca nhiem vu da hoan thanh";
+    unlockBtn.disabled = false;
+    unlockHint.textContent = "Ban co the mo khoa ngay bay gio";
+  } else {
+    caption.textContent = "Hoan thanh cac nhiem vu ben duoi de mo khoa.";
+    unlockBtn.disabled = true;
+    unlockHint.textContent = "Hoan thanh tat ca nhiem vu de mo khoa";
+  }
+}
+
+const sheet = document.getElementById("sheet");
+const sheetBackdrop = document.getElementById("sheetBackdrop");
+const sheetTitle = document.getElementById("sheetTitle");
+const sheetDesc = document.getElementById("sheetDesc");
+const sheetStatus = document.getElementById("sheetStatus");
+const sheetCommentBox = document.getElementById("sheetCommentBox");
+const commentInput = document.getElementById("commentInput");
+const sheetVerifyBtn = document.getElementById("sheetVerify");
+const sheetCancelBtn = document.getElementById("sheetCancel");
+
+function openSheet(taskId) {
+  const task = TASKS.find(t => t.id === taskId);
+  if (!task) return;
+  state.activeTaskId = taskId;
+  sheetTitle.textContent = task.title;
+  sheetDesc.textContent = task.desc;
+  sheetCommentBox.style.display = task.hasComment ? "block" : "none";
+  commentInput.value = "";
+
+  const verified = state.results[taskId] === true;
+  setSheetStatus(verified ? "Da xac minh" : "Chua xac minh", verified ? "success" : "");
+  sheetVerifyBtn.textContent = task.hasComment ? "Xac minh binh luan" : "Kiem tra";
+  sheetVerifyBtn.disabled = false;
+
+  sheetBackdrop.classList.add("open");
+  sheet.classList.add("open");
+
+  if (task.url) {
+    window.open(task.url, "_blank");
+  }
+}
+
+function closeSheet() {
+  if (state.sheetBusy) return;
+  sheetBackdrop.classList.remove("open");
+  sheet.classList.remove("open");
+  state.activeTaskId = null;
+}
+
+function setSheetStatus(text, type = "") {
+  sheetStatus.innerHTML = `<span>${text}</span>`;
+  sheetStatus.style.color = type === "success" ? "var(--success)" : type === "error" ? "var(--error)" : "var(--text)";
+}
+
+sheetCancelBtn.addEventListener("click", closeSheet);
+sheetBackdrop.addEventListener("click", closeSheet);
+
+sheetVerifyBtn.addEventListener("click", async () => {
+  const task = TASKS.find(t => t.id === state.activeTaskId);
+  if (!task) return;
+
+  if (task.hasComment && commentInput.value.trim().length === 0) {
+    setSheetStatus("Vui long nhap noi dung binh luan", "error");
+    logBypassAttempt("Gui xac minh binh luan trong", task.id);
+    return;
+  }
+
+  state.sheetBusy = true;
+  sheetVerifyBtn.disabled = true;
+  setSheetStatus(`<span class="spinner"></span> Dang kiem tra xac minh...`);
+
+  setTimeout(() => {
+    const isSuccess = true;
+    if (isSuccess) {
+      setSheetStatus("Xac minh thanh cong", "success");
+      markTaskResult(task.id, true);
+      showToast("Xac minh thanh cong", "success");
+      setTimeout(closeSheet, 750);
+    } else {
+      setSheetStatus("Chua hoan thanh nhiem vu", "error");
+      logBypassAttempt("Xac minh pride thoi gian / Chua lam", task.id);
+    }
+    state.sheetBusy = false;
+    sheetVerifyBtn.disabled = false;
+  }, 1200);
+});
+
+function markTaskResult(taskId, verified) {
+  state.results[taskId] = verified;
+  set(ref(db, `users/${userId}/tasks/${taskId}`), verified);
+  renderTasks();
+  if (verified) {
+    taskListEl.classList.remove("pulse");
+    void taskListEl.offsetWidth;
+    taskListEl.classList.add("pulse");
+  }
+  maybeShowSuccess();
+}
+
+function maybeShowSuccess() {
+  const total = TASKS.length;
+  const done = TASKS.filter(t => state.results[t.id] === true).length;
+  if (total > 0 && done === total) {
+    set(ref(db, `stats/completedUsers`), increment(1));
+    setTimeout(() => {
+      document.getElementById("successOverlay").classList.add("open");
+    }, 400);
+  }
+}
+
+document.getElementById("unlockBtn").addEventListener("click", (e) => {
+  addRipple(e);
+  const done = TASKS.filter(t => state.results[t.id] === true).length;
+  if (done < TASKS.length) {
+    logBypassAttempt("Co tinh bam MO KHOA khi chua xong het", "global");
+    showToast("Ban chua hoan thanh tat ca nhiem vu!", "error");
+    return;
+  }
+  document.getElementById("successOverlay").classList.add("open");
+});
+
+document.getElementById("finalUnlockBtn").addEventListener("click", (e) => {
+  addRipple(e);
+  showToast("Da mo khoa thanh cong", "success");
+});
+
+function loadConfigAndTasks() {
+  onValue(ref(db, "tasks"), (snapshot) => {
+    const data = snapshot.val();
+    TASKS = [];
+    if (data) {
+      Object.keys(data).forEach(key => {
+        TASKS.push({
+          id: key,
+          title: data[key].title,
+          desc: data[key].desc,
+          url: data[key].url,
+          hasComment: data[key].hasComment || false,
+          icon: data[key].hasComment 
+            ? `<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>`
+            : `<path d="M22 12a10 10 0 1 1-3-7.1"/><polyline points="22 4 12 14.01 9 11.01"/>`
+        });
+      });
+    }
+    
+    get(ref(db, `users/${userId}/tasks`)).then((userSnapshot) => {
+      if (userSnapshot.exists()) {
+        state.results = userSnapshot.val();
+      }
+      renderTasks();
+    });
+  });
+
+  onValue(ref(db, "stats/youtubeStats"), (snapshot) => {
+    const stats = snapshot.val();
+    if (stats) {
+      document.getElementById("statSubs").textContent = Number(stats.subscribers || 0).toLocaleString("vi-VN");
+      document.getElementById("statLikes").textContent = Number(stats.likes || 0).toLocaleString("vi-VN");
+      document.getElementById("statComments").textContent = Number(stats.comments || 0).toLocaleString("vi-VN");
+    }
+  });
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme === "light" ? "light" : "dark");
+  document.getElementById("themeIcon").innerHTML = theme === "light" 
+    ? `<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>` 
+    : `<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>`;
+}
+
+let currentTheme = "dark";
+applyTheme(currentTheme);
+
+document.getElementById("themeToggle").addEventListener("click", (e) => {
+  addRipple(e);
+  currentTheme = currentTheme === "dark" ? "light" : "dark";
+  applyTheme(currentTheme);
+});
+
+function init() {
+  trackUserVisit();
+  loadConfigAndTasks();
+
+  setTimeout(() => {
+    const splash = document.getElementById("splash");
+    if (splash) {
+      splash.classList.add("hide");
+      setTimeout(() => splash.remove(), 500);
+    }
+  }, 650);
+}
+
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>
