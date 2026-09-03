@@ -361,7 +361,7 @@ footer.foot{text-align:center; margin-top:26px; font-size:11.5px; color:var(--te
     <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12a10 10 0 1 1-3-7.1"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
   </div>
   <h1>YouTube Checker</h1>
-  <p>Dang tai...</p>
+  <p>Dang ket noi den he thong...</p>
 </div>
 
 <div id="app">
@@ -457,10 +457,13 @@ const firebaseConfig = {
   appId: "1:685476439350:web:949054ecba7f0a0c383f97"
 };
 
+const YT_API_KEY = "AIzaSyAR-zsFqyZag3TDlSUecY696E757fLQxAo";
+
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 let TASKS = [];
+let initialSubCounts = {};
 let userId = localStorage.getItem("yt_checker_uid");
 if (!userId) {
   userId = "usr_" + Math.random().toString(36).substring(2, 9);
@@ -472,6 +475,27 @@ const state = {
   activeTaskId: null,
   sheetBusy: false
 };
+
+function extractChannelId(url) {
+  if (!url) return null;
+  const match = url.match(/youtube\.com\/channel\/([a-zA-Z0-9_-]+)/);
+  if (match) return match[1];
+  return null;
+}
+
+async function fetchYoutubeSubCount(channelId) {
+  if (!channelId) return null;
+  try {
+    const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${channelId}&key=${YT_API_KEY}`);
+    const data = await res.json();
+    if (data.items && data.items.length > 0) {
+      return parseInt(data.items[0].statistics.subscriberCount, 10);
+    }
+  } catch (err) {
+    console.error("Loi ket noi YouTube API:", err);
+  }
+  return null;
+}
 
 function trackUserVisit() {
   set(ref(db, `users/${userId}/lastActive`), Date.now());
@@ -595,7 +619,7 @@ const commentInput = document.getElementById("commentInput");
 const sheetVerifyBtn = document.getElementById("sheetVerify");
 const sheetCancelBtn = document.getElementById("sheetCancel");
 
-function openSheet(taskId) {
+async function openSheet(taskId) {
   const task = TASKS.find(t => t.id === taskId);
   if (!task) return;
   state.activeTaskId = taskId;
@@ -611,6 +635,14 @@ function openSheet(taskId) {
 
   sheetBackdrop.classList.add("open");
   sheet.classList.add("open");
+
+  const channelId = extractChannelId(task.url);
+  if (channelId && !initialSubCounts[taskId]) {
+    const currentSubs = await fetchYoutubeSubCount(channelId);
+    if (currentSubs !== null) {
+      initialSubCounts[taskId] = currentSubs;
+    }
+  }
 
   if (task.url) {
     window.open(task.url, "_blank");
@@ -644,22 +676,46 @@ sheetVerifyBtn.addEventListener("click", async () => {
 
   state.sheetBusy = true;
   sheetVerifyBtn.disabled = true;
-  setSheetStatus(`<span class="spinner"></span> Dang kiem tra xac minh...`);
+  setSheetStatus(`<span class="spinner"></span> Dang quet va xac minh du lieu tu YouTube...`);
+
+  const startTime = Date.now();
+  let isSuccess = false;
+
+  const channelId = extractChannelId(task.url);
+  if (channelId) {
+    const latestSubCount = await fetchYoutubeSubCount(channelId);
+    const startSubCount = initialSubCounts[task.id];
+    
+    if (latestSubCount !== null && startSubCount !== undefined) {
+      if (latestSubCount > startSubCount) {
+        isSuccess = true;
+      } else {
+        isSuccess = false;
+      }
+    } else {
+      isSuccess = true;
+    }
+  } else {
+    isSuccess = true;
+  }
+
+  const elapsedTime = Date.now() - startTime;
+  const minDelay = 2200;
+  const remainingDelay = Math.max(0, minDelay - elapsedTime);
 
   setTimeout(() => {
-    const isSuccess = true;
     if (isSuccess) {
       setSheetStatus("Xac minh thanh cong", "success");
       markTaskResult(task.id, true);
       showToast("Xac minh thanh cong", "success");
-      setTimeout(closeSheet, 750);
+      setTimeout(closeSheet, 850);
     } else {
-      setSheetStatus("Chua hoan thanh nhiem vu", "error");
-      logBypassAttempt("Xac minh pride thoi gian / Chua lam", task.id);
+      setSheetStatus("Chua phat hien tang Dang ky/Thich. Vui long kiem tra lai!", "error");
+      logBypassAttempt("Chua tang Sub/Like tren YouTube", task.id);
     }
     state.sheetBusy = false;
     sheetVerifyBtn.disabled = false;
-  }, 1200);
+  }, remainingDelay);
 });
 
 function markTaskResult(taskId, verified) {
@@ -681,7 +737,7 @@ function maybeShowSuccess() {
     set(ref(db, `stats/completedUsers`), increment(1));
     setTimeout(() => {
       document.getElementById("successOverlay").classList.add("open");
-    }, 400);
+    }, 450);
   }
 }
 
@@ -698,7 +754,16 @@ document.getElementById("unlockBtn").addEventListener("click", (e) => {
 
 document.getElementById("finalUnlockBtn").addEventListener("click", (e) => {
   addRipple(e);
-  showToast("Da mo khoa thanh cong", "success");
+  get(ref(db, "systemConfig")).then(snapshot => {
+    const config = snapshot.val();
+    if (config && config.isMaintenance) {
+      showToast("He thong dang bao tri link. Vui long quay lai sau!", "error");
+    } else if (config && config.targetUrl) {
+      window.location.href = config.targetUrl;
+    } else {
+      showToast("Da mo khoa thanh cong", "success");
+    }
+  });
 });
 
 function loadConfigAndTasks() {
@@ -762,9 +827,9 @@ function init() {
     const splash = document.getElementById("splash");
     if (splash) {
       splash.classList.add("hide");
-      setTimeout(() => splash.remove(), 500);
+      setTimeout(() => splash.remove(), 600);
     }
-  }, 650);
+  }, 1200);
 }
 
 document.addEventListener("DOMContentLoaded", init);
