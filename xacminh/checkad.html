@@ -50,13 +50,11 @@ button:hover{opacity:0.9;}
 .btn-danger{background:var(--error);}
 .btn-warning{background:var(--warning); color:#000;}
 .btn-success{background:var(--success); color:#000;}
+.btn-sm{padding:6px 10px; font-size:12px; border-radius:6px; margin-right:4px;}
 
-.channel-preview{
-  display:none; align-items:center; gap:15px;
-  background:rgba(255,255,255,0.08); border:1px solid var(--glass-border);
-  border-radius:12px; padding:15px; margin-top:15px;
+.channel-status-info{
+  font-size:12px; margin-top:6px; color:var(--warning); display:none;
 }
-.channel-preview img{width:56px; height:56px; border-radius:50%; object-fit:cover;}
 
 table{width:100%; border-collapse:collapse; margin-top:10px;}
 th, td{padding:12px; text-align:left; border-bottom:1px solid var(--glass-border); font-size:13px;}
@@ -71,12 +69,17 @@ th{color:var(--text-secondary);}
 .modal-backdrop.open{display:flex;}
 .modal-box{
   background:var(--bg-2); border:1px solid var(--glass-border);
-  border-radius:20px; padding:24px; max-width:400px; width:100%; text-align:center;
+  border-radius:20px; padding:24px; max-width:440px; width:100%; text-align:center;
 }
 
 #authSection{max-width:400px; margin:80px auto;}
 #adminSection{display:none;}
 .table-responsive{overflow-x:auto;}
+.edit-btn-icon{
+  background:none; border:none; padding:4px 8px; cursor:pointer; color:var(--warning);
+  font-size:14px;
+}
+.edit-btn-icon:hover{opacity:0.8;}
 </style>
 </head>
 <body>
@@ -148,7 +151,7 @@ th{color:var(--text-secondary);}
 
     <!-- THÊM NHIỆM VỤ MỚI -->
     <div class="card" style="margin-bottom:25px;">
-      <h2>Thêm Nhiệm Vụ Mới (Hỗ Trợ Phân Loại)</h2>
+      <h2>Thêm Nhiệm Vụ Mới (Tự Động Lấy ID Từ URL)</h2>
       <div class="grid" style="grid-template-columns: 1fr 1fr;">
         <div>
           <div class="form-group">
@@ -173,16 +176,9 @@ th{color:var(--text-secondary);}
 
         <div>
           <div class="form-group">
-            <label>Đường dẫn Liên kết (URL)</label>
-            <input type="text" id="taskUrl" placeholder="https://www.youtube.com/watch?v=...">
-          </div>
-          <div class="form-group" id="fieldChannelId">
-            <label>Channel ID (Ví dụ: UCX6OQ3DkcsbYNE6H8uQQuVA)</label>
-            <input type="text" id="taskChannelId" placeholder="UC...">
-          </div>
-          <div class="form-group" id="fieldVideoId">
-            <label>Video ID (Ví dụ: dQw4w9WgXcQ)</label>
-            <input type="text" id="taskVideoId" placeholder="dQw4w9WgXcQ">
+            <label>Đường dẫn Liên kết Kênh / Video (URL)</label>
+            <input type="text" id="taskUrl" placeholder="Dán link YouTube (Kênh hoặc Video) vào đây...">
+            <div id="urlParsingStatus" class="channel-status-info"></div>
           </div>
           <div class="form-group" id="fieldCommentText" style="display:none;">
             <label>Nội dung bình luận yêu cầu</label>
@@ -202,7 +198,7 @@ th{color:var(--text-secondary);}
             <tr>
               <th>Loại</th>
               <th>Tiêu Đề</th>
-              <th>Link / ID</th>
+              <th>Link / Channel ID</th>
               <th>Trạng Thái</th>
               <th>Thao Tác</th>
             </tr>
@@ -271,6 +267,26 @@ th{color:var(--text-secondary);}
   </div>
 </div>
 
+<!-- EDIT LINK MODAL (BÚT CHÌ) -->
+<div class="modal-backdrop" id="editModal">
+  <div class="modal-box">
+    <h3>Sửa Đường Dẫn Nhiệm Vụ ✏️</h3>
+    <div class="form-group" style="text-align:left; margin-top:15px;">
+      <label>Tiêu đề nhiệm vụ</label>
+      <input type="text" id="editTaskTitle" readonly style="opacity:0.6;">
+    </div>
+    <div class="form-group" style="text-align:left;">
+      <label>URL Mới (Kênh hoặc Video)</label>
+      <input type="text" id="editTaskUrl" placeholder="https://youtube.com/...">
+      <div id="editUrlParsingStatus" class="channel-status-info"></div>
+    </div>
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button id="editModalCancelBtn" class="btn-secondary" style="flex:1;">Hủy</button>
+      <button id="editModalSaveBtn" class="btn-success" style="flex:1;">Lưu Thay Đổi</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getDatabase, ref, set, push, onValue, remove, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -286,12 +302,20 @@ const firebaseConfig = {
   appId: "1:685476439350:web:949054ecba7f0a0c383f97"
 };
 
+const YT_API_KEY = "AIzaSyAR-zsFqyZag3TDlSUecY696E757fLQxAo";
+
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
 
 let isMaintenance = false;
 let confirmCallback = null;
+let currentAutoChannelId = "";
+let currentAutoVideoId = "";
+
+let editingTaskId = null;
+let editAutoChannelId = "";
+let editAutoVideoId = "";
 
 function escapeHtml(str) {
   if (!str) return "";
@@ -355,24 +379,78 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// PARSE YOUTUBE URL
-function extractYoutubeInfo(url) {
-  if (!url) return { channelId: "", videoId: "" };
+// TỰ ĐỘNG CHUYỂN ĐỔI LINK THÀNH CHANNEL ID BẰNG YOUTUBE API
+async function resolveYoutubeUrl(urlStr) {
+  if (!urlStr) return { channelId: "", videoId: "" };
   let channelId = "", videoId = "";
-  
-  const chMatch = url.match(/youtube\.com\/channel\/([a-zA-Z0-9_-]+)/);
+
+  const chMatch = urlStr.match(/youtube\.com\/channel\/([a-zA-Z0-9_-]+)/);
   if (chMatch) channelId = chMatch[1];
 
-  const vMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]+)/);
+  const vMatch = urlStr.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]+)/);
   if (vMatch) videoId = vMatch[1];
+
+  const handleMatch = urlStr.match(/youtube\.com\/@([a-zA-Z0-9_.-]+)/);
+  if (handleMatch && !channelId) {
+    try {
+      const handle = handleMatch[1];
+      const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=id,snippet&forHandle=${handle}&key=${YT_API_KEY}`);
+      const data = await res.json();
+      if (data.items && data.items.length > 0) {
+        channelId = data.items[0].id;
+      }
+    } catch(e) {}
+  }
+
+  if (videoId && !channelId) {
+    try {
+      const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${YT_API_KEY}`);
+      const data = await res.json();
+      if (data.items && data.items.length > 0) {
+        channelId = data.items[0].snippet.channelId;
+      }
+    } catch(e) {}
+  }
 
   return { channelId, videoId };
 }
 
-document.getElementById("taskUrl").addEventListener("input", (e) => {
-  const info = extractYoutubeInfo(e.target.value);
-  if (info.channelId) document.getElementById("taskChannelId").value = info.channelId;
-  if (info.videoId) document.getElementById("taskVideoId").value = info.videoId;
+// Xử lý tự động khi dán link ở ô Thêm mới
+document.getElementById("taskUrl").addEventListener("change", async (e) => {
+  const statusEl = document.getElementById("urlParsingStatus");
+  statusEl.style.display = "block";
+  statusEl.textContent = "Đang nhận diện Channel ID từ URL...";
+  
+  const result = await resolveYoutubeUrl(e.target.value.trim());
+  currentAutoChannelId = result.channelId;
+  currentAutoVideoId = result.videoId;
+
+  if (result.channelId) {
+    statusEl.style.color = "var(--success)";
+    statusEl.textContent = `✓ Đã tìm thấy Channel ID: ${result.channelId}`;
+  } else {
+    statusEl.style.color = "var(--warning)";
+    statusEl.textContent = "Chưa nhận diện được Channel ID. Hệ thống sẽ kiểm tra qua link khi xác minh.";
+  }
+});
+
+// Xử lý tự động khi dán link ở Modal Bút Chì
+document.getElementById("editTaskUrl").addEventListener("change", async (e) => {
+  const statusEl = document.getElementById("editUrlParsingStatus");
+  statusEl.style.display = "block";
+  statusEl.textContent = "Đang nhận diện Channel ID từ URL...";
+  
+  const result = await resolveYoutubeUrl(e.target.value.trim());
+  editAutoChannelId = result.channelId;
+  editAutoVideoId = result.videoId;
+
+  if (result.channelId) {
+    statusEl.style.color = "var(--success)";
+    statusEl.textContent = `✓ Đã nhận diện Channel ID: ${result.channelId}`;
+  } else {
+    statusEl.style.color = "var(--warning)";
+    statusEl.textContent = "Không tìm thấy Channel ID riêng.";
+  }
 });
 
 document.getElementById("taskTypeSelect").addEventListener("change", (e) => {
@@ -432,7 +510,10 @@ function initListeners() {
       tr.innerHTML = `
         <td><span class="badge badge-info">${escapeHtml(item.type || 'subscribe')}</span></td>
         <td><b>${escapeHtml(item.title)}</b></td>
-        <td><small>${escapeHtml(item.channelId || item.videoId || 'N/A')}</small></td>
+        <td>
+          <small id="url-display-${key}">${escapeHtml(item.url || item.channelId || 'N/A')}</small>
+          <button class="edit-btn-icon" data-edit="${key}" title="Sửa Link Nhiệm Vụ">✏️</button>
+        </td>
         <td>${isDevDisabled ? '<span class="badge">Đã ẩn</span>' : '<span class="badge badge-info">Hoạt động</span>'}</td>
         <td>
           <button class="btn-warning btn-sm" data-toggle="${key}">${isDevDisabled ? 'Hiện' : 'Ẩn'}</button>
@@ -451,6 +532,17 @@ function initListeners() {
         });
       });
 
+      // Mở Modal Bút Chì Sửa Link
+      tr.querySelector(`[data-edit="${key}"]`).addEventListener("click", () => {
+        editingTaskId = key;
+        document.getElementById("editTaskTitle").value = item.title || "";
+        document.getElementById("editTaskUrl").value = item.url || "";
+        editAutoChannelId = item.channelId || "";
+        editAutoVideoId = item.videoId || "";
+        document.getElementById("editUrlParsingStatus").style.display = "none";
+        document.getElementById("editModal").classList.add("open");
+      });
+
       table.appendChild(tr);
     });
   });
@@ -460,6 +552,37 @@ function initListeners() {
     renderBypassLogs(data);
   });
 }
+
+// Lưu sửa link nhiệm vụ từ Modal Bút Chì
+document.getElementById("editModalCancelBtn").addEventListener("click", () => {
+  document.getElementById("editModal").classList.remove("open");
+  editingTaskId = null;
+});
+
+document.getElementById("editModalSaveBtn").addEventListener("click", async () => {
+  if (!editingTaskId) return;
+  const newUrl = document.getElementById("editTaskUrl").value.trim();
+  if (!newUrl) {
+    alert("Vui lòng nhập đường dẫn URL!");
+    return;
+  }
+
+  const result = await resolveYoutubeUrl(newUrl);
+
+  const updates = {
+    url: newUrl,
+    channelId: result.channelId || editAutoChannelId,
+    videoId: result.videoId || editAutoVideoId
+  };
+
+  set(ref(db, `tasks/${editingTaskId}/url`), updates.url);
+  set(ref(db, `tasks/${editingTaskId}/channelId`), updates.channelId);
+  set(ref(db, `tasks/${editingTaskId}/videoId`), updates.videoId).then(() => {
+    alert("Cập nhật đường dẫn nhiệm vụ thành công!");
+    document.getElementById("editModal").classList.remove("open");
+    editingTaskId = null;
+  });
+});
 
 function renderUsersTable(usersData) {
   const table = document.getElementById("userListTable");
@@ -528,13 +651,11 @@ document.getElementById("bypassFilter").addEventListener("change", () => {
 });
 
 // ADD TASK
-document.getElementById("addTaskBtn").addEventListener("click", () => {
+document.getElementById("addTaskBtn").addEventListener("click", async () => {
   const type = document.getElementById("taskTypeSelect").value;
   const title = document.getElementById("taskTitle").value.trim();
   const desc = document.getElementById("taskDesc").value.trim();
   const url = document.getElementById("taskUrl").value.trim();
-  const channelId = document.getElementById("taskChannelId").value.trim();
-  const videoId = document.getElementById("taskVideoId").value.trim();
   const commentText = document.getElementById("taskCommentText").value.trim();
 
   if (!title || !url) {
@@ -542,13 +663,15 @@ document.getElementById("addTaskBtn").addEventListener("click", () => {
     return;
   }
 
+  const result = await resolveYoutubeUrl(url);
+
   const newTask = {
     type: type,
     title: title,
     desc: desc || "Hoàn thành nhiệm vụ",
     url: url,
-    channelId: channelId,
-    videoId: videoId,
+    channelId: result.channelId || currentAutoChannelId,
+    videoId: result.videoId || currentAutoVideoId,
     commentText: commentText,
     hasComment: (type === "comment"),
     status: "active",
@@ -556,10 +679,13 @@ document.getElementById("addTaskBtn").addEventListener("click", () => {
   };
 
   push(ref(db, "tasks"), newTask).then(() => {
-    alert("Thêm nhiệm vụ thành công!");
+    alert("Thêm nhiệm vụ mới thành công!");
     document.getElementById("taskTitle").value = "";
     document.getElementById("taskDesc").value = "";
     document.getElementById("taskUrl").value = "";
+    document.getElementById("urlParsingStatus").style.display = "none";
+    currentAutoChannelId = "";
+    currentAutoVideoId = "";
   });
 });
 
