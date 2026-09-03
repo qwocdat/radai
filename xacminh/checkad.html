@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard - Task Manager</title>
+<title>Admin Dashboard - Task Link Manager</title>
 <style>
 :root{
   --bg-1:#0b0d14;
@@ -50,11 +50,10 @@ button:hover{opacity:0.9;}
 .btn-danger{background:var(--error);}
 .btn-warning{background:var(--warning); color:#000;}
 .btn-success{background:var(--success); color:#000;}
+.btn-secondary{background:var(--glass-border); color:var(--text);}
 .btn-sm{padding:6px 10px; font-size:12px; border-radius:6px; margin-right:4px;}
 
-.channel-status-info{
-  font-size:12px; margin-top:6px; color:var(--warning); display:none;
-}
+.channel-status-info{font-size:12px; margin-top:6px; color:var(--warning); display:none;}
 
 table{width:100%; border-collapse:collapse; margin-top:10px;}
 th, td{padding:12px; text-align:left; border-bottom:1px solid var(--glass-border); font-size:13px;}
@@ -70,17 +69,18 @@ th{color:var(--text-secondary);}
 .modal-backdrop.open{display:flex;}
 .modal-box{
   background:var(--bg-2); border:1px solid var(--glass-border);
-  border-radius:20px; padding:24px; max-width:480px; width:100%; text-align:center;
+  border-radius:20px; padding:24px; max-width:560px; width:100%; text-align:left;
+  max-height:90vh; overflow-y:auto;
 }
 
-#authSection{max-width:400px; margin:80px auto;}
+#authSection{max-width:400px; margin:80px auto; text-align:center;}
 #adminSection{display:none;}
 .table-responsive{overflow-x:auto;}
-.edit-btn-icon{
-  background:none; border:none; padding:4px 8px; cursor:pointer; color:var(--warning);
-  font-size:14px;
+.task-item-builder{
+  background:rgba(0,0,0,0.25); border:1px dashed var(--glass-border);
+  border-radius:12px; padding:12px; margin-bottom:12px; position:relative;
 }
-.edit-btn-icon:hover{opacity:0.8;}
+.remove-task-btn{position:absolute; top:8px; right:8px; background:var(--error); padding:4px 8px; font-size:11px; border-radius:4px;}
 </style>
 </head>
 <body>
@@ -90,11 +90,11 @@ th{color:var(--text-secondary);}
   <!-- ADMIN AUTHENTICATION -->
   <div id="authSection" class="card">
     <h2>Đăng Nhập Admin</h2>
-    <div class="form-group">
+    <div class="form-group" style="text-align:left;">
       <label>Email Admin</label>
       <input type="email" id="adminEmail" placeholder="admin@example.com">
     </div>
-    <div class="form-group">
+    <div class="form-group" style="text-align:left;">
       <label>Mật Khẩu</label>
       <input type="password" id="adminPassword" placeholder="••••••••">
     </div>
@@ -105,197 +105,79 @@ th{color:var(--text-secondary);}
   <!-- MAIN ADMIN DASHBOARD -->
   <div id="adminSection">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-      <h1>Trang Quản Lý Hệ Thống</h1>
+      <h1>Trang Quản Lý Hệ Thống Link</h1>
       <button id="logoutBtn" class="btn-danger">Đăng Xuất</button>
     </div>
 
     <!-- STATS -->
     <div class="grid">
       <div class="card">
-        <div>Tổng số nhiệm vụ</div>
-        <div class="val" id="totalTasks">0</div>
+        <div>Tổng số Link đã tạo</div>
+        <div class="val" id="totalLinks">0</div>
       </div>
       <div class="card">
         <div>Tổng người dùng</div>
         <div class="val" id="totalUsers">0</div>
       </div>
       <div class="card">
-        <div>Đã hoàn thành</div>
+        <div>Lượt mở khóa Link</div>
         <div class="val" id="completedUsers">0</div>
       </div>
       <div class="card">
-        <div>Lượt cố tình Bypass</div>
+        <div>Lượt Bypass / Lỗi</div>
         <div class="val" id="bypassCount" style="color:var(--error);">0</div>
       </div>
     </div>
 
-    <!-- CẤU HÌNH BẢO TRÌ & LINK ĐÍCH CHUNG -->
+    <!-- TẠO LINK RÚT GỌN MỚI CHỨA NHIỀU NHIỆM VỤ -->
     <div class="card" style="margin-bottom:25px;">
-      <h2>Cấu Hình Hệ Thống & Bảo Trì Chung</h2>
-      <div class="grid" style="grid-template-columns: 1fr 1fr; margin-bottom:0;">
-        <div>
-          <strong>Chế Độ Bảo Trì Toàn Hệ Thống:</strong>
-          <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;" id="maintenanceText">Trạng thái: Đang hoạt động</div>
-          <button id="toggleMaintenanceBtn" style="margin-top:10px;">Bật Bảo Trì Chung</button>
-        </div>
-        <div class="form-group">
-          <label>Link Mở Khóa Đích Mặc Định (Target URL Mặc Định)</label>
-          <input type="text" id="targetDestinationUrl" placeholder="https://example.com/file">
-          <button id="saveTargetBtn" style="margin-top:10px;">Lưu Link Mặc Định</button>
-        </div>
+      <h2>Tạo Link Nhiệm Vụ Mới</h2>
+      <div class="form-group">
+        <label>Tên Gợi Nhớ Cho Link (VD: Link Tải Game Hack Free Fire)</label>
+        <input type="text" id="linkTitleName" placeholder="Nhập tên mô tả link...">
       </div>
-      <div style="margin-top:15px; border-top:1px solid var(--glass-border); padding-top:15px; display:flex; gap:10px;">
-        <button id="resetAllUsersBtn" class="btn-warning">Reset Tiến Trình Tất Cả Người Dùng</button>
-        <button id="syncStatsBtn" class="btn-success">Đồng Bộ Lại Thống Kê</button>
+      <div class="form-group">
+        <label>Trang Đích Mở Khóa (Target URL Sau Khi Làm Xong Nhiệm Vụ)</label>
+        <input type="text" id="linkTargetUrl" placeholder="https://example.com/file-download">
       </div>
+
+      <hr style="border-color:var(--glass-border); margin:20px 0;">
+      <h3>Danh Sách Nhiệm Vụ Trong Link Này</h3>
+      <div id="tasksContainer"></div>
+
+      <button id="addTaskBtn" class="btn-secondary" style="width:100%; margin-bottom:15px;">+ Thêm Nhiệm Vụ Vào Link</button>
+      <button id="saveLinkBtn" class="btn-success" style="width:100%;">TẠO LINK NHIỆM VỤ NGAY</button>
     </div>
 
-    <!-- THÊM NHIỆM VỤ MỚI -->
+    <!-- DANH SÁCH LINK ĐÃ TẠO -->
     <div class="card" style="margin-bottom:25px;">
-      <h2>Thêm Nhiệm Vụ Mới (Tự Động Sinh Link Rút Gọn & Trang Đích)</h2>
-      <div class="grid" style="grid-template-columns: 1fr 1fr;">
-        <div>
-          <div class="form-group">
-            <label>Loại Nhiệm Vụ</label>
-            <select id="taskTypeSelect">
-              <option value="subscribe">Subscribe (Kênh YouTube)</option>
-              <option value="like">Like (Video YouTube)</option>
-              <option value="comment">Comment (Bình luận Video)</option>
-              <option value="watch">Watch (Xem Video)</option>
-              <option value="custom">Custom (Liên kết khác)</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Tiêu đề hiển thị</label>
-            <input type="text" id="taskTitle" placeholder="Đăng ký kênh YouTube chính thức">
-          </div>
-          <div class="form-group">
-            <label>Mô tả nhiệm vụ</label>
-            <input type="text" id="taskDesc" placeholder="Nhấn Đăng ký và bật chuông">
-          </div>
-          <div class="form-group">
-            <label>Trang Đích Riêng Cho Nhiệm Vụ Này (Target URL)</label>
-            <input type="text" id="taskTargetUrl" placeholder="https://trang-dich-rieng.com/file">
-          </div>
-        </div>
-
-        <div>
-          <div class="form-group">
-            <label>Đường dẫn Liên kết Kênh / Video (URL YouTube)</label>
-            <input type="text" id="taskUrl" placeholder="Dán link YouTube (Kênh hoặc Video) vào đây...">
-            <div id="urlParsingStatus" class="channel-status-info"></div>
-          </div>
-          <div class="form-group" id="fieldCommentText" style="display:none;">
-            <label>Nội dung bình luận mẫu (Mỗi dòng là 1 câu bình luận)</label>
-            <textarea id="taskCommentText" rows="4" placeholder="Tuyệt vời quá admin ơi!&#10;Video rất hay và bổ ích.&#10;Hóng clip tiếp theo."></textarea>
-          </div>
-          <button id="addTaskBtn" style="width:100%; margin-top:10px;">Thêm Nhiệm Vụ Ngay</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- DANH SÁCH NHIỆM VỤ -->
-    <div class="card" style="margin-bottom:25px;">
-      <h2>Danh Sách Nhiệm Vụ</h2>
+      <h2>Danh Sách Link Đã Tạo</h2>
       <div class="table-responsive">
         <table>
           <thead>
             <tr>
-              <th>Loại</th>
-              <th>Tiêu Đề / Link Rút Gọn</th>
-              <th>Link YouTube</th>
+              <th>Mã Alias / Link Rút Gọn</th>
+              <th>Tên Link</th>
+              <th>Số Nhiệm Vụ</th>
               <th>Trạng Thái</th>
               <th>Thao Tác</th>
             </tr>
           </thead>
-          <tbody id="taskListTable"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- QUẢN LÝ NGƯỜI DÙNG -->
-    <div class="card" style="margin-bottom:25px;">
-      <h2>Danh Sách Người Dùng</h2>
-      <div class="table-responsive">
-        <table>
-          <thead>
-            <tr>
-              <th>User ID</th>
-              <th>Hoạt động cuối</th>
-              <th>Thiết bị</th>
-              <th>Đã hoàn thành</th>
-              <th>Thao Tác</th>
-            </tr>
-          </thead>
-          <tbody id="userListTable"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- CANH BAO BYPASS -->
-    <div class="card">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h2 style="color:var(--error); margin:0;">Nhật Ký Cố Tình Bypass / Lỗi</h2>
-        <select id="bypassFilter" style="width:180px;">
-          <option value="all">Tất cả nhật ký</option>
-          <option value="verification_failed">Verification Failed</option>
-          <option value="api_error">API Error</option>
-          <option value="premature_unlock">Premature Unlock</option>
-        </select>
-      </div>
-      <div class="table-responsive">
-        <table>
-          <thead>
-            <tr>
-              <th>Thời Gian</th>
-              <th>User ID</th>
-              <th>Hành Vi</th>
-              <th>Nhiệm Vụ</th>
-            </tr>
-          </thead>
-          <tbody id="bypassTable"></tbody>
+          <tbody id="linkListTable"></tbody>
         </table>
       </div>
     </div>
   </div>
 </div>
 
-<!-- CONFIRMATION MODAL -->
+<!-- CONFIRM MODAL -->
 <div class="modal-backdrop" id="confirmModal">
-  <div class="modal-box">
+  <div class="modal-box" style="text-align:center;">
     <h3 id="modalTitle">Xác Nhận Hành Động</h3>
     <p id="modalMessage" style="font-size:14px; color:var(--text-secondary); margin-bottom:20px;">Bạn có chắc chắn muốn thực hiện?</p>
     <div style="display:flex; gap:10px;">
       <button id="modalCancelBtn" class="btn-secondary" style="flex:1;">Hủy</button>
       <button id="modalConfirmBtn" class="btn-danger" style="flex:1;">Xác Nhận</button>
-    </div>
-  </div>
-</div>
-
-<!-- EDIT LINK & TARGET MODAL (BÚT CHÌ) -->
-<div class="modal-backdrop" id="editModal">
-  <div class="modal-box">
-    <h3>Sửa Nhiệm Vụ & Trang Đích ✏️</h3>
-    <div class="form-group" style="text-align:left; margin-top:15px;">
-      <label>Tiêu đề nhiệm vụ</label>
-      <input type="text" id="editTaskTitle">
-    </div>
-    <div class="form-group" style="text-align:left;">
-      <label>URL YouTube Mới (Kênh hoặc Video)</label>
-      <input type="text" id="editTaskUrl" placeholder="https://youtube.com/...">
-      <div id="editUrlParsingStatus" class="channel-status-info"></div>
-    </div>
-    <div class="form-group" style="text-align:left;">
-      <label>Trang Đích Riêng (Target URL)</label>
-      <input type="text" id="editTargetUrl" placeholder="https://trang-dich-rieng.com/file">
-    </div>
-    <div class="form-group" style="text-align:left;">
-      <label>Danh sách bình luận mẫu (Mỗi dòng 1 câu)</label>
-      <textarea id="editCommentText" rows="3" placeholder="Bình luận dòng 1&#10;Bình luận dòng 2"></textarea>
-    </div>
-    <div style="display:flex; gap:10px; margin-top:20px;">
-      <button id="editModalCancelBtn" class="btn-secondary" style="flex:1;">Hủy</button>
-      <button id="editModalSaveBtn" class="btn-success" style="flex:1;">Lưu Thay Đổi</button>
     </div>
   </div>
 </div>
@@ -321,14 +203,17 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
 
-let isMaintenance = false;
 let confirmCallback = null;
-let currentAutoChannelId = "";
-let currentAutoVideoId = "";
 
-let editingTaskId = null;
-let editAutoChannelId = "";
-let editAutoVideoId = "";
+function cleanUrl(raw) {
+  if (!raw) return "";
+  let s = String(raw).trim();
+  s = s.replace(/^(web:|intent:)+/i, "");
+  if (!s.startsWith("http://") && !s.startsWith("https://")) {
+    s = "https://" + s.replace(/^\/+/, "");
+  }
+  return s;
+}
 
 function generateShortAlias() {
   return Math.random().toString(36).substring(2, 8);
@@ -336,12 +221,7 @@ function generateShortAlias() {
 
 function escapeHtml(str) {
   if (!str) return "";
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+  return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
 function showConfirm(title, message, onConfirm) {
@@ -381,9 +261,7 @@ document.getElementById("loginBtn").addEventListener("click", () => {
     });
 });
 
-document.getElementById("logoutBtn").addEventListener("click", () => {
-  signOut(auth);
-});
+document.getElementById("logoutBtn").addEventListener("click", () => signOut(auth));
 
 onAuthStateChanged(auth, (user) => {
   if (user) {
@@ -396,7 +274,7 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// TỰ ĐỘNG CHUYỂN ĐỔI LINK THÀNH CHANNEL ID BẰNG YOUTUBE API
+// YOUTUBE DATA PARSER
 async function resolveYoutubeUrl(urlStr) {
   if (!urlStr) return { channelId: "", videoId: "" };
   let channelId = "", videoId = "";
@@ -411,11 +289,9 @@ async function resolveYoutubeUrl(urlStr) {
   if (handleMatch && !channelId) {
     try {
       const handle = handleMatch[1];
-      const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=id,snippet&forHandle=${handle}&key=${YT_API_KEY}`);
+      const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=id&forHandle=${handle}&key=${YT_API_KEY}`);
       const data = await res.json();
-      if (data.items && data.items.length > 0) {
-        channelId = data.items[0].id;
-      }
+      if (data.items && data.items.length > 0) channelId = data.items[0].id;
     } catch(e) {}
   }
 
@@ -423,345 +299,175 @@ async function resolveYoutubeUrl(urlStr) {
     try {
       const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${YT_API_KEY}`);
       const data = await res.json();
-      if (data.items && data.items.length > 0) {
-        channelId = data.items[0].snippet.channelId;
-      }
+      if (data.items && data.items.length > 0) channelId = data.items[0].snippet.channelId;
     } catch(e) {}
   }
 
   return { channelId, videoId };
 }
 
-document.getElementById("taskUrl").addEventListener("change", async (e) => {
-  const statusEl = document.getElementById("urlParsingStatus");
-  statusEl.style.display = "block";
-  statusEl.textContent = "Đang nhận diện Channel ID từ URL...";
-  
-  const result = await resolveYoutubeUrl(e.target.value.trim());
-  currentAutoChannelId = result.channelId;
-  currentAutoVideoId = result.videoId;
+// BUILDER THÊM NHIỀU NHIỆM VỤ VÀO LINK
+const tasksContainer = document.getElementById("tasksContainer");
 
-  if (result.channelId) {
-    statusEl.style.color = "var(--success)";
-    statusEl.textContent = `✓ Đã tìm thấy Channel ID: ${result.channelId}`;
-  } else {
-    statusEl.style.color = "var(--warning)";
-    statusEl.textContent = "Chưa nhận diện được Channel ID. Hệ thống sẽ kiểm tra qua link khi xác minh.";
-  }
-});
+function createTaskItemDOM() {
+  const div = document.createElement("div");
+  div.className = "task-item-builder";
+  div.innerHTML = `
+    <button type="button" class="remove-task-btn">Xóa</button>
+    <div class="form-group">
+      <label>Loại Nhiệm Vụ</label>
+      <select class="t-type">
+        <option value="subscribe">Subscribe (Đăng ký kênh)</option>
+        <option value="like">Like (Thích video)</option>
+        <option value="comment">Comment (Bình luận video)</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Tiêu Đề Nhiệm Vụ</label>
+      <input type="text" class="t-title" placeholder="Đăng ký kênh Youtube Admin">
+    </div>
+    <div class="form-group">
+      <label>URL Youtube (Video/Kênh)</label>
+      <input type="text" class="t-url" placeholder="https://youtube.com/...">
+    </div>
+    <div class="form-group t-comment-box" style="display:none;">
+      <label>Mẫu Bình Luận (Mỗi dòng 1 câu mẫu)</label>
+      <textarea class="t-comment" rows="2" placeholder="Hay quá admin ơi&#10;Video rất hữu ích"></textarea>
+    </div>
+  `;
 
-document.getElementById("editTaskUrl").addEventListener("change", async (e) => {
-  const statusEl = document.getElementById("editUrlParsingStatus");
-  statusEl.style.display = "block";
-  statusEl.textContent = "Đang nhận diện Channel ID từ URL...";
-  
-  const result = await resolveYoutubeUrl(e.target.value.trim());
-  editAutoChannelId = result.channelId;
-  editAutoVideoId = result.videoId;
+  div.querySelector(".t-type").addEventListener("change", (e) => {
+    div.querySelector(".t-comment-box").style.display = (e.target.value === "comment") ? "block" : "none";
+  });
 
-  if (result.channelId) {
-    statusEl.style.color = "var(--success)";
-    statusEl.textContent = `✓ Đã nhận diện Channel ID: ${result.channelId}`;
-  } else {
-    statusEl.style.color = "var(--warning)";
-    statusEl.textContent = "Không tìm thấy Channel ID riêng.";
-  }
-});
+  div.querySelector(".remove-task-btn").addEventListener("click", () => div.remove());
 
-document.getElementById("taskTypeSelect").addEventListener("change", (e) => {
-  const val = e.target.value;
-  document.getElementById("fieldCommentText").style.display = (val === "comment") ? "block" : "none";
-});
+  tasksContainer.appendChild(div);
+}
 
+document.getElementById("addTaskBtn").addEventListener("click", createTaskItemDOM);
+
+// KHỞI TẠO DỮ LIỆU THỐNG KÊ & LISTENERS
 function initListeners() {
-  onValue(ref(db, "users"), (snapshot) => {
-    const data = snapshot.val();
-    const count = data ? Object.keys(data).length : 0;
-    document.getElementById("totalUsers").textContent = count;
-    renderUsersTable(data);
-  });
+  // Tự động thêm 1 task mẫu
+  if(tasksContainer.children.length === 0) createTaskItemDOM();
 
-  onValue(ref(db, "stats/completedUsers"), (snapshot) => {
-    document.getElementById("completedUsers").textContent = snapshot.val() || 0;
-  });
-
-  onValue(ref(db, "systemConfig"), (snapshot) => {
+  onValue(ref(db, "links"), (snapshot) => {
     const data = snapshot.val();
-    if (data) {
-      isMaintenance = data.isMaintenance || false;
-      document.getElementById("targetDestinationUrl").value = data.targetUrl || "";
-      const text = document.getElementById("maintenanceText");
-      const btn = document.getElementById("toggleMaintenanceBtn");
-      if (isMaintenance) {
-        text.textContent = "Trạng thái: ĐANG BẢO TRÌ CHUNG (Khóa toàn bộ)";
-        text.style.color = "var(--error)";
-        btn.textContent = "Tắt Bảo Trì Chung";
-        btn.className = "btn-warning";
-      } else {
-        text.textContent = "Trạng thái: Đang hoạt động bình thường";
-        text.style.color = "var(--success)";
-        btn.textContent = "Bật Bảo Trì Chung";
-        btn.className = "";
-      }
-    }
-  });
-
-  onValue(ref(db, "tasks"), (snapshot) => {
-    const data = snapshot.val();
-    const table = document.getElementById("taskListTable");
+    const table = document.getElementById("linkListTable");
     table.innerHTML = "";
     if (!data) {
-      document.getElementById("totalTasks").textContent = 0;
+      document.getElementById("totalLinks").textContent = 0;
       return;
     }
+
     const keys = Object.keys(data);
-    document.getElementById("totalTasks").textContent = keys.length;
+    document.getElementById("totalLinks").textContent = keys.length;
 
-    keys.forEach(key => {
-      const item = data[key];
+    const origin = window.location.origin + window.location.pathname.replace("checkad.html", "check.html");
+
+    keys.forEach(alias => {
+      const item = data[alias];
       const tr = document.createElement("tr");
-      const alias = item.shortAlias || key;
-      const shortUrl = `${window.location.origin}/check.html?id=${alias}`;
-
-      let statusBadge = '<span class="badge badge-info">Hoạt động</span>';
-      if (item.status === "disabled") statusBadge = '<span class="badge">Đã ẩn</span>';
-      if (item.status === "maintenance") statusBadge = '<span class="badge badge-warning">Bảo trì</span>';
+      const shortUrl = `${origin}?id=${alias}`;
+      const taskCount = item.tasks ? item.tasks.length : 0;
+      const isMaint = item.status === "maintenance";
 
       tr.innerHTML = `
-        <td><span class="badge badge-info">${escapeHtml(item.type || 'subscribe')}</span></td>
+        <td><a href="${shortUrl}" target="_blank" style="color:var(--accent); font-weight:bold;">${alias}</a></td>
+        <td><b>${escapeHtml(item.title)}</b><br><small style="color:var(--text-secondary)">Đích: ${escapeHtml(item.targetUrl)}</small></td>
+        <td><span class="badge badge-info">${taskCount} Nhiệm vụ</span></td>
+        <td>${isMaint ? '<span class="badge badge-warning">Bảo trì</span>' : '<span class="badge badge-info">Hoạt động</span>'}</td>
         <td>
-          <b>${escapeHtml(item.title)}</b><br>
-          <small><a href="${shortUrl}" target="_blank" style="color:var(--accent);">${shortUrl}</a></small>
-        </td>
-        <td>
-          <small>${escapeHtml(item.url || 'N/A')}</small>
-          <button class="edit-btn-icon" data-edit="${key}" title="Sửa Link Nhiệm Vụ & Trang Đích">✏️</button>
-        </td>
-        <td>${statusBadge}</td>
-        <td>
-          <button class="btn-warning btn-sm" data-maint="${key}">${item.status === 'maintenance' ? 'Mở lại' : 'Bảo trì'}</button>
-          <button class="btn-danger btn-sm" data-del="${key}">Xóa</button>
+          <button class="btn-warning btn-sm" data-maint="${alias}">${isMaint ? 'Mở lại' : 'Bảo trì'}</button>
+          <button class="btn-danger btn-sm" data-del="${alias}">Xóa Link</button>
         </td>
       `;
 
-      tr.querySelector(`[data-maint="${key}"]`).addEventListener("click", () => {
-        const nextStatus = item.status === "maintenance" ? "active" : "maintenance";
-        set(ref(db, `tasks/${key}/status`), nextStatus);
+      tr.querySelector(`[data-maint="${alias}"]`).addEventListener("click", () => {
+        const nextStatus = isMaint ? "active" : "maintenance";
+        set(ref(db, `links/${alias}/status`), nextStatus);
       });
 
-      tr.querySelector(`[data-del="${key}"]`).addEventListener("click", () => {
-        showConfirm("Xóa Nhiệm Vụ", `Bạn có chắc muốn xóa nhiệm vụ "${item.title}"?`, () => {
-          remove(ref(db, `tasks/${key}`));
+      tr.querySelector(`[data-del="${alias}"]`).addEventListener("click", () => {
+        showConfirm("Xóa Link", `Xóa link rút gọn "${alias}"?`, () => {
+          remove(ref(db, `links/${alias}`));
         });
-      });
-
-      tr.querySelector(`[data-edit="${key}"]`).addEventListener("click", () => {
-        editingTaskId = key;
-        document.getElementById("editTaskTitle").value = item.title || "";
-        document.getElementById("editTaskUrl").value = item.url || "";
-        document.getElementById("editTargetUrl").value = item.targetUrl || "";
-        document.getElementById("editCommentText").value = item.commentText || "";
-        editAutoChannelId = item.channelId || "";
-        editAutoVideoId = item.videoId || "";
-        document.getElementById("editUrlParsingStatus").style.display = "none";
-        document.getElementById("editModal").classList.add("open");
       });
 
       table.appendChild(tr);
     });
   });
 
-  onValue(ref(db, "bypassLogs"), (snapshot) => {
+  onValue(ref(db, "users"), (snapshot) => {
     const data = snapshot.val();
-    renderBypassLogs(data);
+    document.getElementById("totalUsers").textContent = data ? Object.keys(data).length : 0;
+  });
+
+  onValue(ref(db, "stats/completedUsers"), (snapshot) => {
+    document.getElementById("completedUsers").textContent = snapshot.val() || 0;
   });
 }
 
-document.getElementById("editModalCancelBtn").addEventListener("click", () => {
-  document.getElementById("editModal").classList.remove("open");
-  editingTaskId = null;
-});
+// LƯU LINK RÚT GỌN CHỨA NHIỀU NHIỆM VỤ
+document.getElementById("saveLinkBtn").addEventListener("click", async () => {
+  const title = document.getElementById("linkTitleName").value.trim();
+  const rawTargetUrl = document.getElementById("linkTargetUrl").value.trim();
+  const targetUrl = cleanUrl(rawTargetUrl);
 
-document.getElementById("editModalSaveBtn").addEventListener("click", async () => {
-  if (!editingTaskId) return;
-  const newTitle = document.getElementById("editTaskTitle").value.trim();
-  const newUrl = document.getElementById("editTaskUrl").value.trim();
-  const targetUrl = document.getElementById("editTargetUrl").value.trim();
-  const commentText = document.getElementById("editCommentText").value.trim();
-
-  if (!newUrl) {
-    alert("Vui lòng nhập đường dẫn URL!");
+  if (!title || !targetUrl) {
+    alert("Vui lòng nhập Tên gợi nhớ và Link Trang Đích!");
     return;
   }
 
-  const result = await resolveYoutubeUrl(newUrl);
+  const taskDOMs = tasksContainer.querySelectorAll(".task-item-builder");
+  if (taskDOMs.length === 0) {
+    alert("Vui lòng thêm ít nhất 1 nhiệm vụ vào Link!");
+    return;
+  }
 
-  set(ref(db, `tasks/${editingTaskId}/title`), newTitle);
-  set(ref(db, `tasks/${editingTaskId}/url`), newUrl);
-  set(ref(db, `tasks/${editingTaskId}/targetUrl`), targetUrl);
-  set(ref(db, `tasks/${editingTaskId}/commentText`), commentText);
-  set(ref(db, `tasks/${editingTaskId}/channelId`), result.channelId || editAutoChannelId);
-  set(ref(db, `tasks/${editingTaskId}/videoId`), result.videoId || editAutoVideoId).then(() => {
-    alert("Cập nhật nhiệm vụ thành công!");
-    document.getElementById("editModal").classList.remove("open");
-    editingTaskId = null;
-  });
-});
+  const tasksList = [];
+  for (let i = 0; i < taskDOMs.length; i++) {
+    const el = taskDOMs[i];
+    const tType = el.querySelector(".t-type").value;
+    const tTitle = el.querySelector(".t-title").value.trim() || `Nhiệm vụ ${i+1}`;
+    const tUrl = cleanUrl(el.querySelector(".t-url").value.trim());
+    const tComment = el.querySelector(".t-comment").value.trim();
 
-function renderUsersTable(usersData) {
-  const table = document.getElementById("userListTable");
-  table.innerHTML = "";
-  if (!usersData) return;
+    if (!tUrl) {
+      alert(`Vui lòng nhập URL Youtube cho Nhiệm vụ thứ ${i+1}!`);
+      return;
+    }
 
-  Object.keys(usersData).forEach(uid => {
-    const u = usersData[uid];
-    const tr = document.createElement("tr");
-    const lastActive = u.lastActive ? new Date(u.lastActive).toLocaleString("vi-VN") : "N/A";
-    const tasksDone = u.tasks ? Object.keys(u.tasks).filter(k => u.tasks[k] === true).length : 0;
+    const resolved = await resolveYoutubeUrl(tUrl);
 
-    tr.innerHTML = `
-      <td><code>${escapeHtml(uid)}</code></td>
-      <td>${lastActive}</td>
-      <td><small>${escapeHtml(u.device || 'Mobile')}</small></td>
-      <td>${tasksDone} nhiệm vụ</td>
-      <td>
-        <button class="btn-warning btn-sm" data-resetusr="${uid}">Reset</button>
-      </td>
-    `;
-
-    tr.querySelector(`[data-resetusr="${uid}"]`).addEventListener("click", () => {
-      showConfirm("Reset User", `Bạn muốn xóa tiến trình của user ${uid}?`, () => {
-        set(ref(db, `users/${uid}/tasks`), null);
-        set(ref(db, `users/${uid}/completed`), null);
-      });
+    tasksList.push({
+      id: "t_" + Math.random().toString(36).substring(2, 9),
+      type: tType,
+      title: tTitle,
+      url: tUrl,
+      channelId: resolved.channelId,
+      videoId: resolved.videoId,
+      commentText: tComment
     });
-
-    table.appendChild(tr);
-  });
-}
-
-function renderBypassLogs(data) {
-  const table = document.getElementById("bypassTable");
-  const filter = document.getElementById("bypassFilter").value;
-  table.innerHTML = "";
-  if (!data) {
-    document.getElementById("bypassCount").textContent = 0;
-    return;
   }
 
-  let keys = Object.keys(data).reverse();
-  if (filter !== "all") {
-    keys = keys.filter(k => data[k].reason === filter);
-  }
-
-  document.getElementById("bypassCount").textContent = keys.length;
-
-  keys.slice(0, 15).forEach(key => {
-    const log = data[key];
-    const date = new Date(log.timestamp).toLocaleString("vi-VN");
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${date}</td>
-      <td><code>${escapeHtml(log.userId)}</code></td>
-      <td><span class="badge">${escapeHtml(log.reason)}</span></td>
-      <td>${escapeHtml(log.taskId)}</td>
-    `;
-    table.appendChild(tr);
-  });
-}
-
-document.getElementById("bypassFilter").addEventListener("change", () => {
-  get(ref(db, "bypassLogs")).then(snapshot => renderBypassLogs(snapshot.val()));
-});
-
-// ADD TASK
-document.getElementById("addTaskBtn").addEventListener("click", async () => {
-  const type = document.getElementById("taskTypeSelect").value;
-  const title = document.getElementById("taskTitle").value.trim();
-  const desc = document.getElementById("taskDesc").value.trim();
-  const url = document.getElementById("taskUrl").value.trim();
-  const targetUrl = document.getElementById("taskTargetUrl").value.trim();
-  const commentText = document.getElementById("taskCommentText").value.trim();
-
-  if (!title || !url) {
-    alert("Vui lòng nhập đầy đủ Tiêu đề và Link URL!");
-    return;
-  }
-
-  const result = await resolveYoutubeUrl(url);
-
-  const newTask = {
-    type: type,
+  const newAlias = generateShortAlias();
+  const linkData = {
+    alias: newAlias,
     title: title,
-    desc: desc || "Hoàn thành nhiệm vụ",
-    url: url,
     targetUrl: targetUrl,
-    shortAlias: generateShortAlias(),
-    channelId: result.channelId || currentAutoChannelId,
-    videoId: result.videoId || currentAutoVideoId,
-    commentText: commentText,
-    hasComment: (type === "comment"),
+    tasks: tasksList,
     status: "active",
     createdAt: Date.now()
   };
 
-  push(ref(db, "tasks"), newTask).then(() => {
-    alert("Thêm nhiệm vụ mới thành công!");
-    document.getElementById("taskTitle").value = "";
-    document.getElementById("taskDesc").value = "";
-    document.getElementById("taskUrl").value = "";
-    document.getElementById("taskTargetUrl").value = "";
-    document.getElementById("taskCommentText").value = "";
-    document.getElementById("urlParsingStatus").style.display = "none";
-    currentAutoChannelId = "";
-    currentAutoVideoId = "";
-  });
-});
-
-// RESET ALL USERS
-document.getElementById("resetAllUsersBtn").addEventListener("click", () => {
-  showConfirm("Reset Tất Cả User", "Bạn có chắc muốn xóa toàn bộ tiến trình của tất cả người dùng?", () => {
-    Promise.all([
-      set(ref(db, "users"), null),
-      set(ref(db, "stats/completedUsers"), 0)
-    ]).then(() => {
-      alert("Đã reset hoàn tất!");
-    });
-  });
-});
-
-// SYNC STATS
-document.getElementById("syncStatsBtn").addEventListener("click", () => {
-  get(ref(db, "users")).then(snapshot => {
-    const users = snapshot.val();
-    let actualCompleted = 0;
-    if (users) {
-      Object.keys(users).forEach(uid => {
-        if (users[uid].completed === true) actualCompleted++;
-      });
-    }
-    set(ref(db, "stats/completedUsers"), actualCompleted).then(() => {
-      alert(`Đã đồng bộ lại! Số user hoàn thành thực tế: ${actualCompleted}`);
-    });
-  });
-});
-
-// SYSTEM CONFIG
-document.getElementById("toggleMaintenanceBtn").addEventListener("click", () => {
-  showConfirm("Đổi Trạng Thái Bảo Trì", "Bạn muốn chuyển đổi trạng thái bảo trì hệ thống?", () => {
-    isMaintenance = !isMaintenance;
-    set(ref(db, "systemConfig/isMaintenance"), isMaintenance);
-  });
-});
-
-document.getElementById("saveTargetBtn").addEventListener("click", () => {
-  const targetUrl = document.getElementById("targetDestinationUrl").value.trim();
-  if (!targetUrl.startsWith("http")) {
-    alert("Đường dẫn phải bắt đầu bằng https:// hoặc http://");
-    return;
-  }
-  set(ref(db, "systemConfig/targetUrl"), targetUrl).then(() => {
-    alert("Đã lưu Link Đích mặc định thành công!");
+  set(ref(db, `links/${newAlias}`), linkData).then(() => {
+    alert(`Tạo Link thành công! Mã Alias: ${newAlias}`);
+    document.getElementById("linkTitleName").value = "";
+    document.getElementById("linkTargetUrl").value = "";
+    tasksContainer.innerHTML = "";
+    createTaskItemDOM();
   });
 });
 </script>
