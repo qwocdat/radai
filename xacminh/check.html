@@ -374,7 +374,7 @@ footer.foot{text-align:center; margin-top:26px; font-size:11.5px; color:var(--te
     </div>
   </header>
 
-  <!-- GOOGLE OAUTH PROFILE BAR (DÙNG ĐỂ THEO DÕI BẤT THƯỜNG / HỦY FOLLOW) -->
+  <!-- GOOGLE OAUTH PROFILE BAR (DÙNG ĐỂ THEO DÕI HÀNH VI) -->
   <section class="glass auth-bar" id="authBar">
     <div class="auth-container-unauth" id="authUnauthBox">
       <button class="btn-login-google" id="btnLoginGoogle">
@@ -973,7 +973,7 @@ function setSheetStatus(text, type = "") {
 document.getElementById("sheetCancel").addEventListener("click", closeSheet);
 sheetBackdrop.addEventListener("click", closeSheet);
 
-/* SỬA DỤNG THỐNG KÊ LƯỢNG SUB/LIKE BAN ĐẦU ĐỂ SO SÁNH TĂNG TRƯỞNG LÀM ĐIỀU KIỆN PASS */
+/* BẮT BỤC ĐĂNG NHẬP GOOGLE KHI BẤM KIỂM TRA MỚI CHO THỰC HIỆN NHIỆM VỤ */
 sheetVerifyBtn.addEventListener("click", async (e) => {
   addRipple(e);
   const task = TASKS.find(t => t.id === state.activeTaskId);
@@ -984,7 +984,17 @@ sheetVerifyBtn.addEventListener("click", async (e) => {
     return;
   }
 
-  if (oauthUser && await checkUserBanStatus(oauthUser.id)) return;
+  // Nếu chưa đăng nhập Google -> Yêu cầu đăng nhập trước
+  if (!oauthUser) {
+    setSheetStatus("Đang yêu cầu đăng nhập Google để tiếp tục...", "info");
+    const loggedIn = await requestGoogleLogin();
+    if (!loggedIn) {
+      setSheetStatus("Bạn bắt buộc phải đăng nhập Google để tiến hành kiểm tra.", "error");
+      return;
+    }
+  }
+
+  if (await checkUserBanStatus(oauthUser.id)) return;
 
   stopVerificationSession();
   state.sheetBusy = true;
