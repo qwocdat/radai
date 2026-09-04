@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
 <title>YouTube Checker</title>
+<!-- Google Identity Services (GIS) -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 :root{
   --bg-1:#0b0d14;
@@ -143,6 +145,22 @@ header.top .titles p{font-size:13.5px; color:var(--text-secondary); margin:0;}
 }
 .theme-toggle:active{transform:scale(.9);}
 .theme-toggle svg{width:18px; height:18px; stroke:var(--text);}
+
+/* GOOGLE OAUTH PROFILE BAR */
+.auth-bar{
+  padding:12px 16px; margin-bottom:16px; display:flex;
+  align-items:center; justify-content:space-between; gap:10px;
+}
+.auth-user-info{display:flex; align-items:center; gap:10px; overflow:hidden;}
+.auth-avatar{width:36px; height:36px; border-radius:50%; object-fit:cover; border:1px solid var(--glass-border);}
+.auth-details{display:flex; flex-direction:column; overflow:hidden;}
+.auth-name{font-size:13.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.auth-status{font-size:11.5px; color:var(--success);}
+.btn-login-google{
+  padding:8px 14px; border-radius:var(--radius-pill); border:none;
+  background:#4285F4; color:#fff; font-size:12.5px; font-weight:600;
+  cursor:pointer; display:flex; align-items:center; gap:6px; flex-shrink:0;
+}
 
 .progress-card{padding:20px 20px 18px; margin-bottom:16px;}
 .progress-card .row-top{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;}
@@ -330,9 +348,7 @@ header.top .titles p{font-size:13.5px; color:var(--text-secondary); margin:0;}
 
 footer.foot{text-align:center; margin-top:26px; font-size:11.5px; color:var(--text-tertiary); padding-bottom:6px;}
 
-.error-card-state{
-  padding:36px 20px; text-align:center;
-}
+.error-card-state{padding:36px 20px; text-align:center;}
 .error-card-state h3{font-size:17px; color:var(--error); margin:0 0 8px;}
 .error-card-state p{font-size:13.5px; color:var(--text-secondary); margin:0;}
 </style>
@@ -344,7 +360,7 @@ footer.foot{text-align:center; margin-top:26px; font-size:11.5px; color:var(--te
     <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12a10 10 0 1 1-3-7.1"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
   </div>
   <h1>Sub Checker</h1>
-  <p>Đang tải dữ liệu...</p>
+  <p id="splashText">Đang tải dữ liệu...</p>
 </div>
 
 <div id="app">
@@ -360,6 +376,21 @@ footer.foot{text-align:center; margin-top:26px; font-size:11.5px; color:var(--te
       </button>
     </div>
   </header>
+
+  <!-- GOOGLE OAUTH PROFILE BAR -->
+  <section class="glass auth-bar" id="authBar">
+    <div class="auth-user-info" id="authUserBox" style="display:none;">
+      <img id="authAvatar" class="auth-avatar" src="" alt="Avatar">
+      <div class="auth-details">
+        <span class="auth-name" id="authName">YouTube User</span>
+        <span class="auth-status">✓ Đã xác thực OAuth 2.0</span>
+      </div>
+    </div>
+    <button class="btn-login-google" id="btnLoginGoogle">
+      <svg width="14" height="14" viewBox="0 0 24 24"><path fill="#fff" d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.545,6.477,2.545,12s4.476,10,10,10c5.768,0,9.638-4.058,9.638-9.807c0-0.682-0.068-1.346-0.187-1.954H12.545z"/></svg>
+      Đăng nhập Google
+    </button>
+  </section>
 
   <section class="glass progress-card">
     <div class="row-top">
@@ -378,7 +409,7 @@ footer.foot{text-align:center; margin-top:26px; font-size:11.5px; color:var(--te
     <p class="unlock-hint" id="unlockHint">Hoàn thành tất cả nhiệm vụ để mở khóa</p>
   </div>
 
-  <footer class="foot">Xác minh trực tiếp qua YouTube Data API v3.</footer>
+  <footer class="foot">Xác minh trực tiếp qua YouTube Data API v3 & OAuth 2.0.</footer>
 </div>
 
 <div class="sheet-backdrop" id="sheetBackdrop"></div>
@@ -387,7 +418,6 @@ footer.foot{text-align:center; margin-top:26px; font-size:11.5px; color:var(--te
   <h3 id="sheetTitle">Tiêu đề nhiệm vụ</h3>
   <p class="desc" id="sheetDesc">Mô tả nhiệm vụ.</p>
   
-  <!-- BẢNG HIỂN THỊ SỐ SUB / LIKE TỰ ĐỘNG CỦA KÊNH -->
   <div id="apiStatBadge" class="api-stat-badge" style="display:none;">
     <span>📊 Trạng thái kênh:</span> <strong id="apiStatValue">Đang tải...</strong>
   </div>
@@ -407,7 +437,6 @@ footer.foot{text-align:center; margin-top:26px; font-size:11.5px; color:var(--te
   </div>
 </div>
 
-<!-- POP-UP THÔNG BÁO XIN LỖI KHI API VƯỢT LƯỢT HẠN NGẠCH (OVER QUOTA) -->
 <div class="api-modal-backdrop" id="apiLimitModal">
   <div class="api-modal-box">
     <h3>⚠️ Rất tiếc, Hệ thống API bị quá tải!</h3>
@@ -420,7 +449,7 @@ footer.foot{text-align:center; margin-top:26px; font-size:11.5px; color:var(--te
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getDatabase, ref, get, set, push, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { getDatabase, ref, get, set, push, runTransaction, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
@@ -433,6 +462,7 @@ const firebaseConfig = {
 };
 
 const YT_API_KEY = "AIzaSyAR-zsFqyZag3TDlSUecY696E757fLQxAo";
+const GOOGLE_CLIENT_ID = "685476439350-9876543210abcdefgh.apps.googleusercontent.com"; // OAuth Client ID
 const POLL_INTERVAL = 5000;
 const VERIFICATION_TIMEOUT = 60000;
 
@@ -443,14 +473,16 @@ let currentLinkId = null;
 let currentLinkData = null;
 let TASKS = [];
 
-const userId = getOrCreateUserId();
+let oauthUser = null; // { id, title, avatar, accessToken }
+let tokenClient = null;
 
 const state = {
   results: {},
   activeTaskId: null,
   sheetBusy: false,
   userCompleted: false,
-  urlState: "VALID"
+  urlState: "VALID",
+  isBanned: false
 };
 
 let verificationSession = null;
@@ -475,16 +507,6 @@ function sanitizeUrl(rawUrl) {
   return clean;
 }
 
-function getOrCreateUserId() {
-  let uid = localStorage.getItem("yt_checker_uid");
-  if (!uid || !uid.startsWith("usr_")) {
-    uid = "usr_" + Math.random().toString(36).substring(2, 11);
-    localStorage.setItem("yt_checker_uid", uid);
-  }
-  return uid;
-}
-
-// BẮT LỖI OVER QUOTA VÀ BẬT POP-UP XIN LỖI MỞ KHÓA TRỰC TIẾP
 function handleApiQuotaExceeded() {
   stopVerificationSession();
   closeSheet();
@@ -499,6 +521,165 @@ function handleApiQuotaExceeded() {
       showToast("Đã mở khóa hoàn tất!", "success");
     }
   };
+}
+
+/* ==================== GOOGLE OAUTH 2.0 & YOUTUBE API ==================== */
+
+function initGoogleOAuth() {
+  if (typeof google === "undefined" || !google.accounts) {
+    setTimeout(initGoogleOAuth, 500);
+    return;
+  }
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: GOOGLE_CLIENT_ID,
+    scope: "https://www.googleapis.com/auth/youtube.readonly",
+    callback: async (tokenResponse) => {
+      if (tokenResponse.error) {
+        showToast("Đăng nhập Google thất bại", "error");
+        return;
+      }
+      await fetchAuthenticatedYoutubeChannel(tokenResponse.access_token);
+    }
+  });
+}
+
+function requestGoogleLogin() {
+  return new Promise((resolve) => {
+    if (!tokenClient) {
+      alert("Hệ thống Google OAuth chưa sẵn sàng, vui lòng thử lại sau giây lát.");
+      resolve(false);
+      return;
+    }
+    tokenClient.callback = async (tokenResponse) => {
+      if (tokenResponse.error) {
+        showToast("Đăng nhập Google thất bại", "error");
+        resolve(false);
+        return;
+      }
+      const success = await fetchAuthenticatedYoutubeChannel(tokenResponse.access_token);
+      resolve(success);
+    };
+    tokenClient.requestAccessToken();
+  });
+}
+
+async function fetchAuthenticatedYoutubeChannel(accessToken) {
+  try {
+    setSplashText("Đang xác nhận tài khoản YouTube...");
+    const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true`, {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+    if (!res.ok) throw new Error("Không thể lấy thông tin kênh YouTube.");
+    const data = await res.json();
+    if (!data.items || data.items.length === 0) throw new Error("Không tìm thấy kênh YouTube cá nhân.");
+
+    const item = data.items[0];
+    oauthUser = {
+      id: item.id,
+      title: item.snippet.title,
+      avatar: item.snippet.thumbnails.default.url,
+      accessToken: accessToken
+    };
+
+    // Kiểm tra trạng thái Ban từ Server/Firebase trước
+    const isBanned = await checkUserBanStatus(oauthUser.id);
+    if (isBanned) return false;
+
+    // Lưu định danh ổn định (Không lưu access token)
+    await update(ref(db, `users/${oauthUser.id}/youtube`), {
+      channelId: oauthUser.id,
+      title: oauthUser.title,
+      avatar: oauthUser.avatar,
+      lastLogin: Date.now()
+    });
+
+    renderAuthBar();
+    await loadUserProgress();
+    return true;
+  } catch (err) {
+    showToast(`Xác thực lỗi: ${err.message}`, "error");
+    return false;
+  } finally {
+    hideSplash();
+  }
+}
+
+function renderAuthBar() {
+  const box = document.getElementById("authUserBox");
+  const btn = document.getElementById("btnLoginGoogle");
+  if (oauthUser) {
+    document.getElementById("authAvatar").src = oauthUser.avatar;
+    document.getElementById("authName").textContent = oauthUser.title;
+    box.style.display = "flex";
+    btn.style.display = "none";
+  } else {
+    box.style.display = "none";
+    btn.style.display = "flex";
+  }
+}
+
+document.getElementById("btnLoginGoogle").addEventListener("click", () => requestGoogleLogin());
+
+/* ==================== ANTI-FRAUD & BAN SYSTEM ==================== */
+
+async function checkUserBanStatus(ytUserId) {
+  if (!ytUserId) return false;
+  const snapshot = await get(ref(db, `users/${ytUserId}/fraud`));
+  if (snapshot.exists() && snapshot.val().status === "banned") {
+    state.isBanned = true;
+    showPermanentBanUI(snapshot.val().reason || "UNSUBSCRIBED_AFTER_VERIFICATION");
+    return true;
+  }
+  return false;
+}
+
+function showPermanentBanUI(reason) {
+  const appEl = document.getElementById("app");
+  appEl.innerHTML = `
+    <div class="glass error-card-state" style="margin-top:40px; padding:40px 20px;">
+      <div style="font-size:48px; margin-bottom:12px;">🚫</div>
+      <h3 style="font-size:22px; color:var(--error); margin-bottom:12px;">TÀI KHOẢN ĐÃ BỊ KHÓA</h3>
+      <p style="font-size:14px; color:var(--text-secondary); line-height:1.6; margin-bottom:20px;">
+        Hệ thống phát hiện tài khoản YouTube của bạn đã chủ động hủy đăng ký kênh sau khi xác minh thành công.<br>
+        <strong>Mã vi phạm:</strong> <code style="color:var(--warning);">${escapeHtml(reason)}</code>
+      </p>
+      <p style="font-size:12.5px; color:var(--text-tertiary);">
+        Trạng thái khóa được lưu vĩnh viễn trên máy chủ. Mọi hành vi tạo tài khoản mới hoặc xóa bộ nhớ đệm sẽ không thể khôi phục.
+      </p>
+    </div>
+  `;
+}
+
+async function markFraudAndBan(ytUserId, targetChannelId, reason) {
+  const now = Date.now();
+  await update(ref(db, `users/${ytUserId}/fraud`), {
+    status: "banned",
+    reason: reason,
+    targetChannelId: targetChannelId,
+    bannedAt: now
+  });
+  state.isBanned = true;
+  showPermanentBanUI(reason);
+}
+
+/* ==================== CHECK SUBSCRIPTION VIA OAUTH ==================== */
+
+async function checkUserSubscriptionOAuth(accessToken, targetChannelId) {
+  if (!accessToken || !targetChannelId) return false;
+  try {
+    const res = await fetch(`https://www.googleapis.com/youtube/v3/subscriptions?part=snippet&mine=true&forChannelId=${encodeURIComponent(targetChannelId)}`, {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+    if (res.status === 403) {
+      handleApiQuotaExceeded();
+      return false;
+    }
+    if (!res.ok) return false;
+    const data = await res.json();
+    return data.items && data.items.length > 0;
+  } catch (e) {
+    return false;
+  }
 }
 
 async function getChannelSubCount(channelId) {
@@ -549,14 +730,15 @@ async function checkRecentComments(videoId, targetLines) {
 }
 
 function trackUserVisit() {
-  if (!currentLinkId) return;
-  set(ref(db, `users/${userId}/lastActive`), Date.now()).catch(()=>{});
-  set(ref(db, `users/${userId}/device`), navigator.userAgent).catch(()=>{});
+  if (!currentLinkId || !oauthUser) return;
+  set(ref(db, `users/${oauthUser.id}/lastActive`), Date.now()).catch(()=>{});
+  set(ref(db, `users/${oauthUser.id}/device`), navigator.userAgent).catch(()=>{});
 }
 
 function logBypassAttempt(reason, taskId = "none") {
+  if (!oauthUser) return;
   push(ref(db, "bypassLogs"), {
-    userId: userId,
+    userId: oauthUser.id,
     linkId: currentLinkId || "none",
     taskId: taskId,
     reason: reason,
@@ -711,10 +893,10 @@ function updateProgress() {
 }
 
 function markUserCompletedOnce() {
-  if (state.userCompleted || !currentLinkId) return;
-  get(ref(db, `users/${userId}/links/${currentLinkId}/completed`)).then(snapshot => {
+  if (state.userCompleted || !currentLinkId || !oauthUser) return;
+  get(ref(db, `users/${oauthUser.id}/links/${currentLinkId}/completed`)).then(snapshot => {
     if (!snapshot.exists() || snapshot.val() !== true) {
-      set(ref(db, `users/${userId}/links/${currentLinkId}/completed`), true);
+      set(ref(db, `users/${oauthUser.id}/links/${currentLinkId}/completed`), true);
       state.userCompleted = true;
       runTransaction(ref(db, "stats/completedUsers"), (current) => (current || 0) + 1);
     } else {
@@ -742,13 +924,7 @@ async function fetchAndDisplayTaskStats(task) {
   
   if (task.type === "subscribe" && task.channelId) {
     statBadge.style.display = "inline-flex";
-    statVal.textContent = "Đang đọc số Sub...";
-    try {
-      const subs = await getChannelSubCount(task.channelId);
-      statVal.textContent = `${Number(subs).toLocaleString("vi-VN")} người đăng ký`;
-    } catch (e) {
-      statVal.textContent = "Không thể tải số sub";
-    }
+    statVal.textContent = "Đang kiểm tra trạng thái YouTube OAuth...";
   } else if (task.type === "like" && task.videoId) {
     statBadge.style.display = "inline-flex";
     statVal.textContent = "Đang đọc lượt Like...";
@@ -822,6 +998,7 @@ function setSheetStatus(text, type = "") {
 document.getElementById("sheetCancel").addEventListener("click", closeSheet);
 sheetBackdrop.addEventListener("click", closeSheet);
 
+/* LOGIC XÁC MINH TASK SUBSCRIBE MỚI CÓ ANTI-FRAUD BAN */
 sheetVerifyBtn.addEventListener("click", async (e) => {
   addRipple(e);
   const task = TASKS.find(t => t.id === state.activeTaskId);
@@ -832,10 +1009,91 @@ sheetVerifyBtn.addEventListener("click", async (e) => {
     return;
   }
 
+  // 1. Yêu cầu đăng nhập Google OAuth nếu chưa xác thực
+  if (!oauthUser) {
+    setSheetStatus("Đang yêu cầu đăng nhập Google...", "info");
+    const loggedIn = await requestGoogleLogin();
+    if (!loggedIn) {
+      setSheetStatus("Bạn cần đăng nhập Google để thực hiện task này.", "error");
+      return;
+    }
+  }
+
+  // 2. Kiểm tra lại trạng thái Ban từ server
+  if (await checkUserBanStatus(oauthUser.id)) return;
+
   stopVerificationSession();
   state.sheetBusy = true;
   sheetVerifyBtn.disabled = true;
 
+  // 3. Xử lý logic Subscribe bằng OAuth & Anti-fraud
+  if (task.type === "subscribe") {
+    setSheetStatus("Đang kiểm tra trạng thái đăng ký kênh...", "info");
+
+    const historySnap = await get(ref(db, `users/${oauthUser.id}/subscriptionHistory/${task.channelId}`));
+    const history = historySnap.val();
+    const currentlySubscribed = await checkUserSubscriptionOAuth(oauthUser.accessToken, task.channelId);
+
+    // CASE ANTI-FRAUD: Đã xác minh trước đó nhưng hiện tại đã Hủy Subscribe
+    if (history && history.everVerified && !currentlySubscribed) {
+      setSheetStatus("Đang kiểm tra lại để tránh nhầm lẫn...", "info");
+      // Double check lần 2 tránh false positive do API delay
+      await new Promise(r => setTimeout(r, 2000));
+      const secondCheck = await checkUserSubscriptionOAuth(oauthUser.accessToken, task.channelId);
+
+      if (!secondCheck) {
+        await markFraudAndBan(oauthUser.id, task.channelId, "UNSUBSCRIBED_AFTER_VERIFICATION");
+        closeSheet();
+        return;
+      }
+    }
+
+    // CASE PASS: Người dùng đã subscribe từ trước hoặc vừa subscribe
+    if (currentlySubscribed) {
+      const now = Date.now();
+      await update(ref(db, `users/${oauthUser.id}/subscriptionHistory/${task.channelId}`), {
+        everVerified: true,
+        status: "subscribed",
+        lastVerifiedAt: now,
+        firstVerifiedAt: (history && history.firstVerifiedAt) ? history.firstVerifiedAt : now
+      });
+      finishSession(true, "Đã xác minh đăng ký kênh!");
+      return;
+    }
+
+    // CASE CHƯA SUBSCRIBE: Mở link kênh và bật cơ chế đếm ngược 60s
+    if (task.url && task.url !== "#") {
+      window.open(sanitizeUrl(task.url), "_blank");
+    }
+    setSheetStatus("Bạn chưa đăng ký kênh. Hãy Subscribe kênh rồi đợi hệ thống kiểm tra lại...", "error");
+
+    const expiresAt = Date.now() + VERIFICATION_TIMEOUT;
+    verificationSession = {
+      taskId: task.id,
+      timer: setInterval(() => {
+        const remaining = Math.max(0, Math.ceil((expiresAt - Date.now()) / 1000));
+        sheetVerifyBtn.textContent = `ĐANG KIỂM TRA... ${remaining}s`;
+        if (remaining <= 0) finishSession(false, "Hết thời gian 60 giây. Không phát hiện đăng ký mới.");
+      }, 1000),
+      poll: setInterval(async () => {
+        const isSubbed = await checkUserSubscriptionOAuth(oauthUser.accessToken, task.channelId);
+        if (isSubbed) {
+          const now = Date.now();
+          await update(ref(db, `users/${oauthUser.id}/subscriptionHistory/${task.channelId}`), {
+            everVerified: true,
+            status: "subscribed",
+            lastVerifiedAt: now,
+            firstVerifiedAt: (history && history.firstVerifiedAt) ? history.firstVerifiedAt : now
+          });
+          finishSession(true, "Đã xác minh đăng ký!");
+        }
+      }, POLL_INTERVAL)
+    };
+
+    return;
+  }
+
+  // 4. Xử lý Like / Comment task (Giữ nguyên)
   if (task.url && task.url !== "#") {
     const cleanUrl = sanitizeUrl(task.url);
     if (cleanUrl !== "#") window.open(cleanUrl, "_blank");
@@ -843,9 +1101,7 @@ sheetVerifyBtn.addEventListener("click", async (e) => {
 
   try {
     let startVal = 0;
-    if (task.type === "subscribe" && task.channelId) {
-      startVal = await getChannelSubCount(task.channelId);
-    } else if (task.type === "like" && task.videoId) {
+    if (task.type === "like" && task.videoId) {
       startVal = await getVideoLikeCount(task.videoId);
     }
 
@@ -856,19 +1112,12 @@ sheetVerifyBtn.addEventListener("click", async (e) => {
       timer: setInterval(() => {
         const remaining = Math.max(0, Math.ceil((expiresAt - Date.now()) / 1000));
         sheetVerifyBtn.textContent = `ĐANG KIỂM TRA... ${remaining}s`;
-
-        if (remaining <= 0) {
-          finishSession(false, "Không phát hiện tương tác mới trong 60 giây.");
-        }
+        if (remaining <= 0) finishSession(false, "Không phát hiện tương tác mới trong 60 giây.");
       }, 1000),
       poll: setInterval(async () => {
         try {
           let isSuccess = false;
-
-          if (task.type === "subscribe" && task.channelId) {
-            const current = await getChannelSubCount(task.channelId);
-            if (current > startVal) isSuccess = true;
-          } else if (task.type === "like" && task.videoId) {
+          if (task.type === "like" && task.videoId) {
             const current = await getVideoLikeCount(task.videoId);
             if (current > startVal) isSuccess = true;
           } else if (task.type === "comment" && task.videoId) {
@@ -877,9 +1126,7 @@ sheetVerifyBtn.addEventListener("click", async (e) => {
             isSuccess = true;
           }
 
-          if (isSuccess) {
-            finishSession(true, "Xác minh thành công!");
-          }
+          if (isSuccess) finishSession(true, "Xác minh thành công!");
         } catch (e) {}
       }, POLL_INTERVAL)
     };
@@ -906,8 +1153,8 @@ function finishSession(isSuccess, message) {
     sheetVerifyBtn.disabled = true;
 
     state.results[currentTaskId] = true;
-    if (currentLinkId) {
-      set(ref(db, `users/${userId}/links/${currentLinkId}/tasks/${currentTaskId}`), true);
+    if (currentLinkId && oauthUser) {
+      set(ref(db, `users/${oauthUser.id}/links/${currentLinkId}/tasks/${currentTaskId}`), true);
     }
     renderTasks();
     showToast("Xác minh thành công!", "success");
@@ -944,6 +1191,16 @@ document.getElementById("unlockBtn").addEventListener("click", (e) => {
   checkAndRedirectTarget();
 });
 
+async function loadUserProgress() {
+  if (!oauthUser || !currentLinkId) return;
+  const userSnapshot = await get(ref(db, `users/${oauthUser.id}/links/${currentLinkId}/tasks`));
+  if (userSnapshot.exists()) {
+    state.results = userSnapshot.val() || {};
+  }
+  trackUserVisit();
+  renderTasks();
+}
+
 async function loadConfigAndTasks() {
   const urlParams = new URLSearchParams(window.location.search);
   const rawId = urlParams.get("id");
@@ -951,6 +1208,7 @@ async function loadConfigAndTasks() {
   if (!rawId || !rawId.trim()) {
     state.urlState = "INVALID_URL";
     renderTasks();
+    hideSplash();
     return;
   }
 
@@ -961,6 +1219,7 @@ async function loadConfigAndTasks() {
     if (!snapshot.exists()) {
       state.urlState = "NOT_FOUND";
       renderTasks();
+      hideSplash();
       return;
     }
 
@@ -969,6 +1228,7 @@ async function loadConfigAndTasks() {
     if (currentLinkData.status === "disabled") {
       state.urlState = "DISABLED";
       renderTasks();
+      hideSplash();
       return;
     }
 
@@ -1001,19 +1261,30 @@ async function loadConfigAndTasks() {
       }));
     }
 
-    const userSnapshot = await get(ref(db, `users/${userId}/links/${currentLinkId}/tasks`));
-    if (userSnapshot.exists()) {
-      state.results = userSnapshot.val() || {};
-    }
-
     state.urlState = "VALID";
-    trackUserVisit();
     renderTasks();
 
   } catch (err) {
     state.urlState = "NOT_FOUND";
     renderTasks();
+  } finally {
+    hideSplash();
   }
+}
+
+function setSplashText(str) {
+  const p = document.getElementById("splashText");
+  if (p) p.textContent = str;
+}
+
+function hideSplash() {
+  setTimeout(() => {
+    const splash = document.getElementById("splash");
+    if (splash) {
+      splash.classList.add("hide");
+      setTimeout(() => splash.remove(), 500);
+    }
+  }, 400);
 }
 
 function updateNetworkStatus() {
@@ -1049,15 +1320,8 @@ document.getElementById("themeToggle").addEventListener("click", (e) => {
 
 function init() {
   updateNetworkStatus();
+  initGoogleOAuth();
   loadConfigAndTasks();
-
-  setTimeout(() => {
-    const splash = document.getElementById("splash");
-    if (splash) {
-      splash.classList.add("hide");
-      setTimeout(() => splash.remove(), 500);
-    }
-  }, 600);
 }
 
 document.addEventListener("DOMContentLoaded", init);
