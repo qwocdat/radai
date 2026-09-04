@@ -146,7 +146,7 @@ header.top .titles p{font-size:13.5px; color:var(--text-secondary); margin:0;}
 .theme-toggle:active{transform:scale(.9);}
 .theme-toggle svg{width:18px; height:18px; stroke:var(--text);}
 
-/* GOOGLE OAUTH PROFILE BAR */
+/* GOOGLE OAUTH PROFILE BAR (DÙNG ĐỂ THEO DÕI HÀNH VI) */
 .auth-bar{
   padding:14px 16px; margin-bottom:16px; display:flex;
   flex-direction:column; gap:8px;
@@ -374,14 +374,14 @@ footer.foot{text-align:center; margin-top:26px; font-size:11.5px; color:var(--te
     </div>
   </header>
 
-  <!-- GOOGLE OAUTH PROFILE BAR -->
+  <!-- GOOGLE OAUTH PROFILE BAR (DÙNG ĐỂ THEO DÕI BẤT THƯỜNG / HỦY FOLLOW) -->
   <section class="glass auth-bar" id="authBar">
     <div class="auth-container-unauth" id="authUnauthBox">
       <button class="btn-login-google" id="btnLoginGoogle">
         <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#fff" d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.545,6.477,2.545,12s4.476,10,10,10c5.768,0,9.638-4.058,9.638-9.807c0-0.682-0.068-1.346-0.187-1.954H12.545z"/></svg>
-        Đăng nhập Google
+        Đăng nhập Google (Thống kê / Bảo mật)
       </button>
-      <p class="auth-hint-text">Vui lòng đăng nhập bằng tài khoản Google liên kết với kênh YouTube của bạn để xác minh nhiệm vụ.</p>
+      <p class="auth-hint-text">Đăng nhập tài khoản Google để lưu lịch sử làm nhiệm vụ và tránh bị khóa do hành vi hủy đăng ký.</p>
     </div>
 
     <div class="auth-user-info" id="authUserBox" style="display:none;">
@@ -390,7 +390,7 @@ footer.foot{text-align:center; margin-top:26px; font-size:11.5px; color:var(--te
         <div class="auth-details">
           <span class="auth-name" id="authName">YouTube User</span>
           <span class="auth-handle" id="authHandle">@username</span>
-          <span class="auth-status">[Đã xác thực]</span>
+          <span class="auth-status">[Đã theo dõi hệ thống]</span>
         </div>
       </div>
     </div>
@@ -413,7 +413,7 @@ footer.foot{text-align:center; margin-top:26px; font-size:11.5px; color:var(--te
     <p class="unlock-hint" id="unlockHint">Hoàn thành tất cả nhiệm vụ để mở khóa</p>
   </div>
 
-  <footer class="foot">Xác minh trực tiếp qua YouTube Data API v3 & OAuth 2.0.</footer>
+  <footer class="foot">Xác minh trực tiếp qua YouTube Data API v3.</footer>
 </div>
 
 <div class="sheet-backdrop" id="sheetBackdrop"></div>
@@ -503,7 +503,7 @@ function sanitizeUrl(rawUrl) {
   return clean;
 }
 
-/* ==================== GOOGLE OAUTH 2.0 & YOUTUBE API ==================== */
+/* ==================== GOOGLE OAUTH (PHỤC VỤ THỐNG KÊ & THEO DÕI HÀNH VI BẤT THƯỜNG) ==================== */
 
 function initGoogleOAuth() {
   if (typeof google === "undefined" || !google.accounts) {
@@ -545,14 +545,13 @@ function requestGoogleLogin() {
 
 async function fetchAuthenticatedYoutubeChannel(accessToken) {
   try {
-    setSplashText("Đang lấy thông tin tài khoản...");
+    setSplashText("Đang lưu thông tin tài khoản...");
     
     let userId = "";
     let userName = "";
     let userHandle = "";
     let userAvatar = "";
 
-    // 1. Thử lấy thông tin kênh YouTube chính chủ trước
     try {
       const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&mine=true`, {
         headers: { Authorization: `Bearer ${accessToken}` }
@@ -572,7 +571,6 @@ async function fetchAuthenticatedYoutubeChannel(accessToken) {
       }
     } catch (e) {}
 
-    // 2. Fallback: Lấy Profile Google nếu tài khoản chưa có Kênh YouTube
     if (!userId) {
       const userRes = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo`, {
         headers: { Authorization: `Bearer ${accessToken}` }
@@ -608,7 +606,7 @@ async function fetchAuthenticatedYoutubeChannel(accessToken) {
     await loadUserProgress();
     return true;
   } catch (err) {
-    showToast(`Xác thực lỗi: ${err.message}`, "error");
+    showToast(`Lỗi lưu profile: ${err.message}`, "error");
     return false;
   } finally {
     hideSplash();
@@ -633,7 +631,7 @@ function renderAuthBar() {
 
 document.getElementById("btnLoginGoogle").addEventListener("click", () => requestGoogleLogin());
 
-/* ==================== ANTI-FRAUD & BAN SYSTEM ==================== */
+/* ==================== BAN SYSTEM (KIỂM TRA HÀNH VI BẤT THƯỜNG) ==================== */
 
 async function checkUserBanStatus(ytUserId) {
   if (!ytUserId) return false;
@@ -652,7 +650,7 @@ function showPermanentBanUI(reason) {
     <div class="glass error-card-state" style="margin-top:40px; padding:40px 20px;">
       <h3 style="font-size:22px; color:var(--error); margin-bottom:12px;">TÀI KHOẢN ĐÃ BỊ KHÓA</h3>
       <p style="font-size:14px; color:var(--text-secondary); line-height:1.6; margin-bottom:20px;">
-        Hệ thống phát hiện tài khoản YouTube của bạn đã chủ động hủy đăng ký kênh sau khi xác minh thành công.<br>
+        Hệ thống phát hiện tài khoản của bạn có hành vi bất thường hoặc hủy theo dõi sau khi xác minh.<br>
         <strong>Mã vi phạm:</strong> <code style="color:var(--warning);">${escapeHtml(reason)}</code>
       </p>
       <p style="font-size:12.5px; color:var(--text-tertiary);">
@@ -662,33 +660,7 @@ function showPermanentBanUI(reason) {
   `;
 }
 
-async function markFraudAndBan(ytUserId, targetChannelId, reason) {
-  const now = Date.now();
-  await update(ref(db, `users/${ytUserId}/fraud`), {
-    status: "banned",
-    reason: reason,
-    targetChannelId: targetChannelId,
-    bannedAt: now
-  });
-  state.isBanned = true;
-  showPermanentBanUI(reason);
-}
-
-/* ==================== YOUTUBE DATA FETCHING ==================== */
-
-async function checkUserSubscriptionOAuth(accessToken, targetChannelId) {
-  if (!accessToken || !targetChannelId) return false;
-  try {
-    const res = await fetch(`https://www.googleapis.com/youtube/v3/subscriptions?part=snippet&mine=true&forChannelId=${encodeURIComponent(targetChannelId)}`, {
-      headers: { Authorization: `Bearer ${accessToken}` }
-    });
-    if (!res.ok) return false;
-    const data = await res.json();
-    return data.items && data.items.length > 0;
-  } catch (e) {
-    return false;
-  }
-}
+/* ==================== YOUTUBE PUBLIC API (SO SÁNH TĂNG TRƯỞNG LƯỢNG SUB/LIKE) ==================== */
 
 async function getChannelSubCount(channelId) {
   if (!channelId) throw new Error("Thiếu Channel ID.");
@@ -732,9 +704,9 @@ function trackUserVisit() {
 }
 
 function logBypassAttempt(reason, taskId = "none") {
-  if (!oauthUser) return;
+  const userId = oauthUser ? oauthUser.id : "guest_user";
   push(ref(db, "bypassLogs"), {
-    userId: oauthUser.id,
+    userId: userId,
     linkId: currentLinkId || "none",
     taskId: taskId,
     reason: reason,
@@ -889,10 +861,11 @@ function updateProgress() {
 }
 
 function markUserCompletedOnce() {
-  if (state.userCompleted || !currentLinkId || !oauthUser) return;
-  get(ref(db, `users/${oauthUser.id}/links/${currentLinkId}/completed`)).then(snapshot => {
+  if (state.userCompleted || !currentLinkId) return;
+  const targetId = oauthUser ? oauthUser.id : "guest_user";
+  get(ref(db, `users/${targetId}/links/${currentLinkId}/completed`)).then(snapshot => {
     if (!snapshot.exists() || snapshot.val() !== true) {
-      set(ref(db, `users/${oauthUser.id}/links/${currentLinkId}/completed`), true);
+      set(ref(db, `users/${targetId}/links/${currentLinkId}/completed`), true);
       state.userCompleted = true;
       runTransaction(ref(db, "stats/completedUsers"), (current) => (current || 0) + 1);
     } else {
@@ -1000,6 +973,7 @@ function setSheetStatus(text, type = "") {
 document.getElementById("sheetCancel").addEventListener("click", closeSheet);
 sheetBackdrop.addEventListener("click", closeSheet);
 
+/* SỬA DỤNG THỐNG KÊ LƯỢNG SUB/LIKE BAN ĐẦU ĐỂ SO SÁNH TĂNG TRƯỞNG LÀM ĐIỀU KIỆN PASS */
 sheetVerifyBtn.addEventListener("click", async (e) => {
   addRipple(e);
   const task = TASKS.find(t => t.id === state.activeTaskId);
@@ -1010,83 +984,13 @@ sheetVerifyBtn.addEventListener("click", async (e) => {
     return;
   }
 
-  if (!oauthUser) {
-    setSheetStatus("Đang yêu cầu đăng nhập Google...", "info");
-    const loggedIn = await requestGoogleLogin();
-    if (!loggedIn) {
-      setSheetStatus("Bạn cần đăng nhập Google để thực hiện task này.", "error");
-      return;
-    }
-  }
-
-  if (await checkUserBanStatus(oauthUser.id)) return;
+  if (oauthUser && await checkUserBanStatus(oauthUser.id)) return;
 
   stopVerificationSession();
   state.sheetBusy = true;
   sheetVerifyBtn.disabled = true;
 
-  if (task.type === "subscribe") {
-    setSheetStatus("Đang kiểm tra trạng thái đăng ký kênh...", "info");
-
-    const historySnap = await get(ref(db, `users/${oauthUser.id}/subscriptionHistory/${task.channelId}`));
-    const history = historySnap.val();
-    const currentlySubscribed = await checkUserSubscriptionOAuth(oauthUser.accessToken, task.channelId);
-
-    if (history && history.everVerified && !currentlySubscribed) {
-      setSheetStatus("Đang kiểm tra lại...", "info");
-      await new Promise(r => setTimeout(r, 2000));
-      const secondCheck = await checkUserSubscriptionOAuth(oauthUser.accessToken, task.channelId);
-
-      if (!secondCheck) {
-        await markFraudAndBan(oauthUser.id, task.channelId, "UNSUBSCRIBED_AFTER_VERIFICATION");
-        closeSheet();
-        return;
-      }
-    }
-
-    if (currentlySubscribed) {
-      const now = Date.now();
-      await update(ref(db, `users/${oauthUser.id}/subscriptionHistory/${task.channelId}`), {
-        everVerified: true,
-        status: "subscribed",
-        lastVerifiedAt: now,
-        firstVerifiedAt: (history && history.firstVerifiedAt) ? history.firstVerifiedAt : now
-      });
-      finishSession(true, "Đã xác minh đăng ký kênh!");
-      return;
-    }
-
-    if (task.url && task.url !== "#") {
-      window.open(sanitizeUrl(task.url), "_blank");
-    }
-    setSheetStatus("Bạn chưa đăng ký kênh. Hãy Subscribe kênh rồi đợi hệ thống kiểm tra lại...", "error");
-
-    const expiresAt = Date.now() + VERIFICATION_TIMEOUT;
-    verificationSession = {
-      taskId: task.id,
-      timer: setInterval(() => {
-        const remaining = Math.max(0, Math.ceil((expiresAt - Date.now()) / 1000));
-        sheetVerifyBtn.textContent = `ĐANG KIỂM TRA... ${remaining}s`;
-        if (remaining <= 0) finishSession(false, "Hết thời gian 60 giây. Không phát hiện đăng ký mới.");
-      }, 1000),
-      poll: setInterval(async () => {
-        const isSubbed = await checkUserSubscriptionOAuth(oauthUser.accessToken, task.channelId);
-        if (isSubbed) {
-          const now = Date.now();
-          await update(ref(db, `users/${oauthUser.id}/subscriptionHistory/${task.channelId}`), {
-            everVerified: true,
-            status: "subscribed",
-            lastVerifiedAt: now,
-            firstVerifiedAt: (history && history.firstVerifiedAt) ? history.firstVerifiedAt : now
-          });
-          finishSession(true, "Đã xác minh đăng ký!");
-        }
-      }, POLL_INTERVAL)
-    };
-
-    return;
-  }
-
+  // Tự động mở link kênh/video nếu có
   if (task.url && task.url !== "#") {
     const cleanUrl = sanitizeUrl(task.url);
     if (cleanUrl !== "#") window.open(cleanUrl, "_blank");
@@ -1094,7 +998,11 @@ sheetVerifyBtn.addEventListener("click", async (e) => {
 
   try {
     let startVal = 0;
-    if (task.type === "like" && task.videoId) {
+    
+    // Đọc giá trị ban đầu để so sánh tăng trưởng
+    if (task.type === "subscribe" && task.channelId) {
+      startVal = await getChannelSubCount(task.channelId);
+    } else if (task.type === "like" && task.videoId) {
       startVal = await getVideoLikeCount(task.videoId);
     }
 
@@ -1105,14 +1013,18 @@ sheetVerifyBtn.addEventListener("click", async (e) => {
       timer: setInterval(() => {
         const remaining = Math.max(0, Math.ceil((expiresAt - Date.now()) / 1000));
         sheetVerifyBtn.textContent = `ĐANG KIỂM TRA... ${remaining}s`;
-        if (remaining <= 0) finishSession(false, "Không phát hiện tương tác mới trong 60 giây.");
+        if (remaining <= 0) finishSession(false, "Hết thời gian 60 giây. Không phát hiện lượt tương tác mới.");
       }, 1000),
       poll: setInterval(async () => {
         try {
           let isSuccess = false;
-          if (task.type === "like" && task.videoId) {
-            const current = await getVideoLikeCount(task.videoId);
-            if (current > startVal) isSuccess = true;
+
+          if (task.type === "subscribe" && task.channelId) {
+            const currentSub = await getChannelSubCount(task.channelId);
+            if (currentSub > startVal) isSuccess = true;
+          } else if (task.type === "like" && task.videoId) {
+            const currentLike = await getVideoLikeCount(task.videoId);
+            if (currentLike > startVal) isSuccess = true;
           } else if (task.type === "comment" && task.videoId) {
             isSuccess = await checkRecentComments(task.videoId, task.commentLines || []);
           } else {
@@ -1146,8 +1058,9 @@ function finishSession(isSuccess, message) {
     sheetVerifyBtn.disabled = true;
 
     state.results[currentTaskId] = true;
-    if (currentLinkId && oauthUser) {
-      set(ref(db, `users/${oauthUser.id}/links/${currentLinkId}/tasks/${currentTaskId}`), true);
+    const targetId = oauthUser ? oauthUser.id : "guest_user";
+    if (currentLinkId) {
+      set(ref(db, `users/${targetId}/links/${currentLinkId}/tasks/${currentTaskId}`), true);
     }
     renderTasks();
     showToast("Xác minh thành công!", "success");
@@ -1185,8 +1098,9 @@ document.getElementById("unlockBtn").addEventListener("click", (e) => {
 });
 
 async function loadUserProgress() {
-  if (!oauthUser || !currentLinkId) return;
-  const userSnapshot = await get(ref(db, `users/${oauthUser.id}/links/${currentLinkId}/tasks`));
+  if (!currentLinkId) return;
+  const targetId = oauthUser ? oauthUser.id : "guest_user";
+  const userSnapshot = await get(ref(db, `users/${targetId}/links/${currentLinkId}/tasks`));
   if (userSnapshot.exists()) {
     state.results = userSnapshot.val() || {};
   }
