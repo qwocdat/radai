@@ -146,7 +146,7 @@ header.top .titles p{font-size:13.5px; color:var(--text-secondary); margin:0;}
 .theme-toggle:active{transform:scale(.9);}
 .theme-toggle svg{width:18px; height:18px; stroke:var(--text);}
 
-/* GOOGLE OAUTH PROFILE BAR (TỐI ƯU CẤU TRÚC) */
+/* GOOGLE OAUTH PROFILE BAR */
 .auth-bar{
   padding:14px 16px; margin-bottom:16px; display:flex;
   flex-direction:column; gap:8px;
@@ -310,20 +310,6 @@ header.top .titles p{font-size:13.5px; color:var(--text-secondary); margin:0;}
 .btn-secondary{background:var(--glass-strong); color:var(--text); border:1px solid var(--glass-border);}
 .btn-primary:disabled{opacity:.5; pointer-events:none;}
 
-.api-modal-backdrop{
-  position:fixed; inset:0; z-index:300;
-  background:rgba(0,0,0,0.65); backdrop-filter:blur(10px);
-  display:none; align-items:center; justify-content:center; padding:20px;
-}
-.api-modal-backdrop.open{display:flex;}
-.api-modal-box{
-  background:var(--bg-2); border:1px solid var(--glass-border);
-  border-radius:var(--radius-xl); padding:24px; max-width:440px; width:100%;
-  text-align:center; box-shadow:var(--shadow-soft);
-}
-.api-modal-box h3{color:var(--warning); font-size:19px; margin:0 0 10px;}
-.api-modal-box p{font-size:14px; color:var(--text-secondary); line-height:1.5; margin:0 0 20px;}
-
 #toast-host{
   position:fixed; left:0; right:0; bottom:calc(20px + var(--safe-bottom));
   z-index:200; display:flex; flex-direction:column; align-items:center; gap:8px;
@@ -389,7 +375,6 @@ footer.foot{text-align:center; margin-top:26px; font-size:11.5px; color:var(--te
 
   <!-- GOOGLE OAUTH PROFILE BAR -->
   <section class="glass auth-bar" id="authBar">
-    <!-- TRẠNG THÁI CHƯA ĐĂNG NHẬP -->
     <div class="auth-container-unauth" id="authUnauthBox">
       <button class="btn-login-google" id="btnLoginGoogle">
         <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#fff" d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.545,6.477,2.545,12s4.476,10,10,10c5.768,0,9.638-4.058,9.638-9.807c0-0.682-0.068-1.346-0.187-1.954H12.545z"/></svg>
@@ -398,13 +383,12 @@ footer.foot{text-align:center; margin-top:26px; font-size:11.5px; color:var(--te
       <p class="auth-hint-text">Vui lòng đăng nhập bằng tài khoản Google liên kết với kênh YouTube của bạn để xác minh nhiệm vụ.</p>
     </div>
 
-    <!-- TRẠNG THÁI ĐÃ ĐĂNG NHẬP -->
     <div class="auth-user-info" id="authUserBox" style="display:none;">
       <div class="auth-user-details-left">
         <img id="authAvatar" class="auth-avatar" src="" alt="Avatar">
         <div class="auth-details">
           <span class="auth-name" id="authName">YouTube User</span>
-          <span class="auth-status">✓ Đã xác thực OAuth 2.0</span>
+          <span class="auth-status">[Đã xác thực]</span>
         </div>
       </div>
     </div>
@@ -437,7 +421,7 @@ footer.foot{text-align:center; margin-top:26px; font-size:11.5px; color:var(--te
   <p class="desc" id="sheetDesc">Mô tả nhiệm vụ.</p>
   
   <div id="apiStatBadge" class="api-stat-badge" style="display:none;">
-    <span>📊 Trạng thái kênh:</span> <strong id="apiStatValue">Đang tải...</strong>
+    <span>Thống kê:</span> <strong id="apiStatValue">Đang tải...</strong>
   </div>
 
   <div class="sheet-status" id="sheetStatus">
@@ -452,14 +436,6 @@ footer.foot{text-align:center; margin-top:26px; font-size:11.5px; color:var(--te
   <div class="sheet-actions">
     <button class="btn-secondary" id="sheetCancel">Đóng</button>
     <button class="btn-primary" id="sheetVerify">KIỂM TRA</button>
-  </div>
-</div>
-
-<div class="api-modal-backdrop" id="apiLimitModal">
-  <div class="api-modal-box">
-    <h3>⚠️ Rất tiếc, Hệ thống API bị quá tải!</h3>
-    <p>Lượt xác minh tự động YouTube API hiện đã đạt giới hạn trong ngày. Thành thật xin lỗi bạn vì sự bất tiện này! Để không làm gián đoạn thời gian của bạn, hệ thống đã tự động kích hoạt chế độ mở khóa trực tiếp.</p>
-    <button class="unlock-btn" id="apiDirectBypassBtn">NHẬN LINK MỞ KHÓA NGAY</button>
   </div>
 </div>
 
@@ -480,7 +456,7 @@ const firebaseConfig = {
 };
 
 const YT_API_KEY = "AIzaSyAR-zsFqyZag3TDlSUecY696E757fLQxAo";
-const GOOGLE_CLIENT_ID = "685476439350-2msgbc249cb6e18vt9iigtmgh5ifohnj.apps.googleusercontent.com"; // Đồng bộ Client ID từ index.html
+const GOOGLE_CLIENT_ID = "685476439350-2msgbc249cb6e18vt9iigtmgh5ifohnj.apps.googleusercontent.com";
 const POLL_INTERVAL = 5000;
 const VERIFICATION_TIMEOUT = 60000;
 
@@ -491,7 +467,7 @@ let currentLinkId = null;
 let currentLinkData = null;
 let TASKS = [];
 
-let oauthUser = null; // { id, title, avatar, accessToken }
+let oauthUser = null;
 let tokenClient = null;
 
 const state = {
@@ -525,22 +501,6 @@ function sanitizeUrl(rawUrl) {
   return clean;
 }
 
-function handleApiQuotaExceeded() {
-  stopVerificationSession();
-  closeSheet();
-  const modal = document.getElementById("apiLimitModal");
-  modal.classList.add("open");
-
-  document.getElementById("apiDirectBypassBtn").onclick = () => {
-    modal.classList.remove("open");
-    if (currentLinkData && currentLinkData.targetUrl) {
-      window.location.href = sanitizeUrl(currentLinkData.targetUrl);
-    } else {
-      showToast("Đã mở khóa hoàn tất!", "success");
-    }
-  };
-}
-
 /* ==================== GOOGLE OAUTH 2.0 & YOUTUBE API ==================== */
 
 function initGoogleOAuth() {
@@ -550,7 +510,7 @@ function initGoogleOAuth() {
   }
   tokenClient = google.accounts.oauth2.initTokenClient({
     client_id: GOOGLE_CLIENT_ID,
-    scope: "openid profile email https://www.googleapis.com/auth/youtube.readonly",
+    scope: "https://www.googleapis.com/auth/youtube.readonly",
     callback: async (tokenResponse) => {
       if (tokenResponse.error) {
         showToast("Đăng nhập Google thất bại", "error");
@@ -583,51 +543,25 @@ function requestGoogleLogin() {
 
 async function fetchAuthenticatedYoutubeChannel(accessToken) {
   try {
-    setSplashText("Đang xác nhận tài khoản...");
-    
-    let channelTitle = "";
-    let channelAvatar = "";
-    let userId = "";
+    setSplashText("Đang xác nhận tài khoản YouTube...");
+    const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true`, {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+    if (!res.ok) throw new Error("Không thể lấy thông tin kênh YouTube.");
+    const data = await res.json();
+    if (!data.items || data.items.length === 0) throw new Error("Không tìm thấy kênh YouTube cá nhân.");
 
-    // 1. Thử lấy thông tin kênh YouTube
-    try {
-      const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true`, {
-        headers: { Authorization: `Bearer ${accessToken}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.items && data.items.length > 0) {
-          userId = data.items[0].id;
-          channelTitle = data.items[0].snippet.title;
-          channelAvatar = data.items[0].snippet.thumbnails.default.url;
-        }
-      }
-    } catch (e) {}
-
-    // 2. Dự phòng lấy Google Profile nếu tài khoản chưa tạo kênh YouTube
-    if (!userId) {
-      const userRes = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo`, {
-        headers: { Authorization: `Bearer ${accessToken}` }
-      });
-      if (!userRes.ok) throw new Error("Không thể lấy thông tin tài khoản Google.");
-      const userInfo = await userRes.json();
-      userId = userInfo.sub;
-      channelTitle = userInfo.name || userInfo.email;
-      channelAvatar = userInfo.picture || "";
-    }
-
+    const item = data.items[0];
     oauthUser = {
-      id: userId,
-      title: channelTitle,
-      avatar: channelAvatar,
+      id: item.id,
+      title: item.snippet.title,
+      avatar: item.snippet.thumbnails.default.url,
       accessToken: accessToken
     };
 
-    // Kiểm tra trạng thái Ban từ Server/Firebase trước
     const isBanned = await checkUserBanStatus(oauthUser.id);
     if (isBanned) return false;
 
-    // Lưu định danh ổn định (Không lưu access token)
     await update(ref(db, `users/${oauthUser.id}/youtube`), {
       channelId: oauthUser.id,
       title: oauthUser.title,
@@ -680,14 +614,13 @@ function showPermanentBanUI(reason) {
   const appEl = document.getElementById("app");
   appEl.innerHTML = `
     <div class="glass error-card-state" style="margin-top:40px; padding:40px 20px;">
-      <div style="font-size:48px; margin-bottom:12px;">🚫</div>
       <h3 style="font-size:22px; color:var(--error); margin-bottom:12px;">TÀI KHOẢN ĐÃ BỊ KHÓA</h3>
       <p style="font-size:14px; color:var(--text-secondary); line-height:1.6; margin-bottom:20px;">
         Hệ thống phát hiện tài khoản YouTube của bạn đã chủ động hủy đăng ký kênh sau khi xác minh thành công.<br>
         <strong>Mã vi phạm:</strong> <code style="color:var(--warning);">${escapeHtml(reason)}</code>
       </p>
       <p style="font-size:12.5px; color:var(--text-tertiary);">
-        Trạng thái khóa được lưu vĩnh viễn trên máy chủ. Mọi hành vi tạo tài khoản mới hoặc xóa bộ nhớ đệm sẽ không thể khôi phục.
+        Trạng thái khóa được lưu vĩnh viễn trên máy chủ.
       </p>
     </div>
   `;
@@ -705,7 +638,7 @@ async function markFraudAndBan(ytUserId, targetChannelId, reason) {
   showPermanentBanUI(reason);
 }
 
-/* ==================== CHECK SUBSCRIPTION VIA OAUTH ==================== */
+/* ==================== YOUTUBE DATA FETCHING ==================== */
 
 async function checkUserSubscriptionOAuth(accessToken, targetChannelId) {
   if (!accessToken || !targetChannelId) return false;
@@ -713,10 +646,6 @@ async function checkUserSubscriptionOAuth(accessToken, targetChannelId) {
     const res = await fetch(`https://www.googleapis.com/youtube/v3/subscriptions?part=snippet&mine=true&forChannelId=${encodeURIComponent(targetChannelId)}`, {
       headers: { Authorization: `Bearer ${accessToken}` }
     });
-    if (res.status === 403) {
-      handleApiQuotaExceeded();
-      return false;
-    }
     if (!res.ok) return false;
     const data = await res.json();
     return data.items && data.items.length > 0;
@@ -728,10 +657,6 @@ async function checkUserSubscriptionOAuth(accessToken, targetChannelId) {
 async function getChannelSubCount(channelId) {
   if (!channelId) throw new Error("Thiếu Channel ID.");
   const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${encodeURIComponent(channelId)}&key=${YT_API_KEY}`);
-  if (res.status === 403) {
-    handleApiQuotaExceeded();
-    throw new Error("API Quota Exceeded");
-  }
   if (!res.ok) throw new Error("Không thể đọc dữ liệu kênh từ YouTube.");
   const data = await res.json();
   if (!data.items || data.items.length === 0) throw new Error("Không tìm thấy kênh YouTube.");
@@ -741,10 +666,6 @@ async function getChannelSubCount(channelId) {
 async function getVideoLikeCount(videoId) {
   if (!videoId) throw new Error("Thiếu Video ID.");
   const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${encodeURIComponent(videoId)}&key=${YT_API_KEY}`);
-  if (res.status === 403) {
-    handleApiQuotaExceeded();
-    throw new Error("API Quota Exceeded");
-  }
   if (!res.ok) throw new Error("Không thể đọc dữ liệu video từ YouTube.");
   const data = await res.json();
   if (!data.items || data.items.length === 0) throw new Error("Không tìm thấy Video YouTube.");
@@ -754,10 +675,6 @@ async function getVideoLikeCount(videoId) {
 async function checkRecentComments(videoId, targetLines) {
   if (!videoId) return false;
   const res = await fetch(`https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=${encodeURIComponent(videoId)}&maxResults=20&key=${YT_API_KEY}`);
-  if (res.status === 403) {
-    handleApiQuotaExceeded();
-    return false;
-  }
   if (!res.ok) return false;
   const data = await res.json();
   if (!data.items) return false;
@@ -961,13 +878,20 @@ function stopVerificationSession() {
   state.sheetBusy = false;
 }
 
+/* LẤY CẢ SỐ LƯỢNG SUB VÀ LIKE HIỂN THỊ TRỰC TIẾP */
 async function fetchAndDisplayTaskStats(task) {
   const statBadge = document.getElementById("apiStatBadge");
   const statVal = document.getElementById("apiStatValue");
   
   if (task.type === "subscribe" && task.channelId) {
     statBadge.style.display = "inline-flex";
-    statVal.textContent = "Đang kiểm tra trạng thái YouTube OAuth...";
+    statVal.textContent = "Đang đọc số người đăng ký...";
+    try {
+      const subs = await getChannelSubCount(task.channelId);
+      statVal.textContent = `${Number(subs).toLocaleString("vi-VN")} người đăng ký`;
+    } catch (e) {
+      statVal.textContent = "Không thể tải lượt đăng ký";
+    }
   } else if (task.type === "like" && task.videoId) {
     statBadge.style.display = "inline-flex";
     statVal.textContent = "Đang đọc lượt Like...";
@@ -1041,7 +965,6 @@ function setSheetStatus(text, type = "") {
 document.getElementById("sheetCancel").addEventListener("click", closeSheet);
 sheetBackdrop.addEventListener("click", closeSheet);
 
-/* LOGIC XÁC MINH TASK SUBSCRIBE MỚI CÓ ANTI-FRAUD BAN */
 sheetVerifyBtn.addEventListener("click", async (e) => {
   addRipple(e);
   const task = TASKS.find(t => t.id === state.activeTaskId);
@@ -1052,7 +975,6 @@ sheetVerifyBtn.addEventListener("click", async (e) => {
     return;
   }
 
-  // 1. Yêu cầu đăng nhập Google OAuth nếu chưa xác thực
   if (!oauthUser) {
     setSheetStatus("Đang yêu cầu đăng nhập Google...", "info");
     const loggedIn = await requestGoogleLogin();
@@ -1062,14 +984,12 @@ sheetVerifyBtn.addEventListener("click", async (e) => {
     }
   }
 
-  // 2. Kiểm tra lại trạng thái Ban từ server
   if (await checkUserBanStatus(oauthUser.id)) return;
 
   stopVerificationSession();
   state.sheetBusy = true;
   sheetVerifyBtn.disabled = true;
 
-  // 3. Xử lý logic Subscribe bằng OAuth & Anti-fraud
   if (task.type === "subscribe") {
     setSheetStatus("Đang kiểm tra trạng thái đăng ký kênh...", "info");
 
@@ -1077,9 +997,8 @@ sheetVerifyBtn.addEventListener("click", async (e) => {
     const history = historySnap.val();
     const currentlySubscribed = await checkUserSubscriptionOAuth(oauthUser.accessToken, task.channelId);
 
-    // CASE ANTI-FRAUD: Đã xác minh trước đó nhưng hiện tại đã Hủy Subscribe
     if (history && history.everVerified && !currentlySubscribed) {
-      setSheetStatus("Đang kiểm tra lại để tránh nhầm lẫn...", "info");
+      setSheetStatus("Đang kiểm tra lại...", "info");
       await new Promise(r => setTimeout(r, 2000));
       const secondCheck = await checkUserSubscriptionOAuth(oauthUser.accessToken, task.channelId);
 
@@ -1090,7 +1009,6 @@ sheetVerifyBtn.addEventListener("click", async (e) => {
       }
     }
 
-    // CASE PASS: Người dùng đã subscribe từ trước hoặc vừa subscribe
     if (currentlySubscribed) {
       const now = Date.now();
       await update(ref(db, `users/${oauthUser.id}/subscriptionHistory/${task.channelId}`), {
@@ -1103,7 +1021,6 @@ sheetVerifyBtn.addEventListener("click", async (e) => {
       return;
     }
 
-    // CASE CHƯA SUBSCRIBE: Mở link kênh và bật cơ chế đếm ngược 60s
     if (task.url && task.url !== "#") {
       window.open(sanitizeUrl(task.url), "_blank");
     }
@@ -1135,7 +1052,6 @@ sheetVerifyBtn.addEventListener("click", async (e) => {
     return;
   }
 
-  // 4. Xử lý Like / Comment task
   if (task.url && task.url !== "#") {
     const cleanUrl = sanitizeUrl(task.url);
     if (cleanUrl !== "#") window.open(cleanUrl, "_blank");
@@ -1190,8 +1106,8 @@ function finishSession(isSuccess, message) {
   stopVerificationSession();
 
   if (isSuccess) {
-    setSheetStatus("✓ " + message, "success");
-    sheetVerifyBtn.textContent = "✓ THÀNH CÔNG";
+    setSheetStatus("[Thành công] " + message, "success");
+    sheetVerifyBtn.textContent = "THÀNH CÔNG";
     sheetVerifyBtn.disabled = true;
 
     state.results[currentTaskId] = true;
@@ -1206,7 +1122,7 @@ function finishSession(isSuccess, message) {
       checkAndRedirectTarget();
     }, 1200);
   } else {
-    setSheetStatus("✕ " + message, "error");
+    setSheetStatus("[Thất bại] " + message, "error");
     sheetVerifyBtn.textContent = "XÁC MINH THẤT BẠI";
     sheetVerifyBtn.disabled = false;
     showToast(message, "error");
