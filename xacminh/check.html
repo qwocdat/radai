@@ -550,7 +550,7 @@ function initGoogleOAuth() {
   }
   tokenClient = google.accounts.oauth2.initTokenClient({
     client_id: GOOGLE_CLIENT_ID,
-    scope: "https://www.googleapis.com/auth/youtube.readonly",
+    scope: "openid profile email https://www.googleapis.com/auth/youtube.readonly",
     callback: async (tokenResponse) => {
       if (tokenResponse.error) {
         showToast("Đăng nhập Google thất bại", "error");
@@ -583,19 +583,43 @@ function requestGoogleLogin() {
 
 async function fetchAuthenticatedYoutubeChannel(accessToken) {
   try {
-    setSplashText("Đang xác nhận tài khoản YouTube...");
-    const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true`, {
-      headers: { Authorization: `Bearer ${accessToken}` }
-    });
-    if (!res.ok) throw new Error("Không thể lấy thông tin kênh YouTube.");
-    const data = await res.json();
-    if (!data.items || data.items.length === 0) throw new Error("Không tìm thấy kênh YouTube cá nhân.");
+    setSplashText("Đang xác nhận tài khoản...");
+    
+    let channelTitle = "";
+    let channelAvatar = "";
+    let userId = "";
 
-    const item = data.items[0];
+    // 1. Thử lấy thông tin kênh YouTube
+    try {
+      const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true`, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.items && data.items.length > 0) {
+          userId = data.items[0].id;
+          channelTitle = data.items[0].snippet.title;
+          channelAvatar = data.items[0].snippet.thumbnails.default.url;
+        }
+      }
+    } catch (e) {}
+
+    // 2. Dự phòng lấy Google Profile nếu tài khoản chưa tạo kênh YouTube
+    if (!userId) {
+      const userRes = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo`, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+      if (!userRes.ok) throw new Error("Không thể lấy thông tin tài khoản Google.");
+      const userInfo = await userRes.json();
+      userId = userInfo.sub;
+      channelTitle = userInfo.name || userInfo.email;
+      channelAvatar = userInfo.picture || "";
+    }
+
     oauthUser = {
-      id: item.id,
-      title: item.snippet.title,
-      avatar: item.snippet.thumbnails.default.url,
+      id: userId,
+      title: channelTitle,
+      avatar: channelAvatar,
       accessToken: accessToken
     };
 
