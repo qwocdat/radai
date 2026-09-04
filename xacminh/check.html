@@ -146,20 +146,30 @@ header.top .titles p{font-size:13.5px; color:var(--text-secondary); margin:0;}
 .theme-toggle:active{transform:scale(.9);}
 .theme-toggle svg{width:18px; height:18px; stroke:var(--text);}
 
-/* GOOGLE OAUTH PROFILE BAR */
+/* GOOGLE OAUTH PROFILE BAR (TỐI ƯU CẤU TRÚC) */
 .auth-bar{
-  padding:12px 16px; margin-bottom:16px; display:flex;
-  align-items:center; justify-content:space-between; gap:10px;
+  padding:14px 16px; margin-bottom:16px; display:flex;
+  flex-direction:column; gap:8px;
 }
-.auth-user-info{display:flex; align-items:center; gap:10px; overflow:hidden;}
+.auth-container-unauth{
+  display:flex; flex-direction:column; gap:6px; width:100%;
+}
+.auth-user-info{display:flex; align-items:center; justify-content:space-between; width:100%;}
+.auth-user-details-left{display:flex; align-items:center; gap:10px; overflow:hidden;}
 .auth-avatar{width:36px; height:36px; border-radius:50%; object-fit:cover; border:1px solid var(--glass-border);}
 .auth-details{display:flex; flex-direction:column; overflow:hidden;}
 .auth-name{font-size:13.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 .auth-status{font-size:11.5px; color:var(--success);}
+
 .btn-login-google{
-  padding:8px 14px; border-radius:var(--radius-pill); border:none;
-  background:#4285F4; color:#fff; font-size:12.5px; font-weight:600;
-  cursor:pointer; display:flex; align-items:center; gap:6px; flex-shrink:0;
+  width:100%; padding:12px 16px; border-radius:var(--radius-pill); border:none;
+  background:#4285F4; color:#fff; font-size:14px; font-weight:600;
+  cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;
+  transition:opacity .2s ease;
+}
+.btn-login-google:active{opacity:0.9;}
+.auth-hint-text{
+  font-size:11.5px; color:var(--text-tertiary); text-align:center; margin:0; line-height:1.4;
 }
 
 .progress-card{padding:20px 20px 18px; margin-bottom:16px;}
@@ -379,17 +389,25 @@ footer.foot{text-align:center; margin-top:26px; font-size:11.5px; color:var(--te
 
   <!-- GOOGLE OAUTH PROFILE BAR -->
   <section class="glass auth-bar" id="authBar">
+    <!-- TRẠNG THÁI CHƯA ĐĂNG NHẬP -->
+    <div class="auth-container-unauth" id="authUnauthBox">
+      <button class="btn-login-google" id="btnLoginGoogle">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#fff" d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.545,6.477,2.545,12s4.476,10,10,10c5.768,0,9.638-4.058,9.638-9.807c0-0.682-0.068-1.346-0.187-1.954H12.545z"/></svg>
+        Đăng nhập Google
+      </button>
+      <p class="auth-hint-text">Vui lòng đăng nhập bằng tài khoản Google liên kết với kênh YouTube của bạn để xác minh nhiệm vụ.</p>
+    </div>
+
+    <!-- TRẠNG THÁI ĐÃ ĐĂNG NHẬP -->
     <div class="auth-user-info" id="authUserBox" style="display:none;">
-      <img id="authAvatar" class="auth-avatar" src="" alt="Avatar">
-      <div class="auth-details">
-        <span class="auth-name" id="authName">YouTube User</span>
-        <span class="auth-status">✓ Đã xác thực OAuth 2.0</span>
+      <div class="auth-user-details-left">
+        <img id="authAvatar" class="auth-avatar" src="" alt="Avatar">
+        <div class="auth-details">
+          <span class="auth-name" id="authName">YouTube User</span>
+          <span class="auth-status">✓ Đã xác thực OAuth 2.0</span>
+        </div>
       </div>
     </div>
-    <button class="btn-login-google" id="btnLoginGoogle">
-      <svg width="14" height="14" viewBox="0 0 24 24"><path fill="#fff" d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.545,6.477,2.545,12s4.476,10,10,10c5.768,0,9.638-4.058,9.638-9.807c0-0.682-0.068-1.346-0.187-1.954H12.545z"/></svg>
-      Đăng nhập Google (vui lòng đăng nhập tài khoản google liên lết với tài khoản youtube của bạn để xác minh)
-    </button>
   </section>
 
   <section class="glass progress-card">
@@ -605,16 +623,17 @@ async function fetchAuthenticatedYoutubeChannel(accessToken) {
 }
 
 function renderAuthBar() {
-  const box = document.getElementById("authUserBox");
-  const btn = document.getElementById("btnLoginGoogle");
+  const unauthBox = document.getElementById("authUnauthBox");
+  const userBox = document.getElementById("authUserBox");
+
   if (oauthUser) {
     document.getElementById("authAvatar").src = oauthUser.avatar;
     document.getElementById("authName").textContent = oauthUser.title;
-    box.style.display = "flex";
-    btn.style.display = "none";
+    unauthBox.style.display = "none";
+    userBox.style.display = "flex";
   } else {
-    box.style.display = "none";
-    btn.style.display = "flex";
+    unauthBox.style.display = "flex";
+    userBox.style.display = "none";
   }
 }
 
@@ -1037,7 +1056,6 @@ sheetVerifyBtn.addEventListener("click", async (e) => {
     // CASE ANTI-FRAUD: Đã xác minh trước đó nhưng hiện tại đã Hủy Subscribe
     if (history && history.everVerified && !currentlySubscribed) {
       setSheetStatus("Đang kiểm tra lại để tránh nhầm lẫn...", "info");
-      // Double check lần 2 tránh false positive do API delay
       await new Promise(r => setTimeout(r, 2000));
       const secondCheck = await checkUserSubscriptionOAuth(oauthUser.accessToken, task.channelId);
 
@@ -1093,7 +1111,7 @@ sheetVerifyBtn.addEventListener("click", async (e) => {
     return;
   }
 
-  // 4. Xử lý Like / Comment task (Giữ nguyên)
+  // 4. Xử lý Like / Comment task
   if (task.url && task.url !== "#") {
     const cleanUrl = sanitizeUrl(task.url);
     if (cleanUrl !== "#") window.open(cleanUrl, "_blank");
