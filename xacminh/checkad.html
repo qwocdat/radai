@@ -106,12 +106,12 @@ th{color:var(--text-secondary);}
         <div class="val" id="totalUsers">0</div>
       </div>
       <div class="card">
-        <div>Lượt mở khóa Link</div>
-        <div class="val" id="completedUsers">0</div>
+        <div>Tài khoản bị khóa (Banned)</div>
+        <div class="val" id="bannedUsersCount" style="color:var(--error);">0</div>
       </div>
       <div class="card">
-        <div>Lượt Bypass / Lỗi</div>
-        <div class="val" id="bypassCount" style="color:var(--error);">0</div>
+        <div>Lượt mở khóa Link</div>
+        <div class="val" id="completedUsers">0</div>
       </div>
     </div>
 
@@ -167,6 +167,26 @@ th{color:var(--text-secondary);}
       <button id="saveLinkBtn" class="btn-success" style="width:100%;">TẠO LINK NHIỆM VỤ NGAY</button>
     </div>
 
+    <!-- DANH SÁCH TÀI KHOẢN BỊ BAN (ANTI-FRAUD) -->
+    <div class="card" style="margin-bottom:25px; border-color:rgba(255,92,92,0.4);">
+      <h2 style="color:var(--error);">🚨 Danh Sách Tài Khoản Bị Khóa (Banned Users)</h2>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>YouTube Channel ID</th>
+              <th>Tên Kênh</th>
+              <th>Lý Do Ban</th>
+              <th>Channel Liên Quan</th>
+              <th>Thời Gian Ban</th>
+              <th>Thao Tác</th>
+            </tr>
+          </thead>
+          <tbody id="bannedUserListTable"></tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- DANH SÁCH LINK ĐÃ TẠO -->
     <div class="card" style="margin-bottom:25px;">
       <h2>Danh Sách Link Đã Tạo</h2>
@@ -194,9 +214,10 @@ th{color:var(--text-secondary);}
         <table>
           <thead>
             <tr>
-              <th>User ID</th>
+              <th>YouTube / User ID</th>
+              <th>Tên Kênh YouTube</th>
               <th>Hoạt động cuối</th>
-              <th>Thiết bị</th>
+              <th>Trạng Thái</th>
               <th>Thao Tác</th>
             </tr>
           </thead>
@@ -248,7 +269,7 @@ th{color:var(--text-secondary);}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getDatabase, ref, set, push, onValue, remove, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { getDatabase, ref, set, push, onValue, remove, get, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
@@ -477,6 +498,7 @@ function initListeners() {
     const usersData = snapshot.val();
     document.getElementById("totalUsers").textContent = usersData ? Object.keys(usersData).length : 0;
     renderUsersTable(usersData);
+    renderBannedUsersTable(usersData);
   });
 
   onValue(ref(db, "stats/completedUsers"), (snapshot) => {
@@ -497,11 +519,14 @@ function renderUsersTable(usersData) {
     const u = usersData[uid];
     const tr = document.createElement("tr");
     const lastActive = u.lastActive ? new Date(u.lastActive).toLocaleString("vi-VN") : "N/A";
+    const ytName = u.youtube ? u.youtube.title : "Chưa OAuth";
+    const isBanned = u.fraud && u.fraud.status === "banned";
 
     tr.innerHTML = `
       <td><code>${escapeHtml(uid)}</code></td>
+      <td><strong>${escapeHtml(ytName)}</strong></td>
       <td>${lastActive}</td>
-      <td><small>${escapeHtml(u.device || 'Mobile')}</small></td>
+      <td>${isBanned ? '<span class="badge">Banned</span>' : '<span class="badge badge-info">Normal</span>'}</td>
       <td>
         <button class="btn-warning btn-sm" data-resetusr="${uid}">Reset User</button>
       </td>
@@ -517,21 +542,62 @@ function renderUsersTable(usersData) {
   });
 }
 
+function renderBannedUsersTable(usersData) {
+  const table = document.getElementById("bannedUserListTable");
+  table.innerHTML = "";
+  if (!usersData) {
+    document.getElementById("bannedUsersCount").textContent = 0;
+    return;
+  }
+
+  let bannedCount = 0;
+
+  Object.keys(usersData).forEach(uid => {
+    const u = usersData[uid];
+    if (u.fraud && u.fraud.status === "banned") {
+      bannedCount++;
+      const tr = document.createElement("tr");
+      const bannedAt = u.fraud.bannedAt ? new Date(u.fraud.bannedAt).toLocaleString("vi-VN") : "N/A";
+      const ytName = u.youtube ? u.youtube.title : "Kênh YouTube";
+
+      tr.innerHTML = `
+        <td><code>${escapeHtml(uid)}</code></td>
+        <td><strong>${escapeHtml(ytName)}</strong></td>
+        <td><span class="badge">${escapeHtml(u.fraud.reason || "UNSUBSCRIBED_AFTER_VERIFICATION")}</span></td>
+        <td><code>${escapeHtml(u.fraud.targetChannelId || "N/A")}</code></td>
+        <td>${bannedAt}</td>
+        <td>
+          <button class="btn-success btn-sm" data-unban="${uid}">Unban (Mở Khóa)</button>
+        </td>
+      `;
+
+      tr.querySelector(`[data-unban="${uid}"]`).addEventListener("click", () => {
+        showConfirm("Unban User", `Bạn có chắc muốn Unban (Gỡ khóa) cho tài khoản YouTube "${ytName}" (${uid})?`, () => {
+          update(ref(db, `users/${uid}/fraud`), {
+            status: "normal",
+            reason: "",
+            unbannedAt: Date.now()
+          });
+        });
+      });
+
+      table.appendChild(tr);
+    }
+  });
+
+  document.getElementById("bannedUsersCount").textContent = bannedCount;
+}
+
 function renderBypassLogs(data) {
   const table = document.getElementById("bypassTable");
   const filter = document.getElementById("bypassFilter").value;
   table.innerHTML = "";
-  if (!data) {
-    document.getElementById("bypassCount").textContent = 0;
-    return;
-  }
+  if (!data) return;
 
   let keys = Object.keys(data).reverse();
   if (filter !== "all") {
     keys = keys.filter(k => data[k].reason === filter);
   }
-
-  document.getElementById("bypassCount").textContent = keys.length;
 
   keys.slice(0, 15).forEach(key => {
     const log = data[key];
