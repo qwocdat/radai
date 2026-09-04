@@ -156,10 +156,11 @@ header.top .titles p{font-size:13.5px; color:var(--text-secondary); margin:0;}
 }
 .auth-user-info{display:flex; align-items:center; justify-content:space-between; width:100%;}
 .auth-user-details-left{display:flex; align-items:center; gap:10px; overflow:hidden;}
-.auth-avatar{width:36px; height:36px; border-radius:50%; object-fit:cover; border:1px solid var(--glass-border);}
+.auth-avatar{width:40px; height:40px; border-radius:50%; object-fit:cover; border:1px solid var(--glass-border); flex-shrink:0;}
 .auth-details{display:flex; flex-direction:column; overflow:hidden;}
-.auth-name{font-size:13.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-.auth-status{font-size:11.5px; color:var(--success);}
+.auth-name{font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.auth-handle{font-size:12px; color:var(--text-secondary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.auth-status{font-size:11px; color:var(--success); font-weight:600;}
 
 .btn-login-google{
   width:100%; padding:12px 16px; border-radius:var(--radius-pill); border:none;
@@ -388,6 +389,7 @@ footer.foot{text-align:center; margin-top:26px; font-size:11.5px; color:var(--te
         <img id="authAvatar" class="auth-avatar" src="" alt="Avatar">
         <div class="auth-details">
           <span class="auth-name" id="authName">YouTube User</span>
+          <span class="auth-handle" id="authHandle">@username</span>
           <span class="auth-status">[Đã xác thực]</span>
         </div>
       </div>
@@ -510,7 +512,7 @@ function initGoogleOAuth() {
   }
   tokenClient = google.accounts.oauth2.initTokenClient({
     client_id: GOOGLE_CLIENT_ID,
-    scope: "https://www.googleapis.com/auth/youtube.readonly",
+    scope: "openid profile email https://www.googleapis.com/auth/youtube.readonly",
     callback: async (tokenResponse) => {
       if (tokenResponse.error) {
         showToast("Đăng nhập Google thất bại", "error");
@@ -543,19 +545,51 @@ function requestGoogleLogin() {
 
 async function fetchAuthenticatedYoutubeChannel(accessToken) {
   try {
-    setSplashText("Đang xác nhận tài khoản YouTube...");
-    const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true`, {
-      headers: { Authorization: `Bearer ${accessToken}` }
-    });
-    if (!res.ok) throw new Error("Không thể lấy thông tin kênh YouTube.");
-    const data = await res.json();
-    if (!data.items || data.items.length === 0) throw new Error("Không tìm thấy kênh YouTube cá nhân.");
+    setSplashText("Đang lấy thông tin tài khoản...");
+    
+    let userId = "";
+    let userName = "";
+    let userHandle = "";
+    let userAvatar = "";
 
-    const item = data.items[0];
+    // 1. Thử lấy thông tin kênh YouTube chính chủ trước
+    try {
+      const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&mine=true`, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.items && data.items.length > 0) {
+          const item = data.items[0];
+          userId = item.id;
+          userName = item.snippet.title;
+          userHandle = item.snippet.customUrl || `@${item.snippet.title.replace(/\s+/g, '').toLowerCase()}`;
+          userAvatar = item.snippet.thumbnails.default.url || item.snippet.thumbnails.medium.url;
+          if (item.statistics && item.statistics.subscriberCount !== undefined) {
+            userHandle += ` • ${Number(item.statistics.subscriberCount).toLocaleString('vi-VN')} Sub`;
+          }
+        }
+      }
+    } catch (e) {}
+
+    // 2. Fallback: Lấy Profile Google nếu tài khoản chưa có Kênh YouTube
+    if (!userId) {
+      const userRes = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo`, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+      if (!userRes.ok) throw new Error("Không thể kết nối thông tin tài khoản Google.");
+      const userInfo = await userRes.json();
+      userId = userInfo.sub;
+      userName = userInfo.name || userInfo.email;
+      userHandle = userInfo.email;
+      userAvatar = userInfo.picture || "";
+    }
+
     oauthUser = {
-      id: item.id,
-      title: item.snippet.title,
-      avatar: item.snippet.thumbnails.default.url,
+      id: userId,
+      title: userName,
+      handle: userHandle,
+      avatar: userAvatar,
       accessToken: accessToken
     };
 
@@ -565,6 +599,7 @@ async function fetchAuthenticatedYoutubeChannel(accessToken) {
     await update(ref(db, `users/${oauthUser.id}/youtube`), {
       channelId: oauthUser.id,
       title: oauthUser.title,
+      handle: oauthUser.handle,
       avatar: oauthUser.avatar,
       lastLogin: Date.now()
     });
@@ -587,6 +622,7 @@ function renderAuthBar() {
   if (oauthUser) {
     document.getElementById("authAvatar").src = oauthUser.avatar;
     document.getElementById("authName").textContent = oauthUser.title;
+    document.getElementById("authHandle").textContent = oauthUser.handle;
     unauthBox.style.display = "none";
     userBox.style.display = "flex";
   } else {
@@ -878,7 +914,6 @@ function stopVerificationSession() {
   state.sheetBusy = false;
 }
 
-/* LẤY CẢ SỐ LƯỢNG SUB VÀ LIKE HIỂN THỊ TRỰC TIẾP */
 async function fetchAndDisplayTaskStats(task) {
   const statBadge = document.getElementById("apiStatBadge");
   const statVal = document.getElementById("apiStatValue");
