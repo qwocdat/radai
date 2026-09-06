@@ -59,16 +59,30 @@
             <p id="error-msg" class="text-xs text-gray-400">Liên kết Get Key bị từ chối do chữ ký không hợp lệ (Phát hiện Bypass).</p>
         </div>
 
-        <!-- Direct Key Display UI -->
-        <div id="direct-key-state" class="glass-panel rounded-3xl p-6 sm:p-8 space-y-6 hidden">
-            <div id="game-img-container" class="hidden text-center">
+        <!-- PHASE 1: TRANG GET KEY CHÍNH BAN ĐẦU -->
+        <div id="phase-initial-state" class="glass-panel rounded-3xl p-6 sm:p-8 space-y-6 hidden text-center">
+            <div id="game-img-container" class="hidden">
                 <img id="game-banner-img" src="" class="w-24 h-24 mx-auto rounded-2xl object-cover border-2 border-blue-500/30 shadow-lg mb-2">
             </div>
 
-            <div class="text-center space-y-2">
+            <div class="space-y-2">
+                <span id="game-badge" class="inline-block text-[11px] font-bold text-blue-400 bg-blue-500/10 border border-blue-500/20 px-3 py-1 rounded-full uppercase tracking-wider">GAME MOD</span>
+                <h1 class="text-2xl font-black text-white tracking-wide">GET KEY TỰ ĐỘNG</h1>
+                <p class="text-xs text-gray-400">Nhấn nút bên dưới để tạo liên kết vượt link Layma.net và nhận key.</p>
+            </div>
+
+            <button id="btn-start-getkey" onclick="startGetKeyProcess()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl transition neon-btn flex items-center justify-center space-x-2 text-base">
+                <i class="fas fa-external-link-alt"></i>
+                <span>TẠO LINK VƯỢT & LẤY KEY</span>
+            </button>
+        </div>
+
+        <!-- PHASE 2: SAU KHỊ VƯỢT LINK QUAY LẠI TỚI TRANG NÀY -->
+        <div id="phase-verify-state" class="glass-panel rounded-3xl p-6 sm:p-8 space-y-6 hidden text-center">
+            <div class="space-y-2">
                 <span id="direct-game-badge" class="inline-block text-[11px] font-bold text-blue-400 bg-blue-500/10 border border-blue-500/20 px-3 py-1 rounded-full uppercase tracking-wider">GAME MOD</span>
                 <h1 class="text-2xl font-black text-white tracking-wide">✓ VƯỢT LINK THÀNH CÔNG</h1>
-                <p class="text-xs text-gray-400">Key của bạn đã mở khóa an toàn!</p>
+                <p class="text-xs text-gray-400">Xác thực thành công! Nhấn bên dưới để mở key.</p>
             </div>
 
             <div class="glass-card p-5 rounded-2xl border border-green-500/30 text-center space-y-3">
@@ -76,7 +90,7 @@
                 <div id="direct-key-val" class="font-mono text-xl font-bold text-green-400 select-all tracking-wider py-1">XXXX-XXXX</div>
                 <div class="flex justify-between border-t border-gray-800 pt-3 text-xs">
                     <span class="text-gray-400">Thời hạn: <strong id="direct-duration-val" class="text-white">1 ngày</strong></span>
-                    <span class="text-gray-400">Trạng thái: <strong class="text-green-400">Sẵn sàng</strong></span>
+                    <span class="text-gray-400">Trạng thái: <strong class="text-green-400">Khả dụng</strong></span>
                 </div>
             </div>
 
@@ -84,39 +98,11 @@
                 <i class="fas fa-check-circle"></i>
                 <span>XÁC NHẬN NHẬN KEY</span>
             </button>
-
-            <!-- Nút tùy chọn chuyển trang khác -->
-            <div id="external-redirect-box" class="hidden pt-2">
-                <a id="btn-external-link" href="#" target="_blank" class="w-full bg-gray-800 hover:bg-gray-700 text-blue-400 font-semibold py-3 rounded-xl border border-blue-500/30 transition flex items-center justify-center space-x-2 text-xs">
-                    <i class="fas fa-compass"></i>
-                    <span id="btn-external-text">LẤY KEY GAME KHÁC</span>
-                </a>
-            </div>
-        </div>
-
-        <!-- Task Multi-step UI -->
-        <div id="task-state" class="glass-panel rounded-3xl p-6 sm:p-8 space-y-6 hidden">
-            <div class="text-center space-y-2">
-                <span id="task-game-badge" class="inline-block text-[11px] font-bold text-blue-400 bg-blue-500/10 border border-blue-500/20 px-3 py-1 rounded-full uppercase tracking-wider">AOV CHẤP TỐ</span>
-                <h1 id="task-title" class="text-2xl font-black text-white tracking-wide">GET KEY AOV</h1>
-                <p id="task-desc" class="text-xs text-gray-400">Hoàn thành đủ các bước bên dưới để mở khóa key.</p>
-            </div>
-            <div class="space-y-2">
-                <div class="flex justify-between text-xs font-semibold">
-                    <span class="text-gray-400">TIẾN TRÌNH</span>
-                    <span id="progress-text" class="text-blue-400">BƯỚC 1 / 2</span>
-                </div>
-                <div class="w-full bg-gray-900 rounded-full h-2 overflow-hidden border border-gray-800">
-                    <div id="progress-bar-fill" class="bg-blue-500 h-full progress-bar-fill w-0"></div>
-                </div>
-            </div>
-            <div id="step-cards-container" class="space-y-4"></div>
-            <div id="action-container" class="pt-2 text-center"></div>
         </div>
 
     </main>
 
-    <!-- Modal Key Claim Result -->
+    <!-- Modal Success -->
     <div id="key-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel max-w-sm w-full p-6 sm:p-8 rounded-3xl text-center space-y-6 border border-blue-500/30 animate-modal shadow-[0_0_50px_rgba(59,130,246,0.3)]">
             <div class="relative inline-flex">
@@ -134,17 +120,9 @@
                     <span id="modal-key-val" class="font-mono text-lg font-bold text-blue-400 select-all tracking-wider">XXXX-XXXX-XXXX</span>
                 </div>
             </div>
-            <div class="space-y-2">
-                <button onclick="copyKeyText()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 rounded-xl transition neon-btn flex items-center justify-center space-x-2">
-                    <i class="fas fa-copy text-sm"></i><span>COPY KEY</span>
-                </button>
-                <div id="modal-ext-box" class="hidden">
-                    <a id="modal-ext-link" href="#" target="_blank" class="w-full bg-gray-800 hover:bg-gray-700 text-blue-400 font-semibold py-2.5 rounded-xl border border-blue-500/30 transition flex items-center justify-center space-x-2 text-xs">
-                        <i class="fas fa-external-link-alt"></i>
-                        <span id="modal-ext-text">CHUYỂN SANG SẢN PHẨM KHÁC</span>
-                    </a>
-                </div>
-            </div>
+            <button onclick="copyKeyText()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 rounded-xl transition neon-btn flex items-center justify-center space-x-2">
+                <i class="fas fa-copy text-sm"></i><span>COPY KEY</span>
+            </button>
         </div>
     </div>
 
@@ -173,16 +151,17 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        const BASE_GETKEY_URL = "https://digitalsmod.site/freekey/getkey.html";
         const SECRET_SALT = "DIGITALSMOD_SECRET_KEY_2026";
-        let targetKeyDoc = null;
         let systemConfig = {};
+        let currentGame = "";
+        let targetKeyDoc = null;
 
-        async function verifySig(text, sig) {
+        async function generateSig(text) {
             const encoder = new TextEncoder();
             const data = encoder.encode(text + SECRET_SALT);
             const hash = await crypto.subtle.digest('SHA-256', data);
-            const expectedSig = Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 16);
-            return expectedSig === sig;
+            return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 16);
         }
 
         function showToast(msg, type = "info") {
@@ -198,75 +177,98 @@
         }
 
         const urlParams = new URLSearchParams(window.location.search);
+        const gameParam = urlParams.get("game");
         const freeKeyParam = urlParams.get("freekey");
         const sigParam = urlParams.get("sig");
 
         async function initApp() {
             try {
-                // Tải Cấu Hình Hệ Thống (Settings)
                 const confSnap = await getDoc(doc(db, "system", "config"));
                 if(confSnap.exists()) {
                     systemConfig = confSnap.data();
                     if(systemConfig.siteName) document.getElementById("site-title").innerText = systemConfig.siteName;
                     if(systemConfig.footer) document.getElementById("site-footer").innerText = systemConfig.footer;
-
-                    // Bật nút chuyển trang ngoài nếu Admin bật cấu hình
-                    if(systemConfig.extBtnEnable && systemConfig.extBtnUrl) {
-                        document.getElementById("btn-external-link").href = systemConfig.extBtnUrl;
-                        if(systemConfig.extBtnText) document.getElementById("btn-external-text").innerText = systemConfig.extBtnText;
-                        document.getElementById("external-redirect-box").classList.remove("hidden");
-
-                        document.getElementById("modal-ext-link").href = systemConfig.extBtnUrl;
-                        if(systemConfig.extBtnText) document.getElementById("modal-ext-text").innerText = systemConfig.extBtnText;
-                        document.getElementById("modal-ext-box").classList.remove("hidden");
-                    }
                 }
 
-                if(freeKeyParam) {
-                    if(!sigParam) {
-                        return showError("Bypass bị từ chối", "Không tìm thấy chữ ký bảo mật (sig).");
-                    }
-
-                    const isValidSig = await verifySig(freeKeyParam, sigParam);
-                    if(!isValidSig) {
-                        return showError("Cảnh báo Bypass!", "Chữ ký bảo mật không khớp. Vui lòng vượt link chính thức.");
+                // PHASE 2: SAU KHỊ USER VƯỢT LINK QUAY LẠI TỚI TRANG NÀY (?freekey=...&sig=...)
+                if(freeKeyParam && sigParam) {
+                    const expectedSig = await generateSig(freeKeyParam);
+                    if(expectedSig !== sigParam) {
+                        return showError("Cảnh báo Bypass!", "Chữ ký bảo mật không hợp lệ. Vui lòng vượt link chính thức.");
                     }
 
                     const keyDocRef = doc(db, "keys", freeKeyParam);
                     const keySnap = await getDoc(keyDocRef);
-
                     document.getElementById("loading-state").classList.add("hidden");
 
-                    if(!keySnap.exists()) {
-                        return showError("Key Không Tồn Tại", `Key ${freeKeyParam} không có trên hệ thống.`);
-                    }
-
+                    if(!keySnap.exists()) return showError("Key không tồn tại", `Key ${freeKeyParam} không có trên hệ thống.`);
                     targetKeyDoc = keySnap.data();
 
                     if(targetKeyDoc.status === "claimed") {
-                        return showError("Key Đã Được Sử Dụng", "Mã key này đã có người nhận trước đó.");
+                        return showError("Key Đã Nhận", "Mã key này đã có người sử dụng trước đó.");
                     }
 
                     document.getElementById("direct-game-badge").innerText = targetKeyDoc.game;
                     document.getElementById("direct-key-val").innerText = targetKeyDoc.key;
                     document.getElementById("direct-duration-val").innerText = targetKeyDoc.duration;
-
-                    const catSnap = await getDoc(doc(db, "categories", targetKeyDoc.game));
-                    if(catSnap.exists() && catSnap.data().imgUrl) {
-                        document.getElementById("game-banner-img").src = catSnap.data().imgUrl;
-                        document.getElementById("game-img-container").classList.remove("hidden");
-                    }
-
-                    document.getElementById("direct-key-state").classList.remove("hidden");
+                    document.getElementById("phase-verify-state").classList.remove("hidden");
                     return;
                 }
 
-                showError("Đường Dẫn Không Hợp Lệ", "Vui lòng truy cập qua liên kết Get Key hợp lệ.");
+                // PHASE 1: TRANG GET KEY BAN ĐẦU (?game=...)
+                currentGame = gameParam || "AOV CHẤP TỐ";
+                document.getElementById("game-badge").innerText = currentGame;
+
+                const catSnap = await getDoc(doc(db, "categories", currentGame));
+                if(catSnap.exists() && catSnap.data().imgUrl) {
+                    document.getElementById("game-banner-img").src = catSnap.data().imgUrl;
+                    document.getElementById("game-img-container").classList.remove("hidden");
+                }
+
+                document.getElementById("loading-state").classList.add("hidden");
+                document.getElementById("phase-initial-state").classList.remove("hidden");
+
+            } catch(e) { showError("Lỗi Hệ Thống", e.message); }
+        }
+
+        // BẤM NÚT LẤY KEY -> TỰ ĐỘNG TÌM KEY & CHUYỂN HƯỚNG TỚI SANG LAYMA.NET
+        window.startGetKeyProcess = async () => {
+            const btn = document.getElementById("btn-start-getkey");
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> <span>ĐANG TẠO LINK...</span>`;
+
+            try {
+                // Tự động tìm 1 key available trong database
+                const q = query(collection(db, "keys"), where("game", "==", currentGame), where("status", "==", "available"), limit(1));
+                const snap = await getDocs(q);
+
+                if(snap.empty) {
+                    showToast(systemConfig.noKeyMsg || "Hiện tại đã hết key cho game này!", "error");
+                    btn.disabled = false;
+                    btn.innerHTML = `<i class="fas fa-external-link-alt"></i> <span>TẠO LINK VƯỢT & LẤY KEY</span>`;
+                    return;
+                }
+
+                const keyVal = snap.docs[0].data().key;
+                const sig = await generateSig(keyVal);
+
+                // Đường dẫn đích kèm sig chống bypass
+                const targetUrl = `${BASE_GETKEY_URL}?freekey=${encodeURIComponent(keyVal)}&sig=${sig}`;
+
+                // Nếu có cài đặt API rút gọn link Layma.net/Link4m
+                if(systemConfig.apiTemplate) {
+                    const finalShortenerUrl = systemConfig.apiTemplate.replace("{URL_DICH}", encodeURIComponent(targetUrl));
+                    window.location.href = finalShortenerUrl;
+                } else {
+                    window.location.href = targetUrl;
+                }
 
             } catch(e) {
-                showError("Lỗi Hệ Thống", e.message);
+                showToast("Lỗi: " + e.message, "error");
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fas fa-external-link-alt"></i> <span>TẠO LINK VƯỢT & LẤY KEY</span>`;
             }
-        }
+        };
 
         window.confirmClaimDirect = async () => {
             const btn = document.getElementById("btn-claim-direct");
@@ -275,7 +277,6 @@
 
             try {
                 const keyRef = doc(db, "keys", targetKeyDoc.key);
-
                 await runTransaction(db, async (transaction) => {
                     const keySnap = await transaction.get(keyRef);
                     if(!keySnap.exists()) throw "Key không tồn tại";
@@ -294,12 +295,14 @@
             } catch(err) {
                 showToast("Lỗi: " + err, "error");
                 btn.disabled = false;
-                btn.innerHTML = `<span>XÁC NHẬN NHẬN KEY</span>`;
+                btn.innerHTML = `<i class="fas fa-check-circle"></i> <span>XÁC NHẬN NHẬN KEY</span>`;
             }
         };
 
         function showError(title, msg) {
             document.getElementById("loading-state").classList.add("hidden");
+            document.getElementById("phase-initial-state").classList.add("hidden");
+            document.getElementById("phase-verify-state").classList.add("hidden");
             document.getElementById("error-title").innerText = title;
             document.getElementById("error-msg").innerText = msg;
             document.getElementById("error-state").classList.remove("hidden");
