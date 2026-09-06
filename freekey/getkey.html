@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Get Key Gateway</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #050811; color: #f3f4f6; font-family: system-ui, -apple-system, sans-serif; }
+        .glass-panel { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .glass-card { background: rgba(30, 41, 59, 0.4); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .neon-btn { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+        .neon-btn:hover { box-shadow: 0 0 30px rgba(59, 130, 246, 0.8); }
+        .progress-bar-fill { transition: width 0.5s ease-in-out; }
+        @keyframes modalScale {
+            0% { opacity: 0; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .animate-modal { animation: modalScale 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between items-center p-4 sm:p-6 overflow-x-hidden">
+
+    <!-- Header / Logo -->
+    <header class="w-full max-w-md flex items-center justify-between py-4">
+        <div class="flex items-center space-x-2">
+            <div class="p-2 bg-blue-600/20 text-blue-400 rounded-xl border border-blue-500/20"><i class="fas fa-key"></i></div>
+            <span id="site-title" class="font-bold tracking-wider text-white text-lg">GET KEY SYSTEM</span>
+        </div>
+        <span class="text-xs text-blue-400 font-mono bg-blue-500/10 px-2.5 py-1 rounded-full border border-blue-500/20 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span> ONLINE
+        </span>
+    </header>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-5 z-50 transform -translate-y-full opacity-0 transition-all duration-300 px-4 py-3 rounded-xl glass-panel shadow-2xl flex items-center space-x-3 pointer-events-none">
+        <i id="toast-icon" class="fas fa-info-circle text-lg"></i>
+        <span id="toast-msg" class="text-sm font-medium text-white"></span>
+    </div>
+
+    <!-- Main Card Container -->
+    <main class="w-full max-w-md my-auto">
+        
+        <!-- Loading Skeleton -->
+        <div id="loading-state" class="glass-panel rounded-3xl p-6 space-y-6 animate-pulse">
+            <div class="h-6 bg-gray-800 rounded-md w-1/3 mx-auto"></div>
+            <div class="h-8 bg-gray-800 rounded-lg w-3/4 mx-auto"></div>
+            <div class="h-20 bg-gray-800 rounded-xl"></div>
+            <div class="h-12 bg-blue-900/30 rounded-xl"></div>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-state" class="glass-panel rounded-3xl p-8 text-center space-y-4 hidden">
+            <div class="inline-flex p-4 bg-red-500/10 text-red-400 rounded-2xl border border-red-500/20">
+                <i class="fas fa-exclamation-triangle text-3xl"></i>
+            </div>
+            <h2 id="error-title" class="text-xl font-bold text-white">Nhiệm Vụ Không Tồn Tại</h2>
+            <p id="error-msg" class="text-xs text-gray-400">Liên kết Get Key này không hợp lệ hoặc đã bị gỡ khỏi hệ thống.</p>
+        </div>
+
+        <!-- Main Task UI -->
+        <div id="task-state" class="glass-panel rounded-3xl p-6 sm:p-8 space-y-6 hidden">
+            
+            <!-- Hero Header -->
+            <div class="text-center space-y-2">
+                <span id="task-game-badge" class="inline-block text-[11px] font-bold text-blue-400 bg-blue-500/10 border border-blue-500/20 px-3 py-1 rounded-full uppercase tracking-wider">AOV CHẤP TỐ</span>
+                <h1 id="task-title" class="text-2xl font-black text-white tracking-wide">GET KEY AOV</h1>
+                <p id="task-desc" class="text-xs text-gray-400">Hoàn thành đủ các bước bên dưới để mở khóa key.</p>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="space-y-2">
+                <div class="flex justify-between text-xs font-semibold">
+                    <span class="text-gray-400">TIẾN TRÌNH</span>
+                    <span id="progress-text" class="text-blue-400">BƯỚC 1 / 2</span>
+                </div>
+                <div class="w-full bg-gray-900 rounded-full h-2 overflow-hidden border border-gray-800">
+                    <div id="progress-bar-fill" class="bg-blue-500 h-full progress-bar-fill w-0"></div>
+                </div>
+            </div>
+
+            <!-- Steps Container -->
+            <div id="step-cards-container" class="space-y-4">
+                <!-- Step Cards Injected Dynamically -->
+            </div>
+
+            <!-- Action Area / Verification State -->
+            <div id="action-container" class="pt-2 text-center">
+                <!-- Buttons rendered dynamically -->
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Modal Key Claim Result -->
+    <div id="key-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="glass-panel max-w-sm w-full p-6 sm:p-8 rounded-3xl text-center space-y-6 border border-blue-500/30 animate-modal shadow-[0_0_50px_rgba(59,130,246,0.3)]">
+            
+            <div class="relative inline-flex">
+                <div class="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-full flex items-center justify-center text-3xl border border-blue-500/40">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+            </div>
+
+            <div class="space-y-1">
+                <h3 class="text-xl font-bold text-white">NHẬN KEY THÀNH CÔNG</h3>
+                <p class="text-xs text-gray-400">Key của bạn đã sẵn sàng sử dụng!</p>
+            </div>
+
+            <div class="glass-card p-4 rounded-2xl space-y-3 border border-gray-700">
+                <div>
+                    <span class="text-[10px] text-gray-400 uppercase tracking-wider block">KEY GAME</span>
+                    <span id="modal-key-val" class="font-mono text-lg font-bold text-blue-400 select-all tracking-wider">XXXX-XXXX-XXXX</span>
+                </div>
+                <div class="flex justify-between border-t border-gray-800 pt-2 text-xs">
+                    <span class="text-gray-400">Game: <strong id="modal-game-val" class="text-white">AOV</strong></span>
+                    <span class="text-gray-400">Thời hạn: <strong id="modal-duration-val" class="text-white">1 ngày</strong></span>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <button onclick="copyKeyText()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 rounded-xl transition neon-btn flex items-center justify-center space-x-2">
+                    <i class="fas fa-copy text-sm"></i><span>COPY KEY</span>
+                </button>
+                <button onclick="closeKeyModal()" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 font-medium py-2.5 rounded-xl transition text-xs">
+                    ĐÓNG
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="w-full max-w-md text-center py-4 text-[11px] text-gray-500">
+        <p id="site-footer">© 2026 Get Key System. All rights reserved.</p>
+    </footer>
+
+    <!-- FIREBASE MODULE & CLIENT LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { 
+            getFirestore, doc, getDoc, runTransaction, serverTimestamp, query, collection, where, getDocs, limit 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // FIREBASE CONFIG OF QUOCDAT-396FE
+        const firebaseConfig = {
+            apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
+            authDomain: "quocdat-396fe.firebaseapp.com",
+            databaseURL: "https://quocdat-396fe-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "quocdat-396fe",
+            storageBucket: "quocdat-396fe.firebasestorage.app",
+            messagingSenderId: "685476439350",
+            appId: "1:685476439350:web:949054ecba7f0a0c383f97"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // State Variables
+        let currentTask = null;
+        let currentStepIndex = 0;
+        let stepWaitTimer = null;
+        let claimedKeyData = null;
+        let systemConfig = {};
+
+        // Toast Helper
+        function showToast(msg, type = "info") {
+            const toast = document.getElementById("toast");
+            const toastMsg = document.getElementById("toast-msg");
+            const toastIcon = document.getElementById("toast-icon");
+            toastMsg.innerText = msg;
+            toast.className = `fixed top-5 z-50 transform transition-all duration-300 px-4 py-3 rounded-xl glass-panel shadow-2xl flex items-center space-x-3 opacity-100 translate-y-0`;
+            if(type === "error") toastIcon.className = "fas fa-exclamation-circle text-red-400";
+            else if(type === "success") toastIcon.className = "fas fa-check-circle text-green-400";
+            else toastIcon.className = "fas fa-info-circle text-blue-400";
+
+            setTimeout(() => {
+                toast.classList.add("opacity-0", "-translate-y-full");
+            }, 3000);
+        }
+
+        // Parse Task ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const taskId = urlParams.get("task");
+
+        // Load Config & Task
+        async function initApp() {
+            try {
+                // Load System Config
+                const confSnap = await getDoc(doc(db, "system", "config"));
+                if(confSnap.exists()) {
+                    systemConfig = confSnap.data();
+                    if(systemConfig.siteName) document.getElementById("site-title").innerText = systemConfig.siteName;
+                    if(systemConfig.footer) document.getElementById("site-footer").innerText = systemConfig.footer;
+                }
+
+                if(!taskId) {
+                    showError("Liên kết không đúng", "Vui lòng kiểm tra lại URL Get Key của bạn.");
+                    return;
+                }
+
+                // Fetch Task
+                const taskSnap = await getDoc(doc(db, "tasks", taskId));
+                document.getElementById("loading-state").classList.add("hidden");
+
+                if(!taskSnap.exists()) {
+                    showError("Liên kết không hợp lệ", `Nhiệm vụ với mã "${taskId}" không tồn tại.`);
+                    return;
+                }
+
+                currentTask = taskSnap.data();
+
+                if(!currentTask.active) {
+                    showError("Nhiệm vụ không khả dụng", "Nhiệm vụ này hiện đang tạm dừng hoặc đã kết thúc.");
+                    return;
+                }
+
+                // Load Progress state from SessionStorage if user returned from bypass link
+                const savedStep = sessionStorage.getItem(`getkey_step_${taskId}`);
+                if(savedStep) {
+                    currentStepIndex = parseInt(savedStep);
+                    if(currentStepIndex >= currentTask.steps.length) {
+                        currentStepIndex = currentTask.steps.length - 1;
+                    }
+                }
+
+                renderTaskUI();
+
+            } catch(e) {
+                showError("Lỗi Hệ Thống", e.message);
+            }
+        }
+
+        function showError(title, msg) {
+            document.getElementById("loading-state").classList.add("hidden");
+            document.getElementById("task-state").classList.add("hidden");
+            document.getElementById("error-title").innerText = title;
+            document.getElementById("error-msg").innerText = msg;
+            document.getElementById("error-state").classList.remove("hidden");
+        }
+
+        // Render User UI
+        function renderTaskUI() {
+            document.getElementById("task-title").innerText = currentTask.name;
+            document.getElementById("task-game-badge").innerText = currentTask.game;
+            document.getElementById("task-desc").innerText = currentTask.description || "Hoàn thành nhiệm vụ để nhận key";
+
+            const totalSteps = currentTask.steps.length;
+            const progressPct = ((currentStepIndex) / totalSteps) * 100;
+            document.getElementById("progress-bar-fill").style.width = `${progressPct}%`;
+            document.getElementById("progress-text").innerText = `BƯỚC ${currentStepIndex + 1} / ${totalSteps}`;
+
+            const container = document.getElementById("step-cards-container");
+            container.innerHTML = "";
+
+            currentTask.steps.forEach((step, idx) => {
+                const isCurrent = idx === currentStepIndex;
+                const isDone = idx < currentStepIndex;
+
+                let borderStyle = "border-gray-800 opacity-60";
+                let statusBadge = `<span class="text-[10px] bg-gray-800 text-gray-400 px-2 py-0.5 rounded-full">CHƯA MỞ</span>`;
+
+                if(isDone) {
+                    borderStyle = "border-green-500/30 bg-green-500/5";
+                    statusBadge = `<span class="text-[10px] bg-green-500/10 text-green-400 border border-green-500/20 px-2 py-0.5 rounded-full"><i class="fas fa-check mr-1"></i>HOÀN THÀNH</span>`;
+                } else if(isCurrent) {
+                    borderStyle = "border-blue-500/50 bg-blue-500/10 shadow-lg shadow-blue-500/5";
+                    statusBadge = `<span class="text-[10px] bg-blue-500/20 text-blue-400 border border-blue-500/30 px-2 py-0.5 rounded-full animate-pulse">HIỆN TẠI</span>`;
+                }
+
+                container.innerHTML += `
+                    <div class="glass-card p-4 rounded-2xl border ${borderStyle} transition-all duration-300">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold text-gray-300">BƯỚC ${idx + 1}: ${step.name || step.platform}</span>
+                            ${statusBadge}
+                        </div>
+                        <p class="text-xs text-gray-400">Nền tảng: <strong class="text-gray-200">${step.platform}</strong></p>
+                        ${isCurrent ? `
+                            <div class="mt-4">
+                                <button id="btn-step-action" onclick="executeStep(${idx})" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 rounded-xl transition neon-btn flex items-center justify-center space-x-2">
+                                    <i class="fas fa-external-link-alt text-xs"></i>
+                                    <span>${step.btnText || 'VƯỢT LINK'}</span>
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+
+            // Action section when all steps completed
+            const actionContainer = document.getElementById("action-container");
+            if(currentStepIndex >= totalSteps) {
+                document.getElementById("progress-bar-fill").style.width = `100%`;
+                document.getElementById("progress-text").innerText = `✓ HOÀN THÀNH TẤT CẢ BƯỚC`;
+                actionContainer.innerHTML = `
+                    <div class="space-y-3">
+                        <div class="p-3 bg-green-500/10 border border-green-500/20 text-green-400 text-xs rounded-xl flex items-center justify-center space-x-2">
+                            <i class="fas fa-circle-check text-base"></i>
+                            <span>Nhiệm vụ đã sẵn sàng! Nhấn bên dưới để nhận key.</span>
+                        </div>
+                        <button onclick="claimKey(event)" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3.5 rounded-xl transition neon-btn flex items-center justify-center space-x-2 text-base">
+                            <i class="fas fa-gift"></i>
+                            <span>NHẬN KEY NGAY</span>
+                        </button>
+                    </div>
+                `;
+            } else {
+                actionContainer.innerHTML = "";
+            }
+
+            document.getElementById("task-state").classList.remove("hidden");
+        }
+
+        // Execute Step Redirect & Timing
+        window.executeStep = (stepIdx) => {
+            const step = currentTask.steps[stepIdx];
+            if(!step || !step.url) return showToast("Cấu hình URL bước này không hợp lệ", "error");
+
+            // Open Third-party URL in new tab
+            window.open(step.url, "_blank");
+
+            // Render waiting status & timer
+            const btn = document.getElementById("btn-step-action");
+            let waitSec = step.minWaitTime || 10;
+            btn.disabled = true;
+            btn.className = "w-full bg-gray-800 text-gray-400 font-semibold py-3 rounded-xl cursor-not-allowed flex items-center justify-center space-x-2";
+            
+            clearInterval(stepWaitTimer);
+            stepWaitTimer = setInterval(() => {
+                btn.innerHTML = `<i class="fas fa-spinner fa-spin text-xs"></i><span>ĐANG KIỂM TRẢ TỰ ĐỘNG (${waitSec}s)...</span>`;
+                waitSec--;
+                if(waitSec < 0) {
+                    clearInterval(stepWaitTimer);
+                    // Increment Step & Save State
+                    currentStepIndex++;
+                    sessionStorage.setItem(`getkey_step_${taskId}`, currentStepIndex);
+                    showToast("Bước thành công!", "success");
+                    renderTaskUI();
+                }
+            }, 1000);
+        };
+
+        // Claim Key Transaction Logic
+        window.claimKey = async (evt) => {
+            const btn = evt.currentTarget;
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> <span>ĐANG KHÓA KEY...</span>`;
+
+            try {
+                // Fetch first available key for this game
+                const availableKeySnap = await fetchAvailableKey(currentTask.game);
+
+                if(!availableKeySnap) {
+                    const noKeyMsg = systemConfig.noKeyMsg || "Hiện tại đã hết key cho game này, vui lòng quay lại sau!";
+                    showToast(noKeyMsg, "error");
+                    btn.disabled = false;
+                    btn.innerHTML = `<i class="fas fa-gift"></i> <span>NHẬN KEY NGAY</span>`;
+                    return;
+                }
+
+                // Run atomic transaction on specific key doc
+                const keyRef = doc(db, "keys", availableKeySnap.id);
+
+                await runTransaction(db, async (transaction) => {
+                    const keyDoc = await transaction.get(keyRef);
+                    if (!keyDoc.exists()) {
+                        throw "Key không tồn tại!";
+                    }
+                    if (keyDoc.data().status !== "available") {
+                        throw "Key đã bị người khác nhận trước!";
+                    }
+
+                    transaction.update(keyRef, {
+                        status: "claimed",
+                        claimedAt: serverTimestamp(),
+                        claimedByTask: taskId
+                    });
+                });
+
+                claimedKeyData = availableKeySnap.data();
+                showKeyModal(claimedKeyData);
+                sessionStorage.removeItem(`getkey_step_${taskId}`);
+
+            } catch (err) {
+                showToast("Lỗi nhận key: " + err, "error");
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fas fa-gift"></i> <span>NHẬN KEY NGAY</span>`;
+            }
+        };
+
+        // Query Helper for transaction
+        async function fetchAvailableKey(gameName) {
+            const q = query(
+                collection(db, "keys"), 
+                where("game", "==", gameName), 
+                where("status", "==", "available"),
+                limit(1)
+            );
+            const snap = await getDocs(q);
+            if(snap.empty) return null;
+            return snap.docs[0];
+        }
+
+        // Modal Controls
+        function showKeyModal(keyData) {
+            document.getElementById("modal-key-val").innerText = keyData.key;
+            document.getElementById("modal-game-val").innerText = keyData.game;
+            document.getElementById("modal-duration-val").innerText = keyData.duration;
+            document.getElementById("key-modal").classList.remove("hidden");
+        }
+
+        window.closeKeyModal = () => {
+            document.getElementById("key-modal").classList.add("hidden");
+            window.location.reload();
+        };
+
+        window.copyKeyText = () => {
+            if(!claimedKeyData) return;
+            navigator.clipboard.writeText(claimedKeyData.key);
+            showToast("Đã sao chép Key vào khay nhớ tạm!", "success");
+        };
+
+        // Start App
+        initApp();
+    </script>
+</body>
+</html>
