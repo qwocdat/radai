@@ -59,7 +59,7 @@
                 <div class="p-2 bg-blue-600/20 rounded-lg text-blue-400"><i class="fas fa-cubes text-xl"></i></div>
                 <div>
                     <h1 class="font-bold text-white text-base tracking-wide" id="sys-title-sidebar">DIGITALSMOD ADMIN</h1>
-                    <span class="text-[10px] text-green-400 font-mono bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/20">v3.1 Pro</span>
+                    <span class="text-[10px] text-green-400 font-mono bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/20">v4.0 Full Version</span>
                 </div>
             </div>
             <nav class="p-4 space-y-1">
@@ -159,7 +159,7 @@
             </div>
 
             <div class="glass p-6 rounded-2xl space-y-4">
-                <h3 class="text-lg font-bold text-white">Danh Sách Game Hiện Có</h3>
+                <h3 class="text-lg font-bold text-white">Danh Sách Game & Link Get Nhanh</h3>
                 <div id="categories-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     <!-- Dynamic Categories -->
                 </div>
@@ -315,45 +315,24 @@
             </div>
         </section>
 
-        <!-- SETTINGS TAB (ĐÃ BỔ SUNG TÙY CHỌN NÚT CHUYỂN TRANG) -->
+        <!-- SETTINGS TAB -->
         <section id="tab-settings" class="tab-content hidden space-y-6">
             <div class="glass p-6 rounded-2xl space-y-4 max-w-2xl">
-                <h3 class="text-lg font-bold text-white">Cấu Hình Hệ Thống</h3>
+                <h3 class="text-lg font-bold text-white">Cấu Hình API Rút Gọn Tự Động (Layma.net / Link4m)</h3>
                 <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Cấu trúc API Layma.net / Web Rút Gọn</label>
+                        <input type="text" id="set-api-template" placeholder="https://layma.net/api?api=YOUR_TOKEN&url={URL_DICH}" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2 text-xs font-mono text-white">
+                        <p class="text-[10px] text-gray-500 mt-1">Dùng tham số <code>{URL_DICH}</code> để code tự chèn link đích đã bọc sig chống bypass.</p>
+                    </div>
                     <div>
                         <label class="block text-xs text-gray-400 mb-1">Tên Website</label>
                         <input type="text" id="set-site-name" value="DIGITALSMOD GET KEY" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white">
                     </div>
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Màu Chủ Đạo (HEX / Tailwind Class)</label>
-                        <input type="text" id="set-main-color" placeholder="#3b82f6" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white">
-                    </div>
-                    <div>
                         <label class="block text-xs text-gray-400 mb-1">Thông Báo Hết Key</label>
                         <input type="text" id="set-no-key-msg" value="Hiện tại đã hết key cho game này, vui lòng quay lại sau!" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white">
                     </div>
-
-                    <!-- Cấu hình Nút Chuyển Trang / Khám phá Key Khác -->
-                    <div class="p-4 glass-card rounded-xl border border-gray-700 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold text-blue-400"><i class="fas fa-external-link-alt mr-1.5"></i> Cấu Hình Nút Chuyển Trang (Lấy Loại Key Khác)</span>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="set-ext-btn-enable" class="sr-only peer">
-                                <div class="w-9 h-5 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
-                            </label>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-[10px] text-gray-400">Tên Hiển Thị Trên Nút</label>
-                                <input type="text" id="set-ext-btn-text" placeholder="LẤY KEY GAME KHÁC" value="LẤY KEY GAME KHÁC" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs text-white">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] text-gray-400">URL Trang Đích Muốn Chuyển Tới</label>
-                                <input type="url" id="set-ext-btn-url" placeholder="https://digitalsmod.site/freekey/getkey.html" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs text-white font-mono">
-                            </div>
-                        </div>
-                    </div>
-
                     <div>
                         <label class="block text-xs text-gray-400 mb-1">Footer Text</label>
                         <input type="text" id="set-footer" value="© 2026 Digitalsmod System. All rights reserved." class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white">
@@ -484,13 +463,18 @@
             }
             snap.forEach(d => {
                 const c = d.data();
+                const directUrl = `${BASE_GETKEY_URL}?game=${encodeURIComponent(c.name)}`;
                 container.innerHTML += `
-                    <div class="glass-card p-4 rounded-xl border border-gray-800 flex items-center justify-between">
+                    <div class="glass-card p-4 rounded-xl border border-gray-800 space-y-3">
                         <div class="flex items-center space-x-3">
                             <img src="${c.imgUrl || 'https://via.placeholder.com/40'}" class="w-10 h-10 rounded-lg object-cover bg-gray-900 border border-gray-700">
                             <span class="text-sm font-bold text-white">${c.name}</span>
                         </div>
-                        <button onclick="deleteCategory('${c.name}')" class="text-xs text-red-400 hover:text-red-300"><i class="fas fa-trash"></i></button>
+                        <div class="text-[10px] font-mono text-gray-400 bg-gray-900/80 p-2 rounded-lg truncate">${directUrl}</div>
+                        <div class="flex justify-between items-center text-xs pt-1">
+                            <button onclick="copyToClipboard('${directUrl}')" class="text-blue-400 font-bold hover:text-blue-300"><i class="fas fa-copy mr-1"></i> Copy Link Get</button>
+                            <button onclick="deleteCategory('${c.name}')" class="text-red-400 hover:text-red-300"><i class="fas fa-trash"></i></button>
+                        </div>
                     </div>
                 `;
             });
@@ -719,28 +703,22 @@
             const snap = await getDoc(doc(db, "system", "config"));
             if(snap.exists()) {
                 const c = snap.data();
+                if(c.apiTemplate) document.getElementById("set-api-template").value = c.apiTemplate;
                 if(c.siteName) document.getElementById("set-site-name").value = c.siteName;
-                if(c.mainColor) document.getElementById("set-main-color").value = c.mainColor;
                 if(c.noKeyMsg) document.getElementById("set-no-key-msg").value = c.noKeyMsg;
                 if(c.footer) document.getElementById("set-footer").value = c.footer;
-                if(c.extBtnEnable !== undefined) document.getElementById("set-ext-btn-enable").checked = c.extBtnEnable;
-                if(c.extBtnText) document.getElementById("set-ext-btn-text").value = c.extBtnText;
-                if(c.extBtnUrl) document.getElementById("set-ext-btn-url").value = c.extBtnUrl;
             }
         };
 
         window.saveSettings = async () => {
             await setDoc(doc(db, "system", "config"), {
+                apiTemplate: document.getElementById("set-api-template").value,
                 siteName: document.getElementById("set-site-name").value,
-                mainColor: document.getElementById("set-main-color").value,
                 noKeyMsg: document.getElementById("set-no-key-msg").value,
-                extBtnEnable: document.getElementById("set-ext-btn-enable").checked,
-                extBtnText: document.getElementById("set-ext-btn-text").value,
-                extBtnUrl: document.getElementById("set-ext-btn-url").value,
                 footer: document.getElementById("set-footer").value,
                 updatedAt: serverTimestamp()
             }, { merge: true });
-            showToast("Lưu cấu hình hệ thống thành công!", "success");
+            showToast("Lưu cấu hình thành công!", "success");
         };
 
         async function loadDashboardStats() {
