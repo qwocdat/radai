@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Get Key Admin Panel</title>
+    <title>Get Key Admin Panel - Digitalsmod</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -33,7 +33,7 @@
                     <i class="fas fa-shield-halved text-3xl"></i>
                 </div>
                 <h2 class="text-2xl font-bold text-white">Admin Authentication</h2>
-                <p class="text-xs text-gray-400 mt-1">Hệ thống Quản lý Get Key</p>
+                <p class="text-xs text-gray-400 mt-1">Digitalsmod Get Key System</p>
             </div>
             <form id="login-form" class="space-y-4">
                 <div>
@@ -58,13 +58,16 @@
             <div class="p-6 border-b border-gray-800/60 flex items-center space-x-3">
                 <div class="p-2 bg-blue-600/20 rounded-lg text-blue-400"><i class="fas fa-cubes text-xl"></i></div>
                 <div>
-                    <h1 class="font-bold text-white text-base tracking-wide" id="sys-title-sidebar">GET KEY ADMIN</h1>
-                    <span class="text-[10px] text-green-400 font-mono bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/20">v2.0 Active</span>
+                    <h1 class="font-bold text-white text-base tracking-wide" id="sys-title-sidebar">DIGITALSMOD ADMIN</h1>
+                    <span class="text-[10px] text-green-400 font-mono bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/20">v2.5 Production</span>
                 </div>
             </div>
             <nav class="p-4 space-y-1">
                 <button onclick="switchTab('dashboard')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-gray-800/50 hover:text-white transition active-tab" data-tab="dashboard">
                     <i class="fas fa-chart-pie w-5"></i><span>Dashboard</span>
+                </button>
+                <button onclick="switchTab('categories')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-gray-800/50 hover:text-white transition" data-tab="categories">
+                    <i class="fas fa-gamepad w-5"></i><span>Danh Mục Game</span>
                 </button>
                 <button onclick="switchTab('keys')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-gray-800/50 hover:text-white transition" data-tab="keys">
                     <i class="fas fa-key w-5"></i><span>Quản Lý Key</span>
@@ -74,6 +77,9 @@
                 </button>
                 <button onclick="switchTab('create-task')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-gray-800/50 hover:text-white transition" data-tab="create-task">
                     <i class="fas fa-plus-circle w-5"></i><span>Tạo Nhiệm Vụ</span>
+                </button>
+                <button onclick="switchTab('quick-api')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-gray-800/50 hover:text-white transition" data-tab="quick-api">
+                    <i class="fas fa-bolt w-5 text-yellow-400"></i><span>Quick Link API</span>
                 </button>
                 <button onclick="switchTab('settings')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-gray-800/50 hover:text-white transition" data-tab="settings">
                     <i class="fas fa-sliders w-5"></i><span>Settings</span>
@@ -131,6 +137,35 @@
             </div>
         </section>
 
+        <!-- DANH MỤC GAME TAB -->
+        <section id="tab-categories" class="tab-content hidden space-y-6">
+            <div class="glass p-6 rounded-2xl space-y-4">
+                <h3 class="text-lg font-bold text-white flex items-center space-x-2">
+                    <i class="fas fa-gamepad text-blue-400"></i><span>Thêm/Sửa Danh Mục Game</span>
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Tên Game (Mã Game)</label>
+                        <input type="text" id="cat-name" placeholder="AOV CHẤP TỐ, Free Fire, Blox Fruit..." class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">URL Link Ảnh (Banner / Logo Game)</label>
+                        <input type="url" id="cat-img" placeholder="https://i.imgur.com/example.png" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                    </div>
+                </div>
+                <button onclick="saveCategory()" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-6 py-2.5 rounded-xl transition glow-button">
+                    Lưu Danh Mục
+                </button>
+            </div>
+
+            <div class="glass p-6 rounded-2xl space-y-4">
+                <h3 class="text-lg font-bold text-white">Danh Sách Game Hiện Có</h3>
+                <div id="categories-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <!-- Dynamic Categories -->
+                </div>
+            </div>
+        </section>
+
         <!-- QUẢN LÝ KEY TAB -->
         <section id="tab-keys" class="tab-content hidden space-y-6">
             <div class="glass p-6 rounded-2xl space-y-4">
@@ -139,8 +174,10 @@
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Tên Game</label>
-                        <input type="text" id="key-game" value="AOV CHẤP TỐ" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <label class="block text-xs text-gray-400 mb-1">Chọn Game</label>
+                        <select id="key-game-select" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                            <!-- Dynamic options -->
+                        </select>
                     </div>
                     <div>
                         <label class="block text-xs text-gray-400 mb-1">Thời Hạn</label>
@@ -200,7 +237,9 @@
                     </div>
                     <div>
                         <label class="block text-xs text-gray-400 mb-1">Game Đã Chọn</label>
-                        <input type="text" id="task-game" placeholder="AOV CHẤP TỐ" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <select id="task-game-select" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                            <!-- Dynamic options -->
+                        </select>
                     </div>
                 </div>
 
@@ -233,6 +272,40 @@
             </div>
         </section>
 
+        <!-- QUICK LINK API TAB -->
+        <section id="tab-quick-api" class="tab-content hidden space-y-6">
+            <div class="glass p-6 rounded-2xl space-y-4">
+                <h3 class="text-lg font-bold text-white flex items-center space-x-2">
+                    <i class="fas fa-bolt text-yellow-400"></i><span>Công Cụ Tạo Quick Link API</span>
+                </h3>
+                <p class="text-xs text-gray-400">Tạo ngay đường dẫn Get Key trực tiếp tới file getkey.html mà không cần lưu Task cố định.</p>
+                
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Chọn Game</label>
+                        <select id="quick-game-select" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white">
+                            <!-- Dynamic -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Danh sách Link Vượt (Mỗi link 1 dòng)</label>
+                        <textarea id="quick-links-input" rows="3" placeholder="https://layma.net/abc123&#10;https://link4m.co/xyz789" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl p-3 text-sm text-white font-mono"></textarea>
+                    </div>
+                    <button onclick="generateQuickLink()" class="bg-yellow-600 hover:bg-yellow-500 text-white text-sm font-medium px-6 py-2.5 rounded-xl transition">
+                        Tạo Quick Link
+                    </button>
+                </div>
+
+                <div id="quick-link-result" class="hidden pt-4 border-t border-gray-800 space-y-2">
+                    <label class="block text-xs text-green-400">Đường dẫn Quick Link API Digitalsmod:</label>
+                    <div class="flex items-center space-x-2">
+                        <input type="text" id="quick-link-url" readonly class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-xs font-mono text-white">
+                        <button onclick="copyToClipboard(document.getElementById('quick-link-url').value)" class="bg-blue-600 text-white px-4 py-2.5 rounded-xl text-xs font-bold shrink-0">COPY</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- DANH SÁCH NHIỆM VỤ TAB -->
         <section id="tab-tasks" class="tab-content hidden space-y-6">
             <div class="glass p-6 rounded-2xl space-y-4">
@@ -253,7 +326,7 @@
                 <div class="space-y-3">
                     <div>
                         <label class="block text-xs text-gray-400 mb-1">Tên Website</label>
-                        <input type="text" id="set-site-name" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white">
+                        <input type="text" id="set-site-name" value="DIGITALSMOD GET KEY" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white">
                     </div>
                     <div>
                         <label class="block text-xs text-gray-400 mb-1">Màu Chủ Đạo (HEX / Tailwind Class)</label>
@@ -265,7 +338,7 @@
                     </div>
                     <div>
                         <label class="block text-xs text-gray-400 mb-1">Footer Text</label>
-                        <input type="text" id="set-footer" value="© 2026 Get Key System. All rights reserved." class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white">
+                        <input type="text" id="set-footer" value="© 2026 Digitalsmod System. All rights reserved." class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white">
                     </div>
                 </div>
                 <button onclick="saveSettings()" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-6 py-2.5 rounded-xl transition glow-button">
@@ -301,6 +374,9 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // CONFIG TARGET URL STRUCTURE
+        const BASE_GETKEY_URL = "https://digitalsmod.site/freekey/getkey.html";
+
         // UI Toast Utility
         window.showToast = (msg, type = "info") => {
             const toast = document.getElementById("toast");
@@ -308,13 +384,9 @@
             const toastIcon = document.getElementById("toast-icon");
             toastMsg.innerText = msg;
             toast.classList.remove("hidden", "translate-x-full");
-            if(type === "error") {
-                toastIcon.className = "fas fa-exclamation-circle text-red-400";
-            } else if(type === "success") {
-                toastIcon.className = "fas fa-check-circle text-green-400";
-            } else {
-                toastIcon.className = "fas fa-info-circle text-blue-400";
-            }
+            if(type === "error") toastIcon.className = "fas fa-exclamation-circle text-red-400";
+            else if(type === "success") toastIcon.className = "fas fa-check-circle text-green-400";
+            else toastIcon.className = "fas fa-info-circle text-blue-400";
             setTimeout(() => {
                 toast.classList.add("translate-x-full");
                 setTimeout(() => toast.classList.add("hidden"), 300);
@@ -333,12 +405,15 @@
             if(activeNav) activeNav.classList.add("bg-blue-600/20", "text-blue-400", "border-r-2", "border-blue-500");
 
             if(tabId === "dashboard") loadDashboardStats();
-            if(tabId === "keys") loadKeysTable();
+            if(tabId === "categories") loadCategories();
+            if(tabId === "keys") { populateGameDropdowns(); loadKeysTable(); }
             if(tabId === "tasks") loadTasksList();
+            if(tabId === "create-task") populateGameDropdowns();
+            if(tabId === "quick-api") populateGameDropdowns();
             if(tabId === "settings") loadSettings();
         };
 
-        // Authentication Observer
+        // Auth Observer
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById("login-modal").classList.add("hidden");
@@ -352,36 +427,99 @@
             }
         });
 
-        // Login Handler
         document.getElementById("login-form").addEventListener("submit", async (e) => {
             e.preventDefault();
-            const email = document.getElementById("login-email").value;
-            const password = document.getElementById("login-password").value;
             try {
-                await signInWithEmailAndPassword(auth, email, password);
+                await signInWithEmailAndPassword(auth, document.getElementById("login-email").value, document.getElementById("login-password").value);
                 showToast("Đăng nhập thành công!", "success");
             } catch (err) {
                 showToast("Lỗi đăng nhập: " + err.message, "error");
             }
         });
 
-        window.logoutAdmin = () => {
-            signOut(auth);
-            showToast("Đã đăng xuất");
+        window.logoutAdmin = () => { signOut(auth); showToast("Đã đăng xuất"); };
+
+        // CATEGORIES MANAGEMENT
+        window.saveCategory = async () => {
+            const name = document.getElementById("cat-name").value.trim();
+            const img = document.getElementById("cat-img").value.trim();
+            if(!name) return showToast("Vui lòng nhập tên game", "error");
+
+            await setDoc(doc(db, "categories", name), { name, imgUrl: img, updatedAt: serverTimestamp() }, { merge: true });
+            showToast("Đã lưu danh mục game!", "success");
+            document.getElementById("cat-name").value = "";
+            document.getElementById("cat-img").value = "";
+            loadCategories();
         };
 
-        // Upload Keys Logic
+        window.loadCategories = async () => {
+            const container = document.getElementById("categories-container");
+            container.innerHTML = `<p class="text-xs text-gray-500">Đang tải...</p>`;
+            const snap = await getDocs(collection(db, "categories"));
+            container.innerHTML = "";
+            if(snap.empty) {
+                container.innerHTML = `<p class="text-xs text-gray-500">Chưa có danh mục game nào.</p>`;
+                return;
+            }
+            snap.forEach(d => {
+                const c = d.data();
+                container.innerHTML += `
+                    <div class="glass-card p-4 rounded-xl border border-gray-800 flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <img src="${c.imgUrl || 'https://via.placeholder.com/40'}" class="w-10 h-10 rounded-lg object-cover bg-gray-900 border border-gray-700">
+                            <span class="text-sm font-bold text-white">${c.name}</span>
+                        </div>
+                        <button onclick="deleteCategory('${c.name}')" class="text-xs text-red-400 hover:text-red-300"><i class="fas fa-trash"></i></button>
+                    </div>
+                `;
+            });
+        };
+
+        window.deleteCategory = async (name) => {
+            if(!confirm(`Xóa danh mục ${name}?`)) return;
+            await deleteDoc(doc(db, "categories", name));
+            showToast("Đã xóa danh mục");
+            loadCategories();
+        };
+
+        async function populateGameDropdowns() {
+            const snaps = await getDocs(collection(db, "categories"));
+            const selects = [document.getElementById("key-game-select"), document.getElementById("task-game-select"), document.getElementById("quick-game-select")];
+            selects.forEach(s => {
+                if(!s) return;
+                s.innerHTML = "";
+                if(snaps.empty) {
+                    s.innerHTML = `<option value="AOV CHẤP TỐ">AOV CHẤP TỐ (Mặc định)</option>`;
+                } else {
+                    snaps.forEach(d => {
+                        s.innerHTML += `<option value="${d.data().name}">${d.data().name}</option>`;
+                    });
+                }
+            });
+        }
+
+        // QUICK API GENERATOR (UPDATED TO TARGET DIGITALSMOD URL)
+        window.generateQuickLink = () => {
+            const game = document.getElementById("quick-game-select").value;
+            const rawLinks = document.getElementById("quick-links-input").value;
+            const links = rawLinks.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+            if(links.length === 0) return showToast("Nhập ít nhất 1 đường dẫn", "error");
+
+            const quickUrl = `${BASE_GETKEY_URL}?quick=1&game=${encodeURIComponent(game)}&steps=${encodeURIComponent(links.join(','))}`;
+            document.getElementById("quick-link-url").value = quickUrl;
+            document.getElementById("quick-link-result").classList.remove("hidden");
+            showToast("Đã khởi tạo Quick Link API Digitalsmod!", "success");
+        };
+
+        // KEYS MANAGEMENT
         window.uploadKeys = async () => {
-            const game = document.getElementById("key-game").value.trim();
+            const game = document.getElementById("key-game-select").value;
             const duration = document.getElementById("key-duration").value;
             const rawText = document.getElementById("key-list-input").value;
 
             if(!game || !rawText) return showToast("Vui lòng điền đầy đủ thông tin", "error");
 
-            const lines = rawText.split("\n")
-                .map(l => l.trim())
-                .filter(l => l.length > 0);
-            
+            const lines = rawText.split("\n").map(l => l.trim()).filter(l => l.length > 0);
             const uniqueKeys = [...new Set(lines)];
 
             let addedCount = 0;
@@ -391,13 +529,7 @@
                 const keyRef = doc(db, "keys", k);
                 const snap = await getDoc(keyRef);
                 if (!snap.exists()) {
-                    batch.set(keyRef, {
-                        key: k,
-                        game: game,
-                        duration: duration,
-                        status: "available",
-                        createdAt: serverTimestamp()
-                    });
+                    batch.set(keyRef, { key: k, game: game, duration: duration, status: "available", createdAt: serverTimestamp() });
                     addedCount++;
                 }
             }
@@ -408,81 +540,56 @@
                 document.getElementById("key-list-input").value = "";
                 loadKeysTable();
             } else {
-                showToast("Không có key mới nào được thêm (tất cả đã tồn tại).", "error");
+                showToast("Không có key mới nào được thêm.", "error");
             }
         };
 
-        // Render Keys Table
         window.loadKeysTable = async () => {
             const tbody = document.getElementById("key-table-body");
             tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500">Đang tải dữ liệu...</td></tr>`;
-            try {
-                const q = query(collection(db, "keys"));
-                const querySnap = await getDocs(q);
-                tbody.innerHTML = "";
-                if(querySnap.empty) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500">Chưa có key nào.</td></tr>`;
-                    return;
-                }
-                querySnap.forEach((docSnap) => {
-                    const data = docSnap.data();
-                    let badgeClass = "bg-green-500/10 text-green-400 border-green-500/20";
-                    if(data.status === "claimed") badgeClass = "bg-purple-500/10 text-purple-400 border-purple-500/20";
-                    if(data.status === "expired") badgeClass = "bg-red-500/10 text-red-400 border-red-500/20";
-
-                    tbody.innerHTML += `
-                        <tr class="hover:bg-gray-800/30 transition">
-                            <td class="p-3 font-mono text-white">${data.key}</td>
-                            <td class="p-3">${data.game}</td>
-                            <td class="p-3">${data.duration}</td>
-                            <td class="p-3"><span class="px-2.5 py-1 rounded-full text-xs font-semibold border ${badgeClass}">${data.status}</span></td>
-                            <td class="p-3">
-                                <button onclick="deleteKey('${docSnap.id}')" class="text-red-400 hover:text-red-300 text-xs"><i class="fas fa-trash"></i> Xóa</button>
-                            </td>
-                        </tr>
-                    `;
-                });
-            } catch(e) {
-                showToast("Lỗi tải key: " + e.message, "error");
+            const q = query(collection(db, "keys"));
+            const querySnap = await getDocs(q);
+            tbody.innerHTML = "";
+            if(querySnap.empty) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500">Chưa có key nào.</td></tr>`;
+                return;
             }
+            querySnap.forEach((docSnap) => {
+                const data = docSnap.data();
+                let badgeClass = "bg-green-500/10 text-green-400 border-green-500/20";
+                if(data.status === "claimed") badgeClass = "bg-purple-500/10 text-purple-400 border-purple-500/20";
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-800/30 transition">
+                        <td class="p-3 font-mono text-white">${data.key}</td>
+                        <td class="p-3">${data.game}</td>
+                        <td class="p-3">${data.duration}</td>
+                        <td class="p-3"><span class="px-2.5 py-1 rounded-full text-xs font-semibold border ${badgeClass}">${data.status}</span></td>
+                        <td class="p-3"><button onclick="deleteKey('${docSnap.id}')" class="text-red-400 hover:text-red-300 text-xs"><i class="fas fa-trash"></i> Xóa</button></td>
+                    </tr>
+                `;
+            });
         };
 
         window.deleteKey = async (keyId) => {
-            if(!confirm("Bạn chắc chắn muốn xóa key này?")) return;
+            if(!confirm("Xóa key này?")) return;
             await deleteDoc(doc(db, "keys", keyId));
             showToast("Đã xóa key");
             loadKeysTable();
         };
 
-        // Steps Form UI Handler
+        // STEPS & TASK
         let currentSteps = [];
         window.addStepRow = (stepData = null) => {
-            const step = stepData || {
-                name: `Bước ${currentSteps.length + 1}`,
-                platform: "Layma.net",
-                url: "",
-                minWaitTime: 10,
-                btnText: "VƯỢT LINK"
-            };
+            const step = stepData || { name: `Bước ${currentSteps.length + 1}`, platform: "Layma.net", url: "", minWaitTime: 10, btnText: "VƯỢT LINK" };
             currentSteps.push(step);
             renderStepRows();
         };
 
-        window.removeStepRow = (idx) => {
-            currentSteps.splice(idx, 1);
-            renderStepRows();
-        };
-
+        window.removeStepRow = (idx) => { currentSteps.splice(idx, 1); renderStepRows(); };
         window.moveStep = (idx, dir) => {
-            if(dir === 'up' && idx > 0) {
-                const temp = currentSteps[idx];
-                currentSteps[idx] = currentSteps[idx-1];
-                currentSteps[idx-1] = temp;
-            } else if(dir === 'down' && idx < currentSteps.length - 1) {
-                const temp = currentSteps[idx];
-                currentSteps[idx] = currentSteps[idx+1];
-                currentSteps[idx+1] = temp;
-            }
+            if(dir === 'up' && idx > 0) [currentSteps[idx], currentSteps[idx-1]] = [currentSteps[idx-1], currentSteps[idx]];
+            else if(dir === 'down' && idx < currentSteps.length - 1) [currentSteps[idx], currentSteps[idx+1]] = [currentSteps[idx+1], currentSteps[idx]];
             renderStepRows();
         };
 
@@ -501,27 +608,12 @@
                             </div>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                            <div>
-                                <label class="block text-[10px] text-gray-400">Tên Bước</label>
-                                <input type="text" value="${s.name}" onchange="currentSteps[${idx}].name = this.value" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs text-white">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] text-gray-400">Tên Nền Tảng</label>
-                                <input type="text" value="${s.platform}" onchange="currentSteps[${idx}].platform = this.value" placeholder="Layma.net / Link4m" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs text-white">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] text-gray-400">Thời gian chờ (giây)</label>
-                                <input type="number" value="${s.minWaitTime}" onchange="currentSteps[${idx}].minWaitTime = parseInt(this.value)" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs text-white">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] text-gray-400">Nội dung nút</label>
-                                <input type="text" value="${s.btnText}" onchange="currentSteps[${idx}].btnText = this.value" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs text-white">
-                            </div>
+                            <div><label class="block text-[10px] text-gray-400">Tên Bước</label><input type="text" value="${s.name}" onchange="currentSteps[${idx}].name = this.value" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs text-white"></div>
+                            <div><label class="block text-[10px] text-gray-400">Tên Nền Tảng</label><input type="text" value="${s.platform}" onchange="currentSteps[${idx}].platform = this.value" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs text-white"></div>
+                            <div><label class="block text-[10px] text-gray-400">Chờ (s)</label><input type="number" value="${s.minWaitTime}" onchange="currentSteps[${idx}].minWaitTime = parseInt(this.value)" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs text-white"></div>
+                            <div><label class="block text-[10px] text-gray-400">Text Nút</label><input type="text" value="${s.btnText}" onchange="currentSteps[${idx}].btnText = this.value" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs text-white"></div>
                         </div>
-                        <div>
-                            <label class="block text-[10px] text-gray-400">URL Vượt Link (Bên thứ ba)</label>
-                            <input type="url" value="${s.url}" onchange="currentSteps[${idx}].url = this.value" placeholder="https://layma.net/xxxxx" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs text-white font-mono">
-                        </div>
+                        <div><label class="block text-[10px] text-gray-400">URL Vượt Link</label><input type="url" value="${s.url}" onchange="currentSteps[${idx}].url = this.value" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs text-white font-mono"></div>
                     </div>
                 `;
             });
@@ -530,138 +622,76 @@
         window.resetTaskForm = () => {
             document.getElementById("editing-task-id").value = "";
             document.getElementById("task-name").value = "";
-            document.getElementById("task-game").value = "";
             document.getElementById("task-desc").value = "";
-            document.getElementById("task-form-title").innerText = "Tạo Nhiệm Vụ Get Key Mới";
             currentSteps = [];
             addStepRow();
         };
 
-        // Random ID generator
         function generateTaskId(length = 7) {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let result = '';
-            for (let i = 0; i < length; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return result;
+            let res = '';
+            for (let i = 0; i < length; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
+            return res;
         }
 
-        // Save Task Handler
         window.saveTask = async () => {
             const editId = document.getElementById("editing-task-id").value;
             const name = document.getElementById("task-name").value.trim();
-            const game = document.getElementById("task-game").value.trim();
+            const game = document.getElementById("task-game-select").value;
             const desc = document.getElementById("task-desc").value.trim();
 
-            if(!name || !game || currentSteps.length === 0) {
-                return showToast("Vui lòng điền tên, game và tạo ít nhất 1 bước", "error");
-            }
+            if(!name || !game || currentSteps.length === 0) return showToast("Vui lòng nhập đầy đủ thông tin", "error");
 
             const taskId = editId ? editId : generateTaskId();
-            const taskDocRef = doc(db, "tasks", taskId);
+            await setDoc(doc(db, "tasks", taskId), {
+                taskId, name, game, description: desc, steps: currentSteps, active: true, updatedAt: serverTimestamp()
+            }, { merge: true });
 
-            const payload = {
-                taskId: taskId,
-                name: name,
-                game: game,
-                description: desc,
-                steps: currentSteps,
-                active: true,
-                updatedAt: serverTimestamp()
-            };
-
-            if(!editId) payload.createdAt = serverTimestamp();
-
-            try {
-                await setDoc(taskDocRef, payload, { merge: true });
-                showToast(`Nhiệm vụ ${taskId} đã lưu thành công!`, "success");
-                resetTaskForm();
-                switchTab('tasks');
-            } catch(e) {
-                showToast("Lỗi lưu nhiệm vụ: " + e.message, "error");
-            }
+            showToast(`Lưu nhiệm vụ ${taskId} thành công!`, "success");
+            resetTaskForm();
+            switchTab('tasks');
         };
 
-        // Load Tasks List
+        // TASK LIST RENDER (UPDATED TO DIGITALSMOD URL)
         window.loadTasksList = async () => {
             const container = document.getElementById("tasks-list-container");
-            container.innerHTML = `<p class="text-gray-500 text-sm">Đang tải danh sách nhiệm vụ...</p>`;
-            try {
-                const querySnap = await getDocs(collection(db, "tasks"));
-                container.innerHTML = "";
-                if(querySnap.empty) {
-                    container.innerHTML = `<p class="text-gray-500 text-sm">Chưa có nhiệm vụ nào được tạo.</p>`;
-                    return;
-                }
-                querySnap.forEach((d) => {
-                    const t = d.data();
-                    const linkUrl = `${window.location.origin}/index.html?task=${t.taskId}`;
-                    container.innerHTML += `
-                        <div class="glass-card p-5 rounded-2xl border border-gray-800 flex flex-col justify-between space-y-4">
-                            <div>
-                                <div class="flex justify-between items-start">
-                                    <h4 class="font-bold text-white text-base">${t.name}</h4>
-                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${t.active ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}">
-                                        ${t.active ? 'ACTIVE' : 'OFFLINE'}
-                                    </span>
-                                </div>
-                                <p class="text-xs text-blue-400 mt-1 font-semibold"><i class="fas fa-gamepad mr-1"></i>${t.game}</p>
-                                <p class="text-xs text-gray-400 mt-2">${t.description || 'Không có mô tả'}</p>
-                                <div class="mt-3 text-xs text-gray-400 font-mono bg-gray-900/80 p-2 rounded-lg flex items-center justify-between">
-                                    <span class="truncate mr-2">${linkUrl}</span>
-                                    <button onclick="copyToClipboard('${linkUrl}')" class="text-blue-400 hover:text-blue-300 font-bold shrink-0"><i class="fas fa-copy"></i> COPY</button>
-                                </div>
+            container.innerHTML = `<p class="text-gray-500 text-sm">Đang tải...</p>`;
+            const querySnap = await getDocs(collection(db, "tasks"));
+            container.innerHTML = "";
+            if(querySnap.empty) { container.innerHTML = `<p class="text-gray-500 text-sm">Chưa có nhiệm vụ.</p>`; return; }
+            querySnap.forEach((d) => {
+                const t = d.data();
+                const linkUrl = `${BASE_GETKEY_URL}?task=${t.taskId}`;
+                container.innerHTML += `
+                    <div class="glass-card p-5 rounded-2xl border border-gray-800 flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-bold text-white text-base">${t.name}</h4>
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${t.active ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}">${t.active ? 'ACTIVE' : 'OFFLINE'}</span>
                             </div>
-                            <div class="flex items-center justify-between pt-2 border-t border-gray-800 text-xs">
-                                <span class="text-gray-500">${t.steps ? t.steps.length : 0} Bước vượt link</span>
-                                <div class="space-x-2">
-                                    <button onclick="toggleTaskActive('${t.taskId}', ${!t.active})" class="text-yellow-400 hover:text-yellow-300">${t.active ? 'Tắt' : 'Bật'}</button>
-                                    <button onclick="editTask('${t.taskId}')" class="text-blue-400 hover:text-blue-300">Sửa</button>
-                                    <button onclick="deleteTask('${t.taskId}')" class="text-red-400 hover:text-red-300">Xóa</button>
-                                </div>
+                            <p class="text-xs text-blue-400 mt-1 font-semibold"><i class="fas fa-gamepad mr-1"></i>${t.game}</p>
+                            <p class="text-xs text-gray-400 mt-2">${t.description || ''}</p>
+                            <div class="mt-3 text-xs text-gray-400 font-mono bg-gray-900/80 p-2 rounded-lg flex items-center justify-between">
+                                <span class="truncate mr-2">${linkUrl}</span>
+                                <button onclick="copyToClipboard('${linkUrl}')" class="text-blue-400 hover:text-blue-300 font-bold shrink-0"><i class="fas fa-copy"></i> COPY</button>
                             </div>
                         </div>
-                    `;
-                });
-            } catch(e) {
-                showToast("Lỗi danh sách task: " + e.message, "error");
-            }
+                        <div class="flex items-center justify-between pt-2 border-t border-gray-800 text-xs">
+                            <span class="text-gray-500">${t.steps ? t.steps.length : 0} Bước</span>
+                            <div class="space-x-2">
+                                <button onclick="toggleTaskActive('${t.taskId}', ${!t.active})" class="text-yellow-400">${t.active ? 'Tắt' : 'Bật'}</button>
+                                <button onclick="deleteTask('${t.taskId}')" class="text-red-400">Xóa</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
         };
 
-        window.copyToClipboard = (text) => {
-            navigator.clipboard.writeText(text);
-            showToast("Đã sao chép đường dẫn!", "success");
-        };
+        window.copyToClipboard = (text) => { navigator.clipboard.writeText(text); showToast("Đã sao chép!", "success"); };
+        window.toggleTaskActive = async (id, st) => { await updateDoc(doc(db, "tasks", id), { active: st }); loadTasksList(); };
+        window.deleteTask = async (id) => { if(confirm("Xóa task này?")) { await deleteDoc(doc(db, "tasks", id)); loadTasksList(); } };
 
-        window.toggleTaskActive = async (taskId, newStatus) => {
-            await updateDoc(doc(db, "tasks", taskId), { active: newStatus });
-            showToast("Cập nhật trạng thái thành công");
-            loadTasksList();
-        };
-
-        window.deleteTask = async (taskId) => {
-            if(!confirm("Xác nhận xóa nhiệm vụ này?")) return;
-            await deleteDoc(doc(db, "tasks", taskId));
-            showToast("Đã xóa nhiệm vụ");
-            loadTasksList();
-        };
-
-        window.editTask = async (taskId) => {
-            const snap = await getDoc(doc(db, "tasks", taskId));
-            if(!snap.exists()) return;
-            const data = snap.data();
-            document.getElementById("editing-task-id").value = taskId;
-            document.getElementById("task-name").value = data.name;
-            document.getElementById("task-game").value = data.game;
-            document.getElementById("task-desc").value = data.description || "";
-            document.getElementById("task-form-title").innerText = `Chỉnh Sửa Nhiệm Vụ: ${taskId}`;
-            currentSteps = data.steps || [];
-            renderStepRows();
-            switchTab('create-task');
-        };
-
-        // Settings Logic
         window.loadSettings = async () => {
             const snap = await getDoc(doc(db, "system", "config"));
             if(snap.exists()) {
@@ -674,46 +704,32 @@
         };
 
         window.saveSettings = async () => {
-            const siteName = document.getElementById("set-site-name").value;
-            const mainColor = document.getElementById("set-main-color").value;
-            const noKeyMsg = document.getElementById("set-no-key-msg").value;
-            const footer = document.getElementById("set-footer").value;
-
             await setDoc(doc(db, "system", "config"), {
-                siteName, mainColor, noKeyMsg, footer, updatedAt: serverTimestamp()
+                siteName: document.getElementById("set-site-name").value,
+                mainColor: document.getElementById("set-main-color").value,
+                noKeyMsg: document.getElementById("set-no-key-msg").value,
+                footer: document.getElementById("set-footer").value,
+                updatedAt: serverTimestamp()
             }, { merge: true });
-
-            showToast("Lưu cấu hình hệ thống thành công!", "success");
+            showToast("Lưu cấu hình thành công!", "success");
         };
 
-        // Dashboard Stats
         async function loadDashboardStats() {
-            try {
-                const tasksSnap = await getDocs(collection(db, "tasks"));
-                const keysSnap = await getDocs(collection(db, "keys"));
-
-                let totalTasks = tasksSnap.size;
-                let activeTasks = 0;
-                tasksSnap.forEach(d => { if(d.data().active) activeTasks++; });
-
-                let availableKeys = 0;
-                let claimedKeys = 0;
-                keysSnap.forEach(d => {
-                    const st = d.data().status;
-                    if(st === "available") availableKeys++;
-                    if(st === "claimed") claimedKeys++;
-                });
-
-                document.getElementById("stat-total-tasks").innerText = totalTasks;
-                document.getElementById("stat-active-tasks").innerText = activeTasks;
-                document.getElementById("stat-available-keys").innerText = availableKeys;
-                document.getElementById("stat-claimed-keys").innerText = claimedKeys;
-            } catch(e) {
-                console.error("Dashboard stats error:", e);
-            }
+            const tasksSnap = await getDocs(collection(db, "tasks"));
+            const keysSnap = await getDocs(collection(db, "keys"));
+            let totalTasks = tasksSnap.size, activeTasks = 0;
+            tasksSnap.forEach(d => { if(d.data().active) activeTasks++; });
+            let availableKeys = 0, claimedKeys = 0;
+            keysSnap.forEach(d => {
+                if(d.data().status === "available") availableKeys++;
+                if(d.data().status === "claimed") claimedKeys++;
+            });
+            document.getElementById("stat-total-tasks").innerText = totalTasks;
+            document.getElementById("stat-active-tasks").innerText = activeTasks;
+            document.getElementById("stat-available-keys").innerText = availableKeys;
+            document.getElementById("stat-claimed-keys").innerText = claimedKeys;
         }
 
-        // Init Step row on start
         addStepRow();
     </script>
 </body>
