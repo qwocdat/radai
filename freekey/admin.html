@@ -59,7 +59,7 @@
                 <div class="p-2 bg-blue-600/20 rounded-lg text-blue-400"><i class="fas fa-cubes text-xl"></i></div>
                 <div>
                     <h1 class="font-bold text-white text-base tracking-wide" id="sys-title-sidebar">DIGITALSMOD ADMIN</h1>
-                    <span class="text-[10px] text-green-400 font-mono bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/20">v2.5 Production</span>
+                    <span class="text-[10px] text-green-400 font-mono bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/20">v3.1 Pro</span>
                 </div>
             </div>
             <nav class="p-4 space-y-1">
@@ -276,28 +276,24 @@
         <section id="tab-quick-api" class="tab-content hidden space-y-6">
             <div class="glass p-6 rounded-2xl space-y-4">
                 <h3 class="text-lg font-bold text-white flex items-center space-x-2">
-                    <i class="fas fa-bolt text-yellow-400"></i><span>Công Cụ Tạo Quick Link API</span>
+                    <i class="fas fa-bolt text-yellow-400"></i><span>Tạo Link Đích API (Chống Bypass)</span>
                 </h3>
-                <p class="text-xs text-gray-400">Tạo ngay đường dẫn Get Key trực tiếp tới file getkey.html mà không cần lưu Task cố định.</p>
+                <p class="text-xs text-gray-400">Tự động chọn 1 Key khả dụng từ Database và sinh ra URL Đích kèm chữ ký bảo mật <code>?freekey=...&sig=...</code> để bạn dán vào web rút gọn như Layma.net/Link4m.</p>
                 
                 <div class="space-y-3">
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Chọn Game</label>
+                        <label class="block text-xs text-gray-400 mb-1">Chọn Game Cần Lấy Key</label>
                         <select id="quick-game-select" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white">
                             <!-- Dynamic -->
                         </select>
                     </div>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Danh sách Link Vượt (Mỗi link 1 dòng)</label>
-                        <textarea id="quick-links-input" rows="3" placeholder="https://layma.net/abc123&#10;https://link4m.co/xyz789" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl p-3 text-sm text-white font-mono"></textarea>
-                    </div>
-                    <button onclick="generateQuickLink()" class="bg-yellow-600 hover:bg-yellow-500 text-white text-sm font-medium px-6 py-2.5 rounded-xl transition">
-                        Tạo Quick Link
+                    <button onclick="generateTargetKeyLink()" class="bg-yellow-600 hover:bg-yellow-500 text-white text-sm font-medium px-6 py-2.5 rounded-xl transition">
+                        Lấy Key Khả Dụng & Sinh Link Đích
                     </button>
                 </div>
 
                 <div id="quick-link-result" class="hidden pt-4 border-t border-gray-800 space-y-2">
-                    <label class="block text-xs text-green-400">Đường dẫn Quick Link API Digitalsmod:</label>
+                    <label class="block text-xs text-green-400">Link Đích Get Key Digitalsmod (Đã bảo mật Chống Bypass):</label>
                     <div class="flex items-center space-x-2">
                         <input type="text" id="quick-link-url" readonly class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-xs font-mono text-white">
                         <button onclick="copyToClipboard(document.getElementById('quick-link-url').value)" class="bg-blue-600 text-white px-4 py-2.5 rounded-xl text-xs font-bold shrink-0">COPY</button>
@@ -319,11 +315,11 @@
             </div>
         </section>
 
-        <!-- SETTINGS TAB -->
+        <!-- SETTINGS TAB (ĐÃ BỔ SUNG TÙY CHỌN NÚT CHUYỂN TRANG) -->
         <section id="tab-settings" class="tab-content hidden space-y-6">
             <div class="glass p-6 rounded-2xl space-y-4 max-w-2xl">
                 <h3 class="text-lg font-bold text-white">Cấu Hình Hệ Thống</h3>
-                <div class="space-y-3">
+                <div class="space-y-4">
                     <div>
                         <label class="block text-xs text-gray-400 mb-1">Tên Website</label>
                         <input type="text" id="set-site-name" value="DIGITALSMOD GET KEY" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white">
@@ -336,6 +332,28 @@
                         <label class="block text-xs text-gray-400 mb-1">Thông Báo Hết Key</label>
                         <input type="text" id="set-no-key-msg" value="Hiện tại đã hết key cho game này, vui lòng quay lại sau!" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white">
                     </div>
+
+                    <!-- Cấu hình Nút Chuyển Trang / Khám phá Key Khác -->
+                    <div class="p-4 glass-card rounded-xl border border-gray-700 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-blue-400"><i class="fas fa-external-link-alt mr-1.5"></i> Cấu Hình Nút Chuyển Trang (Lấy Loại Key Khác)</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="set-ext-btn-enable" class="sr-only peer">
+                                <div class="w-9 h-5 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[10px] text-gray-400">Tên Hiển Thị Trên Nút</label>
+                                <input type="text" id="set-ext-btn-text" placeholder="LẤY KEY GAME KHÁC" value="LẤY KEY GAME KHÁC" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs text-white">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-gray-400">URL Trang Đích Muốn Chuyển Tới</label>
+                                <input type="url" id="set-ext-btn-url" placeholder="https://digitalsmod.site/freekey/getkey.html" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs text-white font-mono">
+                            </div>
+                        </div>
+                    </div>
+
                     <div>
                         <label class="block text-xs text-gray-400 mb-1">Footer Text</label>
                         <input type="text" id="set-footer" value="© 2026 Digitalsmod System. All rights reserved." class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white">
@@ -356,7 +374,7 @@
             getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged 
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { 
-            getFirestore, collection, doc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, query, where, serverTimestamp, writeBatch 
+            getFirestore, collection, doc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, query, where, limit, serverTimestamp, writeBatch 
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // FIREBASE CONFIG OF QUOCDAT-396FE
@@ -374,10 +392,16 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // CONFIG TARGET URL STRUCTURE
         const BASE_GETKEY_URL = "https://digitalsmod.site/freekey/getkey.html";
+        const SECRET_SALT = "DIGITALSMOD_SECRET_KEY_2026";
 
-        // UI Toast Utility
+        async function generateSig(text) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(text + SECRET_SALT);
+            const hash = await crypto.subtle.digest('SHA-256', data);
+            return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 16);
+        }
+
         window.showToast = (msg, type = "info") => {
             const toast = document.getElementById("toast");
             const toastMsg = document.getElementById("toast-msg");
@@ -393,7 +417,6 @@
             }, 3000);
         };
 
-        // Tab Navigation
         window.switchTab = (tabId) => {
             document.querySelectorAll(".tab-content").forEach(el => el.classList.add("hidden"));
             document.querySelectorAll(".nav-btn").forEach(el => el.classList.remove("bg-blue-600/20", "text-blue-400", "border-r-2", "border-blue-500"));
@@ -413,7 +436,6 @@
             if(tabId === "settings") loadSettings();
         };
 
-        // Auth Observer
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById("login-modal").classList.add("hidden");
@@ -439,7 +461,6 @@
 
         window.logoutAdmin = () => { signOut(auth); showToast("Đã đăng xuất"); };
 
-        // CATEGORIES MANAGEMENT
         window.saveCategory = async () => {
             const name = document.getElementById("cat-name").value.trim();
             const img = document.getElementById("cat-img").value.trim();
@@ -498,20 +519,24 @@
             });
         }
 
-        // QUICK API GENERATOR (UPDATED TO TARGET DIGITALSMOD URL)
-        window.generateQuickLink = () => {
+        window.generateTargetKeyLink = async () => {
             const game = document.getElementById("quick-game-select").value;
-            const rawLinks = document.getElementById("quick-links-input").value;
-            const links = rawLinks.split("\n").map(l => l.trim()).filter(l => l.length > 0);
-            if(links.length === 0) return showToast("Nhập ít nhất 1 đường dẫn", "error");
+            const q = query(collection(db, "keys"), where("game", "==", game), where("status", "==", "available"), limit(1));
+            const snap = await getDocs(q);
 
-            const quickUrl = `${BASE_GETKEY_URL}?quick=1&game=${encodeURIComponent(game)}&steps=${encodeURIComponent(links.join(','))}`;
-            document.getElementById("quick-link-url").value = quickUrl;
+            if(snap.empty) {
+                return showToast(`Game "${game}" đã hết key khả dụng!`, "error");
+            }
+
+            const targetKey = snap.docs[0].data().key;
+            const sig = await generateSig(targetKey);
+
+            const finalUrl = `${BASE_GETKEY_URL}?freekey=${encodeURIComponent(targetKey)}&sig=${sig}`;
+            document.getElementById("quick-link-url").value = finalUrl;
             document.getElementById("quick-link-result").classList.remove("hidden");
-            showToast("Đã khởi tạo Quick Link API Digitalsmod!", "success");
+            showToast(`Đã lấy Key [${targetKey}] và tạo đường dẫn!`, "success");
         };
 
-        // KEYS MANAGEMENT
         window.uploadKeys = async () => {
             const game = document.getElementById("key-game-select").value;
             const duration = document.getElementById("key-duration").value;
@@ -578,7 +603,6 @@
             loadKeysTable();
         };
 
-        // STEPS & TASK
         let currentSteps = [];
         window.addStepRow = (stepData = null) => {
             const step = stepData || { name: `Bước ${currentSteps.length + 1}`, platform: "Layma.net", url: "", minWaitTime: 10, btnText: "VƯỢT LINK" };
@@ -652,7 +676,6 @@
             switchTab('tasks');
         };
 
-        // TASK LIST RENDER (UPDATED TO DIGITALSMOD URL)
         window.loadTasksList = async () => {
             const container = document.getElementById("tasks-list-container");
             container.innerHTML = `<p class="text-gray-500 text-sm">Đang tải...</p>`;
@@ -700,6 +723,9 @@
                 if(c.mainColor) document.getElementById("set-main-color").value = c.mainColor;
                 if(c.noKeyMsg) document.getElementById("set-no-key-msg").value = c.noKeyMsg;
                 if(c.footer) document.getElementById("set-footer").value = c.footer;
+                if(c.extBtnEnable !== undefined) document.getElementById("set-ext-btn-enable").checked = c.extBtnEnable;
+                if(c.extBtnText) document.getElementById("set-ext-btn-text").value = c.extBtnText;
+                if(c.extBtnUrl) document.getElementById("set-ext-btn-url").value = c.extBtnUrl;
             }
         };
 
@@ -708,10 +734,13 @@
                 siteName: document.getElementById("set-site-name").value,
                 mainColor: document.getElementById("set-main-color").value,
                 noKeyMsg: document.getElementById("set-no-key-msg").value,
+                extBtnEnable: document.getElementById("set-ext-btn-enable").checked,
+                extBtnText: document.getElementById("set-ext-btn-text").value,
+                extBtnUrl: document.getElementById("set-ext-btn-url").value,
                 footer: document.getElementById("set-footer").value,
                 updatedAt: serverTimestamp()
             }, { merge: true });
-            showToast("Lưu cấu hình thành công!", "success");
+            showToast("Lưu cấu hình hệ thống thành công!", "success");
         };
 
         async function loadDashboardStats() {
