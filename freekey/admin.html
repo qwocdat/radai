@@ -11,43 +11,34 @@
         .glass { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .glass-card { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.05); }
         .glow-button { box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
-        .glow-button:hover { box-shadow: 0 0 25px rgba(59, 130, 246, 0.7); }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #0b0f19; }
-        ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 3px; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col md:flex-row">
 
     <!-- Toast Notification -->
-    <div id="toast" class="fixed top-5 right-5 z-50 transform translate-x-full transition-transform duration-300 ease-in-out px-4 py-3 rounded-xl glass shadow-2xl flex items-center space-x-3 hidden">
+    <div id="toast" class="fixed top-5 right-5 z-50 transform translate-x-full transition-all duration-300 px-4 py-3 rounded-xl glass shadow-2xl flex items-center space-x-3 hidden">
         <i id="toast-icon" class="fas fa-info-circle text-lg"></i>
         <span id="toast-msg" class="text-sm font-medium"></span>
     </div>
 
     <!-- Login Modal -->
     <div id="login-modal" class="fixed inset-0 z-40 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="glass max-w-md w-full p-8 rounded-2xl shadow-2xl relative border border-blue-500/20">
+        <div class="glass max-w-md w-full p-8 rounded-2xl border border-blue-500/20">
             <div class="text-center mb-6">
-                <div class="inline-flex p-3 rounded-2xl bg-blue-500/10 text-blue-400 mb-3">
-                    <i class="fas fa-shield-halved text-3xl"></i>
-                </div>
+                <div class="inline-flex p-3 rounded-2xl bg-blue-500/10 text-blue-400 mb-3"><i class="fas fa-shield-halved text-3xl"></i></div>
                 <h2 class="text-2xl font-bold text-white">Admin Authentication</h2>
-                <p class="text-xs text-gray-400 mt-1">Digitalsmod Get Key System</p>
+                <p class="text-xs text-gray-400 mt-1">Digitalsmod System</p>
             </div>
             <form id="login-form" class="space-y-4">
                 <div>
                     <label class="block text-xs text-gray-400 mb-1">Email</label>
-                    <input type="email" id="login-email" required class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition">
+                    <input type="email" id="login-email" required class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white">
                 </div>
                 <div>
                     <label class="block text-xs text-gray-400 mb-1">Mật khẩu</label>
-                    <input type="password" id="login-password" required class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition">
+                    <input type="password" id="login-password" required class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white">
                 </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 rounded-xl transition glow-button flex items-center justify-center space-x-2">
-                    <span>Đăng Nhập</span>
-                    <i class="fas fa-arrow-right text-xs"></i>
-                </button>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 rounded-xl transition glow-button">Đăng Nhập</button>
             </form>
         </div>
     </div>
@@ -58,38 +49,19 @@
             <div class="p-6 border-b border-gray-800/60 flex items-center space-x-3">
                 <div class="p-2 bg-blue-600/20 rounded-lg text-blue-400"><i class="fas fa-cubes text-xl"></i></div>
                 <div>
-                    <h1 class="font-bold text-white text-base tracking-wide" id="sys-title-sidebar">DIGITALSMOD ADMIN</h1>
-                    <span class="text-[10px] text-green-400 font-mono bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/20">v4.0 Full Version</span>
+                    <h1 class="font-bold text-white text-base">DIGITALSMOD ADMIN</h1>
+                    <span class="text-[10px] text-green-400 font-mono bg-green-500/10 px-2 py-0.5 rounded-full">v4.5 Pro</span>
                 </div>
             </div>
             <nav class="p-4 space-y-1">
-                <button onclick="switchTab('dashboard')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-gray-800/50 hover:text-white transition active-tab" data-tab="dashboard">
-                    <i class="fas fa-chart-pie w-5"></i><span>Dashboard</span>
-                </button>
-                <button onclick="switchTab('categories')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-gray-800/50 hover:text-white transition" data-tab="categories">
-                    <i class="fas fa-gamepad w-5"></i><span>Danh Mục Game</span>
-                </button>
-                <button onclick="switchTab('keys')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-gray-800/50 hover:text-white transition" data-tab="keys">
-                    <i class="fas fa-key w-5"></i><span>Quản Lý Key</span>
-                </button>
-                <button onclick="switchTab('tasks')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-gray-800/50 hover:text-white transition" data-tab="tasks">
-                    <i class="fas fa-list-check w-5"></i><span>Danh Sách Nhiệm Vụ</span>
-                </button>
-                <button onclick="switchTab('create-task')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-gray-800/50 hover:text-white transition" data-tab="create-task">
-                    <i class="fas fa-plus-circle w-5"></i><span>Tạo Nhiệm Vụ</span>
-                </button>
-                <button onclick="switchTab('quick-api')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-gray-800/50 hover:text-white transition" data-tab="quick-api">
-                    <i class="fas fa-bolt w-5 text-yellow-400"></i><span>Quick Link API</span>
-                </button>
-                <button onclick="switchTab('settings')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-gray-800/50 hover:text-white transition" data-tab="settings">
-                    <i class="fas fa-sliders w-5"></i><span>Settings</span>
-                </button>
+                <button onclick="switchTab('dashboard')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-gray-800/50" data-tab="dashboard"><i class="fas fa-chart-pie w-5"></i><span>Dashboard</span></button>
+                <button onclick="switchTab('categories')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-gray-800/50" data-tab="categories"><i class="fas fa-gamepad w-5"></i><span>Danh Mục Game</span></button>
+                <button onclick="switchTab('keys')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-gray-800/50" data-tab="keys"><i class="fas fa-key w-5"></i><span>Quản Lý Key</span></button>
+                <button onclick="switchTab('settings')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-gray-800/50" data-tab="settings"><i class="fas fa-sliders w-5"></i><span>Cấu Hình API Vượt Link</span></button>
             </nav>
         </div>
-        <div class="p-4 border-t border-gray-800/60">
-            <button onclick="logoutAdmin()" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 transition">
-                <i class="fas fa-right-from-bracket w-5"></i><span>Đăng Xuất</span>
-            </button>
+        <div class="p-4 border-t border-gray-800">
+            <button onclick="logoutAdmin()" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10"><i class="fas fa-right-from-bracket w-5"></i><span>Đăng Xuất</span></button>
         </div>
     </aside>
 
@@ -98,41 +70,19 @@
         
         <!-- DASHBOARD TAB -->
         <section id="tab-dashboard" class="tab-content space-y-6">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h2 class="text-2xl font-bold text-white">Thống Kê Hệ Thống</h2>
-                    <p class="text-xs text-gray-400">Tổng quan dữ liệu thời gian thực từ Firebase Firestore</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <h2 class="text-2xl font-bold text-white">Thống Kê Hệ Thống</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div class="glass-card p-5 rounded-2xl flex items-center space-x-4">
-                    <div class="p-3 bg-blue-500/10 text-blue-400 rounded-xl"><i class="fas fa-tasks text-2xl"></i></div>
-                    <div>
-                        <p class="text-xs text-gray-400 font-medium">Tổng Nhiệm Vụ</p>
-                        <h3 id="stat-total-tasks" class="text-2xl font-bold text-white">0</h3>
-                    </div>
-                </div>
-                <div class="glass-card p-5 rounded-2xl flex items-center space-x-4">
-                    <div class="p-3 bg-green-500/10 text-green-400 rounded-xl"><i class="fas fa-check-circle text-2xl"></i></div>
-                    <div>
-                        <p class="text-xs text-gray-400 font-medium">Nhiệm Vụ Hoạt Động</p>
-                        <h3 id="stat-active-tasks" class="text-2xl font-bold text-white">0</h3>
-                    </div>
+                    <div class="p-3 bg-blue-500/10 text-blue-400 rounded-xl"><i class="fas fa-gamepad text-2xl"></i></div>
+                    <div><p class="text-xs text-gray-400">Danh Mục Game</p><h3 id="stat-total-games" class="text-2xl font-bold text-white">0</h3></div>
                 </div>
                 <div class="glass-card p-5 rounded-2xl flex items-center space-x-4">
                     <div class="p-3 bg-yellow-500/10 text-yellow-400 rounded-xl"><i class="fas fa-key text-2xl"></i></div>
-                    <div>
-                        <p class="text-xs text-gray-400 font-medium">Key Còn Lại (Available)</p>
-                        <h3 id="stat-available-keys" class="text-2xl font-bold text-white">0</h3>
-                    </div>
+                    <div><p class="text-xs text-gray-400">Key Khả Dụng</p><h3 id="stat-available-keys" class="text-2xl font-bold text-white">0</h3></div>
                 </div>
                 <div class="glass-card p-5 rounded-2xl flex items-center space-x-4">
                     <div class="p-3 bg-purple-500/10 text-purple-400 rounded-xl"><i class="fas fa-user-check text-2xl"></i></div>
-                    <div>
-                        <p class="text-xs text-gray-400 font-medium">Key Đã Phát (Claimed)</p>
-                        <h3 id="stat-claimed-keys" class="text-2xl font-bold text-white">0</h3>
-                    </div>
+                    <div><p class="text-xs text-gray-400">Key Đã Phát</p><h3 id="stat-claimed-keys" class="text-2xl font-bold text-white">0</h3></div>
                 </div>
             </div>
         </section>
@@ -140,207 +90,66 @@
         <!-- DANH MỤC GAME TAB -->
         <section id="tab-categories" class="tab-content hidden space-y-6">
             <div class="glass p-6 rounded-2xl space-y-4">
-                <h3 class="text-lg font-bold text-white flex items-center space-x-2">
-                    <i class="fas fa-gamepad text-blue-400"></i><span>Thêm/Sửa Danh Mục Game</span>
-                </h3>
+                <h3 class="text-lg font-bold text-white">Thêm Danh Mục Game</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Tên Game (Mã Game)</label>
-                        <input type="text" id="cat-name" placeholder="AOV CHẤP TỐ, Free Fire, Blox Fruit..." class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">URL Link Ảnh (Banner / Logo Game)</label>
-                        <input type="url" id="cat-img" placeholder="https://i.imgur.com/example.png" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
-                    </div>
+                    <input type="text" id="cat-name" placeholder="Tên Game (VD: Free Fire, AOV...)" class="bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white">
+                    <input type="url" id="cat-img" placeholder="Link Ảnh Banner/Logo" class="bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white">
                 </div>
-                <button onclick="saveCategory()" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-6 py-2.5 rounded-xl transition glow-button">
-                    Lưu Danh Mục
-                </button>
+                <button onclick="saveCategory()" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-6 py-2.5 rounded-xl glow-button">Lưu Game</button>
             </div>
-
             <div class="glass p-6 rounded-2xl space-y-4">
-                <h3 class="text-lg font-bold text-white">Danh Sách Game & Link Get Nhanh</h3>
-                <div id="categories-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    <!-- Dynamic Categories -->
-                </div>
+                <h3 class="text-lg font-bold text-white">Danh Sách Game</h3>
+                <div id="categories-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
             </div>
         </section>
 
         <!-- QUẢN LÝ KEY TAB -->
         <section id="tab-keys" class="tab-content hidden space-y-6">
             <div class="glass p-6 rounded-2xl space-y-4">
-                <h3 class="text-lg font-bold text-white flex items-center space-x-2">
-                    <i class="fas fa-upload text-blue-400"></i><span>Upload Key Hàng Loạt</span>
-                </h3>
+                <h3 class="text-lg font-bold text-white">Upload Key Hàng Loạt</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Chọn Game</label>
-                        <select id="key-game-select" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
-                            <!-- Dynamic options -->
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Thời Hạn</label>
-                        <select id="key-duration" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
-                            <option value="1 ngày">1 ngày</option>
-                            <option value="3 ngày">3 ngày</option>
-                            <option value="7 ngày">7 ngày</option>
-                            <option value="30 ngày">30 ngày</option>
-                            <option value="Vĩnh viễn">Vĩnh viễn</option>
-                        </select>
-                    </div>
+                    <select id="key-game-select" class="bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white"></select>
+                    <select id="key-duration" class="bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white">
+                        <option value="24 Giờ">24 Giờ</option>
+                        <option value="48 Giờ">48 Giờ</option>
+                        <option value="7 Ngày">7 Ngày</option>
+                        <option value="Vĩnh Viễn">Vĩnh Viễn</option>
+                    </select>
                 </div>
-                <div>
-                    <label class="block text-xs text-gray-400 mb-1">Danh sách Key (Mỗi key một dòng)</label>
-                    <textarea id="key-list-input" rows="5" placeholder="ame1610IYOY5N&#10;ame1610AVHWVY&#10;ame1610QTNEYY" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl p-4 text-sm font-mono text-white focus:outline-none focus:border-blue-500"></textarea>
-                </div>
-                <button onclick="uploadKeys()" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-6 py-2.5 rounded-xl transition glow-button">
-                    Lưu Key Vào Firestore
-                </button>
+                <textarea id="key-list-input" rows="4" placeholder="Mỗi key một dòng..." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 text-sm font-mono text-white"></textarea>
+                <button onclick="uploadKeys()" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-6 py-2.5 rounded-xl glow-button">Lưu Key Vào Firestore</button>
             </div>
-
-            <!-- Key List -->
             <div class="glass p-6 rounded-2xl space-y-4">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-lg font-bold text-white">Danh Sách Key Trong Database</h3>
-                    <button onclick="loadKeysTable()" class="text-xs text-gray-400 hover:text-white"><i class="fas fa-sync mr-1"></i>Làm mới</button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-gray-300">
-                        <thead class="text-xs text-gray-400 bg-gray-900/50 uppercase border-b border-gray-800">
-                            <tr>
-                                <th class="p-3">Key</th>
-                                <th class="p-3">Game</th>
-                                <th class="p-3">Thời Hạn</th>
-                                <th class="p-3">Trạng Thái</th>
-                                <th class="p-3">Thao Tác</th>
-                            </tr>
-                        </thead>
-                        <tbody id="key-table-body" class="divide-y divide-gray-800/50">
-                            <tr><td colspan="5" class="p-4 text-center text-gray-500">Đang tải dữ liệu...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+                <h3 class="text-lg font-bold text-white">Danh Sách Key</h3>
+                <table class="w-full text-left text-sm text-gray-300">
+                    <thead class="bg-gray-900/50 text-xs text-gray-400">
+                        <tr><th class="p-3">Key</th><th class="p-3">Game</th><th class="p-3">Thời Hạn</th><th class="p-3">Trạng Thái</th><th class="p-3">Xóa</th></tr>
+                    </thead>
+                    <tbody id="key-table-body" class="divide-y divide-gray-800"></tbody>
+                </table>
             </div>
         </section>
 
-        <!-- TẠO NHIỆM VỤ TAB -->
-        <section id="tab-create-task" class="tab-content hidden space-y-6">
-            <div class="glass p-6 rounded-2xl space-y-6">
-                <h3 class="text-lg font-bold text-white" id="task-form-title">Tạo Nhiệm Vụ Get Key Mới</h3>
-                <input type="hidden" id="editing-task-id" value="">
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Tên Nhiệm Vụ</label>
-                        <input type="text" id="task-name" placeholder="GET KEY AOV" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Game Đã Chọn</label>
-                        <select id="task-game-select" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
-                            <!-- Dynamic options -->
-                        </select>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs text-gray-400 mb-1">Mô Tả Nhiệm Vụ</label>
-                    <textarea id="task-desc" rows="2" placeholder="Hoàn thành link để nhận key" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-blue-500"></textarea>
-                </div>
-
-                <!-- Steps Builder -->
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-                        <h4 class="text-sm font-semibold text-gray-200">Cấu Hình Các Bước Vượt Link</h4>
-                        <button type="button" onclick="addStepRow()" class="text-xs bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 border border-blue-500/30 px-3 py-1.5 rounded-lg transition flex items-center space-x-1">
-                            <i class="fas fa-plus"></i><span>Thêm Bước</span>
-                        </button>
-                    </div>
-                    <div id="steps-container" class="space-y-3">
-                        <!-- Step Rows dynamic insertion -->
-                    </div>
-                </div>
-
-                <div class="pt-4 flex space-x-3">
-                    <button onclick="saveTask()" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-6 py-2.5 rounded-xl transition glow-button">
-                        Lưu Nhiệm Vụ
-                    </button>
-                    <button onclick="resetTaskForm()" class="bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm font-medium px-4 py-2.5 rounded-xl transition">
-                        Hủy / Làm Mới
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- QUICK LINK API TAB -->
-        <section id="tab-quick-api" class="tab-content hidden space-y-6">
-            <div class="glass p-6 rounded-2xl space-y-4">
-                <h3 class="text-lg font-bold text-white flex items-center space-x-2">
-                    <i class="fas fa-bolt text-yellow-400"></i><span>Tạo Link Đích API (Chống Bypass)</span>
-                </h3>
-                <p class="text-xs text-gray-400">Tự động chọn 1 Key khả dụng từ Database và sinh ra URL Đích kèm chữ ký bảo mật <code>?freekey=...&sig=...</code> để bạn dán vào web rút gọn như Layma.net/Link4m.</p>
-                
-                <div class="space-y-3">
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Chọn Game Cần Lấy Key</label>
-                        <select id="quick-game-select" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white">
-                            <!-- Dynamic -->
-                        </select>
-                    </div>
-                    <button onclick="generateTargetKeyLink()" class="bg-yellow-600 hover:bg-yellow-500 text-white text-sm font-medium px-6 py-2.5 rounded-xl transition">
-                        Lấy Key Khả Dụng & Sinh Link Đích
-                    </button>
-                </div>
-
-                <div id="quick-link-result" class="hidden pt-4 border-t border-gray-800 space-y-2">
-                    <label class="block text-xs text-green-400">Link Đích Get Key Digitalsmod (Đã bảo mật Chống Bypass):</label>
-                    <div class="flex items-center space-x-2">
-                        <input type="text" id="quick-link-url" readonly class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-xs font-mono text-white">
-                        <button onclick="copyToClipboard(document.getElementById('quick-link-url').value)" class="bg-blue-600 text-white px-4 py-2.5 rounded-xl text-xs font-bold shrink-0">COPY</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- DANH SÁCH NHIỆM VỤ TAB -->
-        <section id="tab-tasks" class="tab-content hidden space-y-6">
-            <div class="glass p-6 rounded-2xl space-y-4">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-lg font-bold text-white">Danh Sách Nhiệm Vụ Get Key</h3>
-                    <button onclick="loadTasksList()" class="text-xs text-gray-400 hover:text-white"><i class="fas fa-sync mr-1"></i>Làm mới</button>
-                </div>
-                <div id="tasks-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Task cards inserted here -->
-                </div>
-            </div>
-        </section>
-
-        <!-- SETTINGS TAB -->
+        <!-- SETTINGS TAB (API VƯỢT LINK SHAWDO MOD) -->
         <section id="tab-settings" class="tab-content hidden space-y-6">
             <div class="glass p-6 rounded-2xl space-y-4 max-w-2xl">
-                <h3 class="text-lg font-bold text-white">Cấu Hình API Rút Gọn Tự Động (Layma.net / Link4m)</h3>
+                <h3 class="text-lg font-bold text-white">Cấu Hình API Rút Gọn Tự Động (Layma / Link4m / Tung.bet)</h3>
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Cấu trúc API Layma.net / Web Rút Gọn</label>
-                        <input type="text" id="set-api-template" placeholder="https://layma.net/api?api=YOUR_TOKEN&url={URL_DICH}" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2 text-xs font-mono text-white">
-                        <p class="text-[10px] text-gray-500 mt-1">Dùng tham số <code>{URL_DICH}</code> để code tự chèn link đích đã bọc sig chống bypass.</p>
+                        <label class="block text-xs text-gray-400 mb-1">Cấu trúc API Rút Gọn Link Vượt Key</label>
+                        <input type="text" id="set-api-template" placeholder="https://tung.bet/GETKEY/shawdomod?url={URL_DICH} hoặc https://layma.net/api?api=TOKEN&url={URL_DICH}" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-xs font-mono text-white">
+                        <p class="text-[10px] text-gray-500 mt-1">Code sẽ tự thay thế <code>{URL_DICH}</code> bằng đường dẫn bọc chữ ký bảo mật chống bypass.</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Link Nhóm Zalo (Nhiệm vụ Task)</label>
+                        <input type="url" id="set-zalo-group" placeholder="https://zalo.me/g/phheuj768" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white">
                     </div>
                     <div>
                         <label class="block text-xs text-gray-400 mb-1">Tên Website</label>
-                        <input type="text" id="set-site-name" value="DIGITALSMOD GET KEY" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Thông Báo Hết Key</label>
-                        <input type="text" id="set-no-key-msg" value="Hiện tại đã hết key cho game này, vui lòng quay lại sau!" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Footer Text</label>
-                        <input type="text" id="set-footer" value="© 2026 Digitalsmod System. All rights reserved." class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white">
+                        <input type="text" id="set-site-name" value="DIGITALSMOD GET KEY" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white">
                     </div>
                 </div>
-                <button onclick="saveSettings()" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-6 py-2.5 rounded-xl transition glow-button">
-                    Lưu Cấu Hình
-                </button>
+                <button onclick="saveSettings()" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-6 py-2.5 rounded-xl glow-button">Lưu Cấu Hình</button>
             </div>
         </section>
 
@@ -349,14 +158,9 @@
     <!-- FIREBASE MODULE & ADMIN LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { 
-            getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged 
-        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { 
-            getFirestore, collection, doc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, query, where, limit, serverTimestamp, writeBatch 
-        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, getDocs, deleteDoc, query, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // FIREBASE CONFIG OF QUOCDAT-396FE
         const firebaseConfig = {
             apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
             authDomain: "quocdat-396fe.firebaseapp.com",
@@ -371,47 +175,19 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        const BASE_GETKEY_URL = "https://digitalsmod.site/freekey/getkey.html";
-        const SECRET_SALT = "DIGITALSMOD_SECRET_KEY_2026";
-
-        async function generateSig(text) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(text + SECRET_SALT);
-            const hash = await crypto.subtle.digest('SHA-256', data);
-            return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 16);
-        }
-
         window.showToast = (msg, type = "info") => {
             const toast = document.getElementById("toast");
-            const toastMsg = document.getElementById("toast-msg");
-            const toastIcon = document.getElementById("toast-icon");
-            toastMsg.innerText = msg;
+            document.getElementById("toast-msg").innerText = msg;
             toast.classList.remove("hidden", "translate-x-full");
-            if(type === "error") toastIcon.className = "fas fa-exclamation-circle text-red-400";
-            else if(type === "success") toastIcon.className = "fas fa-check-circle text-green-400";
-            else toastIcon.className = "fas fa-info-circle text-blue-400";
-            setTimeout(() => {
-                toast.classList.add("translate-x-full");
-                setTimeout(() => toast.classList.add("hidden"), 300);
-            }, 3000);
+            setTimeout(() => toast.classList.add("translate-x-full"), 3000);
         };
 
         window.switchTab = (tabId) => {
             document.querySelectorAll(".tab-content").forEach(el => el.classList.add("hidden"));
-            document.querySelectorAll(".nav-btn").forEach(el => el.classList.remove("bg-blue-600/20", "text-blue-400", "border-r-2", "border-blue-500"));
-            
-            const target = document.getElementById(`tab-${tabId}`);
-            if(target) target.classList.remove("hidden");
-            
-            const activeNav = document.querySelector(`[data-tab="${tabId}"]`);
-            if(activeNav) activeNav.classList.add("bg-blue-600/20", "text-blue-400", "border-r-2", "border-blue-500");
-
+            document.getElementById(`tab-${tabId}`).classList.remove("hidden");
             if(tabId === "dashboard") loadDashboardStats();
             if(tabId === "categories") loadCategories();
             if(tabId === "keys") { populateGameDropdowns(); loadKeysTable(); }
-            if(tabId === "tasks") loadTasksList();
-            if(tabId === "create-task") populateGameDropdowns();
-            if(tabId === "quick-api") populateGameDropdowns();
             if(tabId === "settings") loadSettings();
         };
 
@@ -423,8 +199,6 @@
                 switchTab('dashboard');
             } else {
                 document.getElementById("login-modal").classList.remove("hidden");
-                document.getElementById("sidebar").classList.add("hidden");
-                document.getElementById("main-content").classList.add("hidden");
             }
         });
 
@@ -433,311 +207,113 @@
             try {
                 await signInWithEmailAndPassword(auth, document.getElementById("login-email").value, document.getElementById("login-password").value);
                 showToast("Đăng nhập thành công!", "success");
-            } catch (err) {
-                showToast("Lỗi đăng nhập: " + err.message, "error");
-            }
+            } catch (err) { showToast("Sai tài khoản/mật khẩu", "error"); }
         });
 
-        window.logoutAdmin = () => { signOut(auth); showToast("Đã đăng xuất"); };
+        window.logoutAdmin = () => signOut(auth);
 
         window.saveCategory = async () => {
             const name = document.getElementById("cat-name").value.trim();
             const img = document.getElementById("cat-img").value.trim();
-            if(!name) return showToast("Vui lòng nhập tên game", "error");
-
+            if(!name) return showToast("Nhập tên game", "error");
             await setDoc(doc(db, "categories", name), { name, imgUrl: img, updatedAt: serverTimestamp() }, { merge: true });
-            showToast("Đã lưu danh mục game!", "success");
-            document.getElementById("cat-name").value = "";
-            document.getElementById("cat-img").value = "";
+            showToast("Đã lưu danh mục!");
             loadCategories();
         };
 
         window.loadCategories = async () => {
             const container = document.getElementById("categories-container");
-            container.innerHTML = `<p class="text-xs text-gray-500">Đang tải...</p>`;
             const snap = await getDocs(collection(db, "categories"));
             container.innerHTML = "";
-            if(snap.empty) {
-                container.innerHTML = `<p class="text-xs text-gray-500">Chưa có danh mục game nào.</p>`;
-                return;
-            }
             snap.forEach(d => {
                 const c = d.data();
-                const directUrl = `${BASE_GETKEY_URL}?game=${encodeURIComponent(c.name)}`;
                 container.innerHTML += `
-                    <div class="glass-card p-4 rounded-xl border border-gray-800 space-y-3">
+                    <div class="glass-card p-4 rounded-xl space-y-2">
                         <div class="flex items-center space-x-3">
-                            <img src="${c.imgUrl || 'https://via.placeholder.com/40'}" class="w-10 h-10 rounded-lg object-cover bg-gray-900 border border-gray-700">
+                            <img src="${c.imgUrl || 'https://via.placeholder.com/40'}" class="w-10 h-10 rounded-lg object-cover">
                             <span class="text-sm font-bold text-white">${c.name}</span>
                         </div>
-                        <div class="text-[10px] font-mono text-gray-400 bg-gray-900/80 p-2 rounded-lg truncate">${directUrl}</div>
-                        <div class="flex justify-between items-center text-xs pt-1">
-                            <button onclick="copyToClipboard('${directUrl}')" class="text-blue-400 font-bold hover:text-blue-300"><i class="fas fa-copy mr-1"></i> Copy Link Get</button>
-                            <button onclick="deleteCategory('${c.name}')" class="text-red-400 hover:text-red-300"><i class="fas fa-trash"></i></button>
-                        </div>
+                        <button onclick="deleteCategory('${c.name}')" class="text-xs text-red-400">Xóa Game</button>
                     </div>
                 `;
             });
         };
 
-        window.deleteCategory = async (name) => {
-            if(!confirm(`Xóa danh mục ${name}?`)) return;
-            await deleteDoc(doc(db, "categories", name));
-            showToast("Đã xóa danh mục");
-            loadCategories();
-        };
+        window.deleteCategory = async (name) => { await deleteDoc(doc(db, "categories", name)); loadCategories(); };
 
         async function populateGameDropdowns() {
             const snaps = await getDocs(collection(db, "categories"));
-            const selects = [document.getElementById("key-game-select"), document.getElementById("task-game-select"), document.getElementById("quick-game-select")];
-            selects.forEach(s => {
-                if(!s) return;
-                s.innerHTML = "";
-                if(snaps.empty) {
-                    s.innerHTML = `<option value="AOV CHẤP TỐ">AOV CHẤP TỐ (Mặc định)</option>`;
-                } else {
-                    snaps.forEach(d => {
-                        s.innerHTML += `<option value="${d.data().name}">${d.data().name}</option>`;
-                    });
-                }
-            });
+            const select = document.getElementById("key-game-select");
+            select.innerHTML = "";
+            snaps.forEach(d => select.innerHTML += `<option value="${d.data().name}">${d.data().name}</option>`);
         }
-
-        window.generateTargetKeyLink = async () => {
-            const game = document.getElementById("quick-game-select").value;
-            const q = query(collection(db, "keys"), where("game", "==", game), where("status", "==", "available"), limit(1));
-            const snap = await getDocs(q);
-
-            if(snap.empty) {
-                return showToast(`Game "${game}" đã hết key khả dụng!`, "error");
-            }
-
-            const targetKey = snap.docs[0].data().key;
-            const sig = await generateSig(targetKey);
-
-            const finalUrl = `${BASE_GETKEY_URL}?freekey=${encodeURIComponent(targetKey)}&sig=${sig}`;
-            document.getElementById("quick-link-url").value = finalUrl;
-            document.getElementById("quick-link-result").classList.remove("hidden");
-            showToast(`Đã lấy Key [${targetKey}] và tạo đường dẫn!`, "success");
-        };
 
         window.uploadKeys = async () => {
             const game = document.getElementById("key-game-select").value;
             const duration = document.getElementById("key-duration").value;
             const rawText = document.getElementById("key-list-input").value;
 
-            if(!game || !rawText) return showToast("Vui lòng điền đầy đủ thông tin", "error");
-
-            const lines = rawText.split("\n").map(l => l.trim()).filter(l => l.length > 0);
-            const uniqueKeys = [...new Set(lines)];
-
-            let addedCount = 0;
+            const lines = [...new Set(rawText.split("\n").map(l => l.trim()).filter(l => l.length > 0))];
             let batch = writeBatch(db);
 
-            for (let k of uniqueKeys) {
-                const keyRef = doc(db, "keys", k);
-                const snap = await getDoc(keyRef);
-                if (!snap.exists()) {
-                    batch.set(keyRef, { key: k, game: game, duration: duration, status: "available", createdAt: serverTimestamp() });
-                    addedCount++;
-                }
+            for (let k of lines) {
+                batch.set(doc(db, "keys", k), { key: k, game, duration, status: "available", createdAt: serverTimestamp() });
             }
-
-            if(addedCount > 0) {
-                await batch.commit();
-                showToast(`Đã thêm thành công ${addedCount} key!`, "success");
-                document.getElementById("key-list-input").value = "";
-                loadKeysTable();
-            } else {
-                showToast("Không có key mới nào được thêm.", "error");
-            }
+            await batch.commit();
+            showToast(`Đã thêm ${lines.length} key!`);
+            document.getElementById("key-list-input").value = "";
+            loadKeysTable();
         };
 
         window.loadKeysTable = async () => {
             const tbody = document.getElementById("key-table-body");
-            tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500">Đang tải dữ liệu...</td></tr>`;
-            const q = query(collection(db, "keys"));
-            const querySnap = await getDocs(q);
+            const snap = await getDocs(collection(db, "keys"));
             tbody.innerHTML = "";
-            if(querySnap.empty) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500">Chưa có key nào.</td></tr>`;
-                return;
-            }
-            querySnap.forEach((docSnap) => {
+            snap.forEach(docSnap => {
                 const data = docSnap.data();
-                let badgeClass = "bg-green-500/10 text-green-400 border-green-500/20";
-                if(data.status === "claimed") badgeClass = "bg-purple-500/10 text-purple-400 border-purple-500/20";
-
                 tbody.innerHTML += `
-                    <tr class="hover:bg-gray-800/30 transition">
+                    <tr class="hover:bg-gray-800/50">
                         <td class="p-3 font-mono text-white">${data.key}</td>
                         <td class="p-3">${data.game}</td>
                         <td class="p-3">${data.duration}</td>
-                        <td class="p-3"><span class="px-2.5 py-1 rounded-full text-xs font-semibold border ${badgeClass}">${data.status}</span></td>
-                        <td class="p-3"><button onclick="deleteKey('${docSnap.id}')" class="text-red-400 hover:text-red-300 text-xs"><i class="fas fa-trash"></i> Xóa</button></td>
+                        <td class="p-3"><span class="px-2 py-1 rounded text-xs ${data.status === 'available' ? 'bg-green-500/10 text-green-400' : 'bg-purple-500/10 text-purple-400'}">${data.status}</span></td>
+                        <td class="p-3"><button onclick="deleteKey('${docSnap.id}')" class="text-red-400 text-xs">Xóa</button></td>
                     </tr>
                 `;
             });
         };
 
-        window.deleteKey = async (keyId) => {
-            if(!confirm("Xóa key này?")) return;
-            await deleteDoc(doc(db, "keys", keyId));
-            showToast("Đã xóa key");
-            loadKeysTable();
-        };
-
-        let currentSteps = [];
-        window.addStepRow = (stepData = null) => {
-            const step = stepData || { name: `Bước ${currentSteps.length + 1}`, platform: "Layma.net", url: "", minWaitTime: 10, btnText: "VƯỢT LINK" };
-            currentSteps.push(step);
-            renderStepRows();
-        };
-
-        window.removeStepRow = (idx) => { currentSteps.splice(idx, 1); renderStepRows(); };
-        window.moveStep = (idx, dir) => {
-            if(dir === 'up' && idx > 0) [currentSteps[idx], currentSteps[idx-1]] = [currentSteps[idx-1], currentSteps[idx]];
-            else if(dir === 'down' && idx < currentSteps.length - 1) [currentSteps[idx], currentSteps[idx+1]] = [currentSteps[idx+1], currentSteps[idx]];
-            renderStepRows();
-        };
-
-        function renderStepRows() {
-            const container = document.getElementById("steps-container");
-            container.innerHTML = "";
-            currentSteps.forEach((s, idx) => {
-                container.innerHTML += `
-                    <div class="glass-card p-4 rounded-xl border border-gray-700 space-y-3 relative">
-                        <div class="flex justify-between items-center">
-                            <span class="text-xs font-bold text-blue-400"># BƯỚC ${idx + 1}</span>
-                            <div class="flex items-center space-x-1">
-                                <button type="button" onclick="moveStep(${idx}, 'up')" class="p-1 text-gray-400 hover:text-white"><i class="fas fa-arrow-up text-xs"></i></button>
-                                <button type="button" onclick="moveStep(${idx}, 'down')" class="p-1 text-gray-400 hover:text-white"><i class="fas fa-arrow-down text-xs"></i></button>
-                                <button type="button" onclick="removeStepRow(${idx})" class="p-1 text-red-400 hover:text-red-300 ml-2"><i class="fas fa-times text-xs"></i></button>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                            <div><label class="block text-[10px] text-gray-400">Tên Bước</label><input type="text" value="${s.name}" onchange="currentSteps[${idx}].name = this.value" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs text-white"></div>
-                            <div><label class="block text-[10px] text-gray-400">Tên Nền Tảng</label><input type="text" value="${s.platform}" onchange="currentSteps[${idx}].platform = this.value" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs text-white"></div>
-                            <div><label class="block text-[10px] text-gray-400">Chờ (s)</label><input type="number" value="${s.minWaitTime}" onchange="currentSteps[${idx}].minWaitTime = parseInt(this.value)" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs text-white"></div>
-                            <div><label class="block text-[10px] text-gray-400">Text Nút</label><input type="text" value="${s.btnText}" onchange="currentSteps[${idx}].btnText = this.value" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs text-white"></div>
-                        </div>
-                        <div><label class="block text-[10px] text-gray-400">URL Vượt Link</label><input type="url" value="${s.url}" onchange="currentSteps[${idx}].url = this.value" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs text-white font-mono"></div>
-                    </div>
-                `;
-            });
-        }
-
-        window.resetTaskForm = () => {
-            document.getElementById("editing-task-id").value = "";
-            document.getElementById("task-name").value = "";
-            document.getElementById("task-desc").value = "";
-            currentSteps = [];
-            addStepRow();
-        };
-
-        function generateTaskId(length = 7) {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let res = '';
-            for (let i = 0; i < length; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
-            return res;
-        }
-
-        window.saveTask = async () => {
-            const editId = document.getElementById("editing-task-id").value;
-            const name = document.getElementById("task-name").value.trim();
-            const game = document.getElementById("task-game-select").value;
-            const desc = document.getElementById("task-desc").value.trim();
-
-            if(!name || !game || currentSteps.length === 0) return showToast("Vui lòng nhập đầy đủ thông tin", "error");
-
-            const taskId = editId ? editId : generateTaskId();
-            await setDoc(doc(db, "tasks", taskId), {
-                taskId, name, game, description: desc, steps: currentSteps, active: true, updatedAt: serverTimestamp()
-            }, { merge: true });
-
-            showToast(`Lưu nhiệm vụ ${taskId} thành công!`, "success");
-            resetTaskForm();
-            switchTab('tasks');
-        };
-
-        window.loadTasksList = async () => {
-            const container = document.getElementById("tasks-list-container");
-            container.innerHTML = `<p class="text-gray-500 text-sm">Đang tải...</p>`;
-            const querySnap = await getDocs(collection(db, "tasks"));
-            container.innerHTML = "";
-            if(querySnap.empty) { container.innerHTML = `<p class="text-gray-500 text-sm">Chưa có nhiệm vụ.</p>`; return; }
-            querySnap.forEach((d) => {
-                const t = d.data();
-                const linkUrl = `${BASE_GETKEY_URL}?task=${t.taskId}`;
-                container.innerHTML += `
-                    <div class="glass-card p-5 rounded-2xl border border-gray-800 flex flex-col justify-between space-y-4">
-                        <div>
-                            <div class="flex justify-between items-start">
-                                <h4 class="font-bold text-white text-base">${t.name}</h4>
-                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${t.active ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}">${t.active ? 'ACTIVE' : 'OFFLINE'}</span>
-                            </div>
-                            <p class="text-xs text-blue-400 mt-1 font-semibold"><i class="fas fa-gamepad mr-1"></i>${t.game}</p>
-                            <p class="text-xs text-gray-400 mt-2">${t.description || ''}</p>
-                            <div class="mt-3 text-xs text-gray-400 font-mono bg-gray-900/80 p-2 rounded-lg flex items-center justify-between">
-                                <span class="truncate mr-2">${linkUrl}</span>
-                                <button onclick="copyToClipboard('${linkUrl}')" class="text-blue-400 hover:text-blue-300 font-bold shrink-0"><i class="fas fa-copy"></i> COPY</button>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-between pt-2 border-t border-gray-800 text-xs">
-                            <span class="text-gray-500">${t.steps ? t.steps.length : 0} Bước</span>
-                            <div class="space-x-2">
-                                <button onclick="toggleTaskActive('${t.taskId}', ${!t.active})" class="text-yellow-400">${t.active ? 'Tắt' : 'Bật'}</button>
-                                <button onclick="deleteTask('${t.taskId}')" class="text-red-400">Xóa</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-        };
-
-        window.copyToClipboard = (text) => { navigator.clipboard.writeText(text); showToast("Đã sao chép!", "success"); };
-        window.toggleTaskActive = async (id, st) => { await updateDoc(doc(db, "tasks", id), { active: st }); loadTasksList(); };
-        window.deleteTask = async (id) => { if(confirm("Xóa task này?")) { await deleteDoc(doc(db, "tasks", id)); loadTasksList(); } };
+        window.deleteKey = async (id) => { await deleteDoc(doc(db, "keys", id)); loadKeysTable(); };
 
         window.loadSettings = async () => {
             const snap = await getDoc(doc(db, "system", "config"));
             if(snap.exists()) {
                 const c = snap.data();
                 if(c.apiTemplate) document.getElementById("set-api-template").value = c.apiTemplate;
+                if(c.zaloGroup) document.getElementById("set-zalo-group").value = c.zaloGroup;
                 if(c.siteName) document.getElementById("set-site-name").value = c.siteName;
-                if(c.noKeyMsg) document.getElementById("set-no-key-msg").value = c.noKeyMsg;
-                if(c.footer) document.getElementById("set-footer").value = c.footer;
             }
         };
 
         window.saveSettings = async () => {
             await setDoc(doc(db, "system", "config"), {
                 apiTemplate: document.getElementById("set-api-template").value,
+                zaloGroup: document.getElementById("set-zalo-group").value,
                 siteName: document.getElementById("set-site-name").value,
-                noKeyMsg: document.getElementById("set-no-key-msg").value,
-                footer: document.getElementById("set-footer").value,
                 updatedAt: serverTimestamp()
             }, { merge: true });
-            showToast("Lưu cấu hình thành công!", "success");
+            showToast("Lưu cấu hình thành công!");
         };
 
         async function loadDashboardStats() {
-            const tasksSnap = await getDocs(collection(db, "tasks"));
-            const keysSnap = await getDocs(collection(db, "keys"));
-            let totalTasks = tasksSnap.size, activeTasks = 0;
-            tasksSnap.forEach(d => { if(d.data().active) activeTasks++; });
-            let availableKeys = 0, claimedKeys = 0;
-            keysSnap.forEach(d => {
-                if(d.data().status === "available") availableKeys++;
-                if(d.data().status === "claimed") claimedKeys++;
-            });
-            document.getElementById("stat-total-tasks").innerText = totalTasks;
-            document.getElementById("stat-active-tasks").innerText = activeTasks;
-            document.getElementById("stat-available-keys").innerText = availableKeys;
-            document.getElementById("stat-claimed-keys").innerText = claimedKeys;
+            const games = await getDocs(collection(db, "categories"));
+            const keys = await getDocs(collection(db, "keys"));
+            document.getElementById("stat-total-games").innerText = games.size;
+            let available = 0, claimed = 0;
+            keys.forEach(d => { if(d.data().status === "available") available++; else claimed++; });
+            document.getElementById("stat-available-keys").innerText = available;
+            document.getElementById("stat-claimed-keys").innerText = claimed;
         }
-
-        addStepRow();
     </script>
 </body>
 </html>
