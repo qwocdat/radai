@@ -12,7 +12,6 @@
         .glass-card { background: rgba(30, 41, 59, 0.4); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
         .neon-btn { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
         .neon-btn:hover { box-shadow: 0 0 30px rgba(59, 130, 246, 0.8); }
-        .progress-bar-fill { transition: width 0.5s ease-in-out; }
         @keyframes modalScale {
             0% { opacity: 0; transform: scale(0.8); }
             100% { opacity: 1; transform: scale(1); }
@@ -56,10 +55,10 @@
                 <i class="fas fa-exclamation-triangle text-3xl"></i>
             </div>
             <h2 id="error-title" class="text-xl font-bold text-white">Xác Thực Thất Bại</h2>
-            <p id="error-msg" class="text-xs text-gray-400">Liên kết Get Key bị từ chối do chữ ký không hợp lệ (Phát hiện Bypass).</p>
+            <p id="error-msg" class="text-xs text-gray-400">Liên kết Get Key bị từ chối do chữ ký không hợp lệ.</p>
         </div>
 
-        <!-- PHASE 1: TRANG GET KEY CHÍNH BAN ĐẦU -->
+        <!-- PHASE 1: TRANG GET KEY BAN ĐẦU -->
         <div id="phase-initial-state" class="glass-panel rounded-3xl p-6 sm:p-8 space-y-6 hidden text-center">
             <div id="game-img-container" class="hidden">
                 <img id="game-banner-img" src="" class="w-24 h-24 mx-auto rounded-2xl object-cover border-2 border-blue-500/30 shadow-lg mb-2">
@@ -68,21 +67,21 @@
             <div class="space-y-2">
                 <span id="game-badge" class="inline-block text-[11px] font-bold text-blue-400 bg-blue-500/10 border border-blue-500/20 px-3 py-1 rounded-full uppercase tracking-wider">GAME MOD</span>
                 <h1 class="text-2xl font-black text-white tracking-wide">GET KEY TỰ ĐỘNG</h1>
-                <p class="text-xs text-gray-400">Nhấn nút bên dưới để tạo liên kết vượt link Layma.net và nhận key.</p>
+                <p class="text-xs text-gray-400">Nhấn nút bên dưới để bắt đầu nhận key miễn phí.</p>
             </div>
 
-            <button id="btn-start-getkey" onclick="startGetKeyProcess()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl transition neon-btn flex items-center justify-center space-x-2 text-base">
-                <i class="fas fa-external-link-alt"></i>
-                <span>TẠO LINK VƯỢT & LẤY KEY</span>
+            <button id="btn-open-task" onclick="openTaskModal()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl transition neon-btn flex items-center justify-center space-x-2 text-base">
+                <i class="fas fa-key"></i>
+                <span>NHẬN KEY NGAY</span>
             </button>
         </div>
 
-        <!-- PHASE 2: SAU KHỊ VƯỢT LINK QUAY LẠI TỚI TRANG NÀY -->
+        <!-- PHASE 2: SAU KHỊ VƯỢT LINK TỚI TRANG NÀY -->
         <div id="phase-verify-state" class="glass-panel rounded-3xl p-6 sm:p-8 space-y-6 hidden text-center">
             <div class="space-y-2">
                 <span id="direct-game-badge" class="inline-block text-[11px] font-bold text-blue-400 bg-blue-500/10 border border-blue-500/20 px-3 py-1 rounded-full uppercase tracking-wider">GAME MOD</span>
                 <h1 class="text-2xl font-black text-white tracking-wide">✓ VƯỢT LINK THÀNH CÔNG</h1>
-                <p class="text-xs text-gray-400">Xác thực thành công! Nhấn bên dưới để mở key.</p>
+                <p class="text-xs text-gray-400">Xác thực thành công! Nhấn bên dưới để lấy mã key.</p>
             </div>
 
             <div class="glass-card p-5 rounded-2xl border border-green-500/30 text-center space-y-3">
@@ -102,23 +101,48 @@
 
     </main>
 
+    <!-- MODAL NHIỆM VỤ TASK POPUP (Kiểu Code Shawdo Mod) -->
+    <div id="task-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="glass-panel max-w-sm w-full p-6 sm:p-8 rounded-3xl text-center space-y-5 border border-blue-500/30 animate-modal shadow-2xl">
+            <div class="space-y-1">
+                <h3 class="text-lg font-bold text-white">Yêu Cầu Hoàn Thành Nhiệm Vụ</h3>
+                <p class="text-xs text-gray-400">Tham gia nhóm để mở khóa đường dẫn lấy Key.</p>
+            </div>
+
+            <div id="task-status-badge" class="inline-flex items-center gap-2 bg-red-500/10 text-red-400 border border-red-500/20 px-4 py-1.5 rounded-full text-xs font-bold">
+                <i class="fas fa-lock"></i> <span>Đã Khóa (0/1)</span>
+            </div>
+
+            <div class="space-y-3">
+                <a id="zalo-task-btn" href="https://zalo.me/g/phheuj768" target="_blank" onclick="completeTaskStep()" class="flex items-center justify-center gap-3 p-3.5 rounded-xl bg-gray-800 text-white font-semibold text-xs border border-gray-700 hover:bg-gray-700 transition">
+                    <i class="fas fa-users text-blue-400 text-base"></i>
+                    <span id="zalo-btn-text">Bước 1: Tham Gia Nhóm Zalo</span>
+                    <i id="task-spinner" class="fas fa-spinner fa-spin hidden"></i>
+                </a>
+
+                <button id="btn-continue-key" disabled onclick="startGetKeyProcess()" class="w-full bg-gray-800 text-gray-500 font-bold py-3.5 rounded-xl text-xs flex items-center justify-center gap-2 cursor-not-allowed transition">
+                    <i id="continue-icon" class="fas fa-spinner fa-spin"></i>
+                    <span id="continue-text">Đang Chờ Nhiệm Vụ...</span>
+                </button>
+            </div>
+
+            <button onclick="closeTaskModal()" class="text-xs text-gray-400 underline hover:text-white">Đóng</button>
+        </div>
+    </div>
+
     <!-- Modal Success -->
     <div id="key-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-        <div class="glass-panel max-w-sm w-full p-6 sm:p-8 rounded-3xl text-center space-y-6 border border-blue-500/30 animate-modal shadow-[0_0_50px_rgba(59,130,246,0.3)]">
-            <div class="relative inline-flex">
-                <div class="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-full flex items-center justify-center text-3xl border border-blue-500/40">
-                    <i class="fas fa-check-circle"></i>
-                </div>
+        <div class="glass-panel max-w-sm w-full p-6 sm:p-8 rounded-3xl text-center space-y-6 border border-blue-500/30 animate-modal shadow-2xl">
+            <div class="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-full flex items-center justify-center text-3xl border border-blue-500/40 mx-auto">
+                <i class="fas fa-check-circle"></i>
             </div>
             <div class="space-y-1">
                 <h3 class="text-xl font-bold text-white">NHẬN KEY THÀNH CÔNG</h3>
                 <p class="text-xs text-gray-400">Key đã lưu vào thiết bị của bạn!</p>
             </div>
             <div class="glass-card p-4 rounded-2xl space-y-3 border border-gray-700">
-                <div>
-                    <span class="text-[10px] text-gray-400 uppercase tracking-wider block">KEY GAME</span>
-                    <span id="modal-key-val" class="font-mono text-lg font-bold text-blue-400 select-all tracking-wider">XXXX-XXXX-XXXX</span>
-                </div>
+                <span class="text-[10px] text-gray-400 uppercase tracking-wider block">KEY GAME</span>
+                <span id="modal-key-val" class="font-mono text-lg font-bold text-blue-400 select-all tracking-wider">XXXX-XXXX-XXXX</span>
             </div>
             <button onclick="copyKeyText()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 rounded-xl transition neon-btn flex items-center justify-center space-x-2">
                 <i class="fas fa-copy text-sm"></i><span>COPY KEY</span>
@@ -126,17 +150,14 @@
         </div>
     </div>
 
-    <!-- Footer -->
     <footer class="w-full max-w-md text-center py-4 text-[11px] text-gray-500">
         <p id="site-footer">© 2026 Digitalsmod System. All rights reserved.</p>
     </footer>
 
-    <!-- FIREBASE MODULE & CLIENT LOGIC -->
+    <!-- FIREBASE & LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { 
-            getFirestore, doc, getDoc, runTransaction, serverTimestamp, query, collection, where, getDocs, limit 
-        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, runTransaction, serverTimestamp, query, collection, where, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
@@ -151,11 +172,12 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        const BASE_GETKEY_URL = "https://digitalsmod.site/freekey/getkey.html";
+        const BASE_GETKEY_URL = window.location.origin + window.location.pathname;
         const SECRET_SALT = "DIGITALSMOD_SECRET_KEY_2026";
         let systemConfig = {};
         let currentGame = "";
         let targetKeyDoc = null;
+        let isTaskCompleted = false;
 
         async function generateSig(text) {
             const encoder = new TextEncoder();
@@ -166,13 +188,8 @@
 
         function showToast(msg, type = "info") {
             const toast = document.getElementById("toast");
-            const toastMsg = document.getElementById("toast-msg");
-            const toastIcon = document.getElementById("toast-icon");
-            toastMsg.innerText = msg;
+            document.getElementById("toast-msg").innerText = msg;
             toast.className = `fixed top-5 z-50 transform transition-all duration-300 px-4 py-3 rounded-xl glass-panel shadow-2xl flex items-center space-x-3 opacity-100 translate-y-0`;
-            if(type === "error") toastIcon.className = "fas fa-exclamation-circle text-red-400";
-            else if(type === "success") toastIcon.className = "fas fa-check-circle text-green-400";
-            else toastIcon.className = "fas fa-info-circle text-blue-400";
             setTimeout(() => toast.classList.add("opacity-0", "-translate-y-full"), 3000);
         }
 
@@ -188,25 +205,20 @@
                     systemConfig = confSnap.data();
                     if(systemConfig.siteName) document.getElementById("site-title").innerText = systemConfig.siteName;
                     if(systemConfig.footer) document.getElementById("site-footer").innerText = systemConfig.footer;
+                    if(systemConfig.zaloGroup) document.getElementById("zalo-task-btn").href = systemConfig.zaloGroup;
                 }
 
-                // PHASE 2: SAU KHỊ USER VƯỢT LINK QUAY LẠI TỚI TRANG NÀY (?freekey=...&sig=...)
                 if(freeKeyParam && sigParam) {
                     const expectedSig = await generateSig(freeKeyParam);
-                    if(expectedSig !== sigParam) {
-                        return showError("Cảnh báo Bypass!", "Chữ ký bảo mật không hợp lệ. Vui lòng vượt link chính thức.");
-                    }
+                    if(expectedSig !== sigParam) return showError("Cảnh báo Bypass!", "Chữ ký không hợp lệ.");
 
-                    const keyDocRef = doc(db, "keys", freeKeyParam);
-                    const keySnap = await getDoc(keyDocRef);
+                    const keySnap = await getDoc(doc(db, "keys", freeKeyParam));
                     document.getElementById("loading-state").classList.add("hidden");
 
-                    if(!keySnap.exists()) return showError("Key không tồn tại", `Key ${freeKeyParam} không có trên hệ thống.`);
+                    if(!keySnap.exists()) return showError("Key không tồn tại", `Key không hợp lệ.`);
                     targetKeyDoc = keySnap.data();
 
-                    if(targetKeyDoc.status === "claimed") {
-                        return showError("Key Đã Nhận", "Mã key này đã có người sử dụng trước đó.");
-                    }
+                    if(targetKeyDoc.status === "claimed") return showError("Key Đã Nhận", "Mã key này đã có người dùng.");
 
                     document.getElementById("direct-game-badge").innerText = targetKeyDoc.game;
                     document.getElementById("direct-key-val").innerText = targetKeyDoc.key;
@@ -215,7 +227,6 @@
                     return;
                 }
 
-                // PHASE 1: TRANG GET KEY BAN ĐẦU (?game=...)
                 currentGame = gameParam || "AOV CHẤP TỐ";
                 document.getElementById("game-badge").innerText = currentGame;
 
@@ -231,72 +242,72 @@
             } catch(e) { showError("Lỗi Hệ Thống", e.message); }
         }
 
-        // BẤM NÚT LẤY KEY -> TỰ ĐỘNG TÌM KEY & CHUYỂN HƯỚNG TỚI SANG LAYMA.NET
+        window.openTaskModal = () => document.getElementById("task-modal").classList.remove("hidden");
+        window.closeTaskModal = () => document.getElementById("task-modal").classList.add("hidden");
+
+        window.completeTaskStep = () => {
+            if (isTaskCompleted) return;
+            document.getElementById("task-spinner").classList.remove("hidden");
+            setTimeout(() => {
+                document.getElementById("task-spinner").classList.add("hidden");
+                isTaskCompleted = true;
+                
+                const badge = document.getElementById("task-status-badge");
+                badge.className = "inline-flex items-center gap-2 bg-green-500/10 text-green-400 border border-green-500/20 px-4 py-1.5 rounded-full text-xs font-bold";
+                badge.innerHTML = `<i class="fas fa-unlock"></i> <span>Đã Mở Khóa (1/1)</span>`;
+
+                const btn = document.getElementById("btn-continue-key");
+                btn.disabled = false;
+                btn.className = "w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3.5 rounded-xl text-xs flex items-center justify-center gap-2 transition neon-btn cursor-pointer";
+                document.getElementById("continue-icon").className = "fas fa-arrow-right";
+                document.getElementById("continue-text").innerText = "Đi Tới Trang Get Key";
+            }, 2000);
+        };
+
         window.startGetKeyProcess = async () => {
-            const btn = document.getElementById("btn-start-getkey");
+            if(!isTaskCompleted) return;
+            const btn = document.getElementById("btn-continue-key");
             btn.disabled = true;
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> <span>ĐANG TẠO LINK...</span>`;
+            document.getElementById("continue-text").innerText = "ĐANG TẠO LINK...";
 
             try {
-                // Tự động tìm 1 key available trong database
                 const q = query(collection(db, "keys"), where("game", "==", currentGame), where("status", "==", "available"), limit(1));
                 const snap = await getDocs(q);
 
                 if(snap.empty) {
-                    showToast(systemConfig.noKeyMsg || "Hiện tại đã hết key cho game này!", "error");
+                    showToast(systemConfig.noKeyMsg || "Hết key cho game này!", "error");
                     btn.disabled = false;
-                    btn.innerHTML = `<i class="fas fa-external-link-alt"></i> <span>TẠO LINK VƯỢT & LẤY KEY</span>`;
+                    document.getElementById("continue-text").innerText = "Đi Tới Trang Get Key";
                     return;
                 }
 
                 const keyVal = snap.docs[0].data().key;
                 const sig = await generateSig(keyVal);
-
-                // Đường dẫn đích kèm sig chống bypass
                 const targetUrl = `${BASE_GETKEY_URL}?freekey=${encodeURIComponent(keyVal)}&sig=${sig}`;
 
-                // Nếu có cài đặt API rút gọn link Layma.net/Link4m
                 if(systemConfig.apiTemplate) {
-                    const finalShortenerUrl = systemConfig.apiTemplate.replace("{URL_DICH}", encodeURIComponent(targetUrl));
-                    window.location.href = finalShortenerUrl;
+                    window.location.href = systemConfig.apiTemplate.replace("{URL_DICH}", encodeURIComponent(targetUrl));
                 } else {
                     window.location.href = targetUrl;
                 }
-
             } catch(e) {
                 showToast("Lỗi: " + e.message, "error");
-                btn.disabled = false;
-                btn.innerHTML = `<i class="fas fa-external-link-alt"></i> <span>TẠO LINK VƯỢT & LẤY KEY</span>`;
             }
         };
 
         window.confirmClaimDirect = async () => {
             const btn = document.getElementById("btn-claim-direct");
             btn.disabled = true;
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> <span>ĐANG XÁC NHẬN...</span>`;
-
             try {
                 const keyRef = doc(db, "keys", targetKeyDoc.key);
                 await runTransaction(db, async (transaction) => {
                     const keySnap = await transaction.get(keyRef);
-                    if(!keySnap.exists()) throw "Key không tồn tại";
-                    if(keySnap.data().status !== "available") throw "Key đã bị nhận trước đó!";
-
-                    transaction.update(keyRef, {
-                        status: "claimed",
-                        claimedAt: serverTimestamp(),
-                        claimedVia: "DirectFreeKey"
-                    });
+                    if(!keySnap.exists() || keySnap.data().status !== "available") throw "Key không hợp lệ!";
+                    transaction.update(keyRef, { status: "claimed", claimedAt: serverTimestamp() });
                 });
-
                 document.getElementById("modal-key-val").innerText = targetKeyDoc.key;
                 document.getElementById("key-modal").classList.remove("hidden");
-
-            } catch(err) {
-                showToast("Lỗi: " + err, "error");
-                btn.disabled = false;
-                btn.innerHTML = `<i class="fas fa-check-circle"></i> <span>XÁC NHẬN NHẬN KEY</span>`;
-            }
+            } catch(err) { showToast("Lỗi: " + err, "error"); btn.disabled = false; }
         };
 
         function showError(title, msg) {
