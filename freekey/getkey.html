@@ -1,330 +1,769 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Get Key Gateway - Digitalsmod</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { background-color: #050811; color: #f3f4f6; font-family: system-ui, -apple-system, sans-serif; }
-        .glass-panel { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
-        .glass-card { background: rgba(30, 41, 59, 0.4); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .neon-btn { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
-        .neon-btn:hover { box-shadow: 0 0 30px rgba(59, 130, 246, 0.8); }
-        @keyframes modalScale {
-            0% { opacity: 0; transform: scale(0.8); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-        .animate-modal { animation: modalScale 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>DigitalsMod - Get Key</title>
+
+<!-- Firebase (compat SDK, single file friendly) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+
+<style>
+:root{
+  --primary-a:#6366f1;
+  --primary-b:#8b5cf6;
+  --accent:#00d9ff;
+  --bg:#0a0a0a;
+  --card:rgba(255,255,255,0.08);
+  --card-border:rgba(255,255,255,0.2);
+  --text:#f1f5f9;
+  --text-dim:#94a3b8;
+  --danger:#ef4444;
+  --success:#22c55e;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{
+  margin:0; padding:0; height:100%;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  overflow:hidden;
+}
+body::before{
+  content:"";
+  position:fixed; inset:0; pointer-events:none; z-index:0;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 2px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 2px);
+  background-size:2px 2px;
+}
+#app{position:relative; z-index:1; height:100%; display:flex; flex-direction:column;}
+
+/* top bar */
+#topbar{
+  padding:16px 18px 10px 18px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+#topbar .brand{font-weight:700; font-size:18px; letter-spacing:0.3px;}
+#topbar .brand span{background:linear-gradient(135deg,var(--primary-a),var(--primary-b)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+#topbar .user-chip{
+  display:flex; align-items:center; gap:8px;
+  background:var(--card); border:1px solid var(--card-border);
+  backdrop-filter:blur(10px); border-radius:999px; padding:6px 12px; font-size:13px;
+}
+#topbar .user-chip img{width:22px; height:22px; border-radius:999px;}
+
+/* swipeable tab container */
+#viewport{flex:1; position:relative; overflow:hidden;}
+#track{
+  display:flex; height:100%; width:500%;
+  transition:transform 0.35s cubic-bezier(.25,.8,.25,1);
+  touch-action:pan-y;
+}
+.tab-pane{
+  width:20%; height:100%; overflow-y:auto; padding:8px 18px 100px 18px;
+  -webkit-overflow-scrolling:touch;
+}
+
+/* glass card */
+.glass-card{
+  background:var(--card);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border:1px solid var(--card-border);
+  border-radius:20px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.35);
+  padding:16px;
+  margin-bottom:14px;
+  position:relative;
+  transition:transform 0.15s ease;
+}
+.glass-card::before{
+  content:"";
+  position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 2px),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 2px);
+  background-size:2px 2px;
+}
+.glass-card:active{transform:scale(0.985);}
+
+h2.section-title{font-size:15px; text-transform:uppercase; letter-spacing:1px; color:var(--text-dim); margin:18px 0 10px 2px;}
+
+/* grid of action cards on Menu tab */
+.grid-actions{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+.action-card{
+  background:var(--card); border:1px solid var(--card-border);
+  backdrop-filter:blur(14px); border-radius:18px; padding:16px 12px;
+  display:flex; flex-direction:column; align-items:flex-start; gap:8px;
+  cursor:pointer; user-select:none;
+}
+.action-card .icon{
+  width:36px; height:36px; border-radius:12px;
+  background:linear-gradient(135deg,var(--primary-a),var(--primary-b));
+  display:flex; align-items:center; justify-content:center; font-size:16px;
+}
+.action-card .label{font-size:13.5px; font-weight:600;}
+.action-card .sub{font-size:11px; color:var(--text-dim);}
+
+.matte-btn{
+  background:linear-gradient(135deg,var(--primary-a),var(--primary-b));
+  border:none; color:#fff; font-weight:600; font-size:14px;
+  padding:12px 18px; border-radius:14px; cursor:pointer;
+  text-shadow:0 2px 4px rgba(0,0,0,0.3);
+  width:100%;
+}
+.matte-btn:active{filter:brightness(0.92);}
+.matte-btn.outline{
+  background:transparent; border:1px solid var(--card-border); color:var(--text);
+  text-shadow:none;
+}
+.matte-btn.danger{background:linear-gradient(135deg,#ef4444,#b91c1c);}
+
+/* status */
+.status-row{display:flex; justify-content:space-between; align-items:center; font-size:13px; padding:6px 0;}
+.status-row .val{font-weight:600;}
+.pill{font-size:11px; padding:3px 9px; border-radius:999px; background:rgba(34,197,94,0.15); color:var(--success); border:1px solid rgba(34,197,94,0.3);}
+.pill.warn{background:rgba(239,68,68,0.15); color:var(--danger); border:1px solid rgba(239,68,68,0.3);}
+
+/* key list */
+.key-item{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.key-item:last-child{border-bottom:none;}
+.key-item .kname{font-size:13.5px; font-weight:600;}
+.key-item .kmeta{font-size:11px; color:var(--text-dim);}
+
+/* chart placeholder */
+canvas#usageChart{width:100%; height:140px;}
+
+/* upload */
+.dropzone{
+  border:1.5px dashed var(--card-border); border-radius:16px; padding:28px 14px;
+  text-align:center; color:var(--text-dim); font-size:13px; cursor:pointer;
+}
+.dropzone.drag{border-color:var(--accent); color:var(--accent);}
+.file-row{display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.06);}
+.file-row img{width:40px; height:40px; object-fit:cover; border-radius:8px; background:rgba(255,255,255,0.05);}
+.file-row .fname{font-size:13px; flex:1;}
+.file-row .del{color:var(--danger); font-size:12px; cursor:pointer;}
+
+/* rewards */
+.streak-wrap{display:flex; gap:6px; margin:10px 0;}
+.streak-dot{flex:1; height:8px; border-radius:99px; background:rgba(255,255,255,0.08);}
+.streak-dot.on{background:linear-gradient(135deg,var(--primary-a),var(--primary-b));}
+.spin-wheel{
+  width:180px; height:180px; margin:14px auto; border-radius:50%;
+  background:conic-gradient(from 0deg,var(--primary-a),var(--primary-b),var(--accent),var(--primary-a));
+  display:flex; align-items:center; justify-content:center;
+  transition:transform 3s cubic-bezier(.17,.67,.16,.99);
+  box-shadow:0 0 40px rgba(99,102,241,0.35);
+}
+.spin-wheel .center{
+  width:60px; height:60px; border-radius:50%; background:#0a0a0a;
+  display:flex; align-items:center; justify-content:center; font-size:11px; color:var(--text-dim);
+}
+
+/* settings */
+.settings-row{display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.06);}
+.settings-row:last-child{border-bottom:none;}
+.settings-row .label{font-size:13.5px;}
+select.theme-select, select.lang-select{
+  background:rgba(255,255,255,0.06); color:var(--text); border:1px solid var(--card-border);
+  border-radius:10px; padding:6px 10px; font-size:13px;
+}
+.switch{position:relative; width:44px; height:26px;}
+.switch input{opacity:0; width:0; height:0;}
+.switch .slider{position:absolute; inset:0; background:rgba(255,255,255,0.15); border-radius:999px; transition:.2s; cursor:pointer;}
+.switch .slider::before{content:""; position:absolute; width:20px; height:20px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.2s;}
+.switch input:checked + .slider{background:linear-gradient(135deg,var(--primary-a),var(--primary-b));}
+.switch input:checked + .slider::before{transform:translateX(18px);}
+
+/* bottom tab bar */
+#tabbar{
+  position:absolute; left:12px; right:12px; bottom:14px; z-index:5;
+  display:flex; justify-content:space-around; align-items:center;
+  background:rgba(255,255,255,0.07); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--card-border); border-radius:22px; padding:8px 4px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.4);
+}
+.tab-btn{
+  flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
+  padding:8px 2px; border-radius:16px; cursor:pointer; color:var(--text-dim);
+  font-size:10px; transition:.2s;
+}
+.tab-btn .ico{font-size:18px;}
+.tab-btn.active{color:var(--text); background:rgba(255,255,255,0.06);}
+.tab-btn.active .ico{filter:drop-shadow(0 0 6px var(--primary-b));}
+
+/* modal / popup */
+#popupOverlay{
+  position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px);
+  display:none; align-items:center; justify-content:center; z-index:50; padding:20px;
+}
+#popupOverlay.show{display:flex;}
+.popup-box{
+  width:100%; max-width:340px; background:rgba(20,20,25,0.9);
+  border:1px solid var(--card-border); border-radius:22px; padding:22px;
+  text-align:center; backdrop-filter:blur(20px);
+}
+.popup-box h3{margin:0 0 8px 0; font-size:16px;}
+.popup-box p{font-size:13px; color:var(--text-dim); margin:0 0 16px 0; line-height:1.5;}
+
+/* toast */
+#toast{
+  position:fixed; left:50%; bottom:110px; transform:translateX(-50%) translateY(20px);
+  background:rgba(20,20,25,0.92); border:1px solid var(--card-border); backdrop-filter:blur(16px);
+  padding:10px 18px; border-radius:14px; font-size:13px; opacity:0; pointer-events:none;
+  transition:.25s; z-index:60; white-space:nowrap;
+}
+#toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+/* light theme override */
+body.light{--bg:#eef1f6; --card:rgba(255,255,255,0.55); --card-border:rgba(0,0,0,0.08); --text:#0f172a; --text-dim:#475569;}
+body.light #popupOverlay .popup-box{background:rgba(255,255,255,0.85);}
+
+/* auth screen */
+#authScreen{
+  position:fixed; inset:0; z-index:40; display:flex; align-items:center; justify-content:center;
+  background:var(--bg); flex-direction:column; gap:16px; padding:24px; text-align:center;
+}
+#authScreen .logo{font-size:26px; font-weight:800;}
+#authScreen .logo span{background:linear-gradient(135deg,var(--primary-a),var(--primary-b)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+#authScreen p{color:var(--text-dim); font-size:13px; max-width:280px;}
+</style>
 </head>
-<body class="min-h-screen flex flex-col justify-between items-center p-4 sm:p-6 overflow-x-hidden">
+<body>
 
-    <!-- Header / Logo -->
-    <header class="w-full max-w-md flex items-center justify-between py-4">
-        <div class="flex items-center space-x-2">
-            <div class="p-2 bg-blue-600/20 text-blue-400 rounded-xl border border-blue-500/20"><i class="fas fa-key"></i></div>
-            <span id="site-title" class="font-bold tracking-wider text-white text-lg">DIGITALSMOD GET KEY</span>
-        </div>
-        <span class="text-xs text-blue-400 font-mono bg-blue-500/10 px-2.5 py-1 rounded-full border border-blue-500/20 flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span> ONLINE
-        </span>
-    </header>
+<div id="authScreen">
+  <div class="logo">Digitals<span>Mod</span></div>
+  <p>Dang nhap de nhan key mien phi va quan ly du lieu cua ban.</p>
+  <button class="matte-btn" style="max-width:220px" onclick="signInGoogle()">Dang nhap voi Google</button>
+  <button class="matte-btn outline" style="max-width:220px" onclick="signInAnon()">Dung thu (Khach)</button>
+</div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed top-5 z-50 transform -translate-y-full opacity-0 transition-all duration-300 px-4 py-3 rounded-xl glass-panel shadow-2xl flex items-center space-x-3 pointer-events-none">
-        <i id="toast-icon" class="fas fa-info-circle text-lg"></i>
-        <span id="toast-msg" class="text-sm font-medium text-white"></span>
+<div id="app" style="display:none;">
+  <div id="topbar">
+    <div class="brand">Digitals<span>Mod</span></div>
+    <div class="user-chip">
+      <img id="userAvatar" src="https://api.dicebear.com/7.x/identicon/svg?seed=guest" alt="">
+      <span id="userName">Khach</span>
     </div>
+  </div>
 
-    <!-- Main Card Container -->
-    <main class="w-full max-w-md my-auto">
-        
-        <!-- Loading Skeleton -->
-        <div id="loading-state" class="glass-panel rounded-3xl p-6 space-y-6 animate-pulse">
-            <div class="h-6 bg-gray-800 rounded-md w-1/3 mx-auto"></div>
-            <div class="h-8 bg-gray-800 rounded-lg w-3/4 mx-auto"></div>
-            <div class="h-20 bg-gray-800 rounded-xl"></div>
-            <div class="h-12 bg-blue-900/30 rounded-xl"></div>
+  <div id="viewport">
+    <div id="track">
+
+      <!-- TAB 0: MENU -->
+      <div class="tab-pane">
+        <div class="glass-card">
+          <div class="status-row"><span>Trang thai tai khoan</span><span class="pill" id="accountPill">Hoat dong</span></div>
+          <div class="status-row"><span>Key con hieu luc</span><span class="val" id="activeKeyCount">0</span></div>
+          <div class="status-row"><span>Ngay tham gia</span><span class="val" id="joinDateLabel">-</span></div>
         </div>
 
-        <!-- Error State -->
-        <div id="error-state" class="glass-panel rounded-3xl p-8 text-center space-y-4 hidden">
-            <div class="inline-flex p-4 bg-red-500/10 text-red-400 rounded-2xl border border-red-500/20">
-                <i class="fas fa-exclamation-triangle text-3xl"></i>
-            </div>
-            <h2 id="error-title" class="text-xl font-bold text-white">Xác Thực Thất Bại</h2>
-            <p id="error-msg" class="text-xs text-gray-400">Liên kết Get Key bị từ chối do chữ ký không hợp lệ.</p>
+        <h2 class="section-title">Chuc nang chinh</h2>
+        <div class="grid-actions">
+          <div class="action-card" onclick="goto(1); openGenerateKey()">
+            <div class="icon">K</div>
+            <div class="label">Lay Key Free</div>
+            <div class="sub">Tao key su dung ngay</div>
+          </div>
+          <div class="action-card" onclick="goto(1)">
+            <div class="icon">D</div>
+            <div class="label">Xem Dashboard</div>
+            <div class="sub">Thong ke chi tiet</div>
+          </div>
+          <div class="action-card" onclick="goto(3)">
+            <div class="icon">R</div>
+            <div class="label">Nhan Thuong</div>
+            <div class="sub">Diem danh hang ngay</div>
+          </div>
+          <div class="action-card" onclick="goto(2)">
+            <div class="icon">U</div>
+            <div class="label">Upload File</div>
+            <div class="sub">Menu / cau hinh</div>
+          </div>
+          <div class="action-card" onclick="copyReferral()">
+            <div class="icon">M</div>
+            <div class="label">Moi Ban</div>
+            <div class="sub">Sao chep link gioi thieu</div>
+          </div>
+          <div class="action-card" onclick="goto(4)">
+            <div class="icon">S</div>
+            <div class="label">Cai Dat</div>
+            <div class="sub">Tuy chinh ung dung</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 1: DASHBOARD -->
+      <div class="tab-pane">
+        <h2 class="section-title">Thong ke su dung</h2>
+        <div class="glass-card">
+          <canvas id="usageChart"></canvas>
         </div>
 
-        <!-- PHASE 1: TRANG GET KEY BAN ĐẦU -->
-        <div id="phase-initial-state" class="glass-panel rounded-3xl p-6 sm:p-8 space-y-6 hidden text-center">
-            <div id="game-img-container" class="hidden">
-                <img id="game-banner-img" src="" class="w-24 h-24 mx-auto rounded-2xl object-cover border-2 border-blue-500/30 shadow-lg mb-2">
-            </div>
-
-            <div class="space-y-2">
-                <span id="game-badge" class="inline-block text-[11px] font-bold text-blue-400 bg-blue-500/10 border border-blue-500/20 px-3 py-1 rounded-full uppercase tracking-wider">GAME MOD</span>
-                <h1 class="text-2xl font-black text-white tracking-wide">GET KEY TỰ ĐỘNG</h1>
-                <p class="text-xs text-gray-400">Nhấn nút bên dưới để bắt đầu nhận key miễn phí.</p>
-            </div>
-
-            <button id="btn-open-task" onclick="openTaskModal()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl transition neon-btn flex items-center justify-center space-x-2 text-base">
-                <i class="fas fa-key"></i>
-                <span>NHẬN KEY NGAY</span>
-            </button>
+        <div class="glass-card">
+          <div class="status-row"><span>Tong luot dung menu</span><span class="val" id="totalUsageVal">0</span></div>
+          <div class="status-row"><span>Ngay con lai (key gan nhat)</span><span class="val" id="daysLeftVal">-</span></div>
+          <div class="status-row"><span>Lan dung gan nhat</span><span class="val" id="lastUsedVal">-</span></div>
         </div>
 
-        <!-- PHASE 2: SAU KHỊ VƯỢT LINK TỚI TRANG NÀY -->
-        <div id="phase-verify-state" class="glass-panel rounded-3xl p-6 sm:p-8 space-y-6 hidden text-center">
-            <div class="space-y-2">
-                <span id="direct-game-badge" class="inline-block text-[11px] font-bold text-blue-400 bg-blue-500/10 border border-blue-500/20 px-3 py-1 rounded-full uppercase tracking-wider">GAME MOD</span>
-                <h1 class="text-2xl font-black text-white tracking-wide">✓ VƯỢT LINK THÀNH CÔNG</h1>
-                <p class="text-xs text-gray-400">Xác thực thành công! Nhấn bên dưới để lấy mã key.</p>
-            </div>
-
-            <div class="glass-card p-5 rounded-2xl border border-green-500/30 text-center space-y-3">
-                <span class="text-[10px] text-gray-400 uppercase tracking-wider block">MÃ KEY CỦA BẠN</span>
-                <div id="direct-key-val" class="font-mono text-xl font-bold text-green-400 select-all tracking-wider py-1">XXXX-XXXX</div>
-                <div class="flex justify-between border-t border-gray-800 pt-3 text-xs">
-                    <span class="text-gray-400">Thời hạn: <strong id="direct-duration-val" class="text-white">1 ngày</strong></span>
-                    <span class="text-gray-400">Trạng thái: <strong class="text-green-400">Khả dụng</strong></span>
-                </div>
-            </div>
-
-            <button id="btn-claim-direct" onclick="confirmClaimDirect()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3.5 rounded-xl transition neon-btn flex items-center justify-center space-x-2 text-base">
-                <i class="fas fa-check-circle"></i>
-                <span>XÁC NHẬN NHẬN KEY</span>
-            </button>
+        <h2 class="section-title">Danh sach key</h2>
+        <div class="glass-card" id="keyListCard">
+          <div style="font-size:12px; color:var(--text-dim);">Chua co key nao.</div>
         </div>
 
-    </main>
+        <button class="matte-btn outline" onclick="refreshDashboard()">Lam moi du lieu</button>
+      </div>
 
-    <!-- MODAL NHIỆM VỤ TASK POPUP (Kiểu Code Shawdo Mod) -->
-    <div id="task-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-        <div class="glass-panel max-w-sm w-full p-6 sm:p-8 rounded-3xl text-center space-y-5 border border-blue-500/30 animate-modal shadow-2xl">
-            <div class="space-y-1">
-                <h3 class="text-lg font-bold text-white">Yêu Cầu Hoàn Thành Nhiệm Vụ</h3>
-                <p class="text-xs text-gray-400">Tham gia nhóm để mở khóa đường dẫn lấy Key.</p>
-            </div>
-
-            <div id="task-status-badge" class="inline-flex items-center gap-2 bg-red-500/10 text-red-400 border border-red-500/20 px-4 py-1.5 rounded-full text-xs font-bold">
-                <i class="fas fa-lock"></i> <span>Đã Khóa (0/1)</span>
-            </div>
-
-            <div class="space-y-3">
-                <a id="zalo-task-btn" href="https://zalo.me/g/phheuj768" target="_blank" onclick="completeTaskStep()" class="flex items-center justify-center gap-3 p-3.5 rounded-xl bg-gray-800 text-white font-semibold text-xs border border-gray-700 hover:bg-gray-700 transition">
-                    <i class="fas fa-users text-blue-400 text-base"></i>
-                    <span id="zalo-btn-text">Bước 1: Tham Gia Nhóm Zalo</span>
-                    <i id="task-spinner" class="fas fa-spinner fa-spin hidden"></i>
-                </a>
-
-                <button id="btn-continue-key" disabled onclick="startGetKeyProcess()" class="w-full bg-gray-800 text-gray-500 font-bold py-3.5 rounded-xl text-xs flex items-center justify-center gap-2 cursor-not-allowed transition">
-                    <i id="continue-icon" class="fas fa-spinner fa-spin"></i>
-                    <span id="continue-text">Đang Chờ Nhiệm Vụ...</span>
-                </button>
-            </div>
-
-            <button onclick="closeTaskModal()" class="text-xs text-gray-400 underline hover:text-white">Đóng</button>
+      <!-- TAB 2: UPLOAD -->
+      <div class="tab-pane">
+        <h2 class="section-title">Upload menu / cau hinh</h2>
+        <div class="glass-card">
+          <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+            Keo tha file vao day hoac bam de chon file
+          </div>
+          <input type="file" id="fileInput" style="display:none" onchange="handleFileSelect(event)">
         </div>
+
+        <h2 class="section-title">File da upload</h2>
+        <div class="glass-card" id="uploadListCard">
+          <div style="font-size:12px; color:var(--text-dim);">Chua co file nao.</div>
+        </div>
+      </div>
+
+      <!-- TAB 3: REWARDS -->
+      <div class="tab-pane">
+        <h2 class="section-title">Diem danh hang ngay</h2>
+        <div class="glass-card" style="text-align:center;">
+          <div class="spin-wheel" id="spinWheel">
+            <div class="center">QUAY</div>
+          </div>
+          <button class="matte-btn" onclick="spinReward()">Quay thuong</button>
+          <div class="streak-wrap" id="streakWrap"></div>
+          <div style="font-size:12px; color:var(--text-dim);">Chuoi diem danh: <span id="streakVal">0</span> ngay</div>
+        </div>
+
+        <h2 class="section-title">Nhiem vu nho</h2>
+        <div class="glass-card">
+          <div class="status-row"><span>Moi 1 ban be</span><span class="pill" id="quest1">+50 diem</span></div>
+          <div class="status-row"><span>Upload 1 file</span><span class="pill" id="quest2">+20 diem</span></div>
+          <div class="status-row"><span>Dang nhap 3 ngay lien tiep</span><span class="pill" id="quest3">+100 diem</span></div>
+        </div>
+      </div>
+
+      <!-- TAB 4: SETTINGS -->
+      <div class="tab-pane">
+        <h2 class="section-title">Thong tin ca nhan</h2>
+        <div class="glass-card">
+          <div class="settings-row">
+            <span class="label">Ten hien thi</span>
+            <input id="displayNameInput" style="background:rgba(255,255,255,0.06); border:1px solid var(--card-border); color:var(--text); border-radius:10px; padding:6px 10px; font-size:13px; width:120px;">
+          </div>
+          <button class="matte-btn outline" style="margin-top:10px" onclick="saveProfile()">Luu thay doi</button>
+        </div>
+
+        <h2 class="section-title">Tuy chinh</h2>
+        <div class="glass-card">
+          <div class="settings-row">
+            <span class="label">Giao dien</span>
+            <select class="theme-select" id="themeSelect" onchange="applyTheme(this.value)">
+              <option value="dark">Toi (Dark)</option>
+              <option value="light">Sang (Light)</option>
+              <option value="auto">Tu dong</option>
+            </select>
+          </div>
+          <div class="settings-row">
+            <span class="label">Ngon ngu</span>
+            <select class="lang-select" id="langSelect">
+              <option value="vi">Tieng Viet</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+          <div class="settings-row">
+            <span class="label">Thong bao</span>
+            <label class="switch"><input type="checkbox" id="notifToggle" checked><span class="slider"></span></label>
+          </div>
+        </div>
+
+        <button class="matte-btn danger" onclick="doLogout()">Dang xuat</button>
+      </div>
+
     </div>
+  </div>
 
-    <!-- Modal Success -->
-    <div id="key-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-        <div class="glass-panel max-w-sm w-full p-6 sm:p-8 rounded-3xl text-center space-y-6 border border-blue-500/30 animate-modal shadow-2xl">
-            <div class="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-full flex items-center justify-center text-3xl border border-blue-500/40 mx-auto">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <div class="space-y-1">
-                <h3 class="text-xl font-bold text-white">NHẬN KEY THÀNH CÔNG</h3>
-                <p class="text-xs text-gray-400">Key đã lưu vào thiết bị của bạn!</p>
-            </div>
-            <div class="glass-card p-4 rounded-2xl space-y-3 border border-gray-700">
-                <span class="text-[10px] text-gray-400 uppercase tracking-wider block">KEY GAME</span>
-                <span id="modal-key-val" class="font-mono text-lg font-bold text-blue-400 select-all tracking-wider">XXXX-XXXX-XXXX</span>
-            </div>
-            <button onclick="copyKeyText()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 rounded-xl transition neon-btn flex items-center justify-center space-x-2">
-                <i class="fas fa-copy text-sm"></i><span>COPY KEY</span>
-            </button>
-        </div>
-    </div>
+  <div id="tabbar">
+    <div class="tab-btn active" data-idx="0" onclick="goto(0)"><div class="ico">◆</div>Menu</div>
+    <div class="tab-btn" data-idx="1" onclick="goto(1)"><div class="ico">▤</div>Dashboard</div>
+    <div class="tab-btn" data-idx="2" onclick="goto(2)"><div class="ico">↑</div>Upload</div>
+    <div class="tab-btn" data-idx="3" onclick="goto(3)"><div class="ico">★</div>Thuong</div>
+    <div class="tab-btn" data-idx="4" onclick="goto(4)"><div class="ico">⚙</div>Cai dat</div>
+  </div>
+</div>
 
-    <footer class="w-full max-w-md text-center py-4 text-[11px] text-gray-500">
-        <p id="site-footer">© 2026 Digitalsmod System. All rights reserved.</p>
-    </footer>
+<div id="popupOverlay">
+  <div class="popup-box">
+    <h3 id="popupTitle">Thong bao</h3>
+    <p id="popupBody">Noi dung thong bao.</p>
+    <button class="matte-btn" onclick="closePopup()">Da hieu</button>
+  </div>
+</div>
 
-    <!-- FIREBASE & LOGIC -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, getDoc, runTransaction, serverTimestamp, query, collection, where, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+<div id="toast"></div>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
-            authDomain: "quocdat-396fe.firebaseapp.com",
-            databaseURL: "https://quocdat-396fe-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "quocdat-396fe",
-            storageBucket: "quocdat-396fe.firebasestorage.app",
-            messagingSenderId: "685476439350",
-            appId: "1:685476439350:web:949054ecba7f0a0c383f97"
-        };
+<script>
+/* =========================================================
+   FIREBASE CONFIG (Cấu hình Firebase cũ của bạn)
+   ========================================================= */
+const firebaseConfig = {
+    apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
+    authDomain: "quocdat-396fe.firebaseapp.com",
+    databaseURL: "https://quocdat-396fe-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "quocdat-396fe",
+    storageBucket: "quocdat-396fe.firebasestorage.app",
+    messagingSenderId: "685476439350",
+    appId: "1:685476439350:web:949054ecba7f0a0c383f97"
+};
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+let app, auth, db, storage;
+try {
+  app = firebase.initializeApp(firebaseConfig);
+  auth = firebase.auth();
+  db = firebase.database();
+  storage = firebase.storage();
+} catch (e) {
+  console.warn("Firebase chua duoc cau hinh dung:", e);
+}
 
-        const BASE_GETKEY_URL = window.location.origin + window.location.pathname;
-        const SECRET_SALT = "DIGITALSMOD_SECRET_KEY_2026";
-        let systemConfig = {};
-        let currentGame = "";
-        let targetKeyDoc = null;
-        let isTaskCompleted = false;
+let currentUser = null;
+let activeTab = 0;
+const TAB_COUNT = 5;
 
-        async function generateSig(text) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(text + SECRET_SALT);
-            const hash = await crypto.subtle.digest('SHA-256', data);
-            return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 16);
-        }
+/* ---------- AUTH ---------- */
+function signInGoogle(){
+  if(!auth){ toast("Firebase chua cau hinh"); return; }
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).then(res => onAuthReady(res.user)).catch(err => toast(err.message));
+}
+function signInAnon(){
+  if(!auth){ toast("Firebase chua cau hinh"); return; }
+  auth.signInAnonymously().then(res => onAuthReady(res.user)).catch(err => toast(err.message));
+}
+function doLogout(){
+  if(auth) auth.signOut();
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('authScreen').style.display = 'flex';
+}
 
-        function showToast(msg, type = "info") {
-            const toast = document.getElementById("toast");
-            document.getElementById("toast-msg").innerText = msg;
-            toast.className = `fixed top-5 z-50 transform transition-all duration-300 px-4 py-3 rounded-xl glass-panel shadow-2xl flex items-center space-x-3 opacity-100 translate-y-0`;
-            setTimeout(() => toast.classList.add("opacity-0", "-translate-y-full"), 3000);
-        }
+function onAuthReady(user){
+  currentUser = user;
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  document.getElementById('userName').textContent = user.displayName || 'Khach';
+  document.getElementById('userAvatar').src = user.photoURL || ('https://api.dicebear.com/7.x/identicon/svg?seed=' + user.uid);
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const gameParam = urlParams.get("game");
-        const freeKeyParam = urlParams.get("freekey");
-        const sigParam = urlParams.get("sig");
+  ensureUserProfile();
+  loadDashboard();
+  loadUploads();
+  loadRewards();
+  maybeShowFirstVisitPopup();
+}
 
-        async function initApp() {
-            try {
-                const confSnap = await getDoc(doc(db, "system", "config"));
-                if(confSnap.exists()) {
-                    systemConfig = confSnap.data();
-                    if(systemConfig.siteName) document.getElementById("site-title").innerText = systemConfig.siteName;
-                    if(systemConfig.footer) document.getElementById("site-footer").innerText = systemConfig.footer;
-                    if(systemConfig.zaloGroup) document.getElementById("zalo-task-btn").href = systemConfig.zaloGroup;
-                }
+if (auth) {
+  auth.onAuthStateChanged(user => { if (user) onAuthReady(user); });
+}
 
-                if(freeKeyParam && sigParam) {
-                    const expectedSig = await generateSig(freeKeyParam);
-                    if(expectedSig !== sigParam) return showError("Cảnh báo Bypass!", "Chữ ký không hợp lệ.");
+function userRef(path){ return db.ref('users/' + currentUser.uid + (path ? '/' + path : '')); }
 
-                    const keySnap = await getDoc(doc(db, "keys", freeKeyParam));
-                    document.getElementById("loading-state").classList.add("hidden");
+function ensureUserProfile(){
+  userRef('profile').once('value').then(snap => {
+    if(!snap.exists()){
+      userRef('profile').set({
+        name: currentUser.displayName || 'Khach',
+        avatar: currentUser.photoURL || '',
+        email: currentUser.email || '',
+        joinDate: new Date().toISOString().slice(0,10)
+      });
+    }
+    const p = snap.val() || {};
+    document.getElementById('joinDateLabel').textContent = p.joinDate || new Date().toISOString().slice(0,10);
+    document.getElementById('displayNameInput').value = p.name || '';
+  });
+}
 
-                    if(!keySnap.exists()) return showError("Key không tồn tại", `Key không hợp lệ.`);
-                    targetKeyDoc = keySnap.data();
+/* ---------- TAB NAVIGATION (swipe) ---------- */
+const track = document.getElementById('track');
+const viewport = document.getElementById('viewport');
+let startX = 0, currentX = 0, dragging = false, viewportWidth = 0;
 
-                    if(targetKeyDoc.status === "claimed") return showError("Key Đã Nhận", "Mã key này đã có người dùng.");
+function goto(idx){
+  activeTab = Math.max(0, Math.min(TAB_COUNT - 1, idx));
+  track.style.transition = 'transform 0.35s cubic-bezier(.25,.8,.25,1)';
+  track.style.transform = `translateX(-${activeTab * (100 / TAB_COUNT)}%)`;
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', i === activeTab));
+}
 
-                    document.getElementById("direct-game-badge").innerText = targetKeyDoc.game;
-                    document.getElementById("direct-key-val").innerText = targetKeyDoc.key;
-                    document.getElementById("direct-duration-val").innerText = targetKeyDoc.duration;
-                    document.getElementById("phase-verify-state").classList.remove("hidden");
-                    return;
-                }
+viewport.addEventListener('pointerdown', e => {
+  dragging = true; startX = e.clientX; viewportWidth = viewport.clientWidth;
+  track.style.transition = 'none';
+});
+viewport.addEventListener('pointermove', e => {
+  if(!dragging) return;
+  currentX = e.clientX - startX;
+  const base = -activeTab * (viewportWidth * TAB_COUNT / TAB_COUNT) - activeTab * 0;
+  const percentBase = -activeTab * (100 / TAB_COUNT);
+  const dragPercent = (currentX / viewportWidth) * (100 / TAB_COUNT);
+  track.style.transform = `translateX(${percentBase + dragPercent}%)`;
+});
+viewport.addEventListener('pointerup', e => {
+  if(!dragging) return;
+  dragging = false;
+  const threshold = viewportWidth * 0.15;
+  if(currentX > threshold) goto(activeTab - 1);
+  else if(currentX < -threshold) goto(activeTab + 1);
+  else goto(activeTab);
+  currentX = 0;
+});
+viewport.addEventListener('pointerleave', () => { if(dragging){ dragging = false; goto(activeTab); currentX = 0; } });
 
-                currentGame = gameParam || "AOV CHẤP TỐ";
-                document.getElementById("game-badge").innerText = currentGame;
+/* ---------- KEY GENERATION ---------- */
+function openGenerateKey(){
+  generateKey();
+}
+function generateKey(){
+  if(!currentUser){ toast("Ban chua dang nhap"); return; }
+  const keyId = db.ref().child('users').push().key;
+  const now = Date.now();
+  const expiresAt = now + 24 * 60 * 60 * 1000;
+  const keyString = 'DGM-' + Math.random().toString(36).slice(2,8).toUpperCase() + '-' + Math.random().toString(36).slice(2,6).toUpperCase();
+  const keyData = {
+    key: keyString,
+    gameType: 'Chung',
+    duration: '24h',
+    createdAt: now,
+    expiresAt: expiresAt,
+    usageCount: 0
+  };
+  userRef('keys/' + keyId).set(keyData).then(() => {
+    userRef('stats/totalUsage').transaction(v => (v || 0) + 1);
+    showPopup('Tao key thanh cong', 'Key cua ban: ' + keyString + '. Het han sau 24 gio.');
+    loadDashboard();
+  }).catch(err => toast(err.message));
+}
 
-                const catSnap = await getDoc(doc(db, "categories", currentGame));
-                if(catSnap.exists() && catSnap.data().imgUrl) {
-                    document.getElementById("game-banner-img").src = catSnap.data().imgUrl;
-                    document.getElementById("game-img-container").classList.remove("hidden");
-                }
+/* ---------- DASHBOARD ---------- */
+function loadDashboard(){
+  userRef('keys').once('value').then(snap => {
+    const data = snap.val() || {};
+    const entries = Object.entries(data);
+    const now = Date.now();
+    const active = entries.filter(([_,k]) => k.expiresAt > now);
+    document.getElementById('activeKeyCount').textContent = active.length;
 
-                document.getElementById("loading-state").classList.add("hidden");
-                document.getElementById("phase-initial-state").classList.remove("hidden");
+    const listCard = document.getElementById('keyListCard');
+    if(entries.length === 0){
+      listCard.innerHTML = '<div style="font-size:12px; color:var(--text-dim);">Chua co key nao.</div>';
+    } else {
+      listCard.innerHTML = entries.sort((a,b) => b[1].createdAt - a[1].createdAt).map(([id,k]) => {
+        const daysLeft = Math.max(0, Math.ceil((k.expiresAt - now) / 86400000));
+        return `<div class="key-item">
+          <div>
+            <div class="kname">${k.key}</div>
+            <div class="kmeta">${k.gameType} - con ${daysLeft} ngay</div>
+          </div>
+          <span class="pill ${daysLeft <= 0 ? 'warn' : ''}">${daysLeft <= 0 ? 'Het han' : 'Con hieu luc'}</span>
+        </div>`;
+      }).join('');
+      const latest = entries.sort((a,b) => b[1].createdAt - a[1].createdAt)[0][1];
+      document.getElementById('daysLeftVal').textContent = Math.max(0, Math.ceil((latest.expiresAt - now) / 86400000)) + ' ngay';
+    }
+  });
 
-            } catch(e) { showError("Lỗi Hệ Thống", e.message); }
-        }
+  userRef('stats').once('value').then(snap => {
+    const s = snap.val() || {};
+    document.getElementById('totalUsageVal').textContent = s.totalUsage || 0;
+    document.getElementById('lastUsedVal').textContent = s.lastUsedDate || '-';
+    drawUsageChart(s.usageHistory || [3,5,2,8,6,9,4]);
+  });
+}
+function refreshDashboard(){ loadDashboard(); toast('Da lam moi'); }
 
-        window.openTaskModal = () => document.getElementById("task-modal").classList.remove("hidden");
-        window.closeTaskModal = () => document.getElementById("task-modal").classList.add("hidden");
+function drawUsageChart(dataPoints){
+  const canvas = document.getElementById('usageChart');
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const w = canvas.clientWidth, h = 140;
+  canvas.width = w * dpr; canvas.height = h * dpr;
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0,0,w,h);
 
-        window.completeTaskStep = () => {
-            if (isTaskCompleted) return;
-            document.getElementById("task-spinner").classList.remove("hidden");
-            setTimeout(() => {
-                document.getElementById("task-spinner").classList.add("hidden");
-                isTaskCompleted = true;
-                
-                const badge = document.getElementById("task-status-badge");
-                badge.className = "inline-flex items-center gap-2 bg-green-500/10 text-green-400 border border-green-500/20 px-4 py-1.5 rounded-full text-xs font-bold";
-                badge.innerHTML = `<i class="fas fa-unlock"></i> <span>Đã Mở Khóa (1/1)</span>`;
+  const max = Math.max(...dataPoints, 1);
+  const step = w / (dataPoints.length - 1 || 1);
+  ctx.beginPath();
+  dataPoints.forEach((v,i) => {
+    const x = i * step;
+    const y = h - (v / max) * (h - 20) - 10;
+    if(i === 0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  const grad = ctx.createLinearGradient(0,0,w,0);
+  grad.addColorStop(0, '#6366f1');
+  grad.addColorStop(1, '#8b5cf6');
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = 'round';
+  ctx.stroke();
 
-                const btn = document.getElementById("btn-continue-key");
-                btn.disabled = false;
-                btn.className = "w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3.5 rounded-xl text-xs flex items-center justify-center gap-2 transition neon-btn cursor-pointer";
-                document.getElementById("continue-icon").className = "fas fa-arrow-right";
-                document.getElementById("continue-text").innerText = "Đi Tới Trang Get Key";
-            }, 2000);
-        };
+  dataPoints.forEach((v,i) => {
+    const x = i * step;
+    const y = h - (v / max) * (h - 20) - 10;
+    ctx.beginPath();
+    ctx.arc(x,y,3,0,Math.PI*2);
+    ctx.fillStyle = '#00d9ff';
+    ctx.fill();
+  });
+}
 
-        window.startGetKeyProcess = async () => {
-            if(!isTaskCompleted) return;
-            const btn = document.getElementById("btn-continue-key");
-            btn.disabled = true;
-            document.getElementById("continue-text").innerText = "ĐANG TẠO LINK...";
+/* ---------- UPLOAD ---------- */
+const dropzone = document.getElementById('dropzone');
+['dragover','dragenter'].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.add('drag'); }));
+['dragleave','drop'].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.remove('drag'); }));
+dropzone.addEventListener('drop', e => {
+  const file = e.dataTransfer.files[0];
+  if(file) uploadFile(file);
+});
+function handleFileSelect(e){
+  const file = e.target.files[0];
+  if(file) uploadFile(file);
+}
+function uploadFile(file){
+  if(!currentUser){ toast('Ban chua dang nhap'); return; }
+  if(!storage){ toast('Firebase Storage chua cau hinh'); return; }
+  const path = 'uploads/' + currentUser.uid + '/' + Date.now() + '_' + file.name;
+  const ref = storage.ref(path);
+  toast('Dang tai len...');
+  ref.put(file).then(snap => snap.ref.getDownloadURL()).then(url => {
+    const fileId = db.ref().child('users').push().key;
+    return userRef('uploads/' + fileId).set({
+      name: file.name,
+      url: url,
+      type: file.type,
+      uploadedAt: Date.now()
+    });
+  }).then(() => {
+    toast('Tai len thanh cong');
+    loadUploads();
+  }).catch(err => toast(err.message));
+}
+function loadUploads(){
+  userRef('uploads').once('value').then(snap => {
+    const data = snap.val() || {};
+    const entries = Object.entries(data);
+    const card = document.getElementById('uploadListCard');
+    if(entries.length === 0){
+      card.innerHTML = '<div style="font-size:12px; color:var(--text-dim);">Chua co file nao.</div>';
+      return;
+    }
+    card.innerHTML = entries.sort((a,b) => b[1].uploadedAt - a[1].uploadedAt).map(([id,f]) => {
+      const isImg = (f.type || '').startsWith('image/');
+      return `<div class="file-row">
+        ${isImg ? `<img src="${f.url}">` : `<div style="width:40px;height:40px;border-radius:8px;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:11px;">FILE</div>`}
+        <div class="fname">${f.name}</div>
+        <div class="del" onclick="deleteUpload('${id}')">Xoa</div>
+      </div>`;
+    }).join('');
+  });
+}
+function deleteUpload(fileId){
+  userRef('uploads/' + fileId).remove().then(() => { toast('Da xoa file'); loadUploads(); });
+}
 
-            try {
-                const q = query(collection(db, "keys"), where("game", "==", currentGame), where("status", "==", "available"), limit(1));
-                const snap = await getDocs(q);
+/* ---------- REWARDS ---------- */
+function loadRewards(){
+  userRef('stats').once('value').then(snap => {
+    const s = snap.val() || {};
+    const streak = s.streak || 0;
+    document.getElementById('streakVal').textContent = streak;
+    const wrap = document.getElementById('streakWrap');
+    wrap.innerHTML = '';
+    for(let i=0;i<7;i++){
+      const dot = document.createElement('div');
+      dot.className = 'streak-dot' + (i < streak % 7 ? ' on' : '');
+      wrap.appendChild(dot);
+    }
+  });
+}
+function spinReward(){
+  if(!currentUser){ toast('Ban chua dang nhap'); return; }
+  const wheel = document.getElementById('spinWheel');
+  const rand = 1800 + Math.floor(Math.random() * 360);
+  wheel.style.transform = 'rotate(' + rand + 'deg)';
+  setTimeout(() => {
+    const rewardPoints = [10,20,50,100][Math.floor(Math.random()*4)];
+    userRef('stats/totalRewards').transaction(v => (v || 0) + rewardPoints);
+    userRef('stats/streak').transaction(v => (v || 0) + 1);
+    userRef('stats/lastUsedDate').set(new Date().toISOString().slice(0,10));
+    showPopup('Chuc mung', 'Ban nhan duoc ' + rewardPoints + ' diem thuong.');
+    loadRewards();
+  }, 3000);
+}
+function copyReferral(){
+  if(!currentUser) return;
+  const link = window.location.origin + window.location.pathname + '?ref=' + currentUser.uid;
+  navigator.clipboard?.writeText(link);
+  toast('Da sao chep link moi ban');
+}
 
-                if(snap.empty) {
-                    showToast(systemConfig.noKeyMsg || "Hết key cho game này!", "error");
-                    btn.disabled = false;
-                    document.getElementById("continue-text").innerText = "Đi Tới Trang Get Key";
-                    return;
-                }
+/* ---------- SETTINGS ---------- */
+function saveProfile(){
+  const name = document.getElementById('displayNameInput').value.trim();
+  if(!name) return;
+  userRef('profile/name').set(name).then(() => {
+    document.getElementById('userName').textContent = name;
+    toast('Da luu thong tin');
+  });
+}
+function applyTheme(mode){
+  if(mode === 'light') document.body.classList.add('light');
+  else if(mode === 'dark') document.body.classList.remove('light');
+  else {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.body.classList.toggle('light', !prefersDark);
+  }
+  localStorage.setItem('dgm_theme', mode);
+}
+(function initTheme(){
+  const saved = localStorage.getItem('dgm_theme') || 'dark';
+  document.getElementById('themeSelect').value = saved;
+  applyTheme(saved);
+})();
 
-                const keyVal = snap.docs[0].data().key;
-                const sig = await generateSig(keyVal);
-                const targetUrl = `${BASE_GETKEY_URL}?freekey=${encodeURIComponent(keyVal)}&sig=${sig}`;
+/* ---------- POPUP / TOAST ---------- */
+function maybeShowFirstVisitPopup(){
+  if(localStorage.getItem('dgm_seen_welcome')) return;
+  showPopup('Chao mung ban', 'Cam on ban da su dung DigitalsMod. Hay diem danh hang ngay de nhan key mien phi.');
+  localStorage.setItem('dgm_seen_welcome', '1');
+}
+function showPopup(title, body){
+  document.getElementById('popupTitle').textContent = title;
+  document.getElementById('popupBody').textContent = body;
+  document.getElementById('popupOverlay').classList.add('show');
+}
+function closePopup(){ document.getElementById('popupOverlay').classList.remove('show'); }
 
-                if(systemConfig.apiTemplate) {
-                    window.location.href = systemConfig.apiTemplate.replace("{URL_DICH}", encodeURIComponent(targetUrl));
-                } else {
-                    window.location.href = targetUrl;
-                }
-            } catch(e) {
-                showToast("Lỗi: " + e.message, "error");
-            }
-        };
-
-        window.confirmClaimDirect = async () => {
-            const btn = document.getElementById("btn-claim-direct");
-            btn.disabled = true;
-            try {
-                const keyRef = doc(db, "keys", targetKeyDoc.key);
-                await runTransaction(db, async (transaction) => {
-                    const keySnap = await transaction.get(keyRef);
-                    if(!keySnap.exists() || keySnap.data().status !== "available") throw "Key không hợp lệ!";
-                    transaction.update(keyRef, { status: "claimed", claimedAt: serverTimestamp() });
-                });
-                document.getElementById("modal-key-val").innerText = targetKeyDoc.key;
-                document.getElementById("key-modal").classList.remove("hidden");
-            } catch(err) { showToast("Lỗi: " + err, "error"); btn.disabled = false; }
-        };
-
-        function showError(title, msg) {
-            document.getElementById("loading-state").classList.add("hidden");
-            document.getElementById("phase-initial-state").classList.add("hidden");
-            document.getElementById("phase-verify-state").classList.add("hidden");
-            document.getElementById("error-title").innerText = title;
-            document.getElementById("error-msg").innerText = msg;
-            document.getElementById("error-state").classList.remove("hidden");
-        }
-
-        window.copyKeyText = () => {
-            navigator.clipboard.writeText(targetKeyDoc.key);
-            showToast("Đã sao chép Key!", "success");
-        };
-
-        initApp();
-    </script>
+let toastTimer;
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+</script>
 </body>
 </html>
