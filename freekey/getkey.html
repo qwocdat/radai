@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>DigitalsMod - Get Key</title>
+<title>DigitalsMod - Nhận Key</title>
 
 <!-- Firebase (compat SDK, single file friendly) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -13,48 +13,52 @@
 
 <style>
 :root{
-  --primary-a:#6366f1;
-  --primary-b:#8b5cf6;
-  --accent:#00d9ff;
-  --bg:#0a0a0a;
-  --card:rgba(255,255,255,0.08);
-  --card-border:rgba(255,255,255,0.2);
-  --text:#f1f5f9;
-  --text-dim:#94a3b8;
-  --danger:#ef4444;
-  --success:#22c55e;
+  --primary:#007aff;
+  --primary-gradient: linear-gradient(135deg, #007aff, #5856d6);
+  --accent:#32ade6;
+  --bg:#000000;
+  --card: rgba(28, 28, 30, 0.75);
+  --card-border: rgba(255, 255, 255, 0.12);
+  --text:#ffffff;
+  --text-dim:#8e8e93;
+  --danger:#ff453a;
+  --success:#30d158;
+  --ios-radius: 18px;
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
 html,body{
   margin:0; padding:0; height:100%;
   background:var(--bg);
   color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
   overflow:hidden;
 }
-body::before{
-  content:"";
-  position:fixed; inset:0; pointer-events:none; z-index:0;
-  background-image:
-    repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 2px),
-    repeating-linear-gradient(90deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 2px);
-  background-size:2px 2px;
-}
+
 #app{position:relative; z-index:1; height:100%; display:flex; flex-direction:column;}
 
-/* top bar */
+/* iOS Top Bar */
 #topbar{
-  padding:16px 18px 10px 18px;
+  padding: 16px 20px 12px 20px;
   display:flex; align-items:center; justify-content:space-between;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
-#topbar .brand{font-weight:700; font-size:18px; letter-spacing:0.3px;}
-#topbar .brand span{background:linear-gradient(135deg,var(--primary-a),var(--primary-b)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+#topbar .brand{font-weight:700; font-size:20px; letter-spacing:-0.5px;}
+#topbar .brand span{color:var(--primary);}
 #topbar .user-chip{
   display:flex; align-items:center; gap:8px;
-  background:var(--card); border:1px solid var(--card-border);
-  backdrop-filter:blur(10px); border-radius:999px; padding:6px 12px; font-size:13px;
+  background: rgba(118, 118, 128, 0.24); border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter:blur(20px); border-radius:999px; padding:6px 14px; font-size:13px; font-weight:500;
 }
-#topbar .user-chip img{width:22px; height:22px; border-radius:999px;}
+
+/* Biểu tượng iOS thay cho avatar ảnh cũ */
+.ios-avatar-icon {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--primary-gradient);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: bold; color: #fff;
+}
 
 /* swipeable tab container */
 #viewport{flex:1; position:relative; overflow:hidden;}
@@ -64,194 +68,194 @@ body::before{
   touch-action:pan-y;
 }
 .tab-pane{
-  width:20%; height:100%; overflow-y:auto; padding:8px 18px 100px 18px;
+  width:20%; height:100%; overflow-y:auto; padding:12px 18px 100px 18px;
   -webkit-overflow-scrolling:touch;
 }
 
-/* glass card */
+/* iOS Glass Card */
 .glass-card{
   background:var(--card);
-  backdrop-filter:blur(14px);
-  -webkit-backdrop-filter:blur(14px);
+  backdrop-filter:blur(25px);
+  -webkit-backdrop-filter:blur(25px);
   border:1px solid var(--card-border);
-  border-radius:20px;
-  box-shadow:0 8px 32px rgba(0,0,0,0.35);
-  padding:16px;
-  margin-bottom:14px;
-  position:relative;
-  transition:transform 0.15s ease;
+  border-radius: var(--ios-radius);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  padding: 18px;
+  margin-bottom: 16px;
+  transition: transform 0.15s ease, background 0.2s ease;
 }
-.glass-card::before{
-  content:"";
-  position:absolute; inset:0; border-radius:inherit; pointer-events:none;
-  background-image:
-    repeating-linear-gradient(0deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 2px),
-    repeating-linear-gradient(90deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 2px);
-  background-size:2px 2px;
+.glass-card:active{transform:scale(0.98);}
+
+h2.section-title{
+  font-size: 13px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.5px; color: var(--text-dim); margin: 20px 0 8px 4px;
 }
-.glass-card:active{transform:scale(0.985);}
 
-h2.section-title{font-size:15px; text-transform:uppercase; letter-spacing:1px; color:var(--text-dim); margin:18px 0 10px 2px;}
-
-/* grid of action cards on Menu tab */
+/* Grid của thẻ thao tác */
 .grid-actions{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
 .action-card{
-  background:var(--card); border:1px solid var(--card-border);
-  backdrop-filter:blur(14px); border-radius:18px; padding:16px 12px;
-  display:flex; flex-direction:column; align-items:flex-start; gap:8px;
-  cursor:pointer; user-select:none;
+  background: var(--card); border: 1px solid var(--card-border);
+  backdrop-filter: blur(20px); border-radius: var(--ios-radius); padding: 16px;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
+  cursor: pointer; user-select: none;
 }
 .action-card .icon{
-  width:36px; height:36px; border-radius:12px;
-  background:linear-gradient(135deg,var(--primary-a),var(--primary-b));
-  display:flex; align-items:center; justify-content:center; font-size:16px;
+  width: 40px; height: 40px; border-radius: 10px;
+  background: var(--primary-gradient);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: bold; color: #fff;
+  box-shadow: 0 4px 12px rgba(0,122,255,0.3);
 }
-.action-card .label{font-size:13.5px; font-weight:600;}
-.action-card .sub{font-size:11px; color:var(--text-dim);}
+.action-card .label{font-size:14px; font-weight:600;}
+.action-card .sub{font-size:11.5px; color:var(--text-dim);}
 
 .matte-btn{
-  background:linear-gradient(135deg,var(--primary-a),var(--primary-b));
-  border:none; color:#fff; font-weight:600; font-size:14px;
-  padding:12px 18px; border-radius:14px; cursor:pointer;
-  text-shadow:0 2px 4px rgba(0,0,0,0.3);
-  width:100%;
+  background: var(--primary-gradient);
+  border: none; color: #fff; font-weight: 600; font-size: 15px;
+  padding: 14px 20px; border-radius: 14px; cursor: pointer;
+  width: 100%; transition: opacity 0.2s;
+  box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
 }
-.matte-btn:active{filter:brightness(0.92);}
+.matte-btn:active{opacity: 0.8;}
 .matte-btn.outline{
-  background:transparent; border:1px solid var(--card-border); color:var(--text);
-  text-shadow:none;
+  background: rgba(118, 118, 128, 0.24); border: 1px solid var(--card-border); color: var(--text);
+  box-shadow: none;
 }
-.matte-btn.danger{background:linear-gradient(135deg,#ef4444,#b91c1c);}
+.matte-btn.danger{background: linear-gradient(135deg, #ff453a, #ff3b30); box-shadow: 0 4px 15px rgba(255, 59, 48, 0.3);}
 
-/* status */
-.status-row{display:flex; justify-content:space-between; align-items:center; font-size:13px; padding:6px 0;}
+/* Trang thai */
+.status-row{display:flex; justify-content:space-between; align-items:center; font-size:14px; padding:8px 0;}
 .status-row .val{font-weight:600;}
-.pill{font-size:11px; padding:3px 9px; border-radius:999px; background:rgba(34,197,94,0.15); color:var(--success); border:1px solid rgba(34,197,94,0.3);}
-.pill.warn{background:rgba(239,68,68,0.15); color:var(--danger); border:1px solid rgba(239,68,68,0.3);}
+.pill{font-size:12px; padding:4px 12px; border-radius:999px; background:rgba(48,209,88,0.15); color:var(--success); border:1px solid rgba(48,209,88,0.3); font-weight:600;}
+.pill.warn{background:rgba(255,69,58,0.15); color:var(--danger); border:1px solid rgba(255,69,58,0.3);}
 
-/* key list */
+/* Danh sach key */
 .key-item{
   display:flex; justify-content:space-between; align-items:center;
-  padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.06);
+  padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.08);
 }
 .key-item:last-child{border-bottom:none;}
-.key-item .kname{font-size:13.5px; font-weight:600;}
-.key-item .kmeta{font-size:11px; color:var(--text-dim);}
+.key-item .kname{font-size:14px; font-weight:600; font-mono: true;}
+.key-item .kmeta{font-size:12px; color:var(--text-dim); margin-top:2px;}
 
-/* chart placeholder */
 canvas#usageChart{width:100%; height:140px;}
 
-/* upload */
+/* Upload Area */
 .dropzone{
-  border:1.5px dashed var(--card-border); border-radius:16px; padding:28px 14px;
-  text-align:center; color:var(--text-dim); font-size:13px; cursor:pointer;
+  border: 2px dashed rgba(255,255,255,0.2); border-radius: var(--ios-radius); padding: 32px 16px;
+  text-align: center; color: var(--text-dim); font-size: 14px; cursor: pointer;
+  background: rgba(255,255,255,0.02); transition: all 0.2s;
 }
-.dropzone.drag{border-color:var(--accent); color:var(--accent);}
-.file-row{display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.06);}
-.file-row img{width:40px; height:40px; object-fit:cover; border-radius:8px; background:rgba(255,255,255,0.05);}
-.file-row .fname{font-size:13px; flex:1;}
-.file-row .del{color:var(--danger); font-size:12px; cursor:pointer;}
+.dropzone.drag{border-color: var(--primary); color: var(--primary); background: rgba(0,122,255,0.1);}
+.file-row{display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.08);}
+.file-row .file-icon-box{
+  width: 42px; height: 42px; border-radius: 10px; background: rgba(118, 118, 128, 0.24);
+  display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: var(--primary);
+}
+.file-row .fname{font-size:13.5px; flex:1; font-weight:500;}
+.file-row .del{color:var(--danger); font-size:13px; cursor:pointer; font-weight:500;}
 
-/* rewards */
-.streak-wrap{display:flex; gap:6px; margin:10px 0;}
-.streak-dot{flex:1; height:8px; border-radius:99px; background:rgba(255,255,255,0.08);}
-.streak-dot.on{background:linear-gradient(135deg,var(--primary-a),var(--primary-b));}
+/* Đổi thưởng */
+.streak-wrap{display:flex; gap:6px; margin:14px 0;}
+.streak-dot{flex:1; height:8px; border-radius:99px; background:rgba(255,255,255,0.15);}
+.streak-dot.on{background: var(--primary-gradient);}
 .spin-wheel{
-  width:180px; height:180px; margin:14px auto; border-radius:50%;
-  background:conic-gradient(from 0deg,var(--primary-a),var(--primary-b),var(--accent),var(--primary-a));
-  display:flex; align-items:center; justify-content:center;
-  transition:transform 3s cubic-bezier(.17,.67,.16,.99);
-  box-shadow:0 0 40px rgba(99,102,241,0.35);
+  width: 180px; height: 180px; margin: 16px auto; border-radius: 50%;
+  background: conic-gradient(from 0deg, #007aff, #5856d6, #32ade6, #007aff);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 3s cubic-bezier(.17,.67,.16,.99);
+  box-shadow: 0 0 30px rgba(0,122,255,0.4);
 }
 .spin-wheel .center{
-  width:60px; height:60px; border-radius:50%; background:#0a0a0a;
-  display:flex; align-items:center; justify-content:center; font-size:11px; color:var(--text-dim);
+  width:64px; height:64px; border-radius:50%; background:#1c1c1e;
+  display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:bold; color:var(--text);
 }
 
-/* settings */
-.settings-row{display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.06);}
+/* Settings */
+.settings-row{display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.08);}
 .settings-row:last-child{border-bottom:none;}
-.settings-row .label{font-size:13.5px;}
+.settings-row .label{font-size:14px; font-weight:500;}
 select.theme-select, select.lang-select{
-  background:rgba(255,255,255,0.06); color:var(--text); border:1px solid var(--card-border);
-  border-radius:10px; padding:6px 10px; font-size:13px;
+  background: rgba(118, 118, 128, 0.24); color: var(--text); border: 1px solid var(--card-border);
+  border-radius: 10px; padding: 6px 12px; font-size: 13.5px; font-weight: 500; outline: none;
 }
-.switch{position:relative; width:44px; height:26px;}
+.switch{position:relative; width:50px; height:30px;}
 .switch input{opacity:0; width:0; height:0;}
-.switch .slider{position:absolute; inset:0; background:rgba(255,255,255,0.15); border-radius:999px; transition:.2s; cursor:pointer;}
-.switch .slider::before{content:""; position:absolute; width:20px; height:20px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.2s;}
-.switch input:checked + .slider{background:linear-gradient(135deg,var(--primary-a),var(--primary-b));}
-.switch input:checked + .slider::before{transform:translateX(18px);}
+.switch .slider{position:absolute; inset:0; background:rgba(120, 120, 128, 0.32); border-radius:999px; transition:.2s; cursor:pointer;}
+.switch .slider::before{content:""; position:absolute; width:26px; height:26px; left:2px; top:2px; background:#fff; border-radius:50%; transition:.2s; box-shadow:0 2px 5px rgba(0,0,0,0.2);}
+.switch input:checked + .slider{background: #34c759;}
+.switch input:checked + .slider::before{transform:translateX(20px);}
 
-/* bottom tab bar */
+/* iOS Tabbar */
 #tabbar{
-  position:absolute; left:12px; right:12px; bottom:14px; z-index:5;
-  display:flex; justify-content:space-around; align-items:center;
-  background:rgba(255,255,255,0.07); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
-  border:1px solid var(--card-border); border-radius:22px; padding:8px 4px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.4);
+  position: fixed; left: 16px; right: 16px; bottom: 20px; z-index: 5;
+  display: flex; justify-content: space-around; align-items: center;
+  background: rgba(30, 30, 32, 0.85);
+  backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+  border: 1px solid var(--card-border); border-radius: 28px; padding: 8px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
 }
 .tab-btn{
-  flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
-  padding:8px 2px; border-radius:16px; cursor:pointer; color:var(--text-dim);
-  font-size:10px; transition:.2s;
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 8px 0; border-radius: 20px; cursor: pointer; color: var(--text-dim);
+  font-size: 10px; font-weight: 500; transition: .2s;
 }
 .tab-btn .ico{font-size:18px;}
-.tab-btn.active{color:var(--text); background:rgba(255,255,255,0.06);}
-.tab-btn.active .ico{filter:drop-shadow(0 0 6px var(--primary-b));}
+.tab-btn.active{color: var(--primary); background: rgba(255,255,255,0.08);}
 
-/* modal / popup */
+/* Popup Overlay */
 #popupOverlay{
-  position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px);
+  position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(15px);
   display:none; align-items:center; justify-content:center; z-index:50; padding:20px;
 }
 #popupOverlay.show{display:flex;}
 .popup-box{
-  width:100%; max-width:340px; background:rgba(20,20,25,0.9);
-  border:1px solid var(--card-border); border-radius:22px; padding:22px;
-  text-align:center; backdrop-filter:blur(20px);
+  width:100%; max-width:320px; background:rgba(30,30,32,0.9);
+  border:1px solid var(--card-border); border-radius:24px; padding:24px;
+  text-align:center; backdrop-filter:blur(20px); box-shadow:0 20px 50px rgba(0,0,0,0.8);
 }
-.popup-box h3{margin:0 0 8px 0; font-size:16px;}
-.popup-box p{font-size:13px; color:var(--text-dim); margin:0 0 16px 0; line-height:1.5;}
+.popup-box h3{margin:0 0 10px 0; font-size:17px; font-weight:700;}
+.popup-box p{font-size:13.5px; color:var(--text-dim); margin:0 0 20px 0; line-height:1.4;}
 
-/* toast */
+/* Toast */
 #toast{
   position:fixed; left:50%; bottom:110px; transform:translateX(-50%) translateY(20px);
-  background:rgba(20,20,25,0.92); border:1px solid var(--card-border); backdrop-filter:blur(16px);
-  padding:10px 18px; border-radius:14px; font-size:13px; opacity:0; pointer-events:none;
-  transition:.25s; z-index:60; white-space:nowrap;
+  background:rgba(40,40,42,0.95); border:1px solid var(--card-border); backdrop-filter:blur(20px);
+  padding:12px 22px; border-radius:20px; font-size:13.5px; font-weight:500; opacity:0; pointer-events:none;
+  transition:.25s; z-index:60; white-space:nowrap; box-shadow:0 10px 30px rgba(0,0,0,0.5);
 }
 #toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
 
-/* light theme override */
-body.light{--bg:#eef1f6; --card:rgba(255,255,255,0.55); --card-border:rgba(0,0,0,0.08); --text:#0f172a; --text-dim:#475569;}
-body.light #popupOverlay .popup-box{background:rgba(255,255,255,0.85);}
+/* Dynamic Themes */
+body.light{--bg:#f2f2f7; --card:rgba(255,255,255,0.8); --card-border:rgba(0,0,0,0.08); --text:#000000; --text-dim:#8e8e93;}
+body.light #popupOverlay .popup-box{background:rgba(255,255,255,0.92);}
+body.light #tabbar{background:rgba(240,240,245,0.85);}
 
-/* auth screen */
+/* Auth Screen iOS */
 #authScreen{
   position:fixed; inset:0; z-index:40; display:flex; align-items:center; justify-content:center;
-  background:var(--bg); flex-direction:column; gap:16px; padding:24px; text-align:center;
+  background:var(--bg); flex-direction:column; gap:20px; padding:24px; text-align:center;
 }
-#authScreen .logo{font-size:26px; font-weight:800;}
-#authScreen .logo span{background:linear-gradient(135deg,var(--primary-a),var(--primary-b)); -webkit-background-clip:text; background-clip:text; color:transparent;}
-#authScreen p{color:var(--text-dim); font-size:13px; max-width:280px;}
+#authScreen .logo{font-size:32px; font-weight:800; letter-spacing:-1px;}
+#authScreen .logo span{color:var(--primary);}
+#authScreen p{color:var(--text-dim); font-size:14px; max-width:280px; line-height:1.4;}
 </style>
 </head>
 <body>
 
 <div id="authScreen">
   <div class="logo">Digitals<span>Mod</span></div>
-  <p>Dang nhap de nhan key mien phi va quan ly du lieu cua ban.</p>
-  <button class="matte-btn" style="max-width:220px" onclick="signInGoogle()">Dang nhap voi Google</button>
-  <button class="matte-btn outline" style="max-width:220px" onclick="signInAnon()">Dung thu (Khach)</button>
+  <p>Đăng nhập để nhận key miễn phí và quản lý dữ liệu của bạn.</p>
+  <button class="matte-btn" style="max-width:260px" onclick="signInGoogle()">Đăng nhập bằng Google</button>
+  <button class="matte-btn outline" style="max-width:260px" onclick="signInAnon()">Dùng thử (Khách)</button>
 </div>
 
 <div id="app" style="display:none;">
   <div id="topbar">
     <div class="brand">Digitals<span>Mod</span></div>
     <div class="user-chip">
-      <img id="userAvatar" src="https://api.dicebear.com/7.x/identicon/svg?seed=guest" alt="">
-      <span id="userName">Khach</span>
+      <div id="userAvatarIcon" class="ios-avatar-icon">K</div>
+      <span id="userName">Khách</span>
     </div>
   </div>
 
@@ -261,157 +265,157 @@ body.light #popupOverlay .popup-box{background:rgba(255,255,255,0.85);}
       <!-- TAB 0: MENU -->
       <div class="tab-pane">
         <div class="glass-card">
-          <div class="status-row"><span>Trang thai tai khoan</span><span class="pill" id="accountPill">Hoat dong</span></div>
-          <div class="status-row"><span>Key con hieu luc</span><span class="val" id="activeKeyCount">0</span></div>
-          <div class="status-row"><span>Ngay tham gia</span><span class="val" id="joinDateLabel">-</span></div>
+          <div class="status-row"><span>Trạng thái tài khoản</span><span class="pill" id="accountPill">Hoạt động</span></div>
+          <div class="status-row"><span>Key còn hiệu lực</span><span class="val" id="activeKeyCount">0</span></div>
+          <div class="status-row"><span>Ngày tham gia</span><span class="val" id="joinDateLabel">-</span></div>
         </div>
 
-        <h2 class="section-title">Chuc nang chinh</h2>
+        <h2 class="section-title">Chức năng chính</h2>
         <div class="grid-actions">
           <div class="action-card" onclick="goto(1); openGenerateKey()">
-            <div class="icon">K</div>
-            <div class="label">Lay Key Free</div>
-            <div class="sub">Tao key su dung ngay</div>
+            <div class="icon">🔑</div>
+            <div class="label">Lấy Key Miễn Phí</div>
+            <div class="sub">Tạo key dùng ngay</div>
           </div>
           <div class="action-card" onclick="goto(1)">
-            <div class="icon">D</div>
-            <div class="label">Xem Dashboard</div>
-            <div class="sub">Thong ke chi tiet</div>
+            <div class="icon">📊</div>
+            <div class="label">Xem Bảng Điều Khiển</div>
+            <div class="sub">Thống kê chi tiết</div>
           </div>
           <div class="action-card" onclick="goto(3)">
-            <div class="icon">R</div>
-            <div class="label">Nhan Thuong</div>
-            <div class="sub">Diem danh hang ngay</div>
+            <div class="icon">🎁</div>
+            <div class="label">Nhận Thưởng</div>
+            <div class="sub">Điểm danh hàng ngày</div>
           </div>
           <div class="action-card" onclick="goto(2)">
-            <div class="icon">U</div>
-            <div class="label">Upload File</div>
-            <div class="sub">Menu / cau hinh</div>
+            <div class="icon">☁️</div>
+            <div class="label">Tải Lên Tệp</div>
+            <div class="sub">Menu / Cấu hình</div>
           </div>
           <div class="action-card" onclick="copyReferral()">
-            <div class="icon">M</div>
-            <div class="label">Moi Ban</div>
-            <div class="sub">Sao chep link gioi thieu</div>
+            <div class="icon">👥</div>
+            <div class="label">Mời Bạn Bè</div>
+            <div class="sub">Sao chép liên kết</div>
           </div>
           <div class="action-card" onclick="goto(4)">
-            <div class="icon">S</div>
-            <div class="label">Cai Dat</div>
-            <div class="sub">Tuy chinh ung dung</div>
+            <div class="icon">⚙️</div>
+            <div class="label">Cài Đặt</div>
+            <div class="sub">Tùy chỉnh ứng dụng</div>
           </div>
         </div>
       </div>
 
       <!-- TAB 1: DASHBOARD -->
       <div class="tab-pane">
-        <h2 class="section-title">Thong ke su dung</h2>
+        <h2 class="section-title">Thống kê sử dụng</h2>
         <div class="glass-card">
           <canvas id="usageChart"></canvas>
         </div>
 
         <div class="glass-card">
-          <div class="status-row"><span>Tong luot dung menu</span><span class="val" id="totalUsageVal">0</span></div>
-          <div class="status-row"><span>Ngay con lai (key gan nhat)</span><span class="val" id="daysLeftVal">-</span></div>
-          <div class="status-row"><span>Lan dung gan nhat</span><span class="val" id="lastUsedVal">-</span></div>
+          <div class="status-row"><span>Tổng lượt dùng menu</span><span class="val" id="totalUsageVal">0</span></div>
+          <div class="status-row"><span>Ngày còn lại (key gần nhất)</span><span class="val" id="daysLeftVal">-</span></div>
+          <div class="status-row"><span>Lần dùng gần nhất</span><span class="val" id="lastUsedVal">-</span></div>
         </div>
 
-        <h2 class="section-title">Danh sach key</h2>
+        <h2 class="section-title">Danh sách key</h2>
         <div class="glass-card" id="keyListCard">
-          <div style="font-size:12px; color:var(--text-dim);">Chua co key nao.</div>
+          <div style="font-size:13px; color:var(--text-dim);">Chưa có key nào.</div>
         </div>
 
-        <button class="matte-btn outline" onclick="refreshDashboard()">Lam moi du lieu</button>
+        <button class="matte-btn outline" onclick="refreshDashboard()">Làm mới dữ liệu</button>
       </div>
 
       <!-- TAB 2: UPLOAD -->
       <div class="tab-pane">
-        <h2 class="section-title">Upload menu / cau hinh</h2>
+        <h2 class="section-title">Tải lên menu / cấu hình</h2>
         <div class="glass-card">
           <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
-            Keo tha file vao day hoac bam de chon file
+            Kéo thả tệp vào đây hoặc bấm để chọn tệp
           </div>
           <input type="file" id="fileInput" style="display:none" onchange="handleFileSelect(event)">
         </div>
 
-        <h2 class="section-title">File da upload</h2>
+        <h2 class="section-title">Tệp đã tải lên</h2>
         <div class="glass-card" id="uploadListCard">
-          <div style="font-size:12px; color:var(--text-dim);">Chua co file nao.</div>
+          <div style="font-size:13px; color:var(--text-dim);">Chưa có tệp nào.</div>
         </div>
       </div>
 
       <!-- TAB 3: REWARDS -->
       <div class="tab-pane">
-        <h2 class="section-title">Diem danh hang ngay</h2>
+        <h2 class="section-title">Điểm danh hàng ngày</h2>
         <div class="glass-card" style="text-align:center;">
           <div class="spin-wheel" id="spinWheel">
             <div class="center">QUAY</div>
           </div>
-          <button class="matte-btn" onclick="spinReward()">Quay thuong</button>
+          <button class="matte-btn" onclick="spinReward()">Quay Thưởng</button>
           <div class="streak-wrap" id="streakWrap"></div>
-          <div style="font-size:12px; color:var(--text-dim);">Chuoi diem danh: <span id="streakVal">0</span> ngay</div>
+          <div style="font-size:13px; color:var(--text-dim);">Chuỗi điểm danh: <span id="streakVal">0</span> ngày</div>
         </div>
 
-        <h2 class="section-title">Nhiem vu nho</h2>
+        <h2 class="section-title">Nhiệm vụ nhỏ</h2>
         <div class="glass-card">
-          <div class="status-row"><span>Moi 1 ban be</span><span class="pill" id="quest1">+50 diem</span></div>
-          <div class="status-row"><span>Upload 1 file</span><span class="pill" id="quest2">+20 diem</span></div>
-          <div class="status-row"><span>Dang nhap 3 ngay lien tiep</span><span class="pill" id="quest3">+100 diem</span></div>
+          <div class="status-row"><span>Mời 1 bạn bè</span><span class="pill" id="quest1">+50 điểm</span></div>
+          <div class="status-row"><span>Tải lên 1 tệp</span><span class="pill" id="quest2">+20 điểm</span></div>
+          <div class="status-row"><span>Đăng nhập 3 ngày liên tiếp</span><span class="pill" id="quest3">+100 điểm</span></div>
         </div>
       </div>
 
       <!-- TAB 4: SETTINGS -->
       <div class="tab-pane">
-        <h2 class="section-title">Thong tin ca nhan</h2>
+        <h2 class="section-title">Thông tin cá nhân</h2>
         <div class="glass-card">
           <div class="settings-row">
-            <span class="label">Ten hien thi</span>
-            <input id="displayNameInput" style="background:rgba(255,255,255,0.06); border:1px solid var(--card-border); color:var(--text); border-radius:10px; padding:6px 10px; font-size:13px; width:120px;">
+            <span class="label">Tên hiển thị</span>
+            <input id="displayNameInput" style="background:rgba(118,118,128,0.24); border:1px solid var(--card-border); color:var(--text); border-radius:10px; padding:8px 12px; font-size:13.5px; width:140px; outline:none;">
           </div>
-          <button class="matte-btn outline" style="margin-top:10px" onclick="saveProfile()">Luu thay doi</button>
+          <button class="matte-btn outline" style="margin-top:12px" onclick="saveProfile()">Lưu thay đổi</button>
         </div>
 
-        <h2 class="section-title">Tuy chinh</h2>
+        <h2 class="section-title">Tùy chỉnh</h2>
         <div class="glass-card">
           <div class="settings-row">
-            <span class="label">Giao dien</span>
+            <span class="label">Giao diện</span>
             <select class="theme-select" id="themeSelect" onchange="applyTheme(this.value)">
-              <option value="dark">Toi (Dark)</option>
-              <option value="light">Sang (Light)</option>
-              <option value="auto">Tu dong</option>
+              <option value="dark">Tối (Dark)</option>
+              <option value="light">Sáng (Light)</option>
+              <option value="auto">Tự động</option>
             </select>
           </div>
           <div class="settings-row">
-            <span class="label">Ngon ngu</span>
+            <span class="label">Ngôn ngữ</span>
             <select class="lang-select" id="langSelect">
-              <option value="vi">Tieng Viet</option>
+              <option value="vi">Tiếng Việt</option>
               <option value="en">English</option>
             </select>
           </div>
           <div class="settings-row">
-            <span class="label">Thong bao</span>
+            <span class="label">Thông báo</span>
             <label class="switch"><input type="checkbox" id="notifToggle" checked><span class="slider"></span></label>
           </div>
         </div>
 
-        <button class="matte-btn danger" onclick="doLogout()">Dang xuat</button>
+        <button class="matte-btn danger" onclick="doLogout()">Đăng xuất</button>
       </div>
 
     </div>
   </div>
 
   <div id="tabbar">
-    <div class="tab-btn active" data-idx="0" onclick="goto(0)"><div class="ico">◆</div>Menu</div>
-    <div class="tab-btn" data-idx="1" onclick="goto(1)"><div class="ico">▤</div>Dashboard</div>
-    <div class="tab-btn" data-idx="2" onclick="goto(2)"><div class="ico">↑</div>Upload</div>
-    <div class="tab-btn" data-idx="3" onclick="goto(3)"><div class="ico">★</div>Thuong</div>
-    <div class="tab-btn" data-idx="4" onclick="goto(4)"><div class="ico">⚙</div>Cai dat</div>
+    <div class="tab-btn active" data-idx="0" onclick="goto(0)"><div class="ico"></div>Menu</div>
+    <div class="tab-btn" data-idx="1" onclick="goto(1)"><div class="ico">📊</div>Thống Kê</div>
+    <div class="tab-btn" data-idx="2" onclick="goto(2)"><div class="ico">☁️</div>Tải Lên</div>
+    <div class="tab-btn" data-idx="3" onclick="goto(3)"><div class="ico">🎁</div>Thưởng</div>
+    <div class="tab-btn" data-idx="4" onclick="goto(4)"><div class="ico">⚙️</div>Cài Đặt</div>
   </div>
 </div>
 
 <div id="popupOverlay">
   <div class="popup-box">
-    <h3 id="popupTitle">Thong bao</h3>
-    <p id="popupBody">Noi dung thong bao.</p>
-    <button class="matte-btn" onclick="closePopup()">Da hieu</button>
+    <h3 id="popupTitle">Thông báo</h3>
+    <p id="popupBody">Nội dung thông báo.</p>
+    <button class="matte-btn" onclick="closePopup()">Đã hiểu</button>
   </div>
 </div>
 
@@ -419,7 +423,7 @@ body.light #popupOverlay .popup-box{background:rgba(255,255,255,0.85);}
 
 <script>
 /* =========================================================
-   FIREBASE CONFIG (Cấu hình Firebase cũ của bạn)
+   Cấu hình Firebase Giữ Nguyên
    ========================================================= */
 const firebaseConfig = {
     apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
@@ -438,7 +442,7 @@ try {
   db = firebase.database();
   storage = firebase.storage();
 } catch (e) {
-  console.warn("Firebase chua duoc cau hinh dung:", e);
+  console.warn("Firebase chưa được cấu hình đúng:", e);
 }
 
 let currentUser = null;
@@ -447,12 +451,12 @@ const TAB_COUNT = 5;
 
 /* ---------- AUTH ---------- */
 function signInGoogle(){
-  if(!auth){ toast("Firebase chua cau hinh"); return; }
+  if(!auth){ toast("Firebase chưa cấu hình"); return; }
   const provider = new firebase.auth.GoogleAuthProvider();
   auth.signInWithPopup(provider).then(res => onAuthReady(res.user)).catch(err => toast(err.message));
 }
 function signInAnon(){
-  if(!auth){ toast("Firebase chua cau hinh"); return; }
+  if(!auth){ toast("Firebase chưa cấu hình"); return; }
   auth.signInAnonymously().then(res => onAuthReady(res.user)).catch(err => toast(err.message));
 }
 function doLogout(){
@@ -465,8 +469,9 @@ function onAuthReady(user){
   currentUser = user;
   document.getElementById('authScreen').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
-  document.getElementById('userName').textContent = user.displayName || 'Khach';
-  document.getElementById('userAvatar').src = user.photoURL || ('https://api.dicebear.com/7.x/identicon/svg?seed=' + user.uid);
+  const name = user.displayName || 'Khách';
+  document.getElementById('userName').textContent = name;
+  document.getElementById('userAvatarIcon').textContent = name.charAt(0).toUpperCase();
 
   ensureUserProfile();
   loadDashboard();
@@ -485,8 +490,8 @@ function ensureUserProfile(){
   userRef('profile').once('value').then(snap => {
     if(!snap.exists()){
       userRef('profile').set({
-        name: currentUser.displayName || 'Khach',
-        avatar: currentUser.photoURL || '',
+        name: currentUser.displayName || 'Khách',
+        avatar: '',
         email: currentUser.email || '',
         joinDate: new Date().toISOString().slice(0,10)
       });
@@ -516,7 +521,6 @@ viewport.addEventListener('pointerdown', e => {
 viewport.addEventListener('pointermove', e => {
   if(!dragging) return;
   currentX = e.clientX - startX;
-  const base = -activeTab * (viewportWidth * TAB_COUNT / TAB_COUNT) - activeTab * 0;
   const percentBase = -activeTab * (100 / TAB_COUNT);
   const dragPercent = (currentX / viewportWidth) * (100 / TAB_COUNT);
   track.style.transform = `translateX(${percentBase + dragPercent}%)`;
@@ -532,12 +536,12 @@ viewport.addEventListener('pointerup', e => {
 });
 viewport.addEventListener('pointerleave', () => { if(dragging){ dragging = false; goto(activeTab); currentX = 0; } });
 
-/* ---------- KEY GENERATION ---------- */
+/* ---------- TẠO KEY ---------- */
 function openGenerateKey(){
   generateKey();
 }
 function generateKey(){
-  if(!currentUser){ toast("Ban chua dang nhap"); return; }
+  if(!currentUser){ toast("Bạn chưa đăng nhập"); return; }
   const keyId = db.ref().child('users').push().key;
   const now = Date.now();
   const expiresAt = now + 24 * 60 * 60 * 1000;
@@ -552,12 +556,12 @@ function generateKey(){
   };
   userRef('keys/' + keyId).set(keyData).then(() => {
     userRef('stats/totalUsage').transaction(v => (v || 0) + 1);
-    showPopup('Tao key thanh cong', 'Key cua ban: ' + keyString + '. Het han sau 24 gio.');
+    showPopup('Tạo Key Thành Công', 'Key của bạn: ' + keyString + '. Hết hạn sau 24 giờ.');
     loadDashboard();
   }).catch(err => toast(err.message));
 }
 
-/* ---------- DASHBOARD ---------- */
+/* ---------- BẢNG ĐIỀU KHIỂN ---------- */
 function loadDashboard(){
   userRef('keys').once('value').then(snap => {
     const data = snap.val() || {};
@@ -568,20 +572,20 @@ function loadDashboard(){
 
     const listCard = document.getElementById('keyListCard');
     if(entries.length === 0){
-      listCard.innerHTML = '<div style="font-size:12px; color:var(--text-dim);">Chua co key nao.</div>';
+      listCard.innerHTML = '<div style="font-size:13px; color:var(--text-dim);">Chưa có key nào.</div>';
     } else {
       listCard.innerHTML = entries.sort((a,b) => b[1].createdAt - a[1].createdAt).map(([id,k]) => {
         const daysLeft = Math.max(0, Math.ceil((k.expiresAt - now) / 86400000));
         return `<div class="key-item">
           <div>
             <div class="kname">${k.key}</div>
-            <div class="kmeta">${k.gameType} - con ${daysLeft} ngay</div>
+            <div class="kmeta">${k.gameType} - còn ${daysLeft} ngày</div>
           </div>
-          <span class="pill ${daysLeft <= 0 ? 'warn' : ''}">${daysLeft <= 0 ? 'Het han' : 'Con hieu luc'}</span>
+          <span class="pill ${daysLeft <= 0 ? 'warn' : ''}">${daysLeft <= 0 ? 'Hết hạn' : 'Còn hiệu lực'}</span>
         </div>`;
       }).join('');
       const latest = entries.sort((a,b) => b[1].createdAt - a[1].createdAt)[0][1];
-      document.getElementById('daysLeftVal').textContent = Math.max(0, Math.ceil((latest.expiresAt - now) / 86400000)) + ' ngay';
+      document.getElementById('daysLeftVal').textContent = Math.max(0, Math.ceil((latest.expiresAt - now) / 86400000)) + ' ngày';
     }
   });
 
@@ -592,7 +596,7 @@ function loadDashboard(){
     drawUsageChart(s.usageHistory || [3,5,2,8,6,9,4]);
   });
 }
-function refreshDashboard(){ loadDashboard(); toast('Da lam moi'); }
+function refreshDashboard(){ loadDashboard(); toast('Đã làm mới'); }
 
 function drawUsageChart(dataPoints){
   const canvas = document.getElementById('usageChart');
@@ -612,10 +616,10 @@ function drawUsageChart(dataPoints){
     if(i === 0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
   });
   const grad = ctx.createLinearGradient(0,0,w,0);
-  grad.addColorStop(0, '#6366f1');
-  grad.addColorStop(1, '#8b5cf6');
+  grad.addColorStop(0, '#007aff');
+  grad.addColorStop(1, '#5856d6');
   ctx.strokeStyle = grad;
-  ctx.lineWidth = 2.5;
+  ctx.lineWidth = 3;
   ctx.lineJoin = 'round';
   ctx.stroke();
 
@@ -623,13 +627,13 @@ function drawUsageChart(dataPoints){
     const x = i * step;
     const y = h - (v / max) * (h - 20) - 10;
     ctx.beginPath();
-    ctx.arc(x,y,3,0,Math.PI*2);
-    ctx.fillStyle = '#00d9ff';
+    ctx.arc(x,y,4,0,Math.PI*2);
+    ctx.fillStyle = '#32ade6';
     ctx.fill();
   });
 }
 
-/* ---------- UPLOAD ---------- */
+/* ---------- TẢI LÊN ---------- */
 const dropzone = document.getElementById('dropzone');
 ['dragover','dragenter'].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.add('drag'); }));
 ['dragleave','drop'].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.remove('drag'); }));
@@ -642,11 +646,11 @@ function handleFileSelect(e){
   if(file) uploadFile(file);
 }
 function uploadFile(file){
-  if(!currentUser){ toast('Ban chua dang nhap'); return; }
-  if(!storage){ toast('Firebase Storage chua cau hinh'); return; }
+  if(!currentUser){ toast('Bạn chưa đăng nhập'); return; }
+  if(!storage){ toast('Firebase Storage chưa cấu hình'); return; }
   const path = 'uploads/' + currentUser.uid + '/' + Date.now() + '_' + file.name;
   const ref = storage.ref(path);
-  toast('Dang tai len...');
+  toast('Đang tải lên...');
   ref.put(file).then(snap => snap.ref.getDownloadURL()).then(url => {
     const fileId = db.ref().child('users').push().key;
     return userRef('uploads/' + fileId).set({
@@ -656,7 +660,7 @@ function uploadFile(file){
       uploadedAt: Date.now()
     });
   }).then(() => {
-    toast('Tai len thanh cong');
+    toast('Tải lên thành công');
     loadUploads();
   }).catch(err => toast(err.message));
 }
@@ -666,24 +670,23 @@ function loadUploads(){
     const entries = Object.entries(data);
     const card = document.getElementById('uploadListCard');
     if(entries.length === 0){
-      card.innerHTML = '<div style="font-size:12px; color:var(--text-dim);">Chua co file nao.</div>';
+      card.innerHTML = '<div style="font-size:13px; color:var(--text-dim);">Chưa có tệp nào.</div>';
       return;
     }
     card.innerHTML = entries.sort((a,b) => b[1].uploadedAt - a[1].uploadedAt).map(([id,f]) => {
-      const isImg = (f.type || '').startsWith('image/');
       return `<div class="file-row">
-        ${isImg ? `<img src="${f.url}">` : `<div style="width:40px;height:40px;border-radius:8px;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:11px;">FILE</div>`}
+        <div class="file-icon-box">TỆP</div>
         <div class="fname">${f.name}</div>
-        <div class="del" onclick="deleteUpload('${id}')">Xoa</div>
+        <div class="del" onclick="deleteUpload('${id}')">Xóa</div>
       </div>`;
     }).join('');
   });
 }
 function deleteUpload(fileId){
-  userRef('uploads/' + fileId).remove().then(() => { toast('Da xoa file'); loadUploads(); });
+  userRef('uploads/' + fileId).remove().then(() => { toast('Đã xóa tệp'); loadUploads(); });
 }
 
-/* ---------- REWARDS ---------- */
+/* ---------- ĐỔI THƯỞNG ---------- */
 function loadRewards(){
   userRef('stats').once('value').then(snap => {
     const s = snap.val() || {};
@@ -699,7 +702,7 @@ function loadRewards(){
   });
 }
 function spinReward(){
-  if(!currentUser){ toast('Ban chua dang nhap'); return; }
+  if(!currentUser){ toast('Bạn chưa đăng nhập'); return; }
   const wheel = document.getElementById('spinWheel');
   const rand = 1800 + Math.floor(Math.random() * 360);
   wheel.style.transform = 'rotate(' + rand + 'deg)';
@@ -708,7 +711,7 @@ function spinReward(){
     userRef('stats/totalRewards').transaction(v => (v || 0) + rewardPoints);
     userRef('stats/streak').transaction(v => (v || 0) + 1);
     userRef('stats/lastUsedDate').set(new Date().toISOString().slice(0,10));
-    showPopup('Chuc mung', 'Ban nhan duoc ' + rewardPoints + ' diem thuong.');
+    showPopup('Chúc Mừng', 'Bạn nhận được ' + rewardPoints + ' điểm thưởng.');
     loadRewards();
   }, 3000);
 }
@@ -716,16 +719,17 @@ function copyReferral(){
   if(!currentUser) return;
   const link = window.location.origin + window.location.pathname + '?ref=' + currentUser.uid;
   navigator.clipboard?.writeText(link);
-  toast('Da sao chep link moi ban');
+  toast('Đã sao chép liên kết mời bạn');
 }
 
-/* ---------- SETTINGS ---------- */
+/* ---------- CÀI ĐẶT ---------- */
 function saveProfile(){
   const name = document.getElementById('displayNameInput').value.trim();
   if(!name) return;
   userRef('profile/name').set(name).then(() => {
     document.getElementById('userName').textContent = name;
-    toast('Da luu thong tin');
+    document.getElementById('userAvatarIcon').textContent = name.charAt(0).toUpperCase();
+    toast('Đã lưu thông tin');
   });
 }
 function applyTheme(mode){
@@ -743,10 +747,10 @@ function applyTheme(mode){
   applyTheme(saved);
 })();
 
-/* ---------- POPUP / TOAST ---------- */
+/* ---------- POPUP & TOAST ---------- */
 function maybeShowFirstVisitPopup(){
   if(localStorage.getItem('dgm_seen_welcome')) return;
-  showPopup('Chao mung ban', 'Cam on ban da su dung DigitalsMod. Hay diem danh hang ngay de nhan key mien phi.');
+  showPopup('Chào Mừng Bạn', 'Cảm ơn bạn đã sử dụng DigitalsMod. Hãy điểm danh hàng ngày để nhận key miễn phí.');
   localStorage.setItem('dgm_seen_welcome', '1');
 }
 function showPopup(title, body){
