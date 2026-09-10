@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DigitalsMod - Admin</title>
+<title>DigitalsMod - Quản Trị Admin</title>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -11,102 +11,94 @@
 
 <style>
 :root{
-  --primary-a:#6366f1;
-  --primary-b:#8b5cf6;
-  --accent:#00d9ff;
-  --bg:#0a0a0a;
-  --card:rgba(255,255,255,0.08);
-  --card-border:rgba(255,255,255,0.2);
-  --text:#f1f5f9;
-  --text-dim:#94a3b8;
-  --danger:#ef4444;
-  --success:#22c55e;
+  --primary:#007aff;
+  --primary-gradient: linear-gradient(135deg, #007aff, #5856d6);
+  --bg:#000000;
+  --card:rgba(28, 28, 30, 0.8);
+  --card-border:rgba(255, 255, 255, 0.12);
+  --text:#ffffff;
+  --text-dim:#8e8e93;
+  --danger:#ff453a;
+  --success:#30d158;
 }
 *{box-sizing:border-box;}
 html,body{
   margin:0; padding:0; min-height:100%;
   background:var(--bg); color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-}
-body::before{
-  content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
-  background-image:
-    repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 2px),
-    repeating-linear-gradient(90deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 2px);
-  background-size:2px 2px;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",sans-serif;
 }
 
 #loginScreen{
   position:fixed; inset:0; z-index:40; display:flex; align-items:center; justify-content:center;
-  flex-direction:column; gap:14px; padding:24px; text-align:center;
+  flex-direction:column; gap:16px; padding:24px; text-align:center; background:var(--bg);
 }
-#loginScreen .logo{font-size:24px; font-weight:800;}
-#loginScreen .logo span{background:linear-gradient(135deg,var(--primary-a),var(--primary-b)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+#loginScreen .logo{font-size:28px; font-weight:800; letter-spacing:-1px;}
+#loginScreen .logo span{color:var(--primary);}
 #loginScreen input{
-  background:rgba(255,255,255,0.06); border:1px solid var(--card-border); color:var(--text);
-  border-radius:12px; padding:12px 14px; font-size:14px; width:260px;
+  background:rgba(118,118,128,0.24); border:1px solid var(--card-border); color:var(--text);
+  border-radius:14px; padding:14px 16px; font-size:15px; width:280px; text-align:center; outline:none;
 }
 .matte-btn{
-  background:linear-gradient(135deg,var(--primary-a),var(--primary-b));
-  border:none; color:#fff; font-weight:600; font-size:14px;
-  padding:11px 18px; border-radius:12px; cursor:pointer; width:260px;
+  background:var(--primary-gradient);
+  border:none; color:#fff; font-weight:600; font-size:15px;
+  padding:12px 20px; border-radius:14px; cursor:pointer; width:280px; box-shadow:0 4px 15px rgba(0,122,255,0.3);
 }
-.matte-btn.small{width:auto; padding:7px 14px; font-size:12.5px;}
-.matte-btn.danger{background:linear-gradient(135deg,#ef4444,#b91c1c);}
-.matte-btn.outline{background:transparent; border:1px solid var(--card-border); color:var(--text);}
+.matte-btn.small{width:auto; padding:8px 16px; font-size:13px;}
+.matte-btn.danger{background:linear-gradient(135deg,#ff453a,#ff3b30);}
+.matte-btn.outline{background:rgba(118,118,128,0.24); border:1px solid var(--card-border); color:var(--text); box-shadow:none;}
 
 #adminApp{display:none; position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:20px 18px 60px 18px;}
-header.top{display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;}
-header.top .brand{font-size:19px; font-weight:800;}
-header.top .brand span{background:linear-gradient(135deg,var(--primary-a),var(--primary-b)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+header.top{display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;}
+header.top .brand{font-size:22px; font-weight:800; letter-spacing:-0.5px;}
+header.top .brand span{color:var(--primary);}
 
-.stats-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:14px; margin-bottom:24px;}
+.stats-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:14px; margin-bottom:24px;}
 .stat-card{
-  background:var(--card); border:1px solid var(--card-border); backdrop-filter:blur(14px);
-  border-radius:18px; padding:16px;
+  background:var(--card); border:1px solid var(--card-border); backdrop-filter:blur(20px);
+  border-radius:18px; padding:18px; box-shadow:0 4px 20px rgba(0,0,0,0.3);
 }
-.stat-card .num{font-size:26px; font-weight:800;}
-.stat-card .lbl{font-size:12px; color:var(--text-dim); margin-top:4px;}
+.stat-card .num{font-size:28px; font-weight:800;}
+.stat-card .lbl{font-size:12.5px; color:var(--text-dim); margin-top:4px; font-weight:500;}
 
-.tabs-row{display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;}
+.tabs-row{display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap;}
 .tabs-row button{
-  background:var(--card); border:1px solid var(--card-border); color:var(--text-dim);
-  padding:8px 16px; border-radius:12px; cursor:pointer; font-size:13px; backdrop-filter:blur(10px);
+  background:rgba(118,118,128,0.24); border:1px solid var(--card-border); color:var(--text-dim);
+  padding:10px 18px; border-radius:14px; cursor:pointer; font-size:13.5px; font-weight:600; backdrop-filter:blur(10px); transition:0.2s;
 }
-.tabs-row button.active{color:var(--text); border-color:var(--primary-b); background:rgba(139,92,246,0.12);}
+.tabs-row button.active{color:var(--text); border-color:var(--primary); background:var(--primary-gradient);}
 
 .glass-card{
-  background:var(--card); border:1px solid var(--card-border); backdrop-filter:blur(14px);
-  border-radius:20px; padding:16px; margin-bottom:16px;
+  background:var(--card); border:1px solid var(--card-border); backdrop-filter:blur(20px);
+  border-radius:20px; padding:20px; margin-bottom:20px; box-shadow:0 4px 20px rgba(0,0,0,0.4);
 }
-.search-row{display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap;}
+.search-row{display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap;}
 .search-row input{
-  flex:1; min-width:200px; background:rgba(255,255,255,0.06); border:1px solid var(--card-border);
-  color:var(--text); border-radius:12px; padding:9px 12px; font-size:13px;
+  flex:1; min-width:200px; background:rgba(118,118,128,0.24); border:1px solid var(--card-border);
+  color:var(--text); border-radius:12px; padding:10px 14px; font-size:14px; outline:none;
 }
 
-table{width:100%; border-collapse:collapse; font-size:13px;}
+table{width:100%; border-collapse:collapse; font-size:13.5px;}
 thead th{
-  text-align:left; padding:9px 8px; color:var(--text-dim); font-weight:600; font-size:11.5px;
+  text-align:left; padding:10px 8px; color:var(--text-dim); font-weight:600; font-size:12px;
   text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--card-border);
 }
-tbody td{padding:10px 8px; border-bottom:1px solid rgba(255,255,255,0.06); vertical-align:middle;}
+tbody td{padding:12px 8px; border-bottom:1px solid rgba(255,255,255,0.08); vertical-align:middle;}
 tbody tr:hover{background:rgba(255,255,255,0.03);}
-.pill{font-size:10.5px; padding:3px 9px; border-radius:999px; background:rgba(34,197,94,0.15); color:var(--success); border:1px solid rgba(34,197,94,0.3);}
-.pill.warn{background:rgba(239,68,68,0.15); color:var(--danger); border:1px solid rgba(239,68,68,0.3);}
-.mono{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12px;}
+.pill{font-size:11px; padding:4px 10px; border-radius:999px; background:rgba(48,209,88,0.15); color:var(--success); border:1px solid rgba(48,209,88,0.3); font-weight:600;}
+.pill.warn{background:rgba(255,69,58,0.15); color:var(--danger); border:1px solid rgba(255,69,58,0.3);}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12.5px;}
 .icon-btn{
-  background:rgba(255,255,255,0.06); border:1px solid var(--card-border); color:var(--text);
-  border-radius:8px; padding:5px 10px; font-size:11.5px; cursor:pointer; margin-right:4px;
+  background:rgba(118,118,128,0.24); border:1px solid var(--card-border); color:var(--text);
+  border-radius:10px; padding:6px 12px; font-size:12px; font-weight:500; cursor:pointer; margin-right:4px;
 }
-.icon-btn.danger{color:var(--danger); border-color:rgba(239,68,68,0.3);}
-.empty-note{font-size:12.5px; color:var(--text-dim); padding:20px 0; text-align:center;}
+.icon-btn.danger{color:var(--danger); border-color:rgba(255,69,58,0.3);}
+.empty-note{font-size:13px; color:var(--text-dim); padding:24px 0; text-align:center;}
 
 #toast{
   position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px);
-  background:rgba(20,20,25,0.92); border:1px solid var(--card-border); backdrop-filter:blur(16px);
-  padding:10px 18px; border-radius:14px; font-size:13px; opacity:0; pointer-events:none;
-  transition:.25s; z-index:60; white-space:nowrap;
+  background:rgba(40,40,42,0.95); border:1px solid var(--card-border); backdrop-filter:blur(20px);
+  padding:12px 22px; border-radius:20px; font-size:13.5px; font-weight:500; opacity:0; pointer-events:none;
+  transition:.25s; z-index:60; white-space:nowrap; box-shadow:0 10px 30px rgba(0,0,0,0.5);
 }
 #toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
 </style>
@@ -115,66 +107,66 @@ tbody tr:hover{background:rgba(255,255,255,0.03);}
 
 <div id="loginScreen">
   <div class="logo">Digitals<span>Mod</span> Admin</div>
-  <input type="password" id="adminPass" placeholder="Nhap ma quan tri">
-  <button class="matte-btn" onclick="tryAdminLogin()">Dang nhap</button>
+  <input type="password" id="adminPass" placeholder="Nhập mã quản trị">
+  <button class="matte-btn" onclick="tryAdminLogin()">Đăng Nhập</button>
 </div>
 
 <div id="adminApp">
   <header class="top">
-    <div class="brand">Digitals<span>Mod</span> - Bang dieu khien</div>
+    <div class="brand">Digitals<span>Mod</span> - Bảng Điều Khiển</div>
     <div>
-      <button class="matte-btn small outline" onclick="refreshAll()">Lam moi</button>
-      <button class="matte-btn small danger" onclick="adminLogout()">Dang xuat</button>
+      <button class="matte-btn small outline" onclick="refreshAll()">Làm Mới</button>
+      <button class="matte-btn small danger" onclick="adminLogout()">Đăng Xuất</button>
     </div>
   </header>
 
   <div class="stats-grid">
-    <div class="stat-card"><div class="num" id="statUsers">0</div><div class="lbl">Tong nguoi dung</div></div>
-    <div class="stat-card"><div class="num" id="statKeys">0</div><div class="lbl">Tong key da tao</div></div>
-    <div class="stat-card"><div class="num" id="statActiveKeys">0</div><div class="lbl">Key con hieu luc</div></div>
-    <div class="stat-card"><div class="num" id="statUploads">0</div><div class="lbl">Tong file upload</div></div>
+    <div class="stat-card"><div class="num" id="statUsers">0</div><div class="lbl">Tổng người dùng</div></div>
+    <div class="stat-card"><div class="num" id="statKeys">0</div><div class="lbl">Tổng key đã tạo</div></div>
+    <div class="stat-card"><div class="num" id="statActiveKeys">0</div><div class="lbl">Key còn hiệu lực</div></div>
+    <div class="stat-card"><div class="num" id="statUploads">0</div><div class="lbl">Tổng tệp đã tải lên</div></div>
   </div>
 
   <div class="tabs-row">
-    <button class="active" data-view="users" onclick="switchView('users')">Nguoi dung</button>
-    <button data-view="keys" onclick="switchView('keys')">Key</button>
-    <button data-view="uploads" onclick="switchView('uploads')">Upload</button>
+    <button class="active" data-view="users" onclick="switchView('users')">Người Dùng</button>
+    <button data-view="keys" onclick="switchView('keys')">Quản Lý Key</button>
+    <button data-view="uploads" onclick="switchView('uploads')">Tệp Tải Lên</button>
   </div>
 
   <!-- USERS VIEW -->
   <div class="glass-card view-panel" id="view-users">
     <div class="search-row">
-      <input id="searchUsers" placeholder="Tim theo ten hoac UID..." oninput="renderUsers()">
+      <input id="searchUsers" placeholder="Tìm theo tên hoặc UID..." oninput="renderUsers()">
     </div>
     <table>
-      <thead><tr><th>Ten</th><th>UID</th><th>Ngay tham gia</th><th>So key</th><th>Diem thuong</th><th></th></tr></thead>
+      <thead><tr><th>Tên</th><th>UID</th><th>Ngày Tham Gia</th><th>Số Key</th><th>Điểm Thưởng</th><th>Thao Tác</th></tr></thead>
       <tbody id="usersTbody"></tbody>
     </table>
-    <div class="empty-note" id="usersEmpty" style="display:none;">Khong co du lieu nguoi dung.</div>
+    <div class="empty-note" id="usersEmpty" style="display:none;">Không có dữ liệu người dùng.</div>
   </div>
 
   <!-- KEYS VIEW -->
   <div class="glass-card view-panel" id="view-keys" style="display:none;">
     <div class="search-row">
-      <input id="searchKeys" placeholder="Tim theo key hoac UID..." oninput="renderKeys()">
+      <input id="searchKeys" placeholder="Tìm theo key hoặc UID..." oninput="renderKeys()">
     </div>
     <table>
-      <thead><tr><th>Key</th><th>Chu so huu (UID)</th><th>Loai</th><th>Tao luc</th><th>Het han</th><th>Trang thai</th><th></th></tr></thead>
+      <thead><tr><th>Mã Key</th><th>Chủ Sở Hữu (UID)</th><th>Loại</th><th>Tạo Lúc</th><th>Hết Hạn</th><th>Trạng Thái</th><th>Thao Tác</th></tr></thead>
       <tbody id="keysTbody"></tbody>
     </table>
-    <div class="empty-note" id="keysEmpty" style="display:none;">Khong co key nao.</div>
+    <div class="empty-note" id="keysEmpty" style="display:none;">Không có mã key nào.</div>
   </div>
 
   <!-- UPLOADS VIEW -->
   <div class="glass-card view-panel" id="view-uploads" style="display:none;">
     <div class="search-row">
-      <input id="searchUploads" placeholder="Tim theo ten file hoac UID..." oninput="renderUploads()">
+      <input id="searchUploads" placeholder="Tìm theo tên tệp hoặc UID..." oninput="renderUploads()">
     </div>
     <table>
-      <thead><tr><th>Ten file</th><th>Chu so huu (UID)</th><th>Loai</th><th>Thoi gian</th><th></th></tr></thead>
+      <thead><tr><th>Tên Tệp</th><th>Chủ Sở Hữu (UID)</th><th>Loại</th><th>Thời Gian</th><th>Thao Tác</th></tr></thead>
       <tbody id="uploadsTbody"></tbody>
     </table>
-    <div class="empty-note" id="uploadsEmpty" style="display:none;">Khong co file nao.</div>
+    <div class="empty-note" id="uploadsEmpty" style="display:none;">Không có tệp nào.</div>
   </div>
 </div>
 
@@ -182,7 +174,7 @@ tbody tr:hover{background:rgba(255,255,255,0.03);}
 
 <script>
 /* =========================================================
-   FIREBASE CONFIG (Cấu hình Firebase cũ)
+   Cấu hình Firebase Giữ Nguyên
    ========================================================= */
 const firebaseConfig = {
     apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
@@ -194,7 +186,7 @@ const firebaseConfig = {
     appId: "1:685476439350:web:949054ecba7f0a0c383f97"
 };
 
-/* Mã quản trị cục bộ được đặt thành ame1610@ */
+/* Mã quản trị cục bộ đặt là ame1610@ */
 const ADMIN_PASSCODE = "ame1610@";
 
 let app, db;
@@ -202,7 +194,7 @@ try {
   app = firebase.initializeApp(firebaseConfig);
   db = firebase.database();
 } catch (e) {
-  console.warn("Firebase chua duoc cau hinh dung:", e);
+  console.warn("Firebase chưa được cấu hình đúng:", e);
 }
 
 let allUsers = {};
@@ -215,7 +207,7 @@ function tryAdminLogin(){
     document.getElementById('adminApp').style.display = 'block';
     refreshAll();
   } else {
-    toast('Sai ma quan tri');
+    toast('Sai mã quản trị');
   }
 }
 function adminLogout(){
@@ -238,14 +230,14 @@ function switchView(name){
 }
 
 function refreshAll(){
-  if(!db){ toast('Firebase chua cau hinh'); return; }
+  if(!db){ toast('Firebase chưa cấu hình'); return; }
   db.ref('users').once('value').then(snap => {
     allUsers = snap.val() || {};
     computeStats();
     renderUsers();
     renderKeys();
     renderUploads();
-    toast('Da tai du lieu');
+    toast('Đã tải dữ liệu');
   }).catch(err => toast(err.message));
 }
 
@@ -275,7 +267,7 @@ function renderUsers(){
   const rows = [];
   Object.entries(allUsers).forEach(([uid, u]) => {
     const profile = u.profile || {};
-    const name = profile.name || 'Khong ten';
+    const name = profile.name || 'Không tên';
     if(q && !name.toLowerCase().includes(q) && !uid.toLowerCase().includes(q)) return;
     const keyCount = Object.keys(u.keys || {}).length;
     const rewards = (u.stats || {}).totalRewards || 0;
@@ -285,15 +277,15 @@ function renderUsers(){
       <td>${profile.joinDate || '-'}</td>
       <td>${keyCount}</td>
       <td>${rewards}</td>
-      <td><button class="icon-btn danger" onclick="deleteUser('${uid}')">Xoa</button></td>
+      <td><button class="icon-btn danger" onclick="deleteUser('${uid}')">Xóa</button></td>
     </tr>`);
   });
   tbody.innerHTML = rows.join('');
   document.getElementById('usersEmpty').style.display = rows.length ? 'none' : 'block';
 }
 function deleteUser(uid){
-  if(!confirm('Xoa toan bo du lieu cua nguoi dung nay?')) return;
-  db.ref('users/' + uid).remove().then(() => { toast('Da xoa nguoi dung'); refreshAll(); });
+  if(!confirm('Xóa toàn bộ dữ liệu của người dùng này?')) return;
+  db.ref('users/' + uid).remove().then(() => { toast('Đã xóa người dùng'); refreshAll(); });
 }
 
 /* ---------- KEYS TABLE ---------- */
@@ -312,10 +304,10 @@ function renderKeys(){
         <td>${k.gameType || '-'}</td>
         <td>${new Date(k.createdAt).toLocaleString('vi-VN')}</td>
         <td>${new Date(k.expiresAt).toLocaleString('vi-VN')}</td>
-        <td><span class="pill ${active ? '' : 'warn'}">${active ? 'Con hieu luc' : 'Het han'}</span></td>
+        <td><span class="pill ${active ? '' : 'warn'}">${active ? 'Còn hiệu lực' : 'Hết hạn'}</span></td>
         <td>
           <button class="icon-btn" onclick="extendKey('${uid}','${keyId}')">+24h</button>
-          <button class="icon-btn danger" onclick="revokeKey('${uid}','${keyId}')">Thu hoi</button>
+          <button class="icon-btn danger" onclick="revokeKey('${uid}','${keyId}')">Thu hồi</button>
         </td>
       </tr>`);
     });
@@ -327,12 +319,12 @@ function extendKey(uid, keyId){
   const ref = db.ref('users/' + uid + '/keys/' + keyId + '/expiresAt');
   ref.once('value').then(snap => {
     const current = snap.val() || Date.now();
-    ref.set(current + 24*60*60*1000).then(() => { toast('Da gia han key'); refreshAll(); });
+    ref.set(current + 24*60*60*1000).then(() => { toast('Đã gia hạn key'); refreshAll(); });
   });
 }
 function revokeKey(uid, keyId){
-  if(!confirm('Thu hoi key nay?')) return;
-  db.ref('users/' + uid + '/keys/' + keyId).remove().then(() => { toast('Da thu hoi key'); refreshAll(); });
+  if(!confirm('Thu hồi key này?')) return;
+  db.ref('users/' + uid + '/keys/' + keyId).remove().then(() => { toast('Đã thu hồi key'); refreshAll(); });
 }
 
 /* ---------- UPLOADS TABLE ---------- */
@@ -350,7 +342,7 @@ function renderUploads(){
         <td>${new Date(f.uploadedAt).toLocaleString('vi-VN')}</td>
         <td>
           <a class="icon-btn" style="text-decoration:none; display:inline-block;" href="${f.url}" target="_blank">Xem</a>
-          <button class="icon-btn danger" onclick="deleteUpload('${uid}','${fileId}')">Xoa</button>
+          <button class="icon-btn danger" onclick="deleteUpload('${uid}','${fileId}')">Xóa</button>
         </td>
       </tr>`);
     });
@@ -359,8 +351,8 @@ function renderUploads(){
   document.getElementById('uploadsEmpty').style.display = rows.length ? 'none' : 'block';
 }
 function deleteUpload(uid, fileId){
-  if(!confirm('Xoa file nay khoi danh sach?')) return;
-  db.ref('users/' + uid + '/uploads/' + fileId).remove().then(() => { toast('Da xoa file'); refreshAll(); });
+  if(!confirm('Xóa tệp này khỏi danh sách?')) return;
+  db.ref('users/' + uid + '/uploads/' + fileId).remove().then(() => { toast('Đã xóa tệp'); refreshAll(); });
 }
 
 /* ---------- TOAST ---------- */
