@@ -35,7 +35,7 @@ html, body {
 
 #app { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; }
 
-/* Topbar iOS Style */
+/* Topbar */
 #topbar {
   padding: 16px 20px 12px 20px;
   display: flex; align-items: center; justify-content: space-between;
@@ -62,7 +62,7 @@ html, body {
 #viewport { flex: 1; position: relative; overflow: hidden; }
 #track {
   display: flex; height: 100%; width: 500%;
-  transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
   touch-action: pan-y;
 }
 .tab-pane {
@@ -70,7 +70,7 @@ html, body {
   -webkit-overflow-scrolling: touch;
 }
 
-/* iOS Glass Card */
+/* Glass Card */
 .glass-card {
   background: var(--card);
   backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
@@ -78,9 +78,7 @@ html, body {
   border-radius: var(--ios-radius);
   box-shadow: 0 4px 24px rgba(0,0,0,0.4);
   padding: 18px; margin-bottom: 16px;
-  transition: transform 0.15s ease;
 }
-.glass-card:active { transform: scale(0.98); }
 
 h2.section-title {
   font-size: 13px; font-weight: 600; text-transform: uppercase;
@@ -178,39 +176,38 @@ select.theme-select, select.lang-select {
 .switch input:checked + .slider::before { transform: translateX(20px); }
 
 /* =========================================================
-   LIQUID GLASS TABBAR (Thanh Menu Kính Lỏng Hiệu Ứng iPhone)
+   THIẾT KẾ MỚI CHUẨN DOCK LIQUID GLASS CHÍNH XÁC
    ========================================================= */
 #tabbar {
   position: fixed; left: 16px; right: 16px; bottom: 20px; z-index: 50;
   display: flex; justify-content: space-around; align-items: center;
-  background: rgba(25, 25, 28, 0.75);
+  background: rgba(25, 25, 28, 0.8);
   backdrop-filter: blur(30px) saturate(180%);
   -webkit-backdrop-filter: blur(30px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 30px; padding: 6px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  user-select: none; -webkit-user-select: none;
   touch-action: none;
 }
 
-/* Viên Kính Lỏng Biến Dạng (Fluid Indicator) */
+/* Kính Lỏng Nền Trượt Đơn Vị Pixel */
 .fluid-pill {
-  position: absolute; top: 6px; bottom: 6px; left: 6px;
-  width: calc((100% - 12px) / 5);
-  background: rgba(255, 255, 255, 0.22);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(15px);
+  position: absolute; top: 6px; bottom: 6px; left: 0; width: 0px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
   border-radius: 24px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.5);
-  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
-              width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1.2),
-              background 0.3s ease;
+  transition: left 0.35s cubic-bezier(0.25, 1, 0.5, 1), 
+              width 0.35s cubic-bezier(0.25, 1, 0.5, 1), 
+              transform 0.2s ease, background 0.2s ease;
   pointer-events: none; z-index: 1;
 }
 
-/* Hiệu ứng phồng to bóng kính khi bấm và giữ */
-#tabbar:active .fluid-pill,
+/* Hiệu ứng Phồng Kính Lỏng khi Giữ */
 .fluid-pill.pressing {
-  transform: scaleY(1.18) scaleX(1.1);
+  transform: scaleY(1.18);
   background: rgba(255, 255, 255, 0.32);
 }
 
@@ -218,8 +215,7 @@ select.theme-select, select.lang-select {
   flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
   padding: 8px 0; border-radius: 20px; cursor: pointer; color: var(--text-dim);
   font-size: 10.5px; font-weight: 500; z-index: 2; position: relative;
-  transition: color 0.3s ease, transform 0.2s ease;
-  user-select: none;
+  transition: color 0.3s ease;
 }
 .tab-btn .ico {
   font-size: 19px;
@@ -227,10 +223,9 @@ select.theme-select, select.lang-select {
 }
 .tab-btn.active { color: #ffffff; }
 .tab-btn.active .ico {
-  transform: translateY(-2px) scale(1.18);
+  transform: translateY(-2px) scale(1.15);
   filter: drop-shadow(0 2px 8px rgba(0, 122, 255, 0.8));
 }
-.tab-btn:active { transform: scale(0.88); }
 
 /* Popup & Toast */
 #popupOverlay {
@@ -254,11 +249,7 @@ select.theme-select, select.lang-select {
 }
 #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* Theme Sáng Tùy Chọn */
-body.light { --bg: #f2f2f7; --card: rgba(255,255,255,0.8); --card-border: rgba(0,0,0,0.08); --text: #000000; --text-dim: #8e8e93; }
-body.light #tabbar { background: rgba(230, 230, 235, 0.85); }
-body.light .fluid-pill { background: rgba(0,0,0,0.12); }
-
+/* Auth Screen */
 #authScreen {
   position: fixed; inset: 0; z-index: 40; display: flex; align-items: center; justify-content: center;
   background: var(--bg); flex-direction: column; gap: 20px; padding: 24px; text-align: center;
@@ -429,14 +420,14 @@ body.light .fluid-pill { background: rgba(0,0,0,0.12); }
     </div>
   </div>
 
-  <!-- LIQUID GLASS TABBAR WITH FLUID PILL -->
+  <!-- LIQUID GLASS TABBAR CHÍNH XÁC -->
   <div id="tabbar">
     <div class="fluid-pill" id="fluidPill"></div>
-    <div class="tab-btn active" data-idx="0" onclick="goto(0)"><div class="ico"></div>Menu</div>
-    <div class="tab-btn" data-idx="1" onclick="goto(1)"><div class="ico">📊</div>Thống Kê</div>
-    <div class="tab-btn" data-idx="2" onclick="goto(2)"><div class="ico">☁️</div>Tải Lên</div>
-    <div class="tab-btn" data-idx="3" onclick="goto(3)"><div class="ico">🎁</div>Thưởng</div>
-    <div class="tab-btn" data-idx="4" onclick="goto(4)"><div class="ico">⚙️</div>Cài Đặt</div>
+    <div class="tab-btn active" data-idx="0"><div class="ico"></div>Menu</div>
+    <div class="tab-btn" data-idx="1"><div class="ico">📊</div>Thống Kê</div>
+    <div class="tab-btn" data-idx="2"><div class="ico">☁️</div>Tải Lên</div>
+    <div class="tab-btn" data-idx="3"><div class="ico">🎁</div>Thưởng</div>
+    <div class="tab-btn" data-idx="4"><div class="ico">⚙️</div>Cài Đặt</div>
   </div>
 </div>
 
@@ -507,6 +498,9 @@ function onAuthReady(user){
   loadUploads();
   loadRewards();
   maybeShowFirstVisitPopup();
+
+  // Khởi tạo vị trí chính xác cho viên Kính Lỏng
+  setTimeout(() => updateFluidPillPosition(false), 100);
 }
 
 if (auth) {
@@ -531,41 +525,61 @@ function ensureUserProfile(){
   });
 }
 
-/* ---------- LIQUID GLASS TAB CONTROL ---------- */
+/* =========================================================
+   THUẬT TOÁN ĐIỀU KHIỂN DOCK KÍNH LỎNG (CHUẨN KHÔNG NẢY)
+   ========================================================= */
 const track = document.getElementById('track');
 const fluidPill = document.getElementById('fluidPill');
+const tabBtns = document.querySelectorAll('.tab-btn');
 const tabbar = document.getElementById('tabbar');
 
-function goto(idx){
-  const lastTab = activeTab;
-  activeTab = Math.max(0, Math.min(TAB_COUNT - 1, idx));
+function updateFluidPillPosition(isStretching = true) {
+  const targetBtn = tabBtns[activeTab];
+  if (!targetBtn) return;
 
-  // Biến dạng lỏng phồng to khi trượt qua lại giữa các tab
-  const distance = Math.abs(activeTab - lastTab);
-  if (distance > 0) {
-    fluidPill.style.width = `calc(${(100 + distance * 18)}% / ${TAB_COUNT})`;
+  const leftPos = targetBtn.offsetLeft;
+  const btnWidth = targetBtn.offsetWidth;
+
+  if (isStretching) {
+    fluidPill.style.width = (btnWidth * 1.25) + 'px';
     setTimeout(() => {
-      fluidPill.style.width = `calc((100% - 12px) / ${TAB_COUNT})`;
-    }, 280);
+      fluidPill.style.width = btnWidth + 'px';
+    }, 200);
+  } else {
+    fluidPill.style.width = btnWidth + 'px';
   }
 
-  // Chuyển vị trí bong bóng kính lỏng
-  fluidPill.style.transform = `translateX(${activeTab * 100}%)`;
+  fluidPill.style.left = leftPos + 'px';
+}
 
-  // Trượt chuyển màn hình
-  track.style.transition = 'transform 0.45s cubic-bezier(0.25, 1, 0.5, 1)';
+function goto(idx) {
+  if (idx < 0 || idx >= TAB_COUNT) return;
+  const lastTab = activeTab;
+  activeTab = idx;
+
+  updateFluidPillPosition(Math.abs(activeTab - lastTab) > 0);
+
+  // Trượt chuyển giao diện màn hình
   track.style.transform = `translateX(-${activeTab * (100 / TAB_COUNT)}%)`;
 
-  // Active Icon State
-  document.querySelectorAll('.tab-btn').forEach((b, i) => {
+  // Cập nhật trạng thái hiển thị của các nút tab
+  tabBtns.forEach((b, i) => {
     b.classList.toggle('active', i === activeTab);
   });
 }
 
-// Bắt sự kiện giữ bấm phồng kính lỏng
-tabbar.addEventListener('pointerdown', () => fluidPill.classList.add('pressing'));
+// Bắt sự kiện bấm trực tiếp hoặc vuốt nhẹ tay trên thanh Dock Kính
+tabBtns.forEach((btn) => {
+  btn.addEventListener('pointerdown', (e) => {
+    const idx = parseInt(btn.getAttribute('data-idx'));
+    fluidPill.classList.add('pressing');
+    goto(idx);
+  });
+});
+
 tabbar.addEventListener('pointerup', () => fluidPill.classList.remove('pressing'));
 tabbar.addEventListener('pointerleave', () => fluidPill.classList.remove('pressing'));
+window.addEventListener('resize', () => updateFluidPillPosition(false));
 
 /* ---------- TẠO KEY ---------- */
 function openGenerateKey(){ generateKey(); }
@@ -662,7 +676,7 @@ function drawUsageChart(dataPoints){
   });
 }
 
-/* ---------- UPLOAD ---------- */
+/* ---------- TẢI LÊN ---------- */
 const dropzone = document.getElementById('dropzone');
 ['dragover','dragenter'].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.add('drag'); }));
 ['dragleave','drop'].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.remove('drag'); }));
