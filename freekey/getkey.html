@@ -5,54 +5,52 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>DigitalsMod - Nhận Key</title>
 
-<!-- Firebase (compat SDK, single file friendly) -->
+<!-- Firebase SDK Compat -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 
 <style>
-:root{
-  --primary:#007aff;
+:root {
+  --primary: #007aff;
   --primary-gradient: linear-gradient(135deg, #007aff, #5856d6);
-  --accent:#32ade6;
-  --bg:#000000;
+  --bg: #000000;
   --card: rgba(28, 28, 30, 0.75);
   --card-border: rgba(255, 255, 255, 0.12);
-  --text:#ffffff;
-  --text-dim:#8e8e93;
-  --danger:#ff453a;
-  --success:#30d158;
-  --ios-radius: 18px;
-}
-*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
-html,body{
-  margin:0; padding:0; height:100%;
-  background:var(--bg);
-  color:var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
-  overflow:hidden;
+  --text: #ffffff;
+  --text-dim: #8e8e93;
+  --danger: #ff453a;
+  --success: #30d158;
+  --ios-radius: 20px;
 }
 
-#app{position:relative; z-index:1; height:100%; display:flex; flex-direction:column;}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body {
+  margin: 0; padding: 0; height: 100%;
+  background: var(--bg); color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  overflow: hidden;
+}
 
-/* iOS Top Bar */
-#topbar{
+#app { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; }
+
+/* Topbar iOS Style */
+#topbar {
   padding: 16px 20px 12px 20px;
-  display:flex; align-items:center; justify-content:space-between;
-  background: rgba(0,0,0,0.8);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
-#topbar .brand{font-weight:700; font-size:20px; letter-spacing:-0.5px;}
-#topbar .brand span{color:var(--primary);}
-#topbar .user-chip{
-  display:flex; align-items:center; gap:8px;
+#topbar .brand { font-weight: 800; font-size: 20px; letter-spacing: -0.5px; }
+#topbar .brand span { color: var(--primary); }
+#topbar .user-chip {
+  display: flex; align-items: center; gap: 8px;
   background: rgba(118, 118, 128, 0.24); border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter:blur(20px); border-radius:999px; padding:6px 14px; font-size:13px; font-weight:500;
+  backdrop-filter: blur(20px); border-radius: 999px; padding: 6px 14px; font-size: 13px; font-weight: 500;
 }
-
-/* Biểu tượng iOS thay cho avatar ảnh cũ */
 .ios-avatar-icon {
   width: 22px; height: 22px; border-radius: 50%;
   background: var(--primary-gradient);
@@ -60,185 +58,214 @@ html,body{
   font-size: 11px; font-weight: bold; color: #fff;
 }
 
-/* swipeable tab container */
-#viewport{flex:1; position:relative; overflow:hidden;}
-#track{
-  display:flex; height:100%; width:500%;
-  transition:transform 0.35s cubic-bezier(.25,.8,.25,1);
-  touch-action:pan-y;
+/* Swiper Viewport */
+#viewport { flex: 1; position: relative; overflow: hidden; }
+#track {
+  display: flex; height: 100%; width: 500%;
+  transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+  touch-action: pan-y;
 }
-.tab-pane{
-  width:20%; height:100%; overflow-y:auto; padding:12px 18px 100px 18px;
-  -webkit-overflow-scrolling:touch;
+.tab-pane {
+  width: 20%; height: 100%; overflow-y: auto; padding: 12px 18px 120px 18px;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* iOS Glass Card */
-.glass-card{
-  background:var(--card);
-  backdrop-filter:blur(25px);
-  -webkit-backdrop-filter:blur(25px);
-  border:1px solid var(--card-border);
+.glass-card {
+  background: var(--card);
+  backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+  border: 1px solid var(--card-border);
   border-radius: var(--ios-radius);
   box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-  padding: 18px;
-  margin-bottom: 16px;
-  transition: transform 0.15s ease, background 0.2s ease;
+  padding: 18px; margin-bottom: 16px;
+  transition: transform 0.15s ease;
 }
-.glass-card:active{transform:scale(0.98);}
+.glass-card:active { transform: scale(0.98); }
 
-h2.section-title{
+h2.section-title {
   font-size: 13px; font-weight: 600; text-transform: uppercase;
   letter-spacing: 0.5px; color: var(--text-dim); margin: 20px 0 8px 4px;
 }
 
-/* Grid của thẻ thao tác */
-.grid-actions{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
-.action-card{
+/* Grid Actions */
+.grid-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.action-card {
   background: var(--card); border: 1px solid var(--card-border);
   backdrop-filter: blur(20px); border-radius: var(--ios-radius); padding: 16px;
   display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
   cursor: pointer; user-select: none;
 }
-.action-card .icon{
-  width: 40px; height: 40px; border-radius: 10px;
+.action-card .icon {
+  width: 40px; height: 40px; border-radius: 12px;
   background: var(--primary-gradient);
   display: flex; align-items: center; justify-content: center;
   font-size: 18px; font-weight: bold; color: #fff;
-  box-shadow: 0 4px 12px rgba(0,122,255,0.3);
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
 }
-.action-card .label{font-size:14px; font-weight:600;}
-.action-card .sub{font-size:11.5px; color:var(--text-dim);}
+.action-card .label { font-size: 14px; font-weight: 600; }
+.action-card .sub { font-size: 11.5px; color: var(--text-dim); }
 
-.matte-btn{
+.matte-btn {
   background: var(--primary-gradient);
   border: none; color: #fff; font-weight: 600; font-size: 15px;
-  padding: 14px 20px; border-radius: 14px; cursor: pointer;
-  width: 100%; transition: opacity 0.2s;
-  box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+  padding: 14px 20px; border-radius: 14px; cursor: pointer; width: 100%;
+  box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3); transition: opacity 0.2s;
 }
-.matte-btn:active{opacity: 0.8;}
-.matte-btn.outline{
+.matte-btn:active { opacity: 0.8; }
+.matte-btn.outline {
   background: rgba(118, 118, 128, 0.24); border: 1px solid var(--card-border); color: var(--text);
   box-shadow: none;
 }
-.matte-btn.danger{background: linear-gradient(135deg, #ff453a, #ff3b30); box-shadow: 0 4px 15px rgba(255, 59, 48, 0.3);}
+.matte-btn.danger { background: linear-gradient(135deg, #ff453a, #ff3b30); box-shadow: 0 4px 15px rgba(255, 59, 48, 0.3); }
 
-/* Trang thai */
-.status-row{display:flex; justify-content:space-between; align-items:center; font-size:14px; padding:8px 0;}
-.status-row .val{font-weight:600;}
-.pill{font-size:12px; padding:4px 12px; border-radius:999px; background:rgba(48,209,88,0.15); color:var(--success); border:1px solid rgba(48,209,88,0.3); font-weight:600;}
-.pill.warn{background:rgba(255,69,58,0.15); color:var(--danger); border:1px solid rgba(255,69,58,0.3);}
+/* Status Rows & List */
+.status-row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; padding: 8px 0; }
+.status-row .val { font-weight: 600; }
+.pill { font-size: 12px; padding: 4px 12px; border-radius: 999px; background: rgba(48,209,88,0.15); color: var(--success); border: 1px solid rgba(48,209,88,0.3); font-weight: 600; }
+.pill.warn { background: rgba(255,69,58,0.15); color: var(--danger); border: 1px solid rgba(255,69,58,0.3); }
 
-/* Danh sach key */
-.key-item{
-  display:flex; justify-content:space-between; align-items:center;
-  padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.08);
-}
-.key-item:last-child{border-bottom:none;}
-.key-item .kname{font-size:14px; font-weight:600; font-mono: true;}
-.key-item .kmeta{font-size:12px; color:var(--text-dim); margin-top:2px;}
+.key-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.key-item:last-child { border-bottom: none; }
+.key-item .kname { font-size: 14px; font-weight: 600; font-family: ui-monospace, monospace; }
+.key-item .kmeta { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
 
-canvas#usageChart{width:100%; height:140px;}
+canvas#usageChart { width: 100%; height: 140px; }
 
-/* Upload Area */
-.dropzone{
+/* Upload Zone */
+.dropzone {
   border: 2px dashed rgba(255,255,255,0.2); border-radius: var(--ios-radius); padding: 32px 16px;
   text-align: center; color: var(--text-dim); font-size: 14px; cursor: pointer;
   background: rgba(255,255,255,0.02); transition: all 0.2s;
 }
-.dropzone.drag{border-color: var(--primary); color: var(--primary); background: rgba(0,122,255,0.1);}
-.file-row{display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.08);}
-.file-row .file-icon-box{
+.dropzone.drag { border-color: var(--primary); color: var(--primary); background: rgba(0,122,255,0.1); }
+.file-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.file-row .file-icon-box {
   width: 42px; height: 42px; border-radius: 10px; background: rgba(118, 118, 128, 0.24);
   display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: var(--primary);
 }
-.file-row .fname{font-size:13.5px; flex:1; font-weight:500;}
-.file-row .del{color:var(--danger); font-size:13px; cursor:pointer; font-weight:500;}
+.file-row .fname { font-size: 13.5px; flex: 1; font-weight: 500; }
+.file-row .del { color: var(--danger); font-size: 13px; cursor: pointer; font-weight: 500; }
 
-/* Đổi thưởng */
-.streak-wrap{display:flex; gap:6px; margin:14px 0;}
-.streak-dot{flex:1; height:8px; border-radius:99px; background:rgba(255,255,255,0.15);}
-.streak-dot.on{background: var(--primary-gradient);}
-.spin-wheel{
+/* Rewards */
+.streak-wrap { display: flex; gap: 6px; margin: 14px 0; }
+.streak-dot { flex: 1; height: 8px; border-radius: 99px; background: rgba(255,255,255,0.15); }
+.streak-dot.on { background: var(--primary-gradient); }
+.spin-wheel {
   width: 180px; height: 180px; margin: 16px auto; border-radius: 50%;
   background: conic-gradient(from 0deg, #007aff, #5856d6, #32ade6, #007aff);
   display: flex; align-items: center; justify-content: center;
   transition: transform 3s cubic-bezier(.17,.67,.16,.99);
   box-shadow: 0 0 30px rgba(0,122,255,0.4);
 }
-.spin-wheel .center{
-  width:64px; height:64px; border-radius:50%; background:#1c1c1e;
-  display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:bold; color:var(--text);
+.spin-wheel .center {
+  width: 64px; height: 64px; border-radius: 50%; background: #1c1c1e;
+  display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: var(--text);
 }
 
 /* Settings */
-.settings-row{display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.08);}
-.settings-row:last-child{border-bottom:none;}
-.settings-row .label{font-size:14px; font-weight:500;}
-select.theme-select, select.lang-select{
+.settings-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.settings-row:last-child { border-bottom: none; }
+.settings-row .label { font-size: 14px; font-weight: 500; }
+select.theme-select, select.lang-select {
   background: rgba(118, 118, 128, 0.24); color: var(--text); border: 1px solid var(--card-border);
-  border-radius: 10px; padding: 6px 12px; font-size: 13.5px; font-weight: 500; outline: none;
+  border-radius: 10px; padding: 6px 12px; font-size: 13.5px; outline: none;
 }
-.switch{position:relative; width:50px; height:30px;}
-.switch input{opacity:0; width:0; height:0;}
-.switch .slider{position:absolute; inset:0; background:rgba(120, 120, 128, 0.32); border-radius:999px; transition:.2s; cursor:pointer;}
-.switch .slider::before{content:""; position:absolute; width:26px; height:26px; left:2px; top:2px; background:#fff; border-radius:50%; transition:.2s; box-shadow:0 2px 5px rgba(0,0,0,0.2);}
-.switch input:checked + .slider{background: #34c759;}
-.switch input:checked + .slider::before{transform:translateX(20px);}
+.switch { position: relative; width: 50px; height: 30px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.switch .slider { position: absolute; inset: 0; background: rgba(120, 120, 128, 0.32); border-radius: 999px; transition: .2s; cursor: pointer; }
+.switch .slider::before { content: ""; position: absolute; width: 26px; height: 26px; left: 2px; top: 2px; background: #fff; border-radius: 50%; transition: .2s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+.switch input:checked + .slider { background: #34c759; }
+.switch input:checked + .slider::before { transform: translateX(20px); }
 
-/* iOS Tabbar */
-#tabbar{
-  position: fixed; left: 16px; right: 16px; bottom: 20px; z-index: 5;
+/* =========================================================
+   LIQUID GLASS TABBAR (Thanh Menu Kính Lỏng Hiệu Ứng iPhone)
+   ========================================================= */
+#tabbar {
+  position: fixed; left: 16px; right: 16px; bottom: 20px; z-index: 50;
   display: flex; justify-content: space-around; align-items: center;
-  background: rgba(30, 30, 32, 0.85);
-  backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
-  border: 1px solid var(--card-border); border-radius: 28px; padding: 8px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+  background: rgba(25, 25, 28, 0.75);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 30px; padding: 6px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  touch-action: none;
 }
-.tab-btn{
-  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+
+/* Viên Kính Lỏng Biến Dạng (Fluid Indicator) */
+.fluid-pill {
+  position: absolute; top: 6px; bottom: 6px; left: 6px;
+  width: calc((100% - 12px) / 5);
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(15px);
+  border-radius: 24px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+              width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1.2),
+              background 0.3s ease;
+  pointer-events: none; z-index: 1;
+}
+
+/* Hiệu ứng phồng to bóng kính khi bấm và giữ */
+#tabbar:active .fluid-pill,
+.fluid-pill.pressing {
+  transform: scaleY(1.18) scaleX(1.1);
+  background: rgba(255, 255, 255, 0.32);
+}
+
+.tab-btn {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
   padding: 8px 0; border-radius: 20px; cursor: pointer; color: var(--text-dim);
-  font-size: 10px; font-weight: 500; transition: .2s;
+  font-size: 10.5px; font-weight: 500; z-index: 2; position: relative;
+  transition: color 0.3s ease, transform 0.2s ease;
+  user-select: none;
 }
-.tab-btn .ico{font-size:18px;}
-.tab-btn.active{color: var(--primary); background: rgba(255,255,255,0.08);}
+.tab-btn .ico {
+  font-size: 19px;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.tab-btn.active { color: #ffffff; }
+.tab-btn.active .ico {
+  transform: translateY(-2px) scale(1.18);
+  filter: drop-shadow(0 2px 8px rgba(0, 122, 255, 0.8));
+}
+.tab-btn:active { transform: scale(0.88); }
 
-/* Popup Overlay */
-#popupOverlay{
-  position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(15px);
-  display:none; align-items:center; justify-content:center; z-index:50; padding:20px;
+/* Popup & Toast */
+#popupOverlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(15px);
+  display: none; align-items: center; justify-content: center; z-index: 60; padding: 20px;
 }
-#popupOverlay.show{display:flex;}
-.popup-box{
-  width:100%; max-width:320px; background:rgba(30,30,32,0.9);
-  border:1px solid var(--card-border); border-radius:24px; padding:24px;
-  text-align:center; backdrop-filter:blur(20px); box-shadow:0 20px 50px rgba(0,0,0,0.8);
+#popupOverlay.show { display: flex; }
+.popup-box {
+  width: 100%; max-width: 320px; background: rgba(30,30,32,0.92);
+  border: 1px solid var(--card-border); border-radius: 24px; padding: 24px;
+  text-align: center; backdrop-filter: blur(20px); box-shadow: 0 20px 50px rgba(0,0,0,0.8);
 }
-.popup-box h3{margin:0 0 10px 0; font-size:17px; font-weight:700;}
-.popup-box p{font-size:13.5px; color:var(--text-dim); margin:0 0 20px 0; line-height:1.4;}
+.popup-box h3 { margin: 0 0 10px 0; font-size: 17px; font-weight: 700; }
+.popup-box p { font-size: 13.5px; color: var(--text-dim); margin: 0 0 20px 0; line-height: 1.4; }
 
-/* Toast */
-#toast{
-  position:fixed; left:50%; bottom:110px; transform:translateX(-50%) translateY(20px);
-  background:rgba(40,40,42,0.95); border:1px solid var(--card-border); backdrop-filter:blur(20px);
-  padding:12px 22px; border-radius:20px; font-size:13.5px; font-weight:500; opacity:0; pointer-events:none;
-  transition:.25s; z-index:60; white-space:nowrap; box-shadow:0 10px 30px rgba(0,0,0,0.5);
+#toast {
+  position: fixed; left: 50%; bottom: 110px; transform: translateX(-50%) translateY(20px);
+  background: rgba(40,40,42,0.95); border: 1px solid var(--card-border); backdrop-filter: blur(20px);
+  padding: 12px 22px; border-radius: 20px; font-size: 13.5px; font-weight: 500; opacity: 0; pointer-events: none;
+  transition: .25s; z-index: 70; white-space: nowrap; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
-#toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* Dynamic Themes */
-body.light{--bg:#f2f2f7; --card:rgba(255,255,255,0.8); --card-border:rgba(0,0,0,0.08); --text:#000000; --text-dim:#8e8e93;}
-body.light #popupOverlay .popup-box{background:rgba(255,255,255,0.92);}
-body.light #tabbar{background:rgba(240,240,245,0.85);}
+/* Theme Sáng Tùy Chọn */
+body.light { --bg: #f2f2f7; --card: rgba(255,255,255,0.8); --card-border: rgba(0,0,0,0.08); --text: #000000; --text-dim: #8e8e93; }
+body.light #tabbar { background: rgba(230, 230, 235, 0.85); }
+body.light .fluid-pill { background: rgba(0,0,0,0.12); }
 
-/* Auth Screen iOS */
-#authScreen{
-  position:fixed; inset:0; z-index:40; display:flex; align-items:center; justify-content:center;
-  background:var(--bg); flex-direction:column; gap:20px; padding:24px; text-align:center;
+#authScreen {
+  position: fixed; inset: 0; z-index: 40; display: flex; align-items: center; justify-content: center;
+  background: var(--bg); flex-direction: column; gap: 20px; padding: 24px; text-align: center;
 }
-#authScreen .logo{font-size:32px; font-weight:800; letter-spacing:-1px;}
-#authScreen .logo span{color:var(--primary);}
-#authScreen p{color:var(--text-dim); font-size:14px; max-width:280px; line-height:1.4;}
+#authScreen .logo { font-size: 32px; font-weight: 800; letter-spacing: -1px; }
+#authScreen .logo span { color: var(--primary); }
+#authScreen p { color: var(--text-dim); font-size: 14px; max-width: 280px; line-height: 1.4; }
 </style>
 </head>
 <body>
@@ -279,7 +306,7 @@ body.light #tabbar{background:rgba(240,240,245,0.85);}
           </div>
           <div class="action-card" onclick="goto(1)">
             <div class="icon">📊</div>
-            <div class="label">Xem Bảng Điều Khiển</div>
+            <div class="label">Bảng Điều Khiển</div>
             <div class="sub">Thống kê chi tiết</div>
           </div>
           <div class="action-card" onclick="goto(3)">
@@ -402,7 +429,9 @@ body.light #tabbar{background:rgba(240,240,245,0.85);}
     </div>
   </div>
 
+  <!-- LIQUID GLASS TABBAR WITH FLUID PILL -->
   <div id="tabbar">
+    <div class="fluid-pill" id="fluidPill"></div>
     <div class="tab-btn active" data-idx="0" onclick="goto(0)"><div class="ico"></div>Menu</div>
     <div class="tab-btn" data-idx="1" onclick="goto(1)"><div class="ico">📊</div>Thống Kê</div>
     <div class="tab-btn" data-idx="2" onclick="goto(2)"><div class="ico">☁️</div>Tải Lên</div>
@@ -423,7 +452,7 @@ body.light #tabbar{background:rgba(240,240,245,0.85);}
 
 <script>
 /* =========================================================
-   Cấu hình Firebase Giữ Nguyên
+   FIREBASE CONFIG (Cấu hình Firebase Cũ)
    ========================================================= */
 const firebaseConfig = {
     apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
@@ -502,44 +531,44 @@ function ensureUserProfile(){
   });
 }
 
-/* ---------- TAB NAVIGATION (swipe) ---------- */
+/* ---------- LIQUID GLASS TAB CONTROL ---------- */
 const track = document.getElementById('track');
-const viewport = document.getElementById('viewport');
-let startX = 0, currentX = 0, dragging = false, viewportWidth = 0;
+const fluidPill = document.getElementById('fluidPill');
+const tabbar = document.getElementById('tabbar');
 
 function goto(idx){
+  const lastTab = activeTab;
   activeTab = Math.max(0, Math.min(TAB_COUNT - 1, idx));
-  track.style.transition = 'transform 0.35s cubic-bezier(.25,.8,.25,1)';
+
+  // Biến dạng lỏng phồng to khi trượt qua lại giữa các tab
+  const distance = Math.abs(activeTab - lastTab);
+  if (distance > 0) {
+    fluidPill.style.width = `calc(${(100 + distance * 18)}% / ${TAB_COUNT})`;
+    setTimeout(() => {
+      fluidPill.style.width = `calc((100% - 12px) / ${TAB_COUNT})`;
+    }, 280);
+  }
+
+  // Chuyển vị trí bong bóng kính lỏng
+  fluidPill.style.transform = `translateX(${activeTab * 100}%)`;
+
+  // Trượt chuyển màn hình
+  track.style.transition = 'transform 0.45s cubic-bezier(0.25, 1, 0.5, 1)';
   track.style.transform = `translateX(-${activeTab * (100 / TAB_COUNT)}%)`;
-  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', i === activeTab));
+
+  // Active Icon State
+  document.querySelectorAll('.tab-btn').forEach((b, i) => {
+    b.classList.toggle('active', i === activeTab);
+  });
 }
 
-viewport.addEventListener('pointerdown', e => {
-  dragging = true; startX = e.clientX; viewportWidth = viewport.clientWidth;
-  track.style.transition = 'none';
-});
-viewport.addEventListener('pointermove', e => {
-  if(!dragging) return;
-  currentX = e.clientX - startX;
-  const percentBase = -activeTab * (100 / TAB_COUNT);
-  const dragPercent = (currentX / viewportWidth) * (100 / TAB_COUNT);
-  track.style.transform = `translateX(${percentBase + dragPercent}%)`;
-});
-viewport.addEventListener('pointerup', e => {
-  if(!dragging) return;
-  dragging = false;
-  const threshold = viewportWidth * 0.15;
-  if(currentX > threshold) goto(activeTab - 1);
-  else if(currentX < -threshold) goto(activeTab + 1);
-  else goto(activeTab);
-  currentX = 0;
-});
-viewport.addEventListener('pointerleave', () => { if(dragging){ dragging = false; goto(activeTab); currentX = 0; } });
+// Bắt sự kiện giữ bấm phồng kính lỏng
+tabbar.addEventListener('pointerdown', () => fluidPill.classList.add('pressing'));
+tabbar.addEventListener('pointerup', () => fluidPill.classList.remove('pressing'));
+tabbar.addEventListener('pointerleave', () => fluidPill.classList.remove('pressing'));
 
 /* ---------- TẠO KEY ---------- */
-function openGenerateKey(){
-  generateKey();
-}
+function openGenerateKey(){ generateKey(); }
 function generateKey(){
   if(!currentUser){ toast("Bạn chưa đăng nhập"); return; }
   const keyId = db.ref().child('users').push().key;
@@ -633,7 +662,7 @@ function drawUsageChart(dataPoints){
   });
 }
 
-/* ---------- TẢI LÊN ---------- */
+/* ---------- UPLOAD ---------- */
 const dropzone = document.getElementById('dropzone');
 ['dragover','dragenter'].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.add('drag'); }));
 ['dragleave','drop'].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.remove('drag'); }));
