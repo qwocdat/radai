@@ -68,7 +68,7 @@ html, body {
   -webkit-overflow-scrolling: touch;
 }
 
-/* Glass Card Trong Suốt Ultra-Clean */
+/* Glass Card */
 .glass-card {
   background: rgba(255, 255, 255, 0.04);
   backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
@@ -169,12 +169,12 @@ select.theme-select, select.lang-select {
 .switch input:checked + .slider::before { transform: translateX(20px); }
 
 /* =========================================================
-   OPTICAL LIQUID GLASS DOCK (THUẬT TOÁN PHẢN CHIẾU ÁNH SÁNG & DI TAY)
+   DOCK KÍNH LỎNG PHỒNG TO RA NGOÀI VÀ TRƯỢT THEO TAY (FLUID SIMULATION)
    ========================================================= */
 #tabbar {
   position: fixed; left: 16px; right: 16px; bottom: 20px; z-index: 50;
   display: flex; justify-content: space-around; align-items: center;
-  background: rgba(20, 20, 25, 0.4);
+  background: rgba(18, 18, 22, 0.5);
   backdrop-filter: blur(40px) saturate(200%);
   -webkit-backdrop-filter: blur(40px) saturate(200%);
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -182,46 +182,48 @@ select.theme-select, select.lang-select {
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
   user-select: none; -webkit-user-select: none;
   touch-action: none;
+  /* Cho phép viên kính khi phồng to tràn ra ngoài viền dock */
+  overflow: visible !important; 
 }
 
-/* Khối Kính Trong Suốt Phản Quang */
+/* Viên Kính Trong Suốt Phản Quang */
 .fluid-pill {
   position: absolute; top: 6px; bottom: 6px; left: 0; width: 0px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.05) 100%);
-  backdrop-filter: blur(25px) brightness(1.2);
-  -webkit-backdrop-filter: blur(25px) brightness(1.2);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.08) 100%);
+  backdrop-filter: blur(30px) brightness(1.3);
+  -webkit-backdrop-filter: blur(30px) brightness(1.3);
   border-radius: 26px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.45);
   box-shadow: 
-    0 8px 25px rgba(0, 0, 0, 0.3),
-    inset 0 1px 2px rgba(255, 255, 255, 0.6),
-    inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+    0 8px 25px rgba(0, 0, 0, 0.35),
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.8),
+    inset 0 -1.5px 2px rgba(0, 0, 0, 0.3);
   pointer-events: none; z-index: 1;
-  /* Thuật toán phản chiếu góc sáng quang học theo góc di chuyển */
-  transition: 
-    left 0.32s cubic-bezier(0.16, 1, 0.3, 1), 
-    width 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-    background-position 0.32s ease;
+  /* Chuyển động siêu mượt theo ngón tay */
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.25s ease,
+              box-shadow 0.25s ease;
 }
 
-/* Khi giữ tay -> Viên kính co giãn lỏng và phồng to quang học */
+/* KHI GIỮ TAY: PHỒNG TO TRÀN RA NGOÀI CẢ Ô DOCK KÍNH */
 .fluid-pill.pressing {
-  transform: scaleY(1.16) scaleX(1.05);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.12) 100%);
+  transform: scaleY(1.38) scaleX(1.15); /* Phồng to vượt khỏi viền Dock */
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.18) 100%);
   box-shadow: 
-    0 12px 30px rgba(0, 0, 0, 0.4),
-    inset 0 1px 3px rgba(255, 255, 255, 0.8);
+    0 15px 35px rgba(0, 122, 255, 0.35),
+    0 10px 20px rgba(0, 0, 0, 0.5),
+    inset 0 2px 4px rgba(255, 255, 255, 0.9);
 }
 
 .tab-btn {
   flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
   padding: 10px 0; border-radius: 22px; cursor: pointer; color: var(--text-dim);
   font-size: 11px; font-weight: 600; z-index: 2; position: relative;
-  transition: color 0.25s ease;
+  transition: color 0.25s ease, transform 0.2s ease;
 }
 
 .tab-btn.active { color: #ffffff; }
+.tab-btn.hover-target { color: rgba(255, 255, 255, 0.85); transform: scale(1.05); }
 
 /* Popup & Toast */
 #popupOverlay {
@@ -495,7 +497,7 @@ function onAuthReady(user){
   loadRewards();
   maybeShowFirstVisitPopup();
 
-  setTimeout(() => updatePillPosition(), 100);
+  setTimeout(() => updatePillToTab(activeTab), 100);
 }
 
 if (auth) {
@@ -521,66 +523,83 @@ function ensureUserProfile(){
 }
 
 /* =========================================================
-   THUẬT TOÁN QUANG HỌC KÍNH LỎNG DOCK (SỬA DỨT ĐIỂM CHUẨN X)
+   THUẬT TOÁN KÍNH LỎNG DOCK PHỒNG TO VÀ DI CHUYỂN CHUẨN
    ========================================================= */
 const track = document.getElementById('track');
 const fluidPill = document.getElementById('fluidPill');
 const tabBtns = document.querySelectorAll('.tab-btn');
 const tabbar = document.getElementById('tabbar');
-let isDraggingTab = false;
 
-function updatePillPosition() {
-  const targetBtn = tabBtns[activeTab];
+let isPressing = false;
+let hoverTabIdx = 0;
+
+// Cập nhật vị trí viên kính lỏng theo index của tab
+function updatePillToTab(tabIdx) {
+  const targetBtn = tabBtns[tabIdx];
   if (!targetBtn) return;
-  
+  fluidPill.style.transition = isPressing ? 'none' : 'left 0.3s cubic-bezier(0.16, 1, 0.3, 1), width 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)';
   fluidPill.style.left = targetBtn.offsetLeft + 'px';
   fluidPill.style.width = targetBtn.offsetWidth + 'px';
 }
 
+// Chuyển trang thực sự khi thả tay
 function goto(idx) {
   if (idx < 0 || idx >= TAB_COUNT) return;
   activeTab = idx;
+  hoverTabIdx = idx;
 
-  updatePillPosition();
+  updatePillToTab(activeTab);
 
-  // Trượt chuyển màn hình nội dung
+  // Màn hình trang mới bắt đầu trượt sang khi thả tay ở đây
   track.style.transform = `translateX(-${activeTab * (100 / TAB_COUNT)}%)`;
 
   tabBtns.forEach((b, i) => {
     b.classList.toggle('active', i === activeTab);
+    b.classList.remove('hover-target');
   });
 }
 
-/* Thuật toán Kéo/Miết Ngón Tay Sang Các Mục */
+// Bắt đầu GIỮ TAY: Phồng to viên kính lỏng
 tabbar.addEventListener('pointerdown', (e) => {
-  isDraggingTab = true;
+  isPressing = true;
   fluidPill.classList.add('pressing');
-  handleDockGesture(e);
+  handleDragMove(e);
 });
 
-tabbar.addEventListener('pointermove', (e) => {
-  if (!isDraggingTab) return;
-  handleDockGesture(e);
+// DI CHUYỂN TAY: Viên kính trượt theo ngón tay, màn hình TRÊN GIỮ NGUYÊN
+window.addEventListener('pointermove', (e) => {
+  if (!isPressing) return;
+  handleDragMove(e);
 });
 
+// THẢ TAY: Màn hình mới bắt đầu chuyển sang tab dừng tay
 window.addEventListener('pointerup', () => {
-  isDraggingTab = false;
+  if (!isPressing) return;
+  isPressing = false;
   fluidPill.classList.remove('pressing');
+  
+  // Dừng tay ở đâu thì chuyển tab tại đó
+  goto(hoverTabIdx);
 });
 
-function handleDockGesture(e) {
+function handleDragMove(e) {
   const rect = tabbar.getBoundingClientRect();
   const touchX = e.clientX - rect.left;
   
   let targetIdx = Math.floor((touchX / rect.width) * TAB_COUNT);
   targetIdx = Math.max(0, Math.min(TAB_COUNT - 1, targetIdx));
   
-  if (targetIdx !== activeTab) {
-    goto(targetIdx);
-  }
+  hoverTabIdx = targetIdx;
+  
+  // Trượt viên kính lỏng theo ngón tay
+  updatePillToTab(hoverTabIdx);
+
+  tabBtns.forEach((b, i) => {
+    b.classList.toggle('hover-target', i === hoverTabIdx && i !== activeTab);
+  });
 }
 
-window.addEventListener('resize', () => updatePillPosition());
+window.addEventListener('resize', () => updatePillToTab(activeTab));
 
 /* ---------- TẠO KEY ---------- */
 function openGenerateKey(){ generateKey(); }
