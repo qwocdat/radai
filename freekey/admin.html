@@ -1,319 +1,377 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Get Key Admin Panel - Digitalsmod</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { background-color: #0b0f19; color: #f3f4f6; font-family: system-ui, -apple-system, sans-serif; }
-        .glass { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
-        .glass-card { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .glow-button { box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DigitalsMod - Admin</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<style>
+:root{
+  --primary-a:#6366f1;
+  --primary-b:#8b5cf6;
+  --accent:#00d9ff;
+  --bg:#0a0a0a;
+  --card:rgba(255,255,255,0.08);
+  --card-border:rgba(255,255,255,0.2);
+  --text:#f1f5f9;
+  --text-dim:#94a3b8;
+  --danger:#ef4444;
+  --success:#22c55e;
+}
+*{box-sizing:border-box;}
+html,body{
+  margin:0; padding:0; min-height:100%;
+  background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+body::before{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 2px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 2px);
+  background-size:2px 2px;
+}
+
+#loginScreen{
+  position:fixed; inset:0; z-index:40; display:flex; align-items:center; justify-content:center;
+  flex-direction:column; gap:14px; padding:24px; text-align:center;
+}
+#loginScreen .logo{font-size:24px; font-weight:800;}
+#loginScreen .logo span{background:linear-gradient(135deg,var(--primary-a),var(--primary-b)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+#loginScreen input{
+  background:rgba(255,255,255,0.06); border:1px solid var(--card-border); color:var(--text);
+  border-radius:12px; padding:12px 14px; font-size:14px; width:260px;
+}
+.matte-btn{
+  background:linear-gradient(135deg,var(--primary-a),var(--primary-b));
+  border:none; color:#fff; font-weight:600; font-size:14px;
+  padding:11px 18px; border-radius:12px; cursor:pointer; width:260px;
+}
+.matte-btn.small{width:auto; padding:7px 14px; font-size:12.5px;}
+.matte-btn.danger{background:linear-gradient(135deg,#ef4444,#b91c1c);}
+.matte-btn.outline{background:transparent; border:1px solid var(--card-border); color:var(--text);}
+
+#adminApp{display:none; position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:20px 18px 60px 18px;}
+header.top{display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;}
+header.top .brand{font-size:19px; font-weight:800;}
+header.top .brand span{background:linear-gradient(135deg,var(--primary-a),var(--primary-b)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+
+.stats-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:14px; margin-bottom:24px;}
+.stat-card{
+  background:var(--card); border:1px solid var(--card-border); backdrop-filter:blur(14px);
+  border-radius:18px; padding:16px;
+}
+.stat-card .num{font-size:26px; font-weight:800;}
+.stat-card .lbl{font-size:12px; color:var(--text-dim); margin-top:4px;}
+
+.tabs-row{display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;}
+.tabs-row button{
+  background:var(--card); border:1px solid var(--card-border); color:var(--text-dim);
+  padding:8px 16px; border-radius:12px; cursor:pointer; font-size:13px; backdrop-filter:blur(10px);
+}
+.tabs-row button.active{color:var(--text); border-color:var(--primary-b); background:rgba(139,92,246,0.12);}
+
+.glass-card{
+  background:var(--card); border:1px solid var(--card-border); backdrop-filter:blur(14px);
+  border-radius:20px; padding:16px; margin-bottom:16px;
+}
+.search-row{display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap;}
+.search-row input{
+  flex:1; min-width:200px; background:rgba(255,255,255,0.06); border:1px solid var(--card-border);
+  color:var(--text); border-radius:12px; padding:9px 12px; font-size:13px;
+}
+
+table{width:100%; border-collapse:collapse; font-size:13px;}
+thead th{
+  text-align:left; padding:9px 8px; color:var(--text-dim); font-weight:600; font-size:11.5px;
+  text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--card-border);
+}
+tbody td{padding:10px 8px; border-bottom:1px solid rgba(255,255,255,0.06); vertical-align:middle;}
+tbody tr:hover{background:rgba(255,255,255,0.03);}
+.pill{font-size:10.5px; padding:3px 9px; border-radius:999px; background:rgba(34,197,94,0.15); color:var(--success); border:1px solid rgba(34,197,94,0.3);}
+.pill.warn{background:rgba(239,68,68,0.15); color:var(--danger); border:1px solid rgba(239,68,68,0.3);}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12px;}
+.icon-btn{
+  background:rgba(255,255,255,0.06); border:1px solid var(--card-border); color:var(--text);
+  border-radius:8px; padding:5px 10px; font-size:11.5px; cursor:pointer; margin-right:4px;
+}
+.icon-btn.danger{color:var(--danger); border-color:rgba(239,68,68,0.3);}
+.empty-note{font-size:12.5px; color:var(--text-dim); padding:20px 0; text-align:center;}
+
+#toast{
+  position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px);
+  background:rgba(20,20,25,0.92); border:1px solid var(--card-border); backdrop-filter:blur(16px);
+  padding:10px 18px; border-radius:14px; font-size:13px; opacity:0; pointer-events:none;
+  transition:.25s; z-index:60; white-space:nowrap;
+}
+#toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+</style>
 </head>
-<body class="min-h-screen flex flex-col md:flex-row">
+<body>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed top-5 right-5 z-50 transform translate-x-full transition-all duration-300 px-4 py-3 rounded-xl glass shadow-2xl flex items-center space-x-3 hidden">
-        <i id="toast-icon" class="fas fa-info-circle text-lg"></i>
-        <span id="toast-msg" class="text-sm font-medium"></span>
+<div id="loginScreen">
+  <div class="logo">Digitals<span>Mod</span> Admin</div>
+  <input type="password" id="adminPass" placeholder="Nhap ma quan tri">
+  <button class="matte-btn" onclick="tryAdminLogin()">Dang nhap</button>
+</div>
+
+<div id="adminApp">
+  <header class="top">
+    <div class="brand">Digitals<span>Mod</span> - Bang dieu khien</div>
+    <div>
+      <button class="matte-btn small outline" onclick="refreshAll()">Lam moi</button>
+      <button class="matte-btn small danger" onclick="adminLogout()">Dang xuat</button>
     </div>
+  </header>
 
-    <!-- Login Modal -->
-    <div id="login-modal" class="fixed inset-0 z-40 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="glass max-w-md w-full p-8 rounded-2xl border border-blue-500/20">
-            <div class="text-center mb-6">
-                <div class="inline-flex p-3 rounded-2xl bg-blue-500/10 text-blue-400 mb-3"><i class="fas fa-shield-halved text-3xl"></i></div>
-                <h2 class="text-2xl font-bold text-white">Admin Authentication</h2>
-                <p class="text-xs text-gray-400 mt-1">Digitalsmod System</p>
-            </div>
-            <form id="login-form" class="space-y-4">
-                <div>
-                    <label class="block text-xs text-gray-400 mb-1">Email</label>
-                    <input type="email" id="login-email" required class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white">
-                </div>
-                <div>
-                    <label class="block text-xs text-gray-400 mb-1">Mật khẩu</label>
-                    <input type="password" id="login-password" required class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white">
-                </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 rounded-xl transition glow-button">Đăng Nhập</button>
-            </form>
-        </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="num" id="statUsers">0</div><div class="lbl">Tong nguoi dung</div></div>
+    <div class="stat-card"><div class="num" id="statKeys">0</div><div class="lbl">Tong key da tao</div></div>
+    <div class="stat-card"><div class="num" id="statActiveKeys">0</div><div class="lbl">Key con hieu luc</div></div>
+    <div class="stat-card"><div class="num" id="statUploads">0</div><div class="lbl">Tong file upload</div></div>
+  </div>
+
+  <div class="tabs-row">
+    <button class="active" data-view="users" onclick="switchView('users')">Nguoi dung</button>
+    <button data-view="keys" onclick="switchView('keys')">Key</button>
+    <button data-view="uploads" onclick="switchView('uploads')">Upload</button>
+  </div>
+
+  <!-- USERS VIEW -->
+  <div class="glass-card view-panel" id="view-users">
+    <div class="search-row">
+      <input id="searchUsers" placeholder="Tim theo ten hoac UID..." oninput="renderUsers()">
     </div>
+    <table>
+      <thead><tr><th>Ten</th><th>UID</th><th>Ngay tham gia</th><th>So key</th><th>Diem thuong</th><th></th></tr></thead>
+      <tbody id="usersTbody"></tbody>
+    </table>
+    <div class="empty-note" id="usersEmpty" style="display:none;">Khong co du lieu nguoi dung.</div>
+  </div>
 
-    <!-- Sidebar -->
-    <aside id="sidebar" class="w-full md:w-64 glass border-r border-gray-800 flex-shrink-0 flex flex-col justify-between hidden">
-        <div>
-            <div class="p-6 border-b border-gray-800/60 flex items-center space-x-3">
-                <div class="p-2 bg-blue-600/20 rounded-lg text-blue-400"><i class="fas fa-cubes text-xl"></i></div>
-                <div>
-                    <h1 class="font-bold text-white text-base">DIGITALSMOD ADMIN</h1>
-                    <span class="text-[10px] text-green-400 font-mono bg-green-500/10 px-2 py-0.5 rounded-full">v4.5 Pro</span>
-                </div>
-            </div>
-            <nav class="p-4 space-y-1">
-                <button onclick="switchTab('dashboard')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-gray-800/50" data-tab="dashboard"><i class="fas fa-chart-pie w-5"></i><span>Dashboard</span></button>
-                <button onclick="switchTab('categories')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-gray-800/50" data-tab="categories"><i class="fas fa-gamepad w-5"></i><span>Danh Mục Game</span></button>
-                <button onclick="switchTab('keys')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-gray-800/50" data-tab="keys"><i class="fas fa-key w-5"></i><span>Quản Lý Key</span></button>
-                <button onclick="switchTab('settings')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-gray-800/50" data-tab="settings"><i class="fas fa-sliders w-5"></i><span>Cấu Hình API Vượt Link</span></button>
-            </nav>
-        </div>
-        <div class="p-4 border-t border-gray-800">
-            <button onclick="logoutAdmin()" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10"><i class="fas fa-right-from-bracket w-5"></i><span>Đăng Xuất</span></button>
-        </div>
-    </aside>
+  <!-- KEYS VIEW -->
+  <div class="glass-card view-panel" id="view-keys" style="display:none;">
+    <div class="search-row">
+      <input id="searchKeys" placeholder="Tim theo key hoac UID..." oninput="renderKeys()">
+    </div>
+    <table>
+      <thead><tr><th>Key</th><th>Chu so huu (UID)</th><th>Loai</th><th>Tao luc</th><th>Het han</th><th>Trang thai</th><th></th></tr></thead>
+      <tbody id="keysTbody"></tbody>
+    </table>
+    <div class="empty-note" id="keysEmpty" style="display:none;">Khong co key nao.</div>
+  </div>
 
-    <!-- Main Content Area -->
-    <main id="main-content" class="flex-1 p-6 md:p-8 overflow-y-auto hidden">
-        
-        <!-- DASHBOARD TAB -->
-        <section id="tab-dashboard" class="tab-content space-y-6">
-            <h2 class="text-2xl font-bold text-white">Thống Kê Hệ Thống</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div class="glass-card p-5 rounded-2xl flex items-center space-x-4">
-                    <div class="p-3 bg-blue-500/10 text-blue-400 rounded-xl"><i class="fas fa-gamepad text-2xl"></i></div>
-                    <div><p class="text-xs text-gray-400">Danh Mục Game</p><h3 id="stat-total-games" class="text-2xl font-bold text-white">0</h3></div>
-                </div>
-                <div class="glass-card p-5 rounded-2xl flex items-center space-x-4">
-                    <div class="p-3 bg-yellow-500/10 text-yellow-400 rounded-xl"><i class="fas fa-key text-2xl"></i></div>
-                    <div><p class="text-xs text-gray-400">Key Khả Dụng</p><h3 id="stat-available-keys" class="text-2xl font-bold text-white">0</h3></div>
-                </div>
-                <div class="glass-card p-5 rounded-2xl flex items-center space-x-4">
-                    <div class="p-3 bg-purple-500/10 text-purple-400 rounded-xl"><i class="fas fa-user-check text-2xl"></i></div>
-                    <div><p class="text-xs text-gray-400">Key Đã Phát</p><h3 id="stat-claimed-keys" class="text-2xl font-bold text-white">0</h3></div>
-                </div>
-            </div>
-        </section>
+  <!-- UPLOADS VIEW -->
+  <div class="glass-card view-panel" id="view-uploads" style="display:none;">
+    <div class="search-row">
+      <input id="searchUploads" placeholder="Tim theo ten file hoac UID..." oninput="renderUploads()">
+    </div>
+    <table>
+      <thead><tr><th>Ten file</th><th>Chu so huu (UID)</th><th>Loai</th><th>Thoi gian</th><th></th></tr></thead>
+      <tbody id="uploadsTbody"></tbody>
+    </table>
+    <div class="empty-note" id="uploadsEmpty" style="display:none;">Khong co file nao.</div>
+  </div>
+</div>
 
-        <!-- DANH MỤC GAME TAB -->
-        <section id="tab-categories" class="tab-content hidden space-y-6">
-            <div class="glass p-6 rounded-2xl space-y-4">
-                <h3 class="text-lg font-bold text-white">Thêm Danh Mục Game</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input type="text" id="cat-name" placeholder="Tên Game (VD: Free Fire, AOV...)" class="bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white">
-                    <input type="url" id="cat-img" placeholder="Link Ảnh Banner/Logo" class="bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white">
-                </div>
-                <button onclick="saveCategory()" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-6 py-2.5 rounded-xl glow-button">Lưu Game</button>
-            </div>
-            <div class="glass p-6 rounded-2xl space-y-4">
-                <h3 class="text-lg font-bold text-white">Danh Sách Game</h3>
-                <div id="categories-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
-            </div>
-        </section>
+<div id="toast"></div>
 
-        <!-- QUẢN LÝ KEY TAB -->
-        <section id="tab-keys" class="tab-content hidden space-y-6">
-            <div class="glass p-6 rounded-2xl space-y-4">
-                <h3 class="text-lg font-bold text-white">Upload Key Hàng Loạt</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <select id="key-game-select" class="bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white"></select>
-                    <select id="key-duration" class="bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white">
-                        <option value="24 Giờ">24 Giờ</option>
-                        <option value="48 Giờ">48 Giờ</option>
-                        <option value="7 Ngày">7 Ngày</option>
-                        <option value="Vĩnh Viễn">Vĩnh Viễn</option>
-                    </select>
-                </div>
-                <textarea id="key-list-input" rows="4" placeholder="Mỗi key một dòng..." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 text-sm font-mono text-white"></textarea>
-                <button onclick="uploadKeys()" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-6 py-2.5 rounded-xl glow-button">Lưu Key Vào Firestore</button>
-            </div>
-            <div class="glass p-6 rounded-2xl space-y-4">
-                <h3 class="text-lg font-bold text-white">Danh Sách Key</h3>
-                <table class="w-full text-left text-sm text-gray-300">
-                    <thead class="bg-gray-900/50 text-xs text-gray-400">
-                        <tr><th class="p-3">Key</th><th class="p-3">Game</th><th class="p-3">Thời Hạn</th><th class="p-3">Trạng Thái</th><th class="p-3">Xóa</th></tr>
-                    </thead>
-                    <tbody id="key-table-body" class="divide-y divide-gray-800"></tbody>
-                </table>
-            </div>
-        </section>
+<script>
+/* =========================================================
+   FIREBASE CONFIG (Cấu hình Firebase cũ)
+   ========================================================= */
+const firebaseConfig = {
+    apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
+    authDomain: "quocdat-396fe.firebaseapp.com",
+    databaseURL: "https://quocdat-396fe-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "quocdat-396fe",
+    storageBucket: "quocdat-396fe.firebasestorage.app",
+    messagingSenderId: "685476439350",
+    appId: "1:685476439350:web:949054ecba7f0a0c383f97"
+};
 
-        <!-- SETTINGS TAB (API VƯỢT LINK SHAWDO MOD) -->
-        <section id="tab-settings" class="tab-content hidden space-y-6">
-            <div class="glass p-6 rounded-2xl space-y-4 max-w-2xl">
-                <h3 class="text-lg font-bold text-white">Cấu Hình API Rút Gọn Tự Động (Layma / Link4m / Tung.bet)</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Cấu trúc API Rút Gọn Link Vượt Key</label>
-                        <input type="text" id="set-api-template" placeholder="https://tung.bet/GETKEY/shawdomod?url={URL_DICH} hoặc https://layma.net/api?api=TOKEN&url={URL_DICH}" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-xs font-mono text-white">
-                        <p class="text-[10px] text-gray-500 mt-1">Code sẽ tự thay thế <code>{URL_DICH}</code> bằng đường dẫn bọc chữ ký bảo mật chống bypass.</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Link Nhóm Zalo (Nhiệm vụ Task)</label>
-                        <input type="url" id="set-zalo-group" placeholder="https://zalo.me/g/phheuj768" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Tên Website</label>
-                        <input type="text" id="set-site-name" value="DIGITALSMOD GET KEY" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white">
-                    </div>
-                </div>
-                <button onclick="saveSettings()" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-6 py-2.5 rounded-xl glow-button">Lưu Cấu Hình</button>
-            </div>
-        </section>
+/* Mã quản trị cục bộ được đặt thành ame1610@ */
+const ADMIN_PASSCODE = "ame1610@";
 
-    </main>
+let app, db;
+try {
+  app = firebase.initializeApp(firebaseConfig);
+  db = firebase.database();
+} catch (e) {
+  console.warn("Firebase chua duoc cau hinh dung:", e);
+}
 
-    <!-- FIREBASE MODULE & ADMIN LOGIC -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, getDoc, getDocs, deleteDoc, query, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+let allUsers = {};
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
-            authDomain: "quocdat-396fe.firebaseapp.com",
-            databaseURL: "https://quocdat-396fe-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "quocdat-396fe",
-            storageBucket: "quocdat-396fe.firebasestorage.app",
-            messagingSenderId: "685476439350",
-            appId: "1:685476439350:web:949054ecba7f0a0c383f97"
-        };
+function tryAdminLogin(){
+  const val = document.getElementById('adminPass').value;
+  if(val && val === ADMIN_PASSCODE){
+    sessionStorage.setItem('dgm_admin_ok', '1');
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminApp').style.display = 'block';
+    refreshAll();
+  } else {
+    toast('Sai ma quan tri');
+  }
+}
+function adminLogout(){
+  sessionStorage.removeItem('dgm_admin_ok');
+  document.getElementById('adminApp').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+}
+(function initSession(){
+  if(sessionStorage.getItem('dgm_admin_ok') === '1'){
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminApp').style.display = 'block';
+    refreshAll();
+  }
+})();
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+function switchView(name){
+  document.querySelectorAll('.tabs-row button').forEach(b => b.classList.toggle('active', b.dataset.view === name));
+  document.querySelectorAll('.view-panel').forEach(p => p.style.display = 'none');
+  document.getElementById('view-' + name).style.display = 'block';
+}
 
-        window.showToast = (msg, type = "info") => {
-            const toast = document.getElementById("toast");
-            document.getElementById("toast-msg").innerText = msg;
-            toast.classList.remove("hidden", "translate-x-full");
-            setTimeout(() => toast.classList.add("translate-x-full"), 3000);
-        };
+function refreshAll(){
+  if(!db){ toast('Firebase chua cau hinh'); return; }
+  db.ref('users').once('value').then(snap => {
+    allUsers = snap.val() || {};
+    computeStats();
+    renderUsers();
+    renderKeys();
+    renderUploads();
+    toast('Da tai du lieu');
+  }).catch(err => toast(err.message));
+}
 
-        window.switchTab = (tabId) => {
-            document.querySelectorAll(".tab-content").forEach(el => el.classList.add("hidden"));
-            document.getElementById(`tab-${tabId}`).classList.remove("hidden");
-            if(tabId === "dashboard") loadDashboardStats();
-            if(tabId === "categories") loadCategories();
-            if(tabId === "keys") { populateGameDropdowns(); loadKeysTable(); }
-            if(tabId === "settings") loadSettings();
-        };
+function computeStats(){
+  const uids = Object.keys(allUsers);
+  let totalKeys = 0, activeKeys = 0, totalUploads = 0;
+  const now = Date.now();
+  uids.forEach(uid => {
+    const u = allUsers[uid];
+    const keys = u.keys || {};
+    Object.values(keys).forEach(k => {
+      totalKeys++;
+      if(k.expiresAt > now) activeKeys++;
+    });
+    totalUploads += Object.keys(u.uploads || {}).length;
+  });
+  document.getElementById('statUsers').textContent = uids.length;
+  document.getElementById('statKeys').textContent = totalKeys;
+  document.getElementById('statActiveKeys').textContent = activeKeys;
+  document.getElementById('statUploads').textContent = totalUploads;
+}
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                document.getElementById("login-modal").classList.add("hidden");
-                document.getElementById("sidebar").classList.remove("hidden");
-                document.getElementById("main-content").classList.remove("hidden");
-                switchTab('dashboard');
-            } else {
-                document.getElementById("login-modal").classList.remove("hidden");
-            }
-        });
+/* ---------- USERS TABLE ---------- */
+function renderUsers(){
+  const q = (document.getElementById('searchUsers').value || '').toLowerCase();
+  const tbody = document.getElementById('usersTbody');
+  const rows = [];
+  Object.entries(allUsers).forEach(([uid, u]) => {
+    const profile = u.profile || {};
+    const name = profile.name || 'Khong ten';
+    if(q && !name.toLowerCase().includes(q) && !uid.toLowerCase().includes(q)) return;
+    const keyCount = Object.keys(u.keys || {}).length;
+    const rewards = (u.stats || {}).totalRewards || 0;
+    rows.push(`<tr>
+      <td>${name}</td>
+      <td class="mono">${uid}</td>
+      <td>${profile.joinDate || '-'}</td>
+      <td>${keyCount}</td>
+      <td>${rewards}</td>
+      <td><button class="icon-btn danger" onclick="deleteUser('${uid}')">Xoa</button></td>
+    </tr>`);
+  });
+  tbody.innerHTML = rows.join('');
+  document.getElementById('usersEmpty').style.display = rows.length ? 'none' : 'block';
+}
+function deleteUser(uid){
+  if(!confirm('Xoa toan bo du lieu cua nguoi dung nay?')) return;
+  db.ref('users/' + uid).remove().then(() => { toast('Da xoa nguoi dung'); refreshAll(); });
+}
 
-        document.getElementById("login-form").addEventListener("submit", async (e) => {
-            e.preventDefault();
-            try {
-                await signInWithEmailAndPassword(auth, document.getElementById("login-email").value, document.getElementById("login-password").value);
-                showToast("Đăng nhập thành công!", "success");
-            } catch (err) { showToast("Sai tài khoản/mật khẩu", "error"); }
-        });
+/* ---------- KEYS TABLE ---------- */
+function renderKeys(){
+  const q = (document.getElementById('searchKeys').value || '').toLowerCase();
+  const tbody = document.getElementById('keysTbody');
+  const rows = [];
+  const now = Date.now();
+  Object.entries(allUsers).forEach(([uid, u]) => {
+    Object.entries(u.keys || {}).forEach(([keyId, k]) => {
+      if(q && !(k.key || '').toLowerCase().includes(q) && !uid.toLowerCase().includes(q)) return;
+      const active = k.expiresAt > now;
+      rows.push(`<tr>
+        <td class="mono">${k.key}</td>
+        <td class="mono">${uid}</td>
+        <td>${k.gameType || '-'}</td>
+        <td>${new Date(k.createdAt).toLocaleString('vi-VN')}</td>
+        <td>${new Date(k.expiresAt).toLocaleString('vi-VN')}</td>
+        <td><span class="pill ${active ? '' : 'warn'}">${active ? 'Con hieu luc' : 'Het han'}</span></td>
+        <td>
+          <button class="icon-btn" onclick="extendKey('${uid}','${keyId}')">+24h</button>
+          <button class="icon-btn danger" onclick="revokeKey('${uid}','${keyId}')">Thu hoi</button>
+        </td>
+      </tr>`);
+    });
+  });
+  tbody.innerHTML = rows.join('');
+  document.getElementById('keysEmpty').style.display = rows.length ? 'none' : 'block';
+}
+function extendKey(uid, keyId){
+  const ref = db.ref('users/' + uid + '/keys/' + keyId + '/expiresAt');
+  ref.once('value').then(snap => {
+    const current = snap.val() || Date.now();
+    ref.set(current + 24*60*60*1000).then(() => { toast('Da gia han key'); refreshAll(); });
+  });
+}
+function revokeKey(uid, keyId){
+  if(!confirm('Thu hoi key nay?')) return;
+  db.ref('users/' + uid + '/keys/' + keyId).remove().then(() => { toast('Da thu hoi key'); refreshAll(); });
+}
 
-        window.logoutAdmin = () => signOut(auth);
+/* ---------- UPLOADS TABLE ---------- */
+function renderUploads(){
+  const q = (document.getElementById('searchUploads').value || '').toLowerCase();
+  const tbody = document.getElementById('uploadsTbody');
+  const rows = [];
+  Object.entries(allUsers).forEach(([uid, u]) => {
+    Object.entries(u.uploads || {}).forEach(([fileId, f]) => {
+      if(q && !(f.name || '').toLowerCase().includes(q) && !uid.toLowerCase().includes(q)) return;
+      rows.push(`<tr>
+        <td>${f.name}</td>
+        <td class="mono">${uid}</td>
+        <td>${f.type || '-'}</td>
+        <td>${new Date(f.uploadedAt).toLocaleString('vi-VN')}</td>
+        <td>
+          <a class="icon-btn" style="text-decoration:none; display:inline-block;" href="${f.url}" target="_blank">Xem</a>
+          <button class="icon-btn danger" onclick="deleteUpload('${uid}','${fileId}')">Xoa</button>
+        </td>
+      </tr>`);
+    });
+  });
+  tbody.innerHTML = rows.join('');
+  document.getElementById('uploadsEmpty').style.display = rows.length ? 'none' : 'block';
+}
+function deleteUpload(uid, fileId){
+  if(!confirm('Xoa file nay khoi danh sach?')) return;
+  db.ref('users/' + uid + '/uploads/' + fileId).remove().then(() => { toast('Da xoa file'); refreshAll(); });
+}
 
-        window.saveCategory = async () => {
-            const name = document.getElementById("cat-name").value.trim();
-            const img = document.getElementById("cat-img").value.trim();
-            if(!name) return showToast("Nhập tên game", "error");
-            await setDoc(doc(db, "categories", name), { name, imgUrl: img, updatedAt: serverTimestamp() }, { merge: true });
-            showToast("Đã lưu danh mục!");
-            loadCategories();
-        };
-
-        window.loadCategories = async () => {
-            const container = document.getElementById("categories-container");
-            const snap = await getDocs(collection(db, "categories"));
-            container.innerHTML = "";
-            snap.forEach(d => {
-                const c = d.data();
-                container.innerHTML += `
-                    <div class="glass-card p-4 rounded-xl space-y-2">
-                        <div class="flex items-center space-x-3">
-                            <img src="${c.imgUrl || 'https://via.placeholder.com/40'}" class="w-10 h-10 rounded-lg object-cover">
-                            <span class="text-sm font-bold text-white">${c.name}</span>
-                        </div>
-                        <button onclick="deleteCategory('${c.name}')" class="text-xs text-red-400">Xóa Game</button>
-                    </div>
-                `;
-            });
-        };
-
-        window.deleteCategory = async (name) => { await deleteDoc(doc(db, "categories", name)); loadCategories(); };
-
-        async function populateGameDropdowns() {
-            const snaps = await getDocs(collection(db, "categories"));
-            const select = document.getElementById("key-game-select");
-            select.innerHTML = "";
-            snaps.forEach(d => select.innerHTML += `<option value="${d.data().name}">${d.data().name}</option>`);
-        }
-
-        window.uploadKeys = async () => {
-            const game = document.getElementById("key-game-select").value;
-            const duration = document.getElementById("key-duration").value;
-            const rawText = document.getElementById("key-list-input").value;
-
-            const lines = [...new Set(rawText.split("\n").map(l => l.trim()).filter(l => l.length > 0))];
-            let batch = writeBatch(db);
-
-            for (let k of lines) {
-                batch.set(doc(db, "keys", k), { key: k, game, duration, status: "available", createdAt: serverTimestamp() });
-            }
-            await batch.commit();
-            showToast(`Đã thêm ${lines.length} key!`);
-            document.getElementById("key-list-input").value = "";
-            loadKeysTable();
-        };
-
-        window.loadKeysTable = async () => {
-            const tbody = document.getElementById("key-table-body");
-            const snap = await getDocs(collection(db, "keys"));
-            tbody.innerHTML = "";
-            snap.forEach(docSnap => {
-                const data = docSnap.data();
-                tbody.innerHTML += `
-                    <tr class="hover:bg-gray-800/50">
-                        <td class="p-3 font-mono text-white">${data.key}</td>
-                        <td class="p-3">${data.game}</td>
-                        <td class="p-3">${data.duration}</td>
-                        <td class="p-3"><span class="px-2 py-1 rounded text-xs ${data.status === 'available' ? 'bg-green-500/10 text-green-400' : 'bg-purple-500/10 text-purple-400'}">${data.status}</span></td>
-                        <td class="p-3"><button onclick="deleteKey('${docSnap.id}')" class="text-red-400 text-xs">Xóa</button></td>
-                    </tr>
-                `;
-            });
-        };
-
-        window.deleteKey = async (id) => { await deleteDoc(doc(db, "keys", id)); loadKeysTable(); };
-
-        window.loadSettings = async () => {
-            const snap = await getDoc(doc(db, "system", "config"));
-            if(snap.exists()) {
-                const c = snap.data();
-                if(c.apiTemplate) document.getElementById("set-api-template").value = c.apiTemplate;
-                if(c.zaloGroup) document.getElementById("set-zalo-group").value = c.zaloGroup;
-                if(c.siteName) document.getElementById("set-site-name").value = c.siteName;
-            }
-        };
-
-        window.saveSettings = async () => {
-            await setDoc(doc(db, "system", "config"), {
-                apiTemplate: document.getElementById("set-api-template").value,
-                zaloGroup: document.getElementById("set-zalo-group").value,
-                siteName: document.getElementById("set-site-name").value,
-                updatedAt: serverTimestamp()
-            }, { merge: true });
-            showToast("Lưu cấu hình thành công!");
-        };
-
-        async function loadDashboardStats() {
-            const games = await getDocs(collection(db, "categories"));
-            const keys = await getDocs(collection(db, "keys"));
-            document.getElementById("stat-total-games").innerText = games.size;
-            let available = 0, claimed = 0;
-            keys.forEach(d => { if(d.data().status === "available") available++; else claimed++; });
-            document.getElementById("stat-available-keys").innerText = available;
-            document.getElementById("stat-claimed-keys").innerText = claimed;
-        }
-    </script>
+/* ---------- TOAST ---------- */
+let toastTimer;
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+</script>
 </body>
 </html>
