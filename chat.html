@@ -118,6 +118,10 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.03);
             cursor: pointer;
         }
+        .group-item.pinned {
+            background: rgba(59, 130, 246, 0.08);
+            border-left: 3px solid var(--primary);
+        }
 
         .group-avatar {
             width: 46px;
@@ -132,7 +136,7 @@
         }
 
         .group-info { flex: 1; }
-        .group-name { font-size: 15px; font-weight: 600; color: #fff; }
+        .group-name { font-size: 15px; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 6px; }
         .group-last-msg { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
 
         .chat-body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
@@ -150,10 +154,77 @@
         .chat-input { flex: 1; background: #0f172a; border: 1px solid var(--border-glass); border-radius: 20px; padding: 10px 16px; color: #fff; font-size: 14px; outline: none; }
         .btn-send { background: #3b82f6; border: none; width: 40px; height: 40px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .btn-create-group { position: absolute; bottom: 20px; right: 20px; width: 52px; height: 52px; border-radius: 50%; background: var(--primary); color: white; border: none; font-size: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+        /* APP CUSTOM TOAST & MODAL UI */
+        #toastContainer {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 90%;
+            max-width: 360px;
+            pointer-events: none;
+        }
+
+        .toast-item {
+            padding: 12px 16px;
+            border-radius: 14px;
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass);
+            color: #fff;
+            font-size: 13px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s forwards;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .custom-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .custom-modal-box {
+            width: 85%;
+            max-width: 320px;
+            background: #1e293b;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid var(--border-glass);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
 <body>
+
+    <div id="toastContainer"></div>
+
+    <!-- CUSTOM APP MODAL TẠO NHÓM -->
+    <div id="createGroupModal" class="custom-modal-overlay" style="display: none;">
+        <div class="custom-modal-box">
+            <h3 style="font-size: 16px; margin-bottom: 12px; color: #fff;">Tạo Nhóm Chat Mới</h3>
+            <input type="text" id="modalGroupNameInput" class="form-control" placeholder="Nhập tên nhóm..." style="margin-bottom: 16px;">
+            <div style="display: flex; gap: 10px;">
+                <button id="btnCancelGroup" class="btn-primary" style="background: rgba(255,255,255,0.1); margin-top: 0;">Hủy</button>
+                <button id="btnConfirmGroup" class="btn-primary" style="margin-top: 0;">Tạo Nhóm</button>
+            </div>
+        </div>
+    </div>
 
     <!-- VIEW 1: ĐĂNG NHẬP -->
     <div id="loginView" class="auth-box">
@@ -223,7 +294,7 @@
         </div>
 
         <div id="groupListView" class="group-list"></div>
-        <button id="btnCreateGroup" class="btn-create-group" onclick="promptCreateGroup()">+</button>
+        <button id="btnCreateGroup" class="btn-create-group" onclick="openCreateGroupModal()">+</button>
 
         <div id="chatView" style="display: none; flex: 1; flex-direction: column;">
             <div class="chat-body" id="chatBody"></div>
@@ -236,7 +307,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-        import { getDatabase, ref, push, onChildAdded, onValue, set, get, child, off } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+        import { getDatabase, ref, push, onChildAdded, onValue, set, get, child, update, off } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKWFn593Y",
@@ -252,6 +323,17 @@
         let currentGroupId = null;
         let unsubscribeMessages = null;
 
+        // TOAST CỦA WEB CHUẨN APP
+        window.showToast = function(msg, isError = false) {
+            const container = document.getElementById('toastContainer');
+            const item = document.createElement('div');
+            item.className = 'toast-item';
+            item.style.borderColor = isError ? 'var(--accent-red)' : 'var(--accent-green)';
+            item.innerHTML = `<span>${isError ? '⚠️' : '✅'}</span> <div>${msg}</div>`;
+            container.appendChild(item);
+            setTimeout(() => { item.remove(); }, 3000);
+        };
+
         window.switchView = function(viewId) {
             ['loginView', 'registerView', 'pendingView', 'chatAppView'].forEach(id => {
                 document.getElementById(id).style.display = (id === viewId) ? (id === 'chatAppView' ? 'flex' : 'block') : 'none';
@@ -263,8 +345,31 @@
             return String(rawId).replace(/[.#$\[\]\/]/g, "_");
         }
 
-        // TỰ ĐỘNG ĐỌC SESSION KHI MỞ APP
-        function initApp() {
+        // TỰ ĐỘNG THÊM USER VÀO NHÓM SYSTEM SHAREFILE
+        async function ensureSystemShareGroup(userKey) {
+            try {
+                const sysGroupRef = child(ref(db), 'digitalsmod_groups/digitalsmod-sharefile');
+                const snapshot = await get(sysGroupRef);
+                if (!snapshot.exists()) {
+                    await set(ref(db, 'digitalsmod_groups/digitalsmod-sharefile'), {
+                        name: 'digitalsmod-sharefile',
+                        isSystem: true,
+                        createdBy: 'system',
+                        createdAt: Date.now(),
+                        members: { [userKey]: true }
+                    });
+                } else {
+                    await update(ref(db, `digitalsmod_groups/digitalsmod-sharefile/members`), {
+                        [userKey]: true
+                    });
+                }
+            } catch (e) {
+                console.error('[DIGITALSMOD] System group update error:', e);
+            }
+        }
+
+        // THIẾT LẬP SESSION BAN ĐẦU
+        async function initApp() {
             const rawSession = localStorage.getItem('digitalsmod_user');
             if (rawSession) {
                 try {
@@ -273,6 +378,7 @@
                         window.location.href = './admin.html';
                         return;
                     }
+                    await ensureSystemShareGroup(getUserKey());
                     if (sessionUser.status === 'approved') {
                         switchView('chatAppView');
                         loadGroupList();
@@ -302,14 +408,15 @@
             const cleanKey = phone.replace(/[.#$\[\]\/]/g, "_");
 
             const snapshot = await get(child(ref(db), `digitalsmod_users/${cleanKey}`));
-            if (!snapshot.exists()) return alert("Tài khoản không tồn tại!");
+            if (!snapshot.exists()) return showToast("Tài khoản không tồn tại!", true);
             
             const user = snapshot.val();
-            if (user.passwordHash !== inputHash) return alert("Mật khẩu không chính xác!");
-            if (user.status === 'banned') return alert("Tài khoản đã bị BAN vĩnh viễn!");
+            if (user.passwordHash !== inputHash) return showToast("Mật khẩu không chính xác!", true);
+            if (user.status === 'banned') return showToast("Tài khoản đã bị BAN vĩnh viễn!", true);
 
             localStorage.setItem('digitalsmod_user', JSON.stringify(user));
             sessionUser = user;
+            await ensureSystemShareGroup(cleanKey);
 
             if (user.status === 'approved') {
                 switchView('chatAppView');
@@ -331,7 +438,7 @@
             const cleanKey = phone.replace(/[.#$\[\]\/]/g, "_");
 
             const snapshot = await get(child(ref(db), `digitalsmod_users/${cleanKey}`));
-            if (snapshot.exists()) return alert("SĐT/Mã định danh đã tồn tại!");
+            if (snapshot.exists()) return showToast("SĐT/Mã định danh đã tồn tại!", true);
 
             const userData = {
                 provider, phone, displayName, passwordHash, role: 'user', status: 'pending', createdAt: new Date().toISOString()
@@ -340,11 +447,12 @@
             await set(ref(db, 'digitalsmod_users/' + cleanKey), userData);
             localStorage.setItem('digitalsmod_user', JSON.stringify(userData));
             sessionUser = userData;
-            alert("Đã gửi yêu cầu xác minh!");
+            await ensureSystemShareGroup(cleanKey);
+            showToast("Đã gửi yêu cầu xác minh!");
             switchView('pendingView');
         });
 
-        // LOAD DANH SÁCH NHÓM CHAT
+        // LOAD DANH SÁCH NHÓM & GHIM NHÓM DIGITALSMOD-SHAREFILE LÊN ĐẦU
         function loadGroupList() {
             const currentUserKey = getUserKey();
             const groupsRef = ref(db, 'digitalsmod_groups');
@@ -353,22 +461,38 @@
                 groupListView.innerHTML = '';
                 if (!snapshot.exists()) return;
 
+                const groups = [];
                 snapshot.forEach((childSnap) => {
-                    const gId = childSnap.key;
-                    const gData = childSnap.val() || {};
+                    groups.push({ id: childSnap.key, data: childSnap.val() });
+                });
+
+                // SẮP XẾP: NHÓM DIGITALSMOD-SHAREFILE LUÔN ĐỨNG ĐẦU
+                groups.sort((a, b) => {
+                    if (a.id === 'digitalsmod-sharefile') return -1;
+                    if (b.id === 'digitalsmod-sharefile') return 1;
+                    return (b.data.createdAt || 0) - (a.data.createdAt || 0);
+                });
+
+                groups.forEach(itemData => {
+                    const gId = itemData.id;
+                    const gData = itemData.data || {};
                     const rawName = gData.name ? String(gData.name).trim() : 'Nhóm';
                     const isMember = gData.members && Boolean(gData.members[currentUserKey]);
                     const isAdmin = sessionUser && sessionUser.role === 'admin';
+                    const isSystemGroup = gId === 'digitalsmod-sharefile';
 
-                    if (isMember || isAdmin) {
+                    if (isMember || isAdmin || isSystemGroup) {
                         const item = document.createElement('div');
-                        item.className = 'group-item';
+                        item.className = 'group-item' + (isSystemGroup ? ' pinned' : '');
                         item.onclick = () => openGroup(gId, rawName);
                         item.innerHTML = `
-                            <div class="group-avatar">${rawName.charAt(0).toUpperCase()}</div>
+                            <div class="group-avatar" style="${isSystemGroup ? 'background: linear-gradient(135deg, #10b981, #059669);' : ''}">${isSystemGroup ? '📁' : rawName.charAt(0).toUpperCase()}</div>
                             <div class="group-info">
-                                <div class="group-name">${rawName} ${isAdmin && !isMember ? '<span style="font-size:10px; color:#ef4444;">(Ghost Admin)</span>' : ''}</div>
-                                <div class="group-last-msg">Bấm để vào phòng chat...</div>
+                                <div class="group-name">
+                                    ${rawName} ${isSystemGroup ? '<span style="font-size:10px; color:#10b981;">📌 [HỆ THỐNG]</span>' : ''}
+                                    ${isAdmin && !isMember && !isSystemGroup ? '<span style="font-size:10px; color:#ef4444;">(Ghost Admin)</span>' : ''}
+                                </div>
+                                <div class="group-last-msg">${isSystemGroup ? 'Nhóm chia sẻ file chung...' : 'Bấm để vào phòng chat...'}</div>
                             </div>
                         `;
                         groupListView.appendChild(item);
@@ -377,22 +501,33 @@
             });
         }
 
-        // TẠO NHÓM MỚI
-        window.promptCreateGroup = async function() {
-            const inputName = prompt("Nhập tên nhóm chat mới:");
-            if (!inputName || !inputName.trim()) return;
+        // TẠO NHÓM BẰNG MODAL APP
+        window.openCreateGroupModal = function() {
+            document.getElementById('modalGroupNameInput').value = '';
+            document.getElementById('createGroupModal').style.display = 'flex';
+        };
+
+        document.getElementById('btnCancelGroup').onclick = () => {
+            document.getElementById('createGroupModal').style.display = 'none';
+        };
+
+        document.getElementById('btnConfirmGroup').onclick = async () => {
+            const groupName = document.getElementById('modalGroupNameInput').value.trim();
+            if (!groupName) return showToast("Tên nhóm không được để rỗng!", true);
 
             const newGroupRef = push(ref(db, 'digitalsmod_groups'));
             const membersData = {};
             membersData[getUserKey()] = true;
 
             await set(newGroupRef, {
-                name: inputName.trim(),
+                name: groupName,
                 createdBy: sessionUser.phone || 'admin',
                 createdAt: Date.now(),
                 members: membersData
             });
-            alert("Đã tạo nhóm!");
+
+            document.getElementById('createGroupModal').style.display = 'none';
+            showToast("Đã tạo nhóm chat mới!");
         };
 
         // MỞ PHÒNG CHAT
