@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DIGITALSMOD CHAT</title>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <script src="/assets/js/watermark.js"></script>
+    <script src="/assets/js/anti_leak.js"></script>
+</head>
+<body>
+    <div class="tg-app">
+        <!-- HEADER TELEGRAM -->
+        <div class="tg-header">
+            <button id="btnBack" onclick="showGroupList()" style="display: none; background: none; border: none; color: #fff; font-size: 18px; cursor: pointer;">&larr;</button>
+            <div class="tg-title" id="headerTitle">DIGITALSMOD</div>
+            <button onclick="logout()" style="background: none; border: none; color: var(--text-muted); font-size: 13px; cursor: pointer;">Đăng xuất</button>
+        </div>
+
+        <!-- MÀN HÌNH 1: DANH SÁCH NHÓM CHAT -->
+        <div id="groupListView" class="group-list"></div>
+        <button id="btnCreateGroup" class="btn-create-group" onclick="promptCreateGroup()">+</button>
+
+        <!-- MÀN HÌNH 2: KHUNG CHAT CHI TIẾT -->
+        <div id="chatView" style="display: none; flex: 1; flex-direction: column;">
+            <div class="chat-body" id="chatBody"></div>
+            <div class="chat-footer">
+                <input type="text" id="msgInput" class="chat-input" placeholder="Nhập tin nhắn..." autocomplete="off">
+                <button id="sendBtn" class="btn-send">&gt;</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+        import { getDatabase, ref, push, onChildAdded, onValue, set, get, child } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKWFn593Y",
+            authDomain: "quocdat-396fe.firebaseapp.com",
+            databaseURL: "https://quocdat-396fe-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "quocdat-396fe"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const sessionUser = JSON.parse(localStorage.getItem('digitalsmod_user'));
+        if (!sessionUser) window.location.href = '/login.php';
+
+        renderWatermark(sessionUser.phone || 'ADMIN', sessionUser.displayName, 'TG-MODE');
+
+        let currentGroupId = null;
+
+        // 1. Tải danh sách nhóm chat
+        const groupsRef = ref(db, 'digitalsmod_groups');
+        onValue(groupsRef, (snapshot) => {
+            const listContainer = document.getElementById('groupListView');
+            listContainer.innerHTML = '';
+
+            if (!snapshot.exists()) {
+                listContainer.innerHTML = '<div style="text-align: center; color: var(--text-muted); margin-top: 40px; font-size: 13px;">Chưa có nhóm nào. Bấm nút (+) để tạo nhóm mới!</div>';
+                return;
+            }
+
+            snapshot.forEach((childSnap) => {
+                const gId = childSnap.key;
+                const gData = childSnap.val();
+
+                const isMember = gData.members && gData.members[sessionUser.phone ? sessionUser.phone.replace(/[.#$\[\]]/g, "_") : "admin"];
+                const isAdmin = sessionUser.role === 'admin';
+
+                // User thấy nhóm mình tham gia, Admin (Ghost Mode) thấy tất cả các nhóm
+                if (isMember || isAdmin) {
+                    const item = document.createElement('div');
+                    item.className = 'group-item';
+                    item.onclick = () => openGroup(gId, gData.name);
+                    item.innerHTML = `
+                        <div class="group-avatar">${gData.name.charAt(0).toUpperCase()}</div>
+                        <div class="group-info">
+                            <div class="group-name">${gData.name} ${isAdmin && !isMember ? '<span style="font-size:10px; color:#ef4444;">(Ghost Admin)</span>' : ''}</div>
+                            <div class="group-last-msg">Bấm để vào phòng chat...</div>
+                        </div>
+                    `;
+                    listContainer.appendChild(item);
+                }
+            });
+        });
+
+        // 2. Tạo nhóm chat mới
+        window.promptCreateGroup = async function() {
+            const groupName = prompt("Nhập tên nhóm chat mới:");
+            if (!groupName) return;
+
+            const newGroupRef = push(ref(db, 'digitalsmod_groups'));
+            const cleanKey = sessionUser.phone ? sessionUser.phone.replace(/[.#$\[\]]/g, "_") : "admin";
+
+            const membersData = {};
+            membersData[cleanKey] = true;
+
+            await set(newGroupRef, {
+                name: groupName,
+                createdBy: sessionUser.phone || 'admin',
+                createdAt: Date.now(),
+                members: membersData
+            });
+
+            alert("Đã tạo nhóm chat mới!");
+        };
+
+        // 3. Mở khung chat chi tiết của nhóm
+        window.openGroup = function(groupId, groupName) {
+            currentGroupId = groupId;
+            document.getElementById('groupListView').style.display = 'none';
+            document.getElementById('btnCreateGroup').style.display = 'none';
+            document.getElementById('chatView').style.display = 'flex';
+            document.getElementById('btnBack').style.display = 'block';
+            document.getElementById('headerTitle').innerText = groupName;
+
+            const chatBody = document.getElementById('chatBody');
+            chatBody.innerHTML = '';
+
+            const msgsRef = ref(db, `digitalsmod_group_messages/${groupId}`);
+            onChildAdded(msgsRef, (snapshot) => {
+                const msg = snapshot.val();
+                const isMe = msg.senderId === (sessionUser.phone || 'admin');
+
+                const wrap = document.createElement('div');
+                wrap.className = 'msg-wrapper ' + (isMe ? 'me' : 'others');
+
+                if (!isMe) {
+                    const sender = document.createElement('div');
+                    sender.className = 'msg-sender';
+                    sender.innerText = msg.senderName;
+                    wrap.appendChild(sender);
+                }
+
+                const bubble = document.createElement('div');
+                bubble.className = 'msg-bubble';
+                bubble.innerText = msg.content;
+
+                const time = document.createElement('div');
+                time.className = 'msg-time';
+                time.innerText = new Date(msg.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                bubble.appendChild(time);
+
+                wrap.appendChild(bubble);
+                chatBody.appendChild(wrap);
+                chatBody.scrollTop = chatBody.scrollHeight;
+            });
+        };
+
+        // 4. Quay lại danh sách nhóm
+        window.showGroupList = function() {
+            currentGroupId = null;
+            document.getElementById('groupListView').style.display = 'block';
+            document.getElementById('btnCreateGroup').style.display = 'flex';
+            document.getElementById('chatView').style.display = 'none';
+            document.getElementById('btnBack').style.display = 'none';
+            document.getElementById('headerTitle').innerText = 'DIGITALSMOD';
+        };
+
+        // 5. Gửi tin nhắn
+        document.getElementById('sendBtn').addEventListener('click', () => {
+            const input = document.getElementById('msgInput');
+            const text = input.value.trim();
+            if (!text || !currentGroupId) return;
+
+            push(ref(db, `digitalsmod_group_messages/${currentGroupId}`), {
+                senderId: sessionUser.phone || 'admin',
+                senderName: sessionUser.displayName,
+                content: text,
+                createdAt: Date.now()
+            });
+            input.value = '';
+        });
+
+        window.logout = function() {
+            localStorage.removeItem('digitalsmod_user');
+            window.location.href = '/login.php';
+        };
+    </script>
+</body>
+</html>
