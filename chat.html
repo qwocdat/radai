@@ -17,10 +17,10 @@
             --text-muted: #7f91a4;
             --accent-green: #00c853;
             --accent-red: #ff5252;
-            --tab-bg: rgba(23, 33, 43, 0.95);
+            --tab-bg: rgba(23, 33, 43, 0.96);
         }
 
-        /* CHẶN BÔI ĐEN VÀ CHỌN VĂN BẢN */
+        /* CHẶN HOÀN TOÀN BÔI ĐEN VÀ HIGHLIGHT */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -42,23 +42,19 @@
             align-items: center;
         }
 
-        /* LỚP MÀN HÌNH ĐEN TUYỀN KHÓA SCREENSHOT / CHUYỂN TAB */
+        /* LỚP ĐEN TUYỀN GIỐNG TRANG ẨN DANH KHI CHỤP/RA NGOÀI */
         #screenShieldOverlay {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
             background: #000000 !important;
             z-index: 999999;
             display: none;
-            justify-content: center;
-            align-items: center;
-            color: #111;
-            font-size: 12px;
         }
         body.shield-active #screenShieldOverlay {
-            display: flex !important;
+            display: block !important;
         }
 
-        /* FORM AUTH */
+        /* AUTH BOX */
         .auth-box {
             width: 90%;
             max-width: 380px;
@@ -110,7 +106,7 @@
         }
         .btn-primary:active { transform: scale(0.98); }
 
-        /* TELEGRAM CONTAINER */
+        /* TELEGRAM MAIN APP CONTAINER */
         .tg-app {
             width: 100%;
             max-width: 480px;
@@ -158,7 +154,7 @@
         }
 
         /* GROUPS LIST */
-        .group-list { padding-bottom: 120px; }
+        .group-list { padding-bottom: 160px; }
         .group-item {
             display: flex;
             align-items: center;
@@ -185,6 +181,8 @@
             font-weight: 700;
             color: #fff;
             flex-shrink: 0;
+            background-size: cover;
+            background-position: center;
         }
 
         .group-info { flex: 1; overflow: hidden; }
@@ -192,7 +190,7 @@
         .group-last-msg { font-size: 13px; color: var(--text-muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         /* CHAT VIEW DETAILED */
-        .chat-body { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .chat-body { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 30px; display: flex; flex-direction: column; gap: 10px; }
         .msg-wrapper { display: flex; flex-direction: column; max-width: 80%; animation: msgPop 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
         .msg-wrapper.me { align-self: flex-end; }
         .msg-wrapper.others { align-self: flex-start; }
@@ -203,10 +201,10 @@
         .msg-wrapper.others .msg-bubble { background: #182533; color: #f1f5f9; border-bottom-left-radius: 4px; }
         .msg-time { font-size: 9px; opacity: 0.6; margin-top: 4px; text-align: right; }
 
-        /* FIX ĐẨY NÂNG CAO THANH NHẬP TIN NHẮN (CHAT FOOTER) */
+        /* CHAT FOOTER (ĐẨY CAO HẲN KHU VỰC NHẬP TIN NHẮN) */
         .chat-footer {
-            padding: 12px 16px;
-            padding-bottom: calc(12px + env(safe-area-inset-bottom, 12px));
+            padding: 16px 16px;
+            padding-bottom: calc(30px + env(safe-area-inset-bottom, 20px));
             background: var(--bg-sidebar);
             display: flex;
             align-items: center;
@@ -214,20 +212,20 @@
             z-index: 10;
             border-top: 1px solid var(--border-glass);
         }
-        .chat-input { flex: 1; background: #0e1621; border: 1px solid var(--border-glass); border-radius: 20px; padding: 10px 16px; color: #fff; font-size: 14px; outline: none; }
-        .btn-send { background: var(--primary); border: none; width: 40px; height: 40px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.15s ease; }
+        .chat-input { flex: 1; background: #0e1621; border: 1px solid var(--border-glass); border-radius: 20px; padding: 12px 16px; color: #fff; font-size: 14px; outline: none; }
+        .btn-send { background: var(--primary); border: none; width: 44px; height: 44px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.15s ease; }
         .btn-send:active { transform: scale(0.9); }
 
-        /* FIX ĐẨY NÂNG CAO NÚT TẠO NHÓM (FAB) */
+        /* TELEGRAM FAB CREATE GROUP BUTTON (ĐẨY CAO HẲN LÊN TRÊN TAB BAR) */
         .btn-create-group-fab {
             position: absolute;
-            bottom: calc(95px + env(safe-area-inset-bottom, 15px));
-            right: 20px;
-            width: 56px;
-            height: 56px;
+            bottom: calc(125px + env(safe-area-inset-bottom, 20px));
+            right: 22px;
+            width: 58px;
+            height: 58px;
             border-radius: 50%;
             background: var(--primary);
-            box-shadow: 0 8px 24px var(--primary-glow);
+            box-shadow: 0 10px 25px var(--primary-glow);
             border: none;
             cursor: pointer;
             display: flex;
@@ -238,18 +236,18 @@
         }
         .btn-create-group-fab:active { transform: scale(0.9); }
 
-        /* FIX ĐẨY NÂNG CAO THANH MENU TAB BAR (BOTTOM TAB BAR) */
+        /* TELEGRAM BOTTOM TAB BAR (ĐẨY CAO HẲN LÊN 45PX + SAFE AREA) */
         .tg-bottom-nav-wrap {
             position: absolute;
-            bottom: calc(24px + env(safe-area-inset-bottom, 12px));
+            bottom: calc(45px + env(safe-area-inset-bottom, 20px));
             left: 50%;
             transform: translateX(-50%);
-            width: 92%;
+            width: 90%;
             max-width: 420px;
-            height: 62px;
+            height: 64px;
             background: var(--tab-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
             border-radius: 32px;
             border: 1px solid var(--border-glass);
             display: flex;
@@ -257,25 +255,25 @@
             justify-content: space-around;
             padding: 0 8px;
             z-index: 25;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
         }
 
         .nav-item {
             flex: 1;
-            height: 44px;
+            height: 46px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             color: var(--text-muted);
             cursor: pointer;
-            border-radius: 22px;
+            border-radius: 23px;
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .nav-item.active {
             color: var(--primary);
-            background: rgba(42, 171, 238, 0.12);
+            background: rgba(42, 171, 238, 0.15);
         }
 
         .nav-icon-wrap {
@@ -366,7 +364,7 @@
 </head>
 <body>
 
-    <!-- LỚP KÍNH ĐEN CHE TOÀN BỘ KHI NGUỜI DÙNG CHỤP MÀN HÌNH / THOÁT TRANG -->
+    <!-- LỚP KÍNH ĐEN CHE MÀN HÌNH CHỐNG LEAK KHỎI CHỤP THOÁT TRANG -->
     <div id="screenShieldOverlay"></div>
 
     <div id="toastContainer"></div>
@@ -477,16 +475,24 @@
             <div id="tabSettings" class="tab-content" style="padding: 20px;">
                 <h3 style="margin-bottom: 15px; color: #fff; font-size: 16px;">Cài đặt bảo mật</h3>
                 <div style="background: #17212b; padding: 16px; border-radius: 14px; border: 1px solid var(--border-glass);">
-                    <div style="font-size: 14px; color: #fff; margin-bottom: 6px;">Blackout Shield Active</div>
-                    <div style="font-size: 12px; color: var(--text-muted);">Đã bật màn hình đen khi chụp màn hình hoặc thoát ứng dụng.</div>
+                    <div style="font-size: 14px; color: #fff; margin-bottom: 6px;">Black Screen Protection</div>
+                    <div style="font-size: 12px; color: var(--text-muted);">Tự động chuyển thành màn hình đen hoàn toàn khi thao tác chụp màn hình hoặc rời trang web.</div>
                 </div>
             </div>
 
-            <!-- TAB 4: PROFILE -->
+            <!-- TAB 4: PROFILE & TÙY CHỈNH AVATAR -->
             <div id="tabProfile" class="tab-content" style="padding: 20px; text-align: center;">
-                <div id="profileAvatar" class="group-avatar" style="width: 70px; height: 70px; font-size: 24px; margin: 20px auto 10px auto;">U</div>
+                <div style="position: relative; width: 80px; height: 80px; margin: 20px auto 10px auto;">
+                    <div id="profileAvatar" class="group-avatar" style="width: 80px; height: 80px; font-size: 28px;">U</div>
+                    <label for="avatarInput" style="position: absolute; bottom: 0; right: 0; background: var(--primary); border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid #17212b;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                    </label>
+                    <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+                </div>
+
                 <div id="profileName" style="font-size: 18px; font-weight: 700; color: #fff;">User Name</div>
                 <div id="profilePhone" style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">+84 000 000</div>
+                <button onclick="document.getElementById('avatarInput').click()" class="btn-primary" style="margin-top: 20px; width: 180px;">Tải Ảnh Đại Diện</button>
             </div>
 
             <!-- DETAIL CHAT VIEW OVERLAY -->
@@ -560,14 +566,11 @@
         let currentGroupId = null;
         let unsubscribeMessages = null;
 
-        // BẢO VỆ CHỐNG CHỤP MÀN HÌNH BẰNG BLACKOUT SCREEN SHIELD
+        // CƠ CHẾ CHỐNG CHỤP MÀN HÌNH CHUYÊN SÂU (BLACKOUT SCREEN SHIELD)
         (function initBlackoutShield() {
-            const shield = document.getElementById('screenShieldOverlay');
-            
             function activateShield() { document.body.classList.add('shield-active'); }
             function deactivateShield() { document.body.classList.remove('shield-active'); }
 
-            // Chặn khi rời ứng dụng / mở đa nhiệm
             window.addEventListener('blur', activateShield);
             window.addEventListener('focus', deactivateShield);
 
@@ -576,16 +579,15 @@
                 else deactivateShield();
             });
 
-            // Chặn phím tắt chụp màn hình trên máy tính
+            // Chặn phím tắt chụp màn hình
             document.addEventListener('keydown', e => {
                 if (e.key === 'PrintScreen' || (e.ctrlKey && e.key === 'p') || (e.metaKey && e.shiftKey && (e.key === '3' || e.key === '4'))) {
                     activateShield();
-                    setTimeout(deactivateShield, 1000);
+                    setTimeout(deactivateShield, 1200);
                     e.preventDefault();
                 }
             });
 
-            // Chặn chuột phải & Copy
             document.addEventListener('contextmenu', e => e.preventDefault());
             document.addEventListener('copy', e => e.preventDefault());
         })();
@@ -638,7 +640,7 @@
                     });
                 }
             } catch (e) {
-                console.error('[DIGITALSMOD] System group update error:', e);
+                console.error('[DIGITALSMOD] System group error:', e);
             }
         }
 
@@ -669,10 +671,47 @@
         function updateProfileTab() {
             if (!sessionUser) return;
             const name = sessionUser.displayName || 'User';
-            document.getElementById('profileAvatar').textContent = name.charAt(0).toUpperCase();
+            const avatarDiv = document.getElementById('profileAvatar');
+
+            if (sessionUser.avatarUrl) {
+                avatarDiv.style.backgroundImage = `url(${sessionUser.avatarUrl})`;
+                avatarDiv.textContent = '';
+            } else {
+                avatarDiv.style.backgroundImage = 'none';
+                avatarDiv.textContent = name.charAt(0).toUpperCase();
+            }
+
             document.getElementById('profileName').textContent = name;
             document.getElementById('profilePhone').textContent = sessionUser.phone || 'N/A';
         }
+
+        // ĐỔI AVATAR NGƯỜI DÙNG
+        document.getElementById('avatarInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (file.size > 2 * 1024 * 1024) {
+                return showToast("Kích thước ảnh phải nhỏ hơn 2MB!", true);
+            }
+
+            const reader = new FileReader();
+            reader.onload = async function(event) {
+                const base64Image = event.target.result;
+                sessionUser.avatarUrl = base64Image;
+                localStorage.setItem('digitalsmod_user', JSON.stringify(sessionUser));
+
+                try {
+                    await update(ref(db, `digitalsmod_users/${getUserKey()}`), {
+                        avatarUrl: base64Image
+                    });
+                    updateProfileTab();
+                    showToast("Đã cập nhật ảnh đại diện!");
+                } catch (err) {
+                    showToast("Lỗi cập nhật ảnh!", true);
+                }
+            };
+            reader.readAsDataURL(file);
+        });
 
         // LOGIN
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
