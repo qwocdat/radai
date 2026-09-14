@@ -6,24 +6,26 @@
     <title>DIGITALSMOD</title>
     <style>
         :root {
-            --bg-main: #0f172a;
-            --bg-sidebar: #1e293b;
-            --bg-chat: #0f172a;
+            --bg-main: #0b141b;
+            --bg-sidebar: #17212b;
+            --bg-chat: #0e1621;
             --border-glass: rgba(255, 255, 255, 0.08);
-            --primary: #3b82f6;
-            --primary-glow: rgba(59, 130, 246, 0.35);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent-green: #10b981;
-            --accent-red: #ef4444;
+            --primary: #2aabee;
+            --primary-dark: #229ed9;
+            --primary-glow: rgba(42, 171, 238, 0.4);
+            --text-main: #f5f5f5;
+            --text-muted: #7f91a4;
+            --accent-green: #00c853;
+            --accent-red: #ff5252;
+            --tab-bg: rgba(23, 33, 43, 0.92);
         }
 
-        /* CHẶN HOÀN TOÀN VÙNG PHỦ XANH KHI GIỮ */
+        /* CHẶN BÔI ĐEN VÀ HIGHLIGHT */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
             user-select: none !important;
             -webkit-user-select: none !important;
             -webkit-touch-callout: none !important;
@@ -38,17 +40,25 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            transition: filter 0.25s ease;
         }
 
+        /* LÀM MỜ KHI MẤT FOCUS ĐỂ CHẶN LEAK SCREENSHOT */
+        body.blurred {
+            filter: blur(20px) brightness(0.5);
+        }
+
+        /* FORM AUTH */
         .auth-box {
             width: 90%;
             max-width: 380px;
-            background: rgba(15, 23, 42, 0.85);
+            background: rgba(23, 33, 43, 0.9);
             backdrop-filter: blur(25px);
             border: 1px solid var(--border-glass);
             border-radius: 24px;
             padding: 28px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+            animation: appSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .auth-title {
@@ -56,28 +66,29 @@
             font-weight: 800;
             text-align: center;
             margin-bottom: 24px;
-            background: linear-gradient(135deg, #60a5fa, #3b82f6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--primary);
+            letter-spacing: 0.5px;
         }
 
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
         .form-control {
             width: 100%;
-            background: rgba(30, 41, 59, 0.6);
+            background: rgba(14, 22, 33, 0.8);
             border: 1px solid var(--border-glass);
             border-radius: 12px;
             padding: 12px 14px;
             color: #fff;
             font-size: 14px;
             outline: none;
+            transition: border-color 0.2s ease;
         }
+        .form-control:focus { border-color: var(--primary); }
 
         .btn-primary {
             width: 100%;
             padding: 12px;
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border: none;
             border-radius: 12px;
             color: white;
@@ -85,9 +96,11 @@
             font-size: 15px;
             cursor: pointer;
             margin-top: 10px;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
+        .btn-primary:active { transform: scale(0.98); }
 
-        /* GIAO DIỆN TELEGRAM CHAT */
+        /* TELEGRAM CONTAINER */
         .tg-app {
             width: 100%;
             max-width: 480px;
@@ -96,6 +109,7 @@
             display: flex;
             flex-direction: column;
             position: relative;
+            overflow: hidden;
         }
 
         .tg-header {
@@ -106,10 +120,35 @@
             justify-content: space-between;
             background: var(--bg-sidebar);
             border-bottom: 1px solid var(--border-glass);
+            z-index: 10;
         }
 
-        .tg-title { font-size: 16px; font-weight: 700; color: #fff; }
-        .group-list { flex: 1; overflow-y: auto; padding: 10px 0; }
+        .tg-title { font-size: 17px; font-weight: 700; color: #fff; }
+
+        .app-view-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab-content {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: none;
+            flex-direction: column;
+            overflow-y: auto;
+            opacity: 0;
+            transform: scale(0.98);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+        .tab-content.active {
+            display: flex;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* GROUPS LIST */
+        .group-list { padding-bottom: 90px; }
         .group-item {
             display: flex;
             align-items: center;
@@ -117,45 +156,136 @@
             gap: 12px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.03);
             cursor: pointer;
+            transition: background 0.15s ease;
         }
+        .group-item:active { background: rgba(255, 255, 255, 0.05); }
         .group-item.pinned {
-            background: rgba(59, 130, 246, 0.08);
+            background: rgba(42, 171, 238, 0.08);
             border-left: 3px solid var(--primary);
         }
 
         .group-avatar {
-            width: 46px;
-            height: 46px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            background: linear-gradient(135deg, #2aabee, #229ed9);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
+            font-weight: 700;
             color: #fff;
+            flex-shrink: 0;
         }
 
-        .group-info { flex: 1; }
+        .group-info { flex: 1; overflow: hidden; }
         .group-name { font-size: 15px; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 6px; }
-        .group-last-msg { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+        .group-last-msg { font-size: 13px; color: var(--text-muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+        /* CHAT VIEW DETAILED */
         .chat-body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
-        .msg-wrapper { display: flex; flex-direction: column; max-width: 80%; }
+        .msg-wrapper { display: flex; flex-direction: column; max-width: 80%; animation: msgPop 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
         .msg-wrapper.me { align-self: flex-end; }
         .msg-wrapper.others { align-self: flex-start; }
         .msg-sender { font-size: 11px; color: #60a5fa; margin-bottom: 3px; margin-left: 4px; }
 
         .msg-bubble { padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.4; word-break: break-word; }
-        .msg-wrapper.me .msg-bubble { background: #2563eb; color: #fff; border-bottom-right-radius: 4px; }
-        .msg-wrapper.others .msg-bubble { background: #1e293b; color: #f1f5f9; border-bottom-left-radius: 4px; }
-        .msg-time { font-size: 9px; opacity: 0.7; margin-top: 4px; text-align: right; }
+        .msg-wrapper.me .msg-bubble { background: #2b5278; color: #fff; border-bottom-right-radius: 4px; }
+        .msg-wrapper.others .msg-bubble { background: #182533; color: #f1f5f9; border-bottom-left-radius: 4px; }
+        .msg-time { font-size: 9px; opacity: 0.6; margin-top: 4px; text-align: right; }
 
-        .chat-footer { padding: 10px 16px; background: var(--bg-sidebar); display: flex; align-items: center; gap: 10px; }
-        .chat-input { flex: 1; background: #0f172a; border: 1px solid var(--border-glass); border-radius: 20px; padding: 10px 16px; color: #fff; font-size: 14px; outline: none; }
-        .btn-send { background: #3b82f6; border: none; width: 40px; height: 40px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .btn-create-group { position: absolute; bottom: 20px; right: 20px; width: 52px; height: 52px; border-radius: 50%; background: var(--primary); color: white; border: none; font-size: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .chat-footer { padding: 10px 16px; background: var(--bg-sidebar); display: flex; align-items: center; gap: 10px; z-index: 10; }
+        .chat-input { flex: 1; background: #0e1621; border: 1px solid var(--border-glass); border-radius: 20px; padding: 10px 16px; color: #fff; font-size: 14px; outline: none; }
+        .btn-send { background: var(--primary); border: none; width: 40px; height: 40px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.15s ease; }
+        .btn-send:active { transform: scale(0.9); }
 
-        /* APP CUSTOM TOAST & MODAL UI */
+        /* FLOATING CREATE GROUP BUTTON (MATCHING TELEGRAM Y HỆT 100%) */
+        .btn-create-group-fab {
+            position: absolute;
+            bottom: 85px;
+            right: 18px;
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 8px 20px var(--primary-glow);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+        }
+        .btn-create-group-fab:active { transform: scale(0.9); }
+
+        /* BOTTOM TAB BAR MENU (TELEGRAM FLOATING CAPSULE STYLE) */
+        .tg-bottom-nav-wrap {
+            position: absolute;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 92%;
+            max-width: 420px;
+            height: 60px;
+            background: var(--tab-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 30px;
+            border: 1px solid var(--border-glass);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 8px;
+            z-index: 25;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-item {
+            flex: 1;
+            height: 44px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 22px;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            background: rgba(42, 171, 238, 0.12);
+        }
+
+        .nav-icon-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-badge {
+            position: absolute;
+            top: -5px;
+            right: -10px;
+            background: var(--primary);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 10px;
+            border: 2px solid var(--bg-sidebar);
+        }
+
+        .nav-label {
+            font-size: 10px;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        /* CUSTOM APP TOAST & MODAL UI */
         #toastContainer {
             position: fixed;
             top: 20px;
@@ -173,13 +303,13 @@
         .toast-item {
             padding: 12px 16px;
             border-radius: 14px;
-            background: rgba(30, 41, 59, 0.95);
+            background: rgba(23, 33, 43, 0.95);
             backdrop-filter: blur(10px);
             border: 1px solid var(--border-glass);
             color: #fff;
             font-size: 13px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            animation: fadeIn 0.3s forwards;
+            animation: appSlideDown 0.3s forwards;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -188,39 +318,60 @@
         .custom-modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(8px);
             z-index: 9999;
             display: flex;
             justify-content: center;
             align-items: center;
+            animation: fadeIn 0.2s ease;
         }
 
         .custom-modal-box {
             width: 85%;
             max-width: 320px;
-            background: #1e293b;
+            background: #17212b;
             border-radius: 20px;
-            padding: 20px;
+            padding: 22px;
             border: 1px solid var(--border-glass);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+            animation: appSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        /* WATERMARK CANVAS OVERLAY */
+        #watermark-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 9998;
+            overflow: hidden;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-content: space-around;
+            opacity: 0.08;
+        }
+        .wm-item { font-size: 11px; color: #fff; transform: rotate(-25deg); white-space: nowrap; padding: 25px; font-weight: 600; }
+
+        @keyframes appSlideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes appSlideDown { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes msgPop { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
 <body>
 
+    <div id="watermark-overlay"></div>
     <div id="toastContainer"></div>
 
     <!-- CUSTOM APP MODAL TẠO NHÓM -->
     <div id="createGroupModal" class="custom-modal-overlay" style="display: none;">
         <div class="custom-modal-box">
-            <h3 style="font-size: 16px; margin-bottom: 12px; color: #fff;">Tạo Nhóm Chat Mới</h3>
+            <h3 style="font-size: 16px; margin-bottom: 14px; color: #fff;">Tạo Nhóm Chat Mới</h3>
             <input type="text" id="modalGroupNameInput" class="form-control" placeholder="Nhập tên nhóm..." style="margin-bottom: 16px;">
             <div style="display: flex; gap: 10px;">
-                <button id="btnCancelGroup" class="btn-primary" style="background: rgba(255,255,255,0.1); margin-top: 0;">Hủy</button>
+                <button id="btnCancelGroup" class="btn-primary" style="background: rgba(255,255,255,0.08); margin-top: 0;">Hủy</button>
                 <button id="btnConfirmGroup" class="btn-primary" style="margin-top: 0;">Tạo Nhóm</button>
             </div>
         </div>
@@ -282,25 +433,105 @@
             Tài khoản của bạn đang được Admin duyệt thủ công.
         </p>
         <button id="btnCheckStatus" class="btn-primary" style="margin-bottom: 10px;">Kiểm tra lại</button>
-        <button onclick="logout()" class="btn-primary" style="background: rgba(239, 68, 68, 0.2); border: 1px solid var(--accent-red);">Đăng xuất</button>
+        <button onclick="logout()" class="btn-primary" style="background: rgba(255, 82, 82, 0.2); border: 1px solid var(--accent-red);">Đăng xuất</button>
     </div>
 
-    <!-- VIEW 4: CHAT TELEGRAM -->
+    <!-- VIEW 4: CHAT TELEGRAM SYSTEM -->
     <div id="chatAppView" class="tg-app" style="display: none;">
+        <!-- HEADER -->
         <div class="tg-header">
-            <button id="btnBack" onclick="showGroupList()" style="display: none; background: none; border: none; color: #fff; font-size: 18px; cursor: pointer;">&larr;</button>
+            <button id="btnBack" onclick="showGroupList()" style="display: none; background: none; border: none; color: #fff; font-size: 18px; cursor: pointer;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
             <div class="tg-title" id="headerTitle">DIGITALSMOD</div>
             <button onclick="logout()" style="background: none; border: none; color: var(--text-muted); font-size: 13px; cursor: pointer;">Đăng xuất</button>
         </div>
 
-        <div id="groupListView" class="group-list"></div>
-        <button id="btnCreateGroup" class="btn-create-group" onclick="openCreateGroupModal()">+</button>
+        <!-- APP CONTAINER UNTILL TABS -->
+        <div class="app-view-container">
+            <!-- TAB 1: CHATS LIST -->
+            <div id="tabChats" class="tab-content active">
+                <div id="groupListView" class="group-list"></div>
+                
+                <!-- TELEGRAM FAB CREATE GROUP BUTTON -->
+                <button id="btnCreateGroup" class="btn-create-group-fab" onclick="openCreateGroupModal()">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                        <path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2Z" fill="white"/>
+                        <path d="M11 7H13V10H16V12H13V15H11V12H8V10H11V7Z" fill="#2aabee"/>
+                    </svg>
+                </button>
+            </div>
 
-        <div id="chatView" style="display: none; flex: 1; flex-direction: column;">
-            <div class="chat-body" id="chatBody"></div>
-            <div class="chat-footer">
-                <input type="text" id="msgInput" class="chat-input" placeholder="Nhập tin nhắn..." autocomplete="off">
-                <button id="sendBtn" class="btn-send">&gt;</button>
+            <!-- TAB 2: CONTACTS -->
+            <div id="tabContacts" class="tab-content" style="padding: 20px; text-align: center; color: var(--text-muted);">
+                <div style="margin-top: 60px; font-size: 14px;">Danh bạ chưa có thành viên nào khác.</div>
+            </div>
+
+            <!-- TAB 3: SETTINGS -->
+            <div id="tabSettings" class="tab-content" style="padding: 20px;">
+                <h3 style="margin-bottom: 15px; color: #fff; font-size: 16px;">Cài đặt bảo mật</h3>
+                <div style="background: #17212b; padding: 16px; border-radius: 14px; border: 1px solid var(--border-glass);">
+                    <div style="font-size: 14px; color: #fff; margin-bottom: 6px;">Anti-Leak & Screenshot</div>
+                    <div style="font-size: 12px; color: var(--text-muted);">Đã bật bảo vệ chống chụp màn hình và tự động mờ khi rời ứng dụng.</div>
+                </div>
+            </div>
+
+            <!-- TAB 4: PROFILE -->
+            <div id="tabProfile" class="tab-content" style="padding: 20px; text-align: center;">
+                <div id="profileAvatar" class="group-avatar" style="width: 70px; height: 70px; font-size: 24px; margin: 20px auto 10px auto;">U</div>
+                <div id="profileName" style="font-size: 18px; font-weight: 700; color: #fff;">User Name</div>
+                <div id="profilePhone" style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">+84 000 000</div>
+            </div>
+
+            <!-- DETAIL CHAT VIEW OVERLAY -->
+            <div id="chatView" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-chat); flex-direction: column; z-index: 30;">
+                <div class="chat-body" id="chatBody"></div>
+                <div class="chat-footer">
+                    <input type="text" id="msgInput" class="chat-input" placeholder="Nhập tin nhắn..." autocomplete="off">
+                    <button id="sendBtn" class="btn-send">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TELEGRAM FLOATING CAPSULE TAB BAR MENU -->
+        <div class="tg-bottom-nav-wrap" id="bottomTabBar">
+            <div class="nav-item active" onclick="switchTab('tabChats', this)">
+                <div class="nav-icon-wrap">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2Z"/>
+                    </svg>
+                    <div class="nav-badge" id="chatUnreadBadge">1</div>
+                </div>
+                <div class="nav-label">Chats</div>
+            </div>
+
+            <div class="nav-item" onclick="switchTab('tabContacts', this)">
+                <div class="nav-icon-wrap">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                    </svg>
+                </div>
+                <div class="nav-label">Contacts</div>
+            </div>
+
+            <div class="nav-item" onclick="switchTab('tabSettings', this)">
+                <div class="nav-icon-wrap">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                </div>
+                <div class="nav-label">Settings</div>
+            </div>
+
+            <div class="nav-item" onclick="switchTab('tabProfile', this)">
+                <div class="nav-icon-wrap">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5.52 19c.64-2.2 1.84-3 4.48-3h4c2.64 0 3.84.8 4.48 3"/><circle cx="12" cy="10" r="3"/><circle cx="12" cy="12" r="10"/>
+                    </svg>
+                </div>
+                <div class="nav-label">Profile</div>
             </div>
         </div>
     </div>
@@ -323,13 +554,43 @@
         let currentGroupId = null;
         let unsubscribeMessages = null;
 
-        // TOAST CỦA WEB CHUẨN APP
+        // ANTI SCREENSHOT LEAK SYSTEM
+        (function initAntiLeak() {
+            document.addEventListener('contextmenu', e => e.preventDefault());
+            document.addEventListener('keydown', e => {
+                if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'u' || e.key === 's' || e.key === 'p' || e.key === 'a')) {
+                    e.preventDefault();
+                }
+            });
+            window.addEventListener('blur', () => document.body.classList.add('blurred'));
+            window.addEventListener('focus', () => document.body.classList.remove('blurred'));
+
+            document.addEventListener('DOMContentLoaded', () => {
+                if (window.Median && window.Median.screenSecurity) window.Median.screenSecurity.enable();
+                else if (window.gonative && window.gonative.screenSecurity) window.gonative.screenSecurity.enable();
+            });
+        })();
+
+        // WATERMARK RENDERER
+        function renderWatermark(uid, name) {
+            const overlay = document.getElementById('watermark-overlay');
+            overlay.innerHTML = '';
+            const wmText = `DIGITALSMOD | ${uid} | ${name}`;
+            for (let i = 0; i < 16; i++) {
+                const item = document.createElement('div');
+                item.className = 'wm-item';
+                item.textContent = wmText;
+                overlay.appendChild(item);
+            }
+        }
+
+        // APP TOAST NOTIFICATION
         window.showToast = function(msg, isError = false) {
             const container = document.getElementById('toastContainer');
             const item = document.createElement('div');
             item.className = 'toast-item';
             item.style.borderColor = isError ? 'var(--accent-red)' : 'var(--accent-green)';
-            item.innerHTML = `<span>${isError ? '⚠️' : '✅'}</span> <div>${msg}</div>`;
+            item.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${isError ? '#ff5252' : '#00c853'}" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="${isError ? 'm15 9-6 6M9 9l6 6' : 'm9 12 2 2 4-4'}"/></svg><div>${msg}</div>`;
             container.appendChild(item);
             setTimeout(() => { item.remove(); }, 3000);
         };
@@ -340,12 +601,19 @@
             });
         };
 
+        window.switchTab = function(tabId, el) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            el.classList.add('active');
+        };
+
         function getUserKey() {
             const rawId = sessionUser ? (sessionUser.phone || sessionUser.providerId || (sessionUser.role === 'admin' ? 'admin' : 'unknown')) : 'unknown';
             return String(rawId).replace(/[.#$\[\]\/]/g, "_");
         }
 
-        // TỰ ĐỘNG THÊM USER VÀO NHÓM SYSTEM SHAREFILE
         async function ensureSystemShareGroup(userKey) {
             try {
                 const sysGroupRef = child(ref(db), 'digitalsmod_groups/digitalsmod-sharefile');
@@ -368,7 +636,6 @@
             }
         }
 
-        // THIẾT LẬP SESSION BAN ĐẦU
         async function initApp() {
             const rawSession = localStorage.getItem('digitalsmod_user');
             if (rawSession) {
@@ -379,6 +646,9 @@
                         return;
                     }
                     await ensureSystemShareGroup(getUserKey());
+                    renderWatermark(sessionUser.phone || 'ADMIN', sessionUser.displayName || 'User');
+                    updateProfileTab();
+
                     if (sessionUser.status === 'approved') {
                         switchView('chatAppView');
                         loadGroupList();
@@ -391,7 +661,15 @@
             switchView('loginView');
         }
 
-        // ĐĂNG NHẬP
+        function updateProfileTab() {
+            if (!sessionUser) return;
+            const name = sessionUser.displayName || 'User';
+            document.getElementById('profileAvatar').textContent = name.charAt(0).toUpperCase();
+            document.getElementById('profileName').textContent = name;
+            document.getElementById('profilePhone').textContent = sessionUser.phone || 'N/A';
+        }
+
+        // LOGIN
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const phone = document.getElementById('login_phone').value.trim();
@@ -417,6 +695,8 @@
             localStorage.setItem('digitalsmod_user', JSON.stringify(user));
             sessionUser = user;
             await ensureSystemShareGroup(cleanKey);
+            renderWatermark(user.phone || 'ADMIN', user.displayName || 'User');
+            updateProfileTab();
 
             if (user.status === 'approved') {
                 switchView('chatAppView');
@@ -426,7 +706,7 @@
             }
         });
 
-        // ĐĂNG KÝ
+        // REGISTER
         document.getElementById('regForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const provider = document.getElementById('reg_provider').value;
@@ -452,7 +732,7 @@
             switchView('pendingView');
         });
 
-        // LOAD DANH SÁCH NHÓM & GHIM NHÓM DIGITALSMOD-SHAREFILE LÊN ĐẦU
+        // LOAD GROUPS & PINNED SYSTEM GROUP
         function loadGroupList() {
             const currentUserKey = getUserKey();
             const groupsRef = ref(db, 'digitalsmod_groups');
@@ -466,7 +746,6 @@
                     groups.push({ id: childSnap.key, data: childSnap.val() });
                 });
 
-                // SẮP XẾP: NHÓM DIGITALSMOD-SHAREFILE LUÔN ĐỨNG ĐẦU
                 groups.sort((a, b) => {
                     if (a.id === 'digitalsmod-sharefile') return -1;
                     if (b.id === 'digitalsmod-sharefile') return 1;
@@ -485,12 +764,18 @@
                         const item = document.createElement('div');
                         item.className = 'group-item' + (isSystemGroup ? ' pinned' : '');
                         item.onclick = () => openGroup(gId, rawName);
+                        
+                        const iconSvg = isSystemGroup 
+                            ? `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>`
+                            : rawName.charAt(0).toUpperCase();
+
                         item.innerHTML = `
-                            <div class="group-avatar" style="${isSystemGroup ? 'background: linear-gradient(135deg, #10b981, #059669);' : ''}">${isSystemGroup ? '📁' : rawName.charAt(0).toUpperCase()}</div>
+                            <div class="group-avatar" style="${isSystemGroup ? 'background: linear-gradient(135deg, #10b981, #059669);' : ''}">${iconSvg}</div>
                             <div class="group-info">
                                 <div class="group-name">
-                                    ${rawName} ${isSystemGroup ? '<span style="font-size:10px; color:#10b981;">📌 [HỆ THỐNG]</span>' : ''}
-                                    ${isAdmin && !isMember && !isSystemGroup ? '<span style="font-size:10px; color:#ef4444;">(Ghost Admin)</span>' : ''}
+                                    ${rawName}
+                                    ${isSystemGroup ? '<span style="font-size:10px; color:#10b981; margin-left:4px; font-weight:700;">[HỆ THỐNG]</span>' : ''}
+                                    ${isAdmin && !isMember && !isSystemGroup ? '<span style="font-size:10px; color:#ef4444; margin-left:4px;">(Ghost Admin)</span>' : ''}
                                 </div>
                                 <div class="group-last-msg">${isSystemGroup ? 'Nhóm chia sẻ file chung...' : 'Bấm để vào phòng chat...'}</div>
                             </div>
@@ -501,7 +786,7 @@
             });
         }
 
-        // TẠO NHÓM BẰNG MODAL APP
+        // CUSTOM MODAL CREATE GROUP
         window.openCreateGroupModal = function() {
             document.getElementById('modalGroupNameInput').value = '';
             document.getElementById('createGroupModal').style.display = 'flex';
@@ -530,15 +815,14 @@
             showToast("Đã tạo nhóm chat mới!");
         };
 
-        // MỞ PHÒNG CHAT
+        // OPEN CHAT
         window.openGroup = function(groupId, groupName) {
             if (typeof unsubscribeMessages === 'function') unsubscribeMessages();
 
             currentGroupId = groupId;
-            document.getElementById('groupListView').style.display = 'none';
-            document.getElementById('btnCreateGroup').style.display = 'none';
             document.getElementById('chatView').style.display = 'flex';
             document.getElementById('btnBack').style.display = 'block';
+            document.getElementById('bottomTabBar').style.display = 'none';
             document.getElementById('headerTitle').textContent = groupName;
 
             const chatBody = document.getElementById('chatBody');
@@ -582,14 +866,13 @@
         window.showGroupList = function() {
             if (typeof unsubscribeMessages === 'function') unsubscribeMessages();
             currentGroupId = null;
-            document.getElementById('groupListView').style.display = 'block';
-            document.getElementById('btnCreateGroup').style.display = 'flex';
             document.getElementById('chatView').style.display = 'none';
             document.getElementById('btnBack').style.display = 'none';
+            document.getElementById('bottomTabBar').style.display = 'flex';
             document.getElementById('headerTitle').textContent = 'DIGITALSMOD';
         };
 
-        // GỬI TIN NHẮN
+        // SEND MESSAGE
         async function sendMessage() {
             if (!currentGroupId) return;
             const input = document.getElementById('msgInput');
