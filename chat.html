@@ -10,18 +10,15 @@
 </head>
 <body>
     <div class="tg-app">
-        <!-- HEADER TELEGRAM -->
         <div class="tg-header">
             <button id="btnBack" style="display: none; background: none; border: none; color: #fff; font-size: 18px; cursor: pointer;">&larr;</button>
             <div class="tg-title" id="headerTitle">DIGITALSMOD</div>
             <button id="btnLogout" style="background: none; border: none; color: var(--text-muted); font-size: 13px; cursor: pointer;">Đăng xuất</button>
         </div>
 
-        <!-- MÀN HÌNH 1: DANH SÁCH NHÓM CHAT -->
         <div id="groupListView" class="group-list"></div>
         <button id="btnCreateGroup" class="btn-create-group">+</button>
 
-        <!-- MÀN HÌNH 2: KHUNG CHAT CHI TIẾT -->
         <div id="chatView" style="display: none; flex: 1; flex-direction: column;">
             <div class="chat-body" id="chatBody"></div>
             <div class="chat-footer">
@@ -37,7 +34,22 @@
 
         const LOGIN_URL = 'https://digitalsmod.42web.io/login.php';
 
-        // 1. FIX SESSION (TỐI ƯU KIỂM TRA ĐỒNG BỘ MỌI TÊN BIẾN ID/PHONE)
+        // 1. NHẬN SESSION TỪ URL VÀ ĐỒNG BỘ VÀO LOCALSTORAGE VERCEL
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionParam = urlParams.get('session');
+
+        if (sessionParam) {
+            try {
+                const decodedUser = JSON.parse(decodeURIComponent(sessionParam));
+                localStorage.setItem('digitalsmod_user', JSON.stringify(decodedUser));
+                // Làm sạch URL sau khi ghi nhận thành công
+                window.history.replaceState({}, document.title, window.location.pathname);
+            } catch (e) {
+                console.error('[DIGITALSMOD CHAT] Lỗi giải mã URL session:', e);
+            }
+        }
+
+        // 2. KIỂM TRA SESSION TRÊN VERCEL
         let sessionUser = null;
         try {
             const rawSession = localStorage.getItem('digitalsmod_user');
@@ -48,16 +60,15 @@
             console.error('[DIGITALSMOD CHAT] Lỗi parse session:', e);
         }
 
-        // Kiểm tra linh hoạt: Chấp nhận cả phone, providerId hoặc role admin
         const hasValidIdentifier = sessionUser && (sessionUser.phone || sessionUser.providerId || sessionUser.role === 'admin');
 
         if (!sessionUser || !hasValidIdentifier) {
             console.warn('[DIGITALSMOD CHAT] Session không hợp lệ, chuyển hướng về login');
             window.location.href = LOGIN_URL;
-            throw new Error('Redirecting to login...'); 
+            throw new Error('Redirecting to login...');
         }
 
-        // 2. FIX USER KEY SANITIZE SANITIZE CHUẨN MỌI TRƯỜNG ĐỊNH DANH
+        // 3. SANITIZE USER KEY DÙNG CHUNG
         function getUserKey() {
             const rawId = sessionUser.phone || sessionUser.providerId || (sessionUser.role === 'admin' ? 'admin' : 'unknown');
             return String(rawId).replace(/[.#$\[\]\/]/g, "_");
@@ -65,7 +76,7 @@
 
         const currentUserKey = getUserKey();
 
-        // 3. WATERMARK AN TOÀN
+        // 4. WATERMARK
         if (typeof renderWatermark === 'function') {
             try {
                 const phoneWatermark = sessionUser.phone || sessionUser.providerId || 'ADMIN';
@@ -76,7 +87,7 @@
             }
         }
 
-        // 4. KHỞI TẠO FIREBASE
+        // 5. KHỞI TẠO FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKWFn593Y",
             authDomain: "quocdat-396fe.firebaseapp.com",
@@ -101,7 +112,7 @@
         let currentGroupId = null;
         let unsubscribeMessages = null;
 
-        // 5. LOAD GROUP LIST
+        // 6. DANH SÁCH NHÓM CHAT (TƯƠNG THÍCH ADMIN GHOST MODE & USER)
         const groupsRef = ref(db, 'digitalsmod_groups');
         onValue(groupsRef, (snapshot) => {
             groupListView.innerHTML = '';
@@ -161,7 +172,7 @@
             console.error('[DIGITALSMOD CHAT] Firebase error (groups):', error);
         });
 
-        // 6. TẠO NHÓM
+        // 7. TẠO NHÓM CHAT MỚI
         async function promptCreateGroup() {
             const inputName = prompt("Nhập tên nhóm chat mới:");
             if (inputName === null) return;
@@ -189,20 +200,22 @@
                     members: membersData
                 });
 
+                console.log('[DIGITALSMOD CHAT] Tạo nhóm thành công');
                 alert("Đã tạo nhóm chat mới!");
             } catch (error) {
                 console.error('[DIGITALSMOD CHAT] Firebase error (create group):', error);
-                alert('Tạo nhóm thất bại!');
+                alert('Tạo nhóm thất bại: ' + error.message);
             }
         }
 
-        // 7. MỞ NHÓM CHAT
+        // 8. MỞ PHÒNG CHAT CHI TIẾT
         function openGroup(groupId, groupName) {
             if (!groupId) return;
 
             if (typeof unsubscribeMessages === 'function') {
                 unsubscribeMessages();
                 unsubscribeMessages = null;
+                console.log('[DIGITALSMOD CHAT] Listener cũ đã được gỡ bỏ');
             }
 
             currentGroupId = groupId;
@@ -251,14 +264,17 @@
             });
 
             unsubscribeMessages = () => off(msgsRef, 'child_added', handleMessage);
+            console.log('[DIGITALSMOD CHAT] Đã gắn Listener cho nhóm:', groupId);
+
             setTimeout(() => { chatBody.scrollTop = chatBody.scrollHeight; }, 100);
         }
 
-        // 8. QUAY LẠI DANH SÁCH NHÓM
+        // 9. QUAY LẠI DANH SÁCH NHÓM
         function showGroupList() {
             if (typeof unsubscribeMessages === 'function') {
                 unsubscribeMessages();
                 unsubscribeMessages = null;
+                console.log('[DIGITALSMOD CHAT] Listener cũ đã được gỡ bỏ');
             }
 
             currentGroupId = null;
@@ -269,7 +285,7 @@
             headerTitle.textContent = 'DIGITALSMOD';
         }
 
-        // 9. GỬI TIN NHẮN
+        // 10. GỬI TIN NHẮN
         async function sendMessage() {
             if (!currentGroupId) return;
 
@@ -290,6 +306,7 @@
 
             try {
                 await push(ref(db, `digitalsmod_group_messages/${currentGroupId}`), payload);
+                console.log('[DIGITALSMOD CHAT] Gửi tin nhắn thành công');
                 msgInput.value = '';
             } catch (error) {
                 console.error('[DIGITALSMOD CHAT] Firebase error (send message):', error);
@@ -297,7 +314,7 @@
             }
         }
 
-        // 10. LẮNG NGHE SỰ KIỆN NÚT BẤM
+        // 11. SỰ KIỆN GIAO DIỆN
         btnCreateGroup.addEventListener('click', promptCreateGroup);
         btnBack.addEventListener('click', showGroupList);
         sendBtn.addEventListener('click', sendMessage);
@@ -309,13 +326,14 @@
             }
         });
 
-        // 11. ĐĂNG XUẤT
+        // 12. ĐĂNG XUẤT
         function logout() {
             if (typeof unsubscribeMessages === 'function') {
                 unsubscribeMessages();
                 unsubscribeMessages = null;
             }
             localStorage.removeItem('digitalsmod_user');
+            console.log('[DIGITALSMOD CHAT] Đã đăng xuất');
             window.location.href = LOGIN_URL;
         }
 
