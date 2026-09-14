@@ -4,24 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>DIGITALSMOD CHAT</title>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <script src="/assets/js/watermark.js"></script>
-    <script src="/assets/js/anti_leak.js"></script>
+    <link rel="stylesheet" href="https://digitalsmod.42web.io/assets/css/style.css">
+    <script src="https://digitalsmod.42web.io/assets/js/watermark.js"></script>
+    <script src="https://digitalsmod.42web.io/assets/js/anti_leak.js"></script>
 </head>
 <body>
     <div class="tg-app">
-        <!-- HEADER TELEGRAM -->
         <div class="tg-header">
             <button id="btnBack" onclick="showGroupList()" style="display: none; background: none; border: none; color: #fff; font-size: 18px; cursor: pointer;">&larr;</button>
             <div class="tg-title" id="headerTitle">DIGITALSMOD</div>
             <button onclick="logout()" style="background: none; border: none; color: var(--text-muted); font-size: 13px; cursor: pointer;">Đăng xuất</button>
         </div>
 
-        <!-- MÀN HÌNH 1: DANH SÁCH NHÓM CHAT -->
         <div id="groupListView" class="group-list"></div>
         <button id="btnCreateGroup" class="btn-create-group" onclick="promptCreateGroup()">+</button>
 
-        <!-- MÀN HÌNH 2: KHUNG CHAT CHI TIẾT -->
         <div id="chatView" style="display: none; flex: 1; flex-direction: column;">
             <div class="chat-body" id="chatBody"></div>
             <div class="chat-footer">
@@ -33,7 +30,13 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-        import { getDatabase, ref, push, onChildAdded, onValue, set, get, child } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+        import { getDatabase, ref, push, onChildAdded, onValue, set } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+
+        // TỰ ĐỘNG CHUYỂN VỀ WEB PHP NẾU CHƯA ĐĂNG NHẬP
+        const sessionUser = JSON.parse(localStorage.getItem('digitalsmod_user'));
+        if (!sessionUser) {
+            window.location.href = 'https://digitalsmod.42web.io/login.php';
+        }
 
         const firebaseConfig = {
             apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKWFn593Y",
@@ -45,14 +48,10 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        const sessionUser = JSON.parse(localStorage.getItem('digitalsmod_user'));
-        if (!sessionUser) window.location.href = '/login.php';
-
         renderWatermark(sessionUser.phone || 'ADMIN', sessionUser.displayName, 'TG-MODE');
 
         let currentGroupId = null;
 
-        // 1. Tải danh sách nhóm chat
         const groupsRef = ref(db, 'digitalsmod_groups');
         onValue(groupsRef, (snapshot) => {
             const listContainer = document.getElementById('groupListView');
@@ -66,11 +65,9 @@
             snapshot.forEach((childSnap) => {
                 const gId = childSnap.key;
                 const gData = childSnap.val();
-
                 const isMember = gData.members && gData.members[sessionUser.phone ? sessionUser.phone.replace(/[.#$\[\]]/g, "_") : "admin"];
                 const isAdmin = sessionUser.role === 'admin';
 
-                // User thấy nhóm mình tham gia, Admin (Ghost Mode) thấy tất cả các nhóm
                 if (isMember || isAdmin) {
                     const item = document.createElement('div');
                     item.className = 'group-item';
@@ -87,14 +84,11 @@
             });
         });
 
-        // 2. Tạo nhóm chat mới
         window.promptCreateGroup = async function() {
             const groupName = prompt("Nhập tên nhóm chat mới:");
             if (!groupName) return;
-
             const newGroupRef = push(ref(db, 'digitalsmod_groups'));
             const cleanKey = sessionUser.phone ? sessionUser.phone.replace(/[.#$\[\]]/g, "_") : "admin";
-
             const membersData = {};
             membersData[cleanKey] = true;
 
@@ -104,11 +98,9 @@
                 createdAt: Date.now(),
                 members: membersData
             });
-
             alert("Đã tạo nhóm chat mới!");
         };
 
-        // 3. Mở khung chat chi tiết của nhóm
         window.openGroup = function(groupId, groupName) {
             currentGroupId = groupId;
             document.getElementById('groupListView').style.display = 'none';
@@ -124,7 +116,6 @@
             onChildAdded(msgsRef, (snapshot) => {
                 const msg = snapshot.val();
                 const isMe = msg.senderId === (sessionUser.phone || 'admin');
-
                 const wrap = document.createElement('div');
                 wrap.className = 'msg-wrapper ' + (isMe ? 'me' : 'others');
 
@@ -138,19 +129,16 @@
                 const bubble = document.createElement('div');
                 bubble.className = 'msg-bubble';
                 bubble.innerText = msg.content;
-
                 const time = document.createElement('div');
                 time.className = 'msg-time';
                 time.innerText = new Date(msg.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                 bubble.appendChild(time);
-
                 wrap.appendChild(bubble);
                 chatBody.appendChild(wrap);
                 chatBody.scrollTop = chatBody.scrollHeight;
             });
         };
 
-        // 4. Quay lại danh sách nhóm
         window.showGroupList = function() {
             currentGroupId = null;
             document.getElementById('groupListView').style.display = 'block';
@@ -160,7 +148,6 @@
             document.getElementById('headerTitle').innerText = 'DIGITALSMOD';
         };
 
-        // 5. Gửi tin nhắn
         document.getElementById('sendBtn').addEventListener('click', () => {
             const input = document.getElementById('msgInput');
             const text = input.value.trim();
@@ -177,7 +164,7 @@
 
         window.logout = function() {
             localStorage.removeItem('digitalsmod_user');
-            window.location.href = '/login.php';
+            window.location.href = 'https://digitalsmod.42web.io/login.php';
         };
     </script>
 </body>
