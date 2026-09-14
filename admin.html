@@ -7,43 +7,86 @@
     <style>
         :root {
             --bg-main: #0f172a;
+            --bg-card: #1e293b;
             --border-glass: rgba(255, 255, 255, 0.08);
             --primary: #3b82f6;
+            --accent-green: #10b981;
+            --accent-purple: #8b5cf6;
             --accent-red: #ef4444;
             --text-main: #f8fafc;
+            --text-muted: #94a3b8;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
         body { background-color: var(--bg-main); color: var(--text-main); padding: 20px; }
-        .btn-primary { padding: 8px 16px; background: #3b82f6; border: none; border-radius: 8px; color: white; cursor: pointer; }
+        .btn-primary { padding: 8px 16px; background: #3b82f6; border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600; }
+        .action-btn { border: none; padding: 4px 8px; border-radius: 6px; color: white; cursor: pointer; font-size: 11px; margin-right: 4px; font-weight: 600; }
+
+        /* KHU VỰC ĐỌC CHAT REALTIME */
+        .admin-chat-section {
+            margin-top: 30px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            height: 420px;
+        }
+        .group-selector { width: 30%; border-right: 1px solid var(--border-glass); padding-right: 15px; overflow-y: auto; }
+        .group-select-item { padding: 10px; background: rgba(15, 23, 42, 0.6); border-radius: 8px; margin-bottom: 8px; cursor: pointer; border: 1px solid transparent; }
+        .group-select-item:hover, .group-select-item.active { border-color: var(--primary); background: rgba(59, 130, 246, 0.15); }
+        .chat-monitor { flex: 1; display: flex; flex-direction: column; }
+        .chat-logs { flex: 1; background: #0f172a; border-radius: 10px; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; font-size: 13px; }
+        .log-msg { background: #1e293b; padding: 8px 12px; border-radius: 8px; width: fit-content; max-width: 85%; }
+        .log-sender { font-size: 11px; color: #60a5fa; font-weight: bold; margin-bottom: 2px; }
+        .log-time { font-size: 9px; opacity: 0.6; margin-top: 4px; text-align: right; }
     </style>
 </head>
 <body>
-    <div style="width: 100%; max-width: 950px; margin: 0 auto;">
+    <div style="width: 100%; max-width: 1050px; margin: 0 auto;">
         <h2>QUẢN TRỊ VIÊN DIGITALSMOD</h2>
-        <div style="margin: 15px 0;">
-            <button onclick="logoutAdmin()" class="btn-primary" style="background: var(--accent-red);">Đăng xuất Admin</button>
-            <a href="./index.html" style="color: var(--primary); margin-left: 15px; font-weight: bold; text-decoration: none;">Vào phòng Chat (Ghost Mode) &rarr;</a>
+        <div style="margin: 15px 0; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <button onclick="logoutAdmin()" class="btn-primary" style="background: var(--accent-red);">Đăng xuất Admin</button>
+                <a href="./index.html" style="color: var(--primary); margin-left: 15px; font-weight: bold; text-decoration: none;">Vào phòng Chat (Ghost Mode) &rarr;</a>
+            </div>
+            <div id="adminRoleBadge" style="font-size: 13px; background: rgba(59, 130, 246, 0.2); padding: 6px 12px; border-radius: 20px; border: 1px solid var(--primary); color: #60a5fa; font-weight: bold;">Role: Super Admin</div>
         </div>
 
-        <h3 style="margin-top: 20px;">Danh Sách Yêu Cầu Duyệt DIGITALSMOD</h3>
+        <h3 style="margin-top: 25px;">Danh Sách Quản Lý Tài Khoản</h3>
         <table style="width: 100%; border-collapse: collapse; text-align: left; margin-top: 15px; font-size: 13px;">
             <thead>
-                <tr style="border-bottom: 1px solid var(--border-glass);">
+                <tr style="border-bottom: 1px solid var(--border-glass); color: var(--text-muted);">
                     <th style="padding: 10px;">Nền tảng</th>
                     <th>Số điện thoại</th>
                     <th>Tên hiển thị</th>
-                    <th>Mật khẩu SHA-256</th>
+                    <th>Chức vụ</th>
                     <th>Trạng thái</th>
-                    <th>Hành động</th>
+                    <th>Hành động Duyệt / Ban</th>
+                    <th>Phân Quyền Admin</th>
                 </tr>
             </thead>
             <tbody id="userTableBody"></tbody>
         </table>
+
+        <!-- MONITOR CHAT REALTIME TẠI TRANG ADMIN -->
+        <h3 style="margin-top: 35px;">Giám Sát Tin Nhắn Realtime</h3>
+        <div class="admin-chat-section">
+            <div class="group-selector" id="adminGroupList">
+                <div style="color: var(--text-muted); font-size: 13px;">Đang tải nhóm...</div>
+            </div>
+            <div class="chat-monitor">
+                <div style="font-size: 14px; font-weight: bold; margin-bottom: 10px; color: var(--primary);" id="activeGroupTitle">Chọn một nhóm để xem tin nhắn</div>
+                <div class="chat-logs" id="adminChatLogs">
+                    <div style="color: var(--text-muted); text-align: center; margin-top: 50px;">Bấm chọn nhóm chat ở cột bên trái để soi tin nhắn realtime</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+        import { getDatabase, ref, onValue, update, off } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKWFn593Y",
@@ -56,18 +99,26 @@
         const db = getDatabase(app);
 
         const sessionUser = JSON.parse(localStorage.getItem('digitalsmod_user'));
-        if (!sessionUser || sessionUser.role !== 'admin') {
+        if (!sessionUser || (sessionUser.role !== 'admin' && sessionUser.role !== 'co_admin')) {
             window.location.href = './index.html';
+        } else {
+            document.getElementById('adminRoleBadge').textContent = `Role: ${sessionUser.role === 'admin' ? 'Super Admin' : 'Phó Admin (Co-Admin)'}`;
         }
 
+        let activeMonitorListener = null;
+
+        // 1. QUẢN LÝ USER, BAN/UNBAN & PHONG HÀM ADMIN / PHÓ ADMIN
         const usersRef = ref(db, 'digitalsmod_users');
         onValue(usersRef, (snapshot) => {
             const tbody = document.getElementById('userTableBody');
             tbody.innerHTML = '';
             
+            if (!snapshot.exists()) return;
+
             snapshot.forEach((childSnap) => {
                 const key = childSnap.key;
-                const u = childSnap.val();
+                const u = childSnap.val() || {};
+                const userRole = u.role || 'user';
 
                 const tr = document.createElement('tr');
                 tr.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
@@ -75,11 +126,16 @@
                     <td style="padding: 10px;">${u.provider || 'N/A'}</td>
                     <td style="font-weight: bold; color: #fff;">${u.phone || 'N/A'}</td>
                     <td>${u.displayName || 'N/A'}</td>
-                    <td style="color: #60a5fa; font-family: monospace; font-size: 11px;">${u.passwordHash ? u.passwordHash.substring(0, 10) + '...' : 'N/A'}</td>
+                    <td><span style="color: ${userRole === 'admin' ? '#ef4444' : (userRole === 'co_admin' ? '#8b5cf6' : '#94a3b8')}; font-weight: bold;">${userRole.toUpperCase()}</span></td>
                     <td><strong style="color: ${u.status === 'approved' ? '#10b981' : (u.status === 'banned' ? '#ef4444' : '#f59e0b')}">${u.status ? u.status.toUpperCase() : 'PENDING'}</strong></td>
                     <td>
-                        ${u.status === 'pending' ? `<button onclick="updateStatus('${key}', 'approved')" style="background: #10b981; color: white; border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer;">DUYỆT</button>` : ''}
-                        ${u.status !== 'banned' ? `<button onclick="updateStatus('${key}', 'banned')" style="background: #ef4444; color: white; border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer; margin-left: 5px;">BAN</button>` : `<button onclick="updateStatus('${key}', 'approved')" style="background: #3b82f6; color: white; border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer;">UNBAN</button>`}
+                        ${u.status === 'pending' ? `<button onclick="updateStatus('${key}', 'approved')" class="action-btn" style="background: #10b981;">DUYỆT</button>` : ''}
+                        ${u.status !== 'banned' ? `<button onclick="updateStatus('${key}', 'banned')" class="action-btn" style="background: #ef4444;">BAN</button>` : `<button onclick="updateStatus('${key}', 'approved')" class="action-btn" style="background: #3b82f6;">UNBAN</button>`}
+                    </td>
+                    <td>
+                        ${userRole !== 'admin' ? `<button onclick="updateRole('${key}', 'admin')" class="action-btn" style="background: #ef4444;">LÊN ADMIN</button>` : ''}
+                        ${userRole !== 'co_admin' ? `<button onclick="updateRole('${key}', 'co_admin')" class="action-btn" style="background: #8b5cf6;">PHÓ ADMIN</button>` : ''}
+                        ${userRole !== 'user' ? `<button onclick="updateRole('${key}', 'user')" class="action-btn" style="background: #64748b;">XÓA QUYỀN</button>` : ''}
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -89,6 +145,69 @@
         window.updateStatus = async function(key, newStatus) {
             await update(ref(db, 'digitalsmod_users/' + key), { status: newStatus });
         };
+
+        window.updateRole = async function(key, newRole) {
+            await update(ref(db, 'digitalsmod_users/' + key), { role: newRole });
+        };
+
+        // 2. GIÁM SÁT CHAT REALTIME TẠI ADMIN
+        const groupsRef = ref(db, 'digitalsmod_groups');
+        onValue(groupsRef, (snapshot) => {
+            const groupListDiv = document.getElementById('adminGroupList');
+            groupListDiv.innerHTML = '';
+
+            if (!snapshot.exists()) {
+                groupListDiv.innerHTML = '<div style="color:var(--text-muted);">Không có nhóm chat</div>';
+                return;
+            }
+
+            snapshot.forEach((childSnap) => {
+                const gId = childSnap.key;
+                const gData = childSnap.val() || {};
+                const item = document.createElement('div');
+                item.className = 'group-select-item';
+                item.innerHTML = `<div style="font-weight:bold; color:#fff;">${gData.name || 'Nhóm'}</div><div style="font-size:11px; color:var(--text-muted); margin-top:2px;">ID: ${gId}</div>`;
+                item.onclick = () => monitorGroupChat(gId, gData.name || 'Nhóm', item);
+                groupListDiv.appendChild(item);
+            });
+        });
+
+        function monitorGroupChat(groupId, groupName, element) {
+            document.querySelectorAll('.group-select-item').forEach(el => el.classList.remove('active'));
+            if (element) element.classList.add('active');
+
+            document.getElementById('activeGroupTitle').textContent = `Đang theo dõi: ${groupName}`;
+            const logsDiv = document.getElementById('adminChatLogs');
+            logsDiv.innerHTML = '';
+
+            if (typeof activeMonitorListener === 'function') activeMonitorListener();
+
+            const msgsRef = ref(db, `digitalsmod_group_messages/${groupId}`);
+            const listener = onValue(msgsRef, (snapshot) => {
+                logsDiv.innerHTML = '';
+                if (!snapshot.exists()) {
+                    logsDiv.innerHTML = '<div style="color:var(--text-muted); text-align:center; margin-top:40px;">Chưa có tin nhắn trong nhóm này.</div>';
+                    return;
+                }
+
+                snapshot.forEach((msgSnap) => {
+                    const msg = msgSnap.val();
+                    if (!msg || !msg.content) return;
+
+                    const msgWrap = document.createElement('div');
+                    msgWrap.className = 'log-msg';
+                    msgWrap.innerHTML = `
+                        <div class="log-sender">${msg.senderName || 'Người dùng'} (${msg.senderId || 'ID'})</div>
+                        <div style="color:#fff;">${msg.content}</div>
+                        <div class="log-time">${new Date(msg.createdAt || Date.now()).toLocaleTimeString()}</div>
+                    `;
+                    logsDiv.appendChild(msgWrap);
+                });
+                logsDiv.scrollTop = logsDiv.scrollHeight;
+            });
+
+            activeMonitorListener = () => off(msgsRef, 'value', listener);
+        }
 
         window.logoutAdmin = function() {
             localStorage.removeItem('digitalsmod_user');
