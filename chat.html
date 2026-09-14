@@ -3,21 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DIGITALSMOD CHAT</title>
-    <link rel="stylesheet" href="https://digitalsmod.42web.io/assets/css/style.css">
-    <script src="https://digitalsmod.42web.io/assets/js/watermark.js"></script>
-    <script src="https://digitalsmod.42web.io/assets/js/anti_leak.js"></script>
+    <title>DIGITALSMOD</title>
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-sidebar: #1e293b;
+            --bg-chat: #0f172a;
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.35);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+        }
+
+        /* CHẶN HOÀN TOÀN VÙNG PHỦ XANH KHI GIỮ */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            user-select: none !important;
+            -webkit-user-select: none !important;
+            -webkit-touch-callout: none !important;
+            -webkit-tap-highlight-color: transparent !important;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .auth-box {
+            width: 90%;
+            max-width: 380px;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            padding: 28px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .auth-title {
+            font-size: 22px;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+        .form-control {
+            width: 100%;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 12px 14px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* GIAO DIỆN TELEGRAM CHAT */
+        .tg-app {
+            width: 100%;
+            max-width: 480px;
+            height: 100vh;
+            background: var(--bg-chat);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .tg-header {
+            height: 56px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-sidebar);
+            border-bottom: 1px solid var(--border-glass);
+        }
+
+        .tg-title { font-size: 16px; font-weight: 700; color: #fff; }
+        .group-list { flex: 1; overflow-y: auto; padding: 10px 0; }
+        .group-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            cursor: pointer;
+        }
+
+        .group-avatar {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .group-info { flex: 1; }
+        .group-name { font-size: 15px; font-weight: 600; color: #fff; }
+        .group-last-msg { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+        .chat-body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+        .msg-wrapper { display: flex; flex-direction: column; max-width: 80%; }
+        .msg-wrapper.me { align-self: flex-end; }
+        .msg-wrapper.others { align-self: flex-start; }
+        .msg-sender { font-size: 11px; color: #60a5fa; margin-bottom: 3px; margin-left: 4px; }
+
+        .msg-bubble { padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.4; word-break: break-word; }
+        .msg-wrapper.me .msg-bubble { background: #2563eb; color: #fff; border-bottom-right-radius: 4px; }
+        .msg-wrapper.others .msg-bubble { background: #1e293b; color: #f1f5f9; border-bottom-left-radius: 4px; }
+        .msg-time { font-size: 9px; opacity: 0.7; margin-top: 4px; text-align: right; }
+
+        .chat-footer { padding: 10px 16px; background: var(--bg-sidebar); display: flex; align-items: center; gap: 10px; }
+        .chat-input { flex: 1; background: #0f172a; border: 1px solid var(--border-glass); border-radius: 20px; padding: 10px 16px; color: #fff; font-size: 14px; outline: none; }
+        .btn-send { background: #3b82f6; border: none; width: 40px; height: 40px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .btn-create-group { position: absolute; bottom: 20px; right: 20px; width: 52px; height: 52px; border-radius: 50%; background: var(--primary); color: white; border: none; font-size: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
 <body>
-    <div class="tg-app">
+
+    <!-- VIEW 1: ĐĂNG NHẬP -->
+    <div id="loginView" class="auth-box">
+        <h2 class="auth-title">DIGITALSMOD</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label>Số điện thoại / Mã định danh</label>
+                <input type="text" id="login_phone" class="form-control" placeholder="Nhập SĐT..." required>
+            </div>
+            <div class="form-group">
+                <label>Mật khẩu</label>
+                <input type="password" id="login_password" class="form-control" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn-primary">ĐĂNG NHẬP</button>
+        </form>
+        <div style="text-align: center; margin-top: 16px;">
+            <a href="#" onclick="switchView('registerView')" style="color: var(--primary); text-decoration: none; font-size: 13px;">Chưa có tài khoản? Đăng ký xác minh</a>
+        </div>
+    </div>
+
+    <!-- VIEW 2: ĐĂNG KÝ -->
+    <div id="registerView" class="auth-box" style="display: none;">
+        <h2 class="auth-title">ĐẮNG KÝ XÁC MINH</h2>
+        <form id="regForm">
+            <div class="form-group">
+                <label>Nền tảng xác minh</label>
+                <select id="reg_provider" class="form-control">
+                    <option value="Zalo">Zalo</option>
+                    <option value="Telegram">Telegram</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Số điện thoại / Mã định danh</label>
+                <input type="text" id="reg_phone" class="form-control" placeholder="Ví dụ: 0987654321" required>
+            </div>
+            <div class="form-group">
+                <label>Tên hiển thị trong Chat</label>
+                <input type="text" id="reg_display_name" class="form-control" placeholder="Tên của bạn..." required>
+            </div>
+            <div class="form-group">
+                <label>Tạo mật khẩu ứng dụng</label>
+                <input type="password" id="reg_password" class="form-control" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn-primary">GỬI YÊU CẦU DUYỆT</button>
+        </form>
+        <div style="text-align: center; margin-top: 16px;">
+            <a href="#" onclick="switchView('loginView')" style="color: var(--primary); text-decoration: none; font-size: 13px;">Đã có tài khoản? Đăng nhập</a>
+        </div>
+    </div>
+
+    <!-- VIEW 3: ĐANG CHỜ DUYỆT -->
+    <div id="pendingView" class="auth-box" style="display: none; text-align: center;">
+        <h2 class="auth-title" style="color: #f59e0b;">ĐANG CHỜ DUYỆT</h2>
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">
+            Tài khoản của bạn đang được Admin duyệt thủ công.
+        </p>
+        <button id="btnCheckStatus" class="btn-primary" style="margin-bottom: 10px;">Kiểm tra lại</button>
+        <button onclick="logout()" class="btn-primary" style="background: rgba(239, 68, 68, 0.2); border: 1px solid var(--accent-red);">Đăng xuất</button>
+    </div>
+
+    <!-- VIEW 4: CHAT TELEGRAM -->
+    <div id="chatAppView" class="tg-app" style="display: none;">
         <div class="tg-header">
-            <button id="btnBack" style="display: none; background: none; border: none; color: #fff; font-size: 18px; cursor: pointer;">&larr;</button>
+            <button id="btnBack" onclick="showGroupList()" style="display: none; background: none; border: none; color: #fff; font-size: 18px; cursor: pointer;">&larr;</button>
             <div class="tg-title" id="headerTitle">DIGITALSMOD</div>
-            <button id="btnLogout" style="background: none; border: none; color: var(--text-muted); font-size: 13px; cursor: pointer;">Đăng xuất</button>
+            <button onclick="logout()" style="background: none; border: none; color: var(--text-muted); font-size: 13px; cursor: pointer;">Đăng xuất</button>
         </div>
 
         <div id="groupListView" class="group-list"></div>
-        <button id="btnCreateGroup" class="btn-create-group">+</button>
+        <button id="btnCreateGroup" class="btn-create-group" onclick="promptCreateGroup()">+</button>
 
         <div id="chatView" style="display: none; flex: 1; flex-direction: column;">
             <div class="chat-body" id="chatBody"></div>
@@ -30,64 +236,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-        import { getDatabase, ref, push, onChildAdded, onValue, set, off } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+        import { getDatabase, ref, push, onChildAdded, onValue, set, get, child, off } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
 
-        const LOGIN_URL = 'https://digitalsmod.42web.io/login.php';
-
-        // 1. NHẬN SESSION TỪ URL VÀ ĐỒNG BỘ VÀO LOCALSTORAGE VERCEL
-        const urlParams = new URLSearchParams(window.location.search);
-        const sessionParam = urlParams.get('session');
-
-        if (sessionParam) {
-            try {
-                const decodedUser = JSON.parse(decodeURIComponent(sessionParam));
-                localStorage.setItem('digitalsmod_user', JSON.stringify(decodedUser));
-                // Làm sạch URL sau khi ghi nhận thành công
-                window.history.replaceState({}, document.title, window.location.pathname);
-            } catch (e) {
-                console.error('[DIGITALSMOD CHAT] Lỗi giải mã URL session:', e);
-            }
-        }
-
-        // 2. KIỂM TRA SESSION TRÊN VERCEL
-        let sessionUser = null;
-        try {
-            const rawSession = localStorage.getItem('digitalsmod_user');
-            if (rawSession) {
-                sessionUser = JSON.parse(rawSession);
-            }
-        } catch (e) {
-            console.error('[DIGITALSMOD CHAT] Lỗi parse session:', e);
-        }
-
-        const hasValidIdentifier = sessionUser && (sessionUser.phone || sessionUser.providerId || sessionUser.role === 'admin');
-
-        if (!sessionUser || !hasValidIdentifier) {
-            console.warn('[DIGITALSMOD CHAT] Session không hợp lệ, chuyển hướng về login');
-            window.location.href = LOGIN_URL;
-            throw new Error('Redirecting to login...');
-        }
-
-        // 3. SANITIZE USER KEY DÙNG CHUNG
-        function getUserKey() {
-            const rawId = sessionUser.phone || sessionUser.providerId || (sessionUser.role === 'admin' ? 'admin' : 'unknown');
-            return String(rawId).replace(/[.#$\[\]\/]/g, "_");
-        }
-
-        const currentUserKey = getUserKey();
-
-        // 4. WATERMARK
-        if (typeof renderWatermark === 'function') {
-            try {
-                const phoneWatermark = sessionUser.phone || sessionUser.providerId || 'ADMIN';
-                const nameWatermark = sessionUser.displayName || 'Khách';
-                renderWatermark(phoneWatermark, nameWatermark, 'TG-MODE');
-            } catch (e) {
-                console.error('[DIGITALSMOD CHAT] Watermark error:', e);
-            }
-        }
-
-        // 5. KHỞI TẠO FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKWFn593Y",
             authDomain: "quocdat-396fe.firebaseapp.com",
@@ -98,151 +248,182 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // PHẦN TỬ GIAO DIỆN
-        const groupListView = document.getElementById('groupListView');
-        const chatView = document.getElementById('chatView');
-        const btnCreateGroup = document.getElementById('btnCreateGroup');
-        const btnBack = document.getElementById('btnBack');
-        const btnLogout = document.getElementById('btnLogout');
-        const headerTitle = document.getElementById('headerTitle');
-        const chatBody = document.getElementById('chatBody');
-        const msgInput = document.getElementById('msgInput');
-        const sendBtn = document.getElementById('sendBtn');
-
+        let sessionUser = null;
         let currentGroupId = null;
         let unsubscribeMessages = null;
 
-        // 6. DANH SÁCH NHÓM CHAT (TƯƠNG THÍCH ADMIN GHOST MODE & USER)
-        const groupsRef = ref(db, 'digitalsmod_groups');
-        onValue(groupsRef, (snapshot) => {
-            groupListView.innerHTML = '';
-
-            if (!snapshot.exists()) {
-                const emptyDiv = document.createElement('div');
-                emptyDiv.style.cssText = 'text-align: center; color: var(--text-muted); margin-top: 40px; font-size: 13px;';
-                emptyDiv.textContent = 'Chưa có nhóm nào. Bấm nút (+) để tạo nhóm mới!';
-                groupListView.appendChild(emptyDiv);
-                return;
-            }
-
-            snapshot.forEach((childSnap) => {
-                const gId = childSnap.key;
-                const gData = childSnap.val() || {};
-
-                const rawName = (gData.name && String(gData.name).trim()) ? String(gData.name).trim() : 'Nhóm';
-                const isMember = gData.members && Boolean(gData.members[currentUserKey]);
-                const isAdmin = sessionUser.role === 'admin';
-
-                if (isMember || isAdmin) {
-                    const item = document.createElement('div');
-                    item.className = 'group-item';
-                    item.onclick = () => openGroup(gId, rawName);
-
-                    const avatar = document.createElement('div');
-                    avatar.className = 'group-avatar';
-                    avatar.textContent = rawName.charAt(0).toUpperCase();
-
-                    const info = document.createElement('div');
-                    info.className = 'group-info';
-
-                    const nameDiv = document.createElement('div');
-                    nameDiv.className = 'group-name';
-                    nameDiv.textContent = rawName;
-
-                    if (isAdmin && !isMember) {
-                        const ghostSpan = document.createElement('span');
-                        ghostSpan.style.cssText = 'font-size:10px; color:#ef4444; margin-left: 5px;';
-                        ghostSpan.textContent = '(Ghost Admin)';
-                        nameDiv.appendChild(ghostSpan);
-                    }
-
-                    const lastMsg = document.createElement('div');
-                    lastMsg.className = 'group-last-msg';
-                    lastMsg.textContent = 'Bấm để vào phòng chat...';
-
-                    info.appendChild(nameDiv);
-                    info.appendChild(lastMsg);
-                    item.appendChild(avatar);
-                    item.appendChild(info);
-
-                    groupListView.appendChild(item);
-                }
+        window.switchView = function(viewId) {
+            ['loginView', 'registerView', 'pendingView', 'chatAppView'].forEach(id => {
+                document.getElementById(id).style.display = (id === viewId) ? (id === 'chatAppView' ? 'flex' : 'block') : 'none';
             });
-        }, (error) => {
-            console.error('[DIGITALSMOD CHAT] Firebase error (groups):', error);
-        });
+        };
 
-        // 7. TẠO NHÓM CHAT MỚI
-        async function promptCreateGroup() {
-            const inputName = prompt("Nhập tên nhóm chat mới:");
-            if (inputName === null) return;
-
-            const groupName = inputName.trim();
-            if (!groupName) {
-                alert("Tên nhóm không được để rỗng!");
-                return;
-            }
-
-            if (groupName.length > 100) {
-                alert("Tên nhóm quá dài! Tối đa 100 ký tự.");
-                return;
-            }
-
-            try {
-                const newGroupRef = push(ref(db, 'digitalsmod_groups'));
-                const membersData = {};
-                membersData[currentUserKey] = true;
-
-                await set(newGroupRef, {
-                    name: groupName,
-                    createdBy: sessionUser.phone || sessionUser.providerId || 'admin',
-                    createdAt: Date.now(),
-                    members: membersData
-                });
-
-                console.log('[DIGITALSMOD CHAT] Tạo nhóm thành công');
-                alert("Đã tạo nhóm chat mới!");
-            } catch (error) {
-                console.error('[DIGITALSMOD CHAT] Firebase error (create group):', error);
-                alert('Tạo nhóm thất bại: ' + error.message);
-            }
+        function getUserKey() {
+            const rawId = sessionUser ? (sessionUser.phone || sessionUser.providerId || (sessionUser.role === 'admin' ? 'admin' : 'unknown')) : 'unknown';
+            return String(rawId).replace(/[.#$\[\]\/]/g, "_");
         }
 
-        // 8. MỞ PHÒNG CHAT CHI TIẾT
-        function openGroup(groupId, groupName) {
-            if (!groupId) return;
+        // TỰ ĐỘNG ĐỌC SESSION KHI MỞ APP
+        function initApp() {
+            const rawSession = localStorage.getItem('digitalsmod_user');
+            if (rawSession) {
+                try {
+                    sessionUser = JSON.parse(rawSession);
+                    if (sessionUser.role === 'admin') {
+                        window.location.href = './admin.html';
+                        return;
+                    }
+                    if (sessionUser.status === 'approved') {
+                        switchView('chatAppView');
+                        loadGroupList();
+                    } else {
+                        switchView('pendingView');
+                    }
+                    return;
+                } catch (e) {}
+            }
+            switchView('loginView');
+        }
 
-            if (typeof unsubscribeMessages === 'function') {
-                unsubscribeMessages();
-                unsubscribeMessages = null;
-                console.log('[DIGITALSMOD CHAT] Listener cũ đã được gỡ bỏ');
+        // ĐĂNG NHẬP
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const phone = document.getElementById('login_phone').value.trim();
+            const rawPassword = document.getElementById('login_password').value;
+
+            if (phone === 'admin' && rawPassword === '123456') {
+                const adminUser = { phone: 'admin', displayName: 'Quản Trị Viên', role: 'admin', status: 'approved' };
+                localStorage.setItem('digitalsmod_user', JSON.stringify(adminUser));
+                window.location.href = './admin.html';
+                return;
             }
 
-            currentGroupId = groupId;
-            groupListView.style.display = 'none';
-            btnCreateGroup.style.display = 'none';
-            chatView.style.display = 'flex';
-            btnBack.style.display = 'block';
-            headerTitle.textContent = groupName;
+            const inputHash = CryptoJS.SHA256(rawPassword).toString();
+            const cleanKey = phone.replace(/[.#$\[\]\/]/g, "_");
 
+            const snapshot = await get(child(ref(db), `digitalsmod_users/${cleanKey}`));
+            if (!snapshot.exists()) return alert("Tài khoản không tồn tại!");
+            
+            const user = snapshot.val();
+            if (user.passwordHash !== inputHash) return alert("Mật khẩu không chính xác!");
+            if (user.status === 'banned') return alert("Tài khoản đã bị BAN vĩnh viễn!");
+
+            localStorage.setItem('digitalsmod_user', JSON.stringify(user));
+            sessionUser = user;
+
+            if (user.status === 'approved') {
+                switchView('chatAppView');
+                loadGroupList();
+            } else {
+                switchView('pendingView');
+            }
+        });
+
+        // ĐĂNG KÝ
+        document.getElementById('regForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const provider = document.getElementById('reg_provider').value;
+            const phone = document.getElementById('reg_phone').value.trim();
+            const displayName = document.getElementById('reg_display_name').value.trim();
+            const rawPassword = document.getElementById('reg_password').value;
+
+            const passwordHash = CryptoJS.SHA256(rawPassword).toString();
+            const cleanKey = phone.replace(/[.#$\[\]\/]/g, "_");
+
+            const snapshot = await get(child(ref(db), `digitalsmod_users/${cleanKey}`));
+            if (snapshot.exists()) return alert("SĐT/Mã định danh đã tồn tại!");
+
+            const userData = {
+                provider, phone, displayName, passwordHash, role: 'user', status: 'pending', createdAt: new Date().toISOString()
+            };
+
+            await set(ref(db, 'digitalsmod_users/' + cleanKey), userData);
+            localStorage.setItem('digitalsmod_user', JSON.stringify(userData));
+            sessionUser = userData;
+            alert("Đã gửi yêu cầu xác minh!");
+            switchView('pendingView');
+        });
+
+        // LOAD DANH SÁCH NHÓM CHAT
+        function loadGroupList() {
+            const currentUserKey = getUserKey();
+            const groupsRef = ref(db, 'digitalsmod_groups');
+            onValue(groupsRef, (snapshot) => {
+                const groupListView = document.getElementById('groupListView');
+                groupListView.innerHTML = '';
+                if (!snapshot.exists()) return;
+
+                snapshot.forEach((childSnap) => {
+                    const gId = childSnap.key;
+                    const gData = childSnap.val() || {};
+                    const rawName = gData.name ? String(gData.name).trim() : 'Nhóm';
+                    const isMember = gData.members && Boolean(gData.members[currentUserKey]);
+                    const isAdmin = sessionUser && sessionUser.role === 'admin';
+
+                    if (isMember || isAdmin) {
+                        const item = document.createElement('div');
+                        item.className = 'group-item';
+                        item.onclick = () => openGroup(gId, rawName);
+                        item.innerHTML = `
+                            <div class="group-avatar">${rawName.charAt(0).toUpperCase()}</div>
+                            <div class="group-info">
+                                <div class="group-name">${rawName} ${isAdmin && !isMember ? '<span style="font-size:10px; color:#ef4444;">(Ghost Admin)</span>' : ''}</div>
+                                <div class="group-last-msg">Bấm để vào phòng chat...</div>
+                            </div>
+                        `;
+                        groupListView.appendChild(item);
+                    }
+                });
+            });
+        }
+
+        // TẠO NHÓM MỚI
+        window.promptCreateGroup = async function() {
+            const inputName = prompt("Nhập tên nhóm chat mới:");
+            if (!inputName || !inputName.trim()) return;
+
+            const newGroupRef = push(ref(db, 'digitalsmod_groups'));
+            const membersData = {};
+            membersData[getUserKey()] = true;
+
+            await set(newGroupRef, {
+                name: inputName.trim(),
+                createdBy: sessionUser.phone || 'admin',
+                createdAt: Date.now(),
+                members: membersData
+            });
+            alert("Đã tạo nhóm!");
+        };
+
+        // MỞ PHÒNG CHAT
+        window.openGroup = function(groupId, groupName) {
+            if (typeof unsubscribeMessages === 'function') unsubscribeMessages();
+
+            currentGroupId = groupId;
+            document.getElementById('groupListView').style.display = 'none';
+            document.getElementById('btnCreateGroup').style.display = 'none';
+            document.getElementById('chatView').style.display = 'flex';
+            document.getElementById('btnBack').style.display = 'block';
+            document.getElementById('headerTitle').textContent = groupName;
+
+            const chatBody = document.getElementById('chatBody');
             chatBody.innerHTML = '';
 
+            const currentUserKey = getUserKey();
             const msgsRef = ref(db, `digitalsmod_group_messages/${groupId}`);
-            
+
             const handleMessage = onChildAdded(msgsRef, (snapshot) => {
                 const msg = snapshot.val();
-                if (!msg || typeof msg !== 'object') return;
-                if (!msg.content || !String(msg.content).trim()) return;
+                if (!msg || !msg.content) return;
 
                 const isMe = String(msg.senderId) === currentUserKey;
-
                 const wrap = document.createElement('div');
                 wrap.className = 'msg-wrapper ' + (isMe ? 'me' : 'others');
 
                 if (!isMe) {
                     const sender = document.createElement('div');
                     sender.className = 'msg-sender';
-                    sender.textContent = msg.senderName ? String(msg.senderName) : 'Người dùng';
+                    sender.textContent = msg.senderName || 'Người dùng';
                     wrap.appendChild(sender);
                 }
 
@@ -252,92 +433,55 @@
 
                 const time = document.createElement('div');
                 time.className = 'msg-time';
-                const timeStamp = (typeof msg.createdAt === 'number') ? msg.createdAt : Date.now();
-                time.textContent = new Date(timeStamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                time.textContent = new Date(msg.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 
                 bubble.appendChild(time);
                 wrap.appendChild(bubble);
                 chatBody.appendChild(wrap);
                 chatBody.scrollTop = chatBody.scrollHeight;
-            }, (error) => {
-                console.error('[DIGITALSMOD CHAT] Firebase error (messages):', error);
             });
 
             unsubscribeMessages = () => off(msgsRef, 'child_added', handleMessage);
-            console.log('[DIGITALSMOD CHAT] Đã gắn Listener cho nhóm:', groupId);
+        };
 
-            setTimeout(() => { chatBody.scrollTop = chatBody.scrollHeight; }, 100);
-        }
-
-        // 9. QUAY LẠI DANH SÁCH NHÓM
-        function showGroupList() {
-            if (typeof unsubscribeMessages === 'function') {
-                unsubscribeMessages();
-                unsubscribeMessages = null;
-                console.log('[DIGITALSMOD CHAT] Listener cũ đã được gỡ bỏ');
-            }
-
+        window.showGroupList = function() {
+            if (typeof unsubscribeMessages === 'function') unsubscribeMessages();
             currentGroupId = null;
-            groupListView.style.display = 'block';
-            btnCreateGroup.style.display = 'flex';
-            chatView.style.display = 'none';
-            btnBack.style.display = 'none';
-            headerTitle.textContent = 'DIGITALSMOD';
-        }
+            document.getElementById('groupListView').style.display = 'block';
+            document.getElementById('btnCreateGroup').style.display = 'flex';
+            document.getElementById('chatView').style.display = 'none';
+            document.getElementById('btnBack').style.display = 'none';
+            document.getElementById('headerTitle').textContent = 'DIGITALSMOD';
+        };
 
-        // 10. GỬI TIN NHẮN
+        // GỬI TIN NHẮN
         async function sendMessage() {
             if (!currentGroupId) return;
-
-            const text = msgInput.value.trim();
+            const input = document.getElementById('msgInput');
+            const text = input.value.trim();
             if (!text) return;
 
-            if (text.length > 2000) {
-                alert('Tin nhắn quá dài! Tối đa 2000 ký tự.');
-                return;
-            }
-
-            const payload = {
-                senderId: currentUserKey,
+            await push(ref(db, `digitalsmod_group_messages/${currentGroupId}`), {
+                senderId: getUserKey(),
                 senderName: sessionUser.displayName || 'Người dùng',
                 content: text,
                 createdAt: Date.now()
-            };
-
-            try {
-                await push(ref(db, `digitalsmod_group_messages/${currentGroupId}`), payload);
-                console.log('[DIGITALSMOD CHAT] Gửi tin nhắn thành công');
-                msgInput.value = '';
-            } catch (error) {
-                console.error('[DIGITALSMOD CHAT] Firebase error (send message):', error);
-                alert('Gửi tin nhắn thất bại!');
-            }
+            });
+            input.value = '';
         }
 
-        // 11. SỰ KIỆN GIAO DIỆN
-        btnCreateGroup.addEventListener('click', promptCreateGroup);
-        btnBack.addEventListener('click', showGroupList);
-        sendBtn.addEventListener('click', sendMessage);
-
-        msgInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
+        document.getElementById('sendBtn').addEventListener('click', sendMessage);
+        document.getElementById('msgInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
         });
 
-        // 12. ĐĂNG XUẤT
-        function logout() {
-            if (typeof unsubscribeMessages === 'function') {
-                unsubscribeMessages();
-                unsubscribeMessages = null;
-            }
+        window.logout = function() {
             localStorage.removeItem('digitalsmod_user');
-            console.log('[DIGITALSMOD CHAT] Đã đăng xuất');
-            window.location.href = LOGIN_URL;
-        }
+            sessionUser = null;
+            switchView('loginView');
+        };
 
-        btnLogout.addEventListener('click', logout);
+        initApp();
     </script>
 </body>
 </html>
