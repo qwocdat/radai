@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - DIGITALSMOD</title>
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --primary: #3b82f6;
+            --accent-red: #ef4444;
+            --text-main: #f8fafc;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background-color: var(--bg-main); color: var(--text-main); padding: 20px; }
+        .btn-primary { padding: 8px 16px; background: #3b82f6; border: none; border-radius: 8px; color: white; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div style="width: 100%; max-width: 950px; margin: 0 auto;">
+        <h2>QUẢN TRỊ VIÊN DIGITALSMOD</h2>
+        <div style="margin: 15px 0;">
+            <button onclick="logoutAdmin()" class="btn-primary" style="background: var(--accent-red);">Đăng xuất Admin</button>
+            <a href="./index.html" style="color: var(--primary); margin-left: 15px; font-weight: bold; text-decoration: none;">Vào phòng Chat (Ghost Mode) &rarr;</a>
+        </div>
+
+        <h3 style="margin-top: 20px;">Danh Sách Yêu Cầu Duyệt DIGITALSMOD</h3>
+        <table style="width: 100%; border-collapse: collapse; text-align: left; margin-top: 15px; font-size: 13px;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--border-glass);">
+                    <th style="padding: 10px;">Nền tảng</th>
+                    <th>Số điện thoại</th>
+                    <th>Tên hiển thị</th>
+                    <th>Mật khẩu SHA-256</th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody"></tbody>
+        </table>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKWFn593Y",
+            authDomain: "quocdat-396fe.firebaseapp.com",
+            databaseURL: "https://quocdat-396fe-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "quocdat-396fe"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const sessionUser = JSON.parse(localStorage.getItem('digitalsmod_user'));
+        if (!sessionUser || sessionUser.role !== 'admin') {
+            window.location.href = './index.html';
+        }
+
+        const usersRef = ref(db, 'digitalsmod_users');
+        onValue(usersRef, (snapshot) => {
+            const tbody = document.getElementById('userTableBody');
+            tbody.innerHTML = '';
+            
+            snapshot.forEach((childSnap) => {
+                const key = childSnap.key;
+                const u = childSnap.val();
+
+                const tr = document.createElement('tr');
+                tr.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+                tr.innerHTML = `
+                    <td style="padding: 10px;">${u.provider || 'N/A'}</td>
+                    <td style="font-weight: bold; color: #fff;">${u.phone || 'N/A'}</td>
+                    <td>${u.displayName || 'N/A'}</td>
+                    <td style="color: #60a5fa; font-family: monospace; font-size: 11px;">${u.passwordHash ? u.passwordHash.substring(0, 10) + '...' : 'N/A'}</td>
+                    <td><strong style="color: ${u.status === 'approved' ? '#10b981' : (u.status === 'banned' ? '#ef4444' : '#f59e0b')}">${u.status ? u.status.toUpperCase() : 'PENDING'}</strong></td>
+                    <td>
+                        ${u.status === 'pending' ? `<button onclick="updateStatus('${key}', 'approved')" style="background: #10b981; color: white; border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer;">DUYỆT</button>` : ''}
+                        ${u.status !== 'banned' ? `<button onclick="updateStatus('${key}', 'banned')" style="background: #ef4444; color: white; border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer; margin-left: 5px;">BAN</button>` : `<button onclick="updateStatus('${key}', 'approved')" style="background: #3b82f6; color: white; border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer;">UNBAN</button>`}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        });
+
+        window.updateStatus = async function(key, newStatus) {
+            await update(ref(db, 'digitalsmod_users/' + key), { status: newStatus });
+        };
+
+        window.logoutAdmin = function() {
+            localStorage.removeItem('digitalsmod_user');
+            window.location.href = './index.html';
+        };
+    </script>
+</body>
+</html>
