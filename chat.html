@@ -17,10 +17,10 @@
             --text-muted: #7f91a4;
             --accent-green: #00c853;
             --accent-red: #ff5252;
-            --tab-bg: rgba(23, 33, 43, 0.92);
+            --tab-bg: rgba(23, 33, 43, 0.95);
         }
 
-        /* CHẶN BÔI ĐEN VÀ HIGHLIGHT */
+        /* CHẶN BÔI ĐEN VÀ CHỌN VĂN BẢN */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -40,19 +40,29 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: filter 0.25s ease;
         }
 
-        /* LÀM MỜ KHI MẤT FOCUS ĐỂ CHẶN LEAK SCREENSHOT */
-        body.blurred {
-            filter: blur(20px) brightness(0.5);
+        /* LỚP MÀN HÌNH ĐEN TUYỀN KHÓA SCREENSHOT / CHUYỂN TAB */
+        #screenShieldOverlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #000000 !important;
+            z-index: 999999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            color: #111;
+            font-size: 12px;
+        }
+        body.shield-active #screenShieldOverlay {
+            display: flex !important;
         }
 
         /* FORM AUTH */
         .auth-box {
             width: 90%;
             max-width: 380px;
-            background: rgba(23, 33, 43, 0.9);
+            background: rgba(23, 33, 43, 0.95);
             backdrop-filter: blur(25px);
             border: 1px solid var(--border-glass);
             border-radius: 24px;
@@ -96,7 +106,7 @@
             font-size: 15px;
             cursor: pointer;
             margin-top: 10px;
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            transition: transform 0.15s ease;
         }
         .btn-primary:active { transform: scale(0.98); }
 
@@ -148,7 +158,7 @@
         }
 
         /* GROUPS LIST */
-        .group-list { padding-bottom: 90px; }
+        .group-list { padding-bottom: 120px; }
         .group-item {
             display: flex;
             align-items: center;
@@ -182,7 +192,7 @@
         .group-last-msg { font-size: 13px; color: var(--text-muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         /* CHAT VIEW DETAILED */
-        .chat-body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+        .chat-body { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 20px; display: flex; flex-direction: column; gap: 10px; }
         .msg-wrapper { display: flex; flex-direction: column; max-width: 80%; animation: msgPop 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
         .msg-wrapper.me { align-self: flex-end; }
         .msg-wrapper.others { align-self: flex-start; }
@@ -193,51 +203,61 @@
         .msg-wrapper.others .msg-bubble { background: #182533; color: #f1f5f9; border-bottom-left-radius: 4px; }
         .msg-time { font-size: 9px; opacity: 0.6; margin-top: 4px; text-align: right; }
 
-        .chat-footer { padding: 10px 16px; background: var(--bg-sidebar); display: flex; align-items: center; gap: 10px; z-index: 10; }
+        /* FIX ĐẨY NÂNG CAO THANH NHẬP TIN NHẮN (CHAT FOOTER) */
+        .chat-footer {
+            padding: 12px 16px;
+            padding-bottom: calc(12px + env(safe-area-inset-bottom, 12px));
+            background: var(--bg-sidebar);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 10;
+            border-top: 1px solid var(--border-glass);
+        }
         .chat-input { flex: 1; background: #0e1621; border: 1px solid var(--border-glass); border-radius: 20px; padding: 10px 16px; color: #fff; font-size: 14px; outline: none; }
         .btn-send { background: var(--primary); border: none; width: 40px; height: 40px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.15s ease; }
         .btn-send:active { transform: scale(0.9); }
 
-        /* FLOATING CREATE GROUP BUTTON (MATCHING TELEGRAM Y HỆT 100%) */
+        /* FIX ĐẨY NÂNG CAO NÚT TẠO NHÓM (FAB) */
         .btn-create-group-fab {
             position: absolute;
-            bottom: 85px;
-            right: 18px;
-            width: 54px;
-            height: 54px;
+            bottom: calc(95px + env(safe-area-inset-bottom, 15px));
+            right: 20px;
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
             background: var(--primary);
-            box-shadow: 0 8px 20px var(--primary-glow);
+            box-shadow: 0 8px 24px var(--primary-glow);
             border: none;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 20;
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .btn-create-group-fab:active { transform: scale(0.9); }
 
-        /* BOTTOM TAB BAR MENU (TELEGRAM FLOATING CAPSULE STYLE) */
+        /* FIX ĐẨY NÂNG CAO THANH MENU TAB BAR (BOTTOM TAB BAR) */
         .tg-bottom-nav-wrap {
             position: absolute;
-            bottom: 16px;
+            bottom: calc(24px + env(safe-area-inset-bottom, 12px));
             left: 50%;
             transform: translateX(-50%);
             width: 92%;
             max-width: 420px;
-            height: 60px;
+            height: 62px;
             background: var(--tab-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border-radius: 30px;
+            border-radius: 32px;
             border: 1px solid var(--border-glass);
             display: flex;
             align-items: center;
             justify-content: space-around;
             padding: 0 8px;
             z-index: 25;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6);
         }
 
         .nav-item {
@@ -251,7 +271,6 @@
             cursor: pointer;
             border-radius: 22px;
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative;
         }
 
         .nav-item.active {
@@ -338,21 +357,6 @@
             animation: appSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* WATERMARK CANVAS OVERLAY */
-        #watermark-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            pointer-events: none;
-            z-index: 9998;
-            overflow: hidden;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-around;
-            align-content: space-around;
-            opacity: 0.08;
-        }
-        .wm-item { font-size: 11px; color: #fff; transform: rotate(-25deg); white-space: nowrap; padding: 25px; font-weight: 600; }
-
         @keyframes appSlideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes appSlideDown { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -362,7 +366,9 @@
 </head>
 <body>
 
-    <div id="watermark-overlay"></div>
+    <!-- LỚP KÍNH ĐEN CHE TOÀN BỘ KHI NGUỜI DÙNG CHỤP MÀN HÌNH / THOÁT TRANG -->
+    <div id="screenShieldOverlay"></div>
+
     <div id="toastContainer"></div>
 
     <!-- CUSTOM APP MODAL TẠO NHÓM -->
@@ -471,8 +477,8 @@
             <div id="tabSettings" class="tab-content" style="padding: 20px;">
                 <h3 style="margin-bottom: 15px; color: #fff; font-size: 16px;">Cài đặt bảo mật</h3>
                 <div style="background: #17212b; padding: 16px; border-radius: 14px; border: 1px solid var(--border-glass);">
-                    <div style="font-size: 14px; color: #fff; margin-bottom: 6px;">Anti-Leak & Screenshot</div>
-                    <div style="font-size: 12px; color: var(--text-muted);">Đã bật bảo vệ chống chụp màn hình và tự động mờ khi rời ứng dụng.</div>
+                    <div style="font-size: 14px; color: #fff; margin-bottom: 6px;">Blackout Shield Active</div>
+                    <div style="font-size: 12px; color: var(--text-muted);">Đã bật màn hình đen khi chụp màn hình hoặc thoát ứng dụng.</div>
                 </div>
             </div>
 
@@ -554,35 +560,35 @@
         let currentGroupId = null;
         let unsubscribeMessages = null;
 
-        // ANTI SCREENSHOT LEAK SYSTEM
-        (function initAntiLeak() {
-            document.addEventListener('contextmenu', e => e.preventDefault());
+        // BẢO VỆ CHỐNG CHỤP MÀN HÌNH BẰNG BLACKOUT SCREEN SHIELD
+        (function initBlackoutShield() {
+            const shield = document.getElementById('screenShieldOverlay');
+            
+            function activateShield() { document.body.classList.add('shield-active'); }
+            function deactivateShield() { document.body.classList.remove('shield-active'); }
+
+            // Chặn khi rời ứng dụng / mở đa nhiệm
+            window.addEventListener('blur', activateShield);
+            window.addEventListener('focus', deactivateShield);
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) activateShield();
+                else deactivateShield();
+            });
+
+            // Chặn phím tắt chụp màn hình trên máy tính
             document.addEventListener('keydown', e => {
-                if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'u' || e.key === 's' || e.key === 'p' || e.key === 'a')) {
+                if (e.key === 'PrintScreen' || (e.ctrlKey && e.key === 'p') || (e.metaKey && e.shiftKey && (e.key === '3' || e.key === '4'))) {
+                    activateShield();
+                    setTimeout(deactivateShield, 1000);
                     e.preventDefault();
                 }
             });
-            window.addEventListener('blur', () => document.body.classList.add('blurred'));
-            window.addEventListener('focus', () => document.body.classList.remove('blurred'));
 
-            document.addEventListener('DOMContentLoaded', () => {
-                if (window.Median && window.Median.screenSecurity) window.Median.screenSecurity.enable();
-                else if (window.gonative && window.gonative.screenSecurity) window.gonative.screenSecurity.enable();
-            });
+            // Chặn chuột phải & Copy
+            document.addEventListener('contextmenu', e => e.preventDefault());
+            document.addEventListener('copy', e => e.preventDefault());
         })();
-
-        // WATERMARK RENDERER
-        function renderWatermark(uid, name) {
-            const overlay = document.getElementById('watermark-overlay');
-            overlay.innerHTML = '';
-            const wmText = `DIGITALSMOD | ${uid} | ${name}`;
-            for (let i = 0; i < 16; i++) {
-                const item = document.createElement('div');
-                item.className = 'wm-item';
-                item.textContent = wmText;
-                overlay.appendChild(item);
-            }
-        }
 
         // APP TOAST NOTIFICATION
         window.showToast = function(msg, isError = false) {
@@ -646,7 +652,6 @@
                         return;
                     }
                     await ensureSystemShareGroup(getUserKey());
-                    renderWatermark(sessionUser.phone || 'ADMIN', sessionUser.displayName || 'User');
                     updateProfileTab();
 
                     if (sessionUser.status === 'approved') {
@@ -695,7 +700,6 @@
             localStorage.setItem('digitalsmod_user', JSON.stringify(user));
             sessionUser = user;
             await ensureSystemShareGroup(cleanKey);
-            renderWatermark(user.phone || 'ADMIN', user.displayName || 'User');
             updateProfileTab();
 
             if (user.status === 'approved') {
