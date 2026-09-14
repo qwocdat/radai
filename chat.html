@@ -37,7 +37,7 @@
 
         const LOGIN_URL = 'https://digitalsmod.42web.io/login.php';
 
-        // 1. FIX SESSION
+        // 1. FIX SESSION (TỐI ƯU KIỂM TRA ĐỒNG BỘ MỌI TÊN BIẾN ID/PHONE)
         let sessionUser = null;
         try {
             const rawSession = localStorage.getItem('digitalsmod_user');
@@ -48,21 +48,24 @@
             console.error('[DIGITALSMOD CHAT] Lỗi parse session:', e);
         }
 
-        if (!sessionUser || typeof sessionUser !== 'object') {
+        // Kiểm tra linh hoạt: Chấp nhận cả phone, providerId hoặc role admin
+        const hasValidIdentifier = sessionUser && (sessionUser.phone || sessionUser.providerId || sessionUser.role === 'admin');
+
+        if (!sessionUser || !hasValidIdentifier) {
             console.warn('[DIGITALSMOD CHAT] Session không hợp lệ, chuyển hướng về login');
             window.location.href = LOGIN_URL;
-            throw new Error('Redirecting to login...'); // Dừng thực thi script tiếp theo
+            throw new Error('Redirecting to login...'); 
         }
 
-        // 2. FIX USER KEY SANITIZE
+        // 2. FIX USER KEY SANITIZE SANITIZE CHUẨN MỌI TRƯỜNG ĐỊNH DANH
         function getUserKey() {
-            const rawId = sessionUser.phone || sessionUser.providerId || 'admin';
+            const rawId = sessionUser.phone || sessionUser.providerId || (sessionUser.role === 'admin' ? 'admin' : 'unknown');
             return String(rawId).replace(/[.#$\[\]\/]/g, "_");
         }
 
         const currentUserKey = getUserKey();
 
-        // 3. FIX WATERMARK AN TOÀN
+        // 3. WATERMARK AN TOÀN
         if (typeof renderWatermark === 'function') {
             try {
                 const phoneWatermark = sessionUser.phone || sessionUser.providerId || 'ADMIN';
@@ -98,7 +101,7 @@
         let currentGroupId = null;
         let unsubscribeMessages = null;
 
-        // 5. FIX GROUP LIST (Chống XSS & An toàn dữ liệu)
+        // 5. LOAD GROUP LIST
         const groupsRef = ref(db, 'digitalsmod_groups');
         onValue(groupsRef, (snapshot) => {
             groupListView.innerHTML = '';
@@ -156,12 +159,9 @@
             });
         }, (error) => {
             console.error('[DIGITALSMOD CHAT] Firebase error (groups):', error);
-            if (error.code === 'PERMISSION_DENIED') {
-                alert('Bạn không có quyền truy cập danh sách nhóm.');
-            }
         });
 
-        // 6. FIX CREATE GROUP (Kiểm tra & Validate dữ liệu)
+        // 6. TẠO NHÓM
         async function promptCreateGroup() {
             const inputName = prompt("Nhập tên nhóm chat mới:");
             if (inputName === null) return;
@@ -184,32 +184,25 @@
 
                 await set(newGroupRef, {
                     name: groupName,
-                    createdBy: sessionUser.phone || 'admin',
+                    createdBy: sessionUser.phone || sessionUser.providerId || 'admin',
                     createdAt: Date.now(),
                     members: membersData
                 });
 
-                console.log('[DIGITALSMOD CHAT] Group created successfully');
                 alert("Đã tạo nhóm chat mới!");
             } catch (error) {
                 console.error('[DIGITALSMOD CHAT] Firebase error (create group):', error);
-                if (error.code === 'PERMISSION_DENIED') {
-                    alert('Bạn không có quyền thực hiện thao tác này.');
-                } else {
-                    alert('Tạo nhóm thất bại: ' + error.message);
-                }
+                alert('Tạo nhóm thất bại!');
             }
         }
 
-        // 7. FIX CHAT LISTENER & OPEN GROUP (Hủy Listener cũ, Render Chống XSS)
+        // 7. MỞ NHÓM CHAT
         function openGroup(groupId, groupName) {
             if (!groupId) return;
 
-            // Hủy listener cũ nếu có
             if (typeof unsubscribeMessages === 'function') {
                 unsubscribeMessages();
                 unsubscribeMessages = null;
-                console.log('[DIGITALSMOD CHAT] Message listener removed');
             }
 
             currentGroupId = groupId;
@@ -255,25 +248,17 @@
                 chatBody.scrollTop = chatBody.scrollHeight;
             }, (error) => {
                 console.error('[DIGITALSMOD CHAT] Firebase error (messages):', error);
-                if (error.code === 'PERMISSION_DENIED') {
-                    alert('Bạn không có quyền xem tin nhắn trong nhóm này.');
-                }
             });
 
-            // Lưu hàm unsubscribe
             unsubscribeMessages = () => off(msgsRef, 'child_added', handleMessage);
-            console.log('[DIGITALSMOD CHAT] Message listener attached for group:', groupId);
-
-            // Reset scroll
             setTimeout(() => { chatBody.scrollTop = chatBody.scrollHeight; }, 100);
         }
 
-        // 8. FIX SHOW GROUP LIST
+        // 8. QUAY LẠI DANH SÁCH NHÓM
         function showGroupList() {
             if (typeof unsubscribeMessages === 'function') {
                 unsubscribeMessages();
                 unsubscribeMessages = null;
-                console.log('[DIGITALSMOD CHAT] Message listener removed');
             }
 
             currentGroupId = null;
@@ -284,7 +269,7 @@
             headerTitle.textContent = 'DIGITALSMOD';
         }
 
-        // 9. FIX SEND MESSAGE (Có hàm riêng, Validate, Không clear input khi lỗi)
+        // 9. GỬI TIN NHẮN
         async function sendMessage() {
             if (!currentGroupId) return;
 
@@ -305,19 +290,14 @@
 
             try {
                 await push(ref(db, `digitalsmod_group_messages/${currentGroupId}`), payload);
-                console.log('[DIGITALSMOD CHAT] Message sent');
-                msgInput.value = ''; // Chỉ clear khi thành công
+                msgInput.value = '';
             } catch (error) {
                 console.error('[DIGITALSMOD CHAT] Firebase error (send message):', error);
-                if (error.code === 'PERMISSION_DENIED') {
-                    alert('Bạn không có quyền gửi tin nhắn trong nhóm này.');
-                } else {
-                    alert('Gửi tin nhắn thất bại: ' + error.message);
-                }
+                alert('Gửi tin nhắn thất bại!');
             }
         }
 
-        // 10. EVENT LISTENERS
+        // 10. LẮNG NGHE SỰ KIỆN NÚT BẤM
         btnCreateGroup.addEventListener('click', promptCreateGroup);
         btnBack.addEventListener('click', showGroupList);
         sendBtn.addEventListener('click', sendMessage);
@@ -329,14 +309,13 @@
             }
         });
 
-        // 11. FIX LOGOUT
+        // 11. ĐĂNG XUẤT
         function logout() {
             if (typeof unsubscribeMessages === 'function') {
                 unsubscribeMessages();
                 unsubscribeMessages = null;
             }
             localStorage.removeItem('digitalsmod_user');
-            console.log('[DIGITALSMOD CHAT] Logged out');
             window.location.href = LOGIN_URL;
         }
 
