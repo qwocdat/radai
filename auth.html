@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác minh OTP</title>
+    <style>
+        body { background: #0b141b; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .card { background: #17212b; padding: 24px; border-radius: 16px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 85%; max-width: 320px; }
+        .spinner { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #2aabee; border-radius: 50%; width: 36px; height: 36px; animation: spin 0.8s linear infinite; margin: 15px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h3>Đang xử lý OTP...</h3>
+        <p style="font-size: 12px; color: #7f91a4;">Vui lòng không đóng cửa sổ này</p>
+        <div class="spinner"></div>
+        <div id="recaptcha-container"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+        import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKWFn593Y",
+            authDomain: "quocdat-396fe.firebaseapp.com",
+            databaseURL: "https://quocdat-396fe-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "quocdat-396fe"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const phone = urlParams.get('phone');
+
+        function sendResult(data) {
+            if (window.opener) {
+                window.opener.postMessage(data, '*');
+            }
+            setTimeout(() => window.close(), 1000);
+        }
+
+        if (phone) {
+            window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', { size: 'invisible' }, auth);
+            signInWithPhoneNumber(auth, phone, window.recaptchaVerifier)
+                .then((confirmationResult) => {
+                    sendResult({ status: 'SUCCESS', verificationId: confirmationResult.verificationId });
+                })
+                .catch((error) => {
+                    sendResult({ status: 'ERROR', message: error.message });
+                });
+        } else {
+            sendResult({ status: 'ERROR', message: 'Thiếu số điện thoại!' });
+        }
+    </script>
+</body>
+</html>
