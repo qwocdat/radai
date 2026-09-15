@@ -21,6 +21,22 @@
         .btn-primary { padding: 8px 16px; background: #3b82f6; border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600; }
         .action-btn { border: none; padding: 4px 8px; border-radius: 6px; color: white; cursor: pointer; font-size: 11px; margin-right: 4px; font-weight: 600; }
 
+        /* FORM ĐĂNG NHẬP ADMIN */
+        #adminLoginOverlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: var(--bg-main); z-index: 99999; display: flex;
+            justify-content: center; align-items: center;
+        }
+        .login-box {
+            background: var(--bg-card); padding: 30px; border-radius: 16px;
+            border: 1px solid var(--border-glass); width: 90%; max-width: 360px; text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        .login-input {
+            width: 100%; padding: 12px; margin: 15px 0; background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-glass); border-radius: 8px; color: #fff; outline: none; text-align: center; font-size: 16px;
+        }
+
         /* KHU VỰC ĐỌC CHAT REALTIME */
         .admin-chat-section {
             margin-top: 30px;
@@ -43,7 +59,19 @@
     </style>
 </head>
 <body>
-    <div style="width: 100%; max-width: 1050px; margin: 0 auto;">
+
+    <!-- OVERLAY ĐĂNG NHẬP ADMIN -->
+    <div id="adminLoginOverlay">
+        <div class="login-box">
+            <h3 style="margin-bottom: 10px; color: var(--primary);">ĐĂNG NHẬP ADMIN</h3>
+            <p style="font-size: 12px; color: var(--text-muted);">Vui lòng nhập mật khẩu quản trị viên để vào trang</p>
+            <input type="password" id="adminPassInput" class="login-input" placeholder="Mật khẩu Admin..." autocomplete="off">
+            <button onclick="loginAdminPass()" class="btn-primary" style="width: 100%; padding: 12px;">ĐĂNG NHẬP</button>
+        </div>
+    </div>
+
+    <!-- NỘI DUNG DASHBOARD ADMIN -->
+    <div id="adminDashboardContent" style="width: 100%; max-width: 1050px; margin: 0 auto; display: none;">
         <h2>QUẢN TRỊ VIÊN DIGITALSMOD</h2>
         <div style="margin: 15px 0; display: flex; justify-content: space-between; align-items: center;">
             <div>
@@ -64,6 +92,7 @@
                     <th>Trạng thái</th>
                     <th>Hành động Duyệt / Ban</th>
                     <th>Phân Quyền Admin</th>
+                    <th>Xóa Tài Khoản</th>
                 </tr>
             </thead>
             <tbody id="userTableBody"></tbody>
@@ -86,7 +115,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-        import { getDatabase, ref, onValue, update, off } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+        import { getDatabase, ref, onValue, update, remove, off } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKWFn593Y",
@@ -98,49 +127,101 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        const sessionUser = JSON.parse(localStorage.getItem('digitalsmod_user'));
-        if (!sessionUser || (sessionUser.role !== 'admin' && sessionUser.role !== 'co_admin')) {
-            window.location.href = './index.html';
-        } else {
-            document.getElementById('adminRoleBadge').textContent = `Role: ${sessionUser.role === 'admin' ? 'Super Admin' : 'Phó Admin (Co-Admin)'}`;
+        // KIỂM TRA ĐĂNG NHẬP ADMIN BẰNG MẬT KHẨU
+        window.loginAdminPass = function() {
+            const pass = document.getElementById('adminPassInput').value;
+            if (pass === 'ame1610@') {
+                sessionStorage.setItem('admin_authenticated', 'true');
+                const adminSession = { phone: '0000000000', displayName: 'Super Admin', role: 'admin', status: 'approved' };
+                localStorage.setItem('digitalsmod_user', JSON.stringify(adminSession));
+                showAdminDashboard();
+            } else {
+                alert('Mật khẩu Admin không chính xác!');
+            }
+        };
+
+        document.getElementById('adminPassInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') loginAdminPass();
+        });
+
+        function checkAdminSession() {
+            if (sessionStorage.getItem('admin_authenticated') === 'true') {
+                showAdminDashboard();
+            } else {
+                document.getElementById('adminLoginOverlay').style.display = 'flex';
+                document.getElementById('adminDashboardContent').style.display = 'none';
+            }
+        }
+
+        function showAdminDashboard() {
+            document.getElementById('adminLoginOverlay').style.display = 'none';
+            document.getElementById('adminDashboardContent').style.display = 'block';
+            initRealtimeAdminData();
         }
 
         let activeMonitorListener = null;
 
-        // 1. QUẢN LÝ USER, BAN/UNBAN & PHONG HÀM ADMIN / PHÓ ADMIN
-        const usersRef = ref(db, 'digitalsmod_users');
-        onValue(usersRef, (snapshot) => {
-            const tbody = document.getElementById('userTableBody');
-            tbody.innerHTML = '';
-            
-            if (!snapshot.exists()) return;
+        // 1. QUẢN LÝ USER, BAN/UNBAN, PHONG HÀM & XÓA TÀI KHOẢN
+        function initRealtimeAdminData() {
+            const usersRef = ref(db, 'digitalsmod_users');
+            onValue(usersRef, (snapshot) => {
+                const tbody = document.getElementById('userTableBody');
+                tbody.innerHTML = '';
+                
+                if (!snapshot.exists()) return;
 
-            snapshot.forEach((childSnap) => {
-                const key = childSnap.key;
-                const u = childSnap.val() || {};
-                const userRole = u.role || 'user';
+                snapshot.forEach((childSnap) => {
+                    const key = childSnap.key;
+                    const u = childSnap.val() || {};
+                    const userRole = u.role || 'user';
 
-                const tr = document.createElement('tr');
-                tr.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
-                tr.innerHTML = `
-                    <td style="padding: 10px;">${u.provider || 'N/A'}</td>
-                    <td style="font-weight: bold; color: #fff;">${u.phone || 'N/A'}</td>
-                    <td>${u.displayName || 'N/A'}</td>
-                    <td><span style="color: ${userRole === 'admin' ? '#ef4444' : (userRole === 'co_admin' ? '#8b5cf6' : '#94a3b8')}; font-weight: bold;">${userRole.toUpperCase()}</span></td>
-                    <td><strong style="color: ${u.status === 'approved' ? '#10b981' : (u.status === 'banned' ? '#ef4444' : '#f59e0b')}">${u.status ? u.status.toUpperCase() : 'PENDING'}</strong></td>
-                    <td>
-                        ${u.status === 'pending' ? `<button onclick="updateStatus('${key}', 'approved')" class="action-btn" style="background: #10b981;">DUYỆT</button>` : ''}
-                        ${u.status !== 'banned' ? `<button onclick="updateStatus('${key}', 'banned')" class="action-btn" style="background: #ef4444;">BAN</button>` : `<button onclick="updateStatus('${key}', 'approved')" class="action-btn" style="background: #3b82f6;">UNBAN</button>`}
-                    </td>
-                    <td>
-                        ${userRole !== 'admin' ? `<button onclick="updateRole('${key}', 'admin')" class="action-btn" style="background: #ef4444;">LÊN ADMIN</button>` : ''}
-                        ${userRole !== 'co_admin' ? `<button onclick="updateRole('${key}', 'co_admin')" class="action-btn" style="background: #8b5cf6;">PHÓ ADMIN</button>` : ''}
-                        ${userRole !== 'user' ? `<button onclick="updateRole('${key}', 'user')" class="action-btn" style="background: #64748b;">XÓA QUYỀN</button>` : ''}
-                    </td>
-                `;
-                tbody.appendChild(tr);
+                    const tr = document.createElement('tr');
+                    tr.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+                    tr.innerHTML = `
+                        <td style="padding: 10px;">${u.provider || 'N/A'}</td>
+                        <td style="font-weight: bold; color: #fff;">${u.phone || 'N/A'}</td>
+                        <td>${u.displayName || 'N/A'}</td>
+                        <td><span style="color: ${userRole === 'admin' ? '#ef4444' : (userRole === 'co_admin' ? '#8b5cf6' : '#94a3b8')}; font-weight: bold;">${userRole.toUpperCase()}</span></td>
+                        <td><strong style="color: ${u.status === 'approved' ? '#10b981' : (u.status === 'banned' ? '#ef4444' : '#f59e0b')}">${u.status ? u.status.toUpperCase() : 'PENDING'}</strong></td>
+                        <td>
+                            ${u.status === 'pending' ? `<button onclick="updateStatus('${key}', 'approved')" class="action-btn" style="background: #10b981;">DUYỆT</button>` : ''}
+                            ${u.status !== 'banned' ? `<button onclick="updateStatus('${key}', 'banned')" class="action-btn" style="background: #ef4444;">BAN</button>` : `<button onclick="updateStatus('${key}', 'approved')" class="action-btn" style="background: #3b82f6;">UNBAN</button>`}
+                        </td>
+                        <td>
+                            ${userRole !== 'admin' ? `<button onclick="updateRole('${key}', 'admin')" class="action-btn" style="background: #ef4444;">LÊN ADMIN</button>` : ''}
+                            ${userRole !== 'co_admin' ? `<button onclick="updateRole('${key}', 'co_admin')" class="action-btn" style="background: #8b5cf6;">PHÓ ADMIN</button>` : ''}
+                            ${userRole !== 'user' ? `<button onclick="updateRole('${key}', 'user')" class="action-btn" style="background: #64748b;">XÓA QUYỀN</button>` : ''}
+                        </td>
+                        <td>
+                            <button onclick="deleteUserAccount('${key}')" class="action-btn" style="background: #b91c1c;">XÓA TÀI KHOẢN</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
             });
-        });
+
+            // 2. GIÁM SÁT CHAT REALTIME TẠI ADMIN
+            const groupsRef = ref(db, 'digitalsmod_groups');
+            onValue(groupsRef, (snapshot) => {
+                const groupListDiv = document.getElementById('adminGroupList');
+                groupListDiv.innerHTML = '';
+
+                if (!snapshot.exists()) {
+                    groupListDiv.innerHTML = '<div style="color:var(--text-muted);">Không có nhóm chat</div>';
+                    return;
+                }
+
+                snapshot.forEach((childSnap) => {
+                    const gId = childSnap.key;
+                    const gData = childSnap.val() || {};
+                    const item = document.createElement('div');
+                    item.className = 'group-select-item';
+                    item.innerHTML = `<div style="font-weight:bold; color:#fff;">${gData.name || 'Nhóm'}</div><div style="font-size:11px; color:var(--text-muted); margin-top:2px;">ID: ${gId}</div>`;
+                    item.onclick = () => monitorGroupChat(gId, gData.name || 'Nhóm', item);
+                    groupListDiv.appendChild(item);
+                });
+            });
+        }
 
         window.updateStatus = async function(key, newStatus) {
             await update(ref(db, 'digitalsmod_users/' + key), { status: newStatus });
@@ -150,27 +231,13 @@
             await update(ref(db, 'digitalsmod_users/' + key), { role: newRole });
         };
 
-        // 2. GIÁM SÁT CHAT REALTIME TẠI ADMIN
-        const groupsRef = ref(db, 'digitalsmod_groups');
-        onValue(groupsRef, (snapshot) => {
-            const groupListDiv = document.getElementById('adminGroupList');
-            groupListDiv.innerHTML = '';
-
-            if (!snapshot.exists()) {
-                groupListDiv.innerHTML = '<div style="color:var(--text-muted);">Không có nhóm chat</div>';
-                return;
+        // CHỨC NĂNG XÓA VĨNH VIỄN TÀI KHOẢN
+        window.deleteUserAccount = async function(key) {
+            if (confirm(`Bạn có chắc chắn muốn XÓA vĩnh viễn tài khoản (${key}) khỏi hệ thống?`)) {
+                await remove(ref(db, 'digitalsmod_users/' + key));
+                alert('Đã xóa tài khoản thành công!');
             }
-
-            snapshot.forEach((childSnap) => {
-                const gId = childSnap.key;
-                const gData = childSnap.val() || {};
-                const item = document.createElement('div');
-                item.className = 'group-select-item';
-                item.innerHTML = `<div style="font-weight:bold; color:#fff;">${gData.name || 'Nhóm'}</div><div style="font-size:11px; color:var(--text-muted); margin-top:2px;">ID: ${gId}</div>`;
-                item.onclick = () => monitorGroupChat(gId, gData.name || 'Nhóm', item);
-                groupListDiv.appendChild(item);
-            });
-        });
+        };
 
         function monitorGroupChat(groupId, groupName, element) {
             document.querySelectorAll('.group-select-item').forEach(el => el.classList.remove('active'));
@@ -210,9 +277,13 @@
         }
 
         window.logoutAdmin = function() {
+            sessionStorage.removeItem('admin_authenticated');
             localStorage.removeItem('digitalsmod_user');
-            window.location.href = './index.html';
+            window.location.reload();
         };
+
+        // Kiểm tra phiên làm việc ngay khi load trang
+        checkAdminSession();
     </script>
 </body>
 </html>
