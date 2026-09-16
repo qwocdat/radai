@@ -1,60 +1,253 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xác minh OTP</title>
-    <style>
-        body { background: #0b141b; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .card { background: #17212b; padding: 24px; border-radius: 16px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 85%; max-width: 320px; }
-        .spinner { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #2aabee; border-radius: 50%; width: 36px; height: 36px; animation: spin 0.8s linear infinite; margin: 15px auto; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0b141b">
+<title>XÁC THỰC TẢI SKINS - DIGITALSMOD</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+<style>
+:root {
+    --bg-main: #0b141b;
+    --bg-card: #17212b;
+    --primary: #2aabee;
+    --primary-dark: #229ed9;
+    --primary-glow: rgba(42, 171, 238, 0.4);
+    --text-main: #f5f5f5;
+    --text-muted: #7f91a4;
+    --accent-green: #00c853;
+    --accent-red: #ff5252;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif; user-select: none; }
+body { background: var(--bg-main); color: var(--text-main); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+
+.auth-card { width: 100%; max-width: 440px; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 28px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); text-align: center; position: relative; overflow: hidden; }
+.auth-card::before { content:''; position:absolute; inset:-2px; border-radius:26px; background:linear-gradient(135deg,var(--primary),transparent 50%,var(--primary-dark)); z-index:-1; opacity:.3; }
+
+.brand-title { font-size: 22px; font-weight: 900; background: linear-gradient(135deg, var(--primary), #8b5cf6); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 6px; letter-spacing: 1px; }
+.sub-title { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+
+.info-box { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-radius: 14px; padding: 14px; text-align: left; margin-bottom: 20px; font-size: 12px; display: flex; flex-direction: column; gap: 8px; }
+.info-row { display: flex; justify-content: space-between; align-items: center; }
+.info-label { color: var(--text-muted); }
+.info-val { color: var(--primary); font-family: monospace; font-weight: 600; }
+
+.status-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-bottom: 16px; }
+.status-badge.loading { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid #f59e0b; }
+.status-badge.success { background: rgba(0, 200, 83, 0.15); color: var(--accent-green); border: 1px solid var(--accent-green); }
+.status-badge.error { background: rgba(255, 82, 82, 0.15); color: var(--accent-red); border: 1px solid var(--accent-red); }
+
+.btn-action { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border: none; border-radius: 14px; color: #fff; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.2s; box-shadow: 0 8px 20px var(--primary-glow); display: none; justify-content: center; align-items: center; gap: 8px; }
+.btn-action:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+.btn-action:active { transform: scale(0.98); }
+
+.timer-txt { font-size: 13px; color: var(--text-muted); margin-top: 14px; }
+.timer-count { color: var(--primary); font-weight: 700; }
+</style>
 </head>
 <body>
-    <div class="card">
-        <h3>Đang xử lý OTP...</h3>
-        <p style="font-size: 12px; color: #7f91a4;">Vui lòng không đóng cửa sổ này</p>
-        <div class="spinner"></div>
-        <div id="recaptcha-container"></div>
+
+<div class="auth-card">
+    <div class="brand-title">DIGITALSMOD AUTH</div>
+    <div class="sub-title">Hệ Thống Xác Thực Tải Skin An Toàn</div>
+
+    <div id="statusBadge" class="status-badge loading">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span>Đang kiểm tra bảo mật...</span>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-        import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+    <div class="info-box">
+        <div class="info-row">
+            <span class="info-label">Thiết bị (HWID):</span>
+            <span class="info-val" id="hwidDisplay">---</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Mã Phiên (Session):</span>
+            <span class="info-val" id="sessionDisplay">---</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Trạng thái Token:</span>
+            <span class="info-val" id="tokenStatusDisplay">Checking</span>
+        </div>
+    </div>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKWFn593Y",
-            authDomain: "quocdat-396fe.firebaseapp.com",
-            databaseURL: "https://quocdat-396fe-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "quocdat-396fe"
-        };
+    <div id="errorMsg" style="color: var(--accent-red); font-size: 13px; margin-bottom: 16px; display: none;"></div>
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
+    <button id="btnDownload" class="btn-action" onclick="processDownload()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>TẢI SKIN NGAY</span>
+    </button>
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const phone = urlParams.get('phone');
+    <div id="timerBox" class="timer-txt" style="display: none;">
+        Vui lòng chờ <span id="countdown" class="timer-count">5</span>s để kích hoạt liên kết...
+    </div>
+</div>
 
-        function sendResult(data) {
-            if (window.opener) {
-                window.opener.postMessage(data, '*');
-            }
-            setTimeout(() => window.close(), 1000);
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKWFn593Y",
+    authDomain: "quocdat-396fe.firebaseapp.com",
+    databaseURL: "https://quocdat-396fe-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "quocdat-396fe"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// Lấy tham số từ URL
+const urlParams = new URLSearchParams(window.location.search);
+const hwid = urlParams.get('hwid');
+const sessionId = urlParams.get('session');
+const skinId = urlParams.get('skin');
+const token = urlParams.get('token');
+
+let targetDownloadUrl = "";
+let authorId = "";
+
+document.getElementById('hwidDisplay').textContent = hwid ? hwid.substring(0, 10) + '...' : 'INVALID';
+document.getElementById('sessionDisplay').textContent = sessionId ? sessionId.substring(0, 10) + '...' : 'INVALID';
+
+function showError(msg) {
+    const badge = document.getElementById('statusBadge');
+    badge.className = 'status-badge error';
+    badge.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        <span>Xác Thực Thất Bại</span>
+    `;
+    
+    const errBox = document.getElementById('errorMsg');
+    errBox.textContent = msg;
+    errBox.style.display = 'block';
+
+    document.getElementById('tokenStatusDisplay').textContent = 'EXPIRED / BYPASS DETECTED';
+    document.getElementById('tokenStatusDisplay').style.color = 'var(--accent-red)';
+}
+
+async function validateAuthentication() {
+    // 1. Kiểm tra Referrer (Bắt buộc đến từ Link4M)
+    const referrer = document.referrer;
+    const isLink4M = referrer.includes('link4m.co') || referrer.includes('link4m.com') || referrer.includes('st.link4m');
+    
+    if (!isLink4M && !window.location.href.includes('localhost') && !window.location.href.includes('127.0.0.1')) {
+        return showError("Phát hiện truy cập trái phép! Vui lòng đi qua liên kết Link4M.");
+    }
+
+    // 2. Kiểm tra tham số bắt buộc
+    if (!hwid || !sessionId || !skinId || !token) {
+        return showError("Thiếu thông tin xác thực HWID / Session ID / Token!");
+    }
+
+    try {
+        // 3. Kiểm tra Token trên Firebase Realtime Database
+        const tokenRef = ref(db, `digitalsmod_auth_tokens/${token}`);
+        const snap = await get(tokenRef);
+
+        if (!snap.exists()) {
+            return showError("Phiên xác thực không tồn tại hoặc đã bị hủy!");
         }
 
-        if (phone) {
-            window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', { size: 'invisible' }, auth);
-            signInWithPhoneNumber(auth, phone, window.recaptchaVerifier)
-                .then((confirmationResult) => {
-                    sendResult({ status: 'SUCCESS', verificationId: confirmationResult.verificationId });
-                })
-                .catch((error) => {
-                    sendResult({ status: 'ERROR', message: error.message });
+        const tokenData = snap.val();
+
+        // Check xem Token có khớp HWID & Session ID không
+        if (tokenData.hwid !== hwid || tokenData.sessionId !== sessionId) {
+            return showError("Cấu hình thiết bị HWID không trùng khớp!");
+        }
+
+        // Check token đã dùng chưa (Single-use)
+        if (tokenData.used === true) {
+            return showError("Liên kết này đã được sử dụng! Vui lòng tạo link mới.");
+        }
+
+        // Check hết hạn (Giới hạn 5 phút)
+        const now = Date.now();
+        if (now - tokenData.createdAt > 5 * 60 * 1000) {
+            return showError("Mã xác thực đã quá thời gian 5 phút!");
+        }
+
+        // Lấy thông tin Skin
+        const skinSnap = await get(ref(db, `digitalsmod_skins/${skinId}`));
+        if (!skinSnap.exists()) {
+            return showError("Tệp Skin không tồn tại hoặc đã bị xóa!");
+        }
+
+        targetDownloadUrl = skinSnap.val().downloadUrl;
+        authorId = skinSnap.val().authorId;
+
+        // Xác thực hợp lệ!
+        document.getElementById('statusBadge').className = 'status-badge success';
+        document.getElementById('statusBadge').innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <span>Xác Thực Hợp Lệ</span>
+        `;
+        document.getElementById('tokenStatusDisplay').textContent = 'VALID (READY)';
+        document.getElementById('tokenStatusDisplay').style.color = 'var(--accent-green)';
+
+        startCountdown();
+
+    } catch (e) {
+        showError("Lỗi kết nối máy chủ xác thực!");
+    }
+}
+
+function startCountdown() {
+    const timerBox = document.getElementById('timerBox');
+    const countdownEl = document.getElementById('countdown');
+    const btn = document.getElementById('btnDownload');
+    timerBox.style.display = 'block';
+
+    let count = 5;
+    const interval = setInterval(() => {
+        count--;
+        countdownEl.textContent = count;
+        if (count <= 0) {
+            clearInterval(interval);
+            timerBox.style.display = 'none';
+            btn.style.display = 'flex';
+        }
+    }, 1000);
+}
+
+window.processDownload = async function() {
+    const btn = document.getElementById('btnDownload');
+    btn.disabled = true;
+    btn.querySelector('span').textContent = 'Đang khởi tạo tệp...';
+
+    try {
+        // 1. Đánh dấu Token đã dùng (Vô hiệu hóa ngay lập tức)
+        await update(ref(db, `digitalsmod_auth_tokens/${token}`), {
+            used: true,
+            usedAt: Date.now()
+        });
+
+        // 2. Cộng 100đ và tăng lượt tải cho tác giả của Skin
+        if (authorId) {
+            const authorRef = ref(db, `digitalsmod_users/${authorId}`);
+            const authorSnap = await get(authorRef);
+            if (authorSnap.exists()) {
+                const currentBalance = authorSnap.val().balance || 0;
+                const currentDownloads = authorSnap.val().totalDownloads || 0;
+                await update(authorRef, {
+                    balance: currentBalance + 100,
+                    totalDownloads: currentDownloads + 1
                 });
-        } else {
-            sendResult({ status: 'ERROR', message: 'Thiếu số điện thoại!' });
+            }
         }
-    </script>
+
+        // 3. Chuyển hướng tới link tải thực tế
+        window.location.href = targetDownloadUrl;
+    } catch (e) {
+        alert("Có lỗi xảy ra trong quá trình xử lý tải xuống!");
+        btn.disabled = false;
+        btn.querySelector('span').textContent = 'TẢI SKIN NGAY';
+    }
+};
+
+// Chạy kiểm tra bảo mật ngay khi trang load
+validateAuthentication();
+</script>
 </body>
 </html>
