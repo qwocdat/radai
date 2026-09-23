@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Đếm Hàng Bằng Âm Thanh</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex; flex-direction: column;
+            justify-content: space-between; align-items: center;
+            height: 100vh; padding: 15px 10px; overflow: hidden;
+            user-select: none; -webkit-user-select: none;
+        }
+        .header-title {
+            font-size: 14px; letter-spacing: 2px; color: #666;
+            text-transform: uppercase; margin-top: 5px;
+        }
+        .main-counter {
+            font-size: 35vw; font-weight: 900; color: #00ff66; line-height: 1;
+            text-shadow: 0 0 30px rgba(0, 255, 102, 0.3); flex-grow: 1;
+            display: flex; align-items: center; justify-content: center;
+            transition: color 0.15s ease;
+        }
+        .controls-panel {
+            width: 100%; max-width: 400px; background-color: #111111;
+            border: 1px solid #222222; border-radius: 16px; padding: 14px 18px;
+            display: flex; flex-direction: column; gap: 10px;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.8);
+        }
+        .status-text {
+            font-size: 13px; color: #888; text-align: center;
+            min-height: 36px; display: flex; align-items: center;
+            justify-content: center; line-height: 1.4; word-break: break-word;
+            padding: 0 4px;
+        }
+        /* Thanh đo âm thanh */
+        .meter-wrap {
+            width: 100%; height: 8px; background: #1a1a1a;
+            border-radius: 4px; overflow: hidden; position: relative;
+        }
+        .meter-fill {
+            height: 100%; width: 0%; background: linear-gradient(90deg, #00ff66, #ffcc00, #ff4444);
+            transition: width 0.05s linear; border-radius: 4px;
+        }
+        .meter-threshold {
+            position: absolute; top: -2px; height: 12px; width: 2px;
+            background: #ffffff; box-shadow: 0 0 4px #fff;
+            transition: left 0.1s ease;
+        }
+        .btn-group { display: flex; gap: 10px; }
+        button {
+            flex: 1; padding: 14px; font-size: 15px; font-weight: bold;
+            border: none; border-radius: 10px; cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        button:active { transform: scale(0.97); }
+        .btn-start { background-color: #007bff; color: #ffffff; }
+        .btn-start.listening { background-color: #ff9800; color: #ffffff; }
+        .btn-reset { background-color: #222222; color: #ff4444; border: 1px solid #333; }
+        .slider-box { display: flex; flex-direction: column; gap: 6px; }
+        .slider-label { display: flex; justify-content: space-between; font-size: 12px; color: #aaa; }
+        input[type=range] { width: 100%; accent-color: #00ff66; cursor: pointer; height: 20px; }
+        /* Banner cảnh báo in-app browser */
+        .warn-banner {
+            display: none;
+            width: 100%; max-width: 400px;
+            background: #4a1010; border: 1px solid #ff4444;
+            color: #ffcccc; font-size: 12px; padding: 10px 12px;
+            border-radius: 10px; margin-bottom: 8px; line-height: 1.5;
+            text-align: center;
+        }
+        .warn-banner b { color: #ff6666; }
+    </style>
+</head>
+<body>
+
+    <div class="header-title">SỐ LƯỢNG HÀNG</div>
+    <div class="main-counter" id="counter">0</div>
+
+    <div class="warn-banner" id="warnBanner">
+        ⚠️ Bạn đang mở trong <b>Zalo/Facebook/Messenger</b> — trình duyệt này <b>CHẶN Micro</b>.<br>
+        👉 Bấm <b>3 dấu chấm ⋮</b> ở góc phải trên → chọn <b>"Mở bằng trình duyệt"</b> (Chrome/Safari).
+    </div>
+
+    <div class="controls-panel">
+        <div class="status-text" id="status">Bấm 'BẬT MICRO' để bắt đầu</div>
+
+        <!-- Thanh đo âm thanh trực quan -->
+        <div class="meter-wrap">
+            <div class="meter-fill" id="meterFill"></div>
+            <div class="meter-threshold" id="meterThreshold" style="left: 30%;"></div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn-start" id="startBtn" onclick="toggleMicrophone()">BẬT MICRO</button>
+            <button class="btn-reset" onclick="resetCount()">Đặt lại (0)</button>
+        </div>
+
+        <div class="slider-box">
+            <div class="slider-label">
+                <span>Ngưỡng tiếng khoan:</span>
+                <span id="thresholdVal" style="color: #00ff66; font-weight: bold;">30</span>
+            </div>
+            <input type="range" id="threshold" min="5" max="100" value="30">
+        </div>
+    </div>
+
+<script>
+    // ===== Cảnh báo nếu mở trong in-app browser =====
+    (function() {
+        var ua = navigator.userAgent || "";
+        var isInApp = /Zalo|FBAN|FBAV|FB_IAB|Instagram|Messenger|Line|MicroMessenger/i.test(ua);
+        var isSecure = (location.protocol === 'https:') || (location.hostname === 'localhost');
+        var banner = document.getElementById('warnBanner');
+
+        if (isInApp) {
+            banner.style.display = 'block';
+        } else if (!isSecure) {
+            banner.style.display = 'block';
+            banner.innerHTML = '⚠️ Trang web phải chạy trên <b>HTTPS</b> mới xin được quyền Micro.<br>Hiện tại: <b>' + location.protocol + '</b>';
+        }
+
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            banner.style.display = 'block';
+            banner.innerHTML = '❌ Trình duyệt này <b>không hỗ trợ</b> Micro. Hãy dùng Chrome hoặc Safari.';
+        }
+    })();
+
+    // ===== Biến toàn cục =====
+    let count = 0;
+    let isListening = false;
+    let audioContext = null;
+    let analyser = null;
+    let microphone = null;
+    let rafId = null;
+    let stream = null;
+    let isCoolingDown = false;
+
+    const counterEl = document.getElementById('counter');
+    const statusEl = document.getElementById('status');
+    const startBtn = document.getElementById('startBtn');
+    const thresholdInput = document.getElementById('threshold');
+    const thresholdVal = document.getElementById('thresholdVal');
+    const meterFill = document.getElementById('meterFill');
+    const meterThreshold = document.getElementById('meterThreshold');
+
+    // Cập nhật thanh trượt
+    thresholdInput.addEventListener('input', () => {
+        thresholdVal.innerText = thresholdInput.value;
+        meterThreshold.style.left = thresholdInput.value + '%';
+    });
+    meterThreshold.style.left = thresholdInput.value + '%';
+
+    function resetCount() {
+        count = 0;
+        counterEl.innerText = count;
+    }
+
+    // ===== Bật / Tắt Micro =====
+    async function toggleMicrophone() {
+        if (isListening) {
+            stopListening();
+            return;
+        }
+
+        // Kiểm tra hỗ trợ
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            statusEl.innerText = "❌ Trình duyệt không hỗ trợ Micro!";
+            statusEl.style.color = "#ff4444";
+            return;
+        }
+
+        try {
+            statusEl.innerText = "⏳ Đang xin quyền Micro...";
+            statusEl.style.color = "#ffc107";
+
+            // Yêu cầu quyền Micro (dùng cấu hình đơn giản để tránh lỗi trên mobile)
+            stream = await navigator.mediaDevices.getUserMedia({
+                audio: {
+                    echoCancellation: false,
+                    noiseSuppression: false,
+                    autoGainControl: false
+                }
+            });
+
+            // Khởi tạo AudioContext
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            audioContext = new AudioCtx();
+            if (audioContext.state === 'suspended') {
+                await audioContext.resume();
+            }
+
+            analyser = audioContext.createAnalyser();
+            analyser.smoothingTimeConstant = 0.6;
+            analyser.fftSize = 512;
+
+            microphone = audioContext.createMediaStreamSource(stream);
+            microphone.connect(analyser);
+
+            isListening = true;
+            startBtn.innerText = "DỪNG LẮNG NGHE";
+            startBtn.classList.add("listening");
+            statusEl.innerText = "🎙️ Đang lắng nghe tiếng khoan...";
+            statusEl.style.color = "#888";
+
+            // Bắt đầu vòng lặp đo âm thanh
+            updateMeter();
+
+        } catch (err) {
+            console.error("Lỗi Micro:", err);
+            let errorMsg = "❌ Lỗi: " + (err.message || err.name);
+
+            if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                errorMsg = "❌ Quyền bị từ chối! Vào 🔒 trên thanh địa chỉ → cho phép Micro";
+            } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+                errorMsg = "❌ Không tìm thấy Micro trên thiết bị!";
+            } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
+                errorMsg = "❌ Micro đang bị app khác chiếm dụng!";
+            } else if (err.name === 'OverconstrainedError') {
+                errorMsg = "❌ Cấu hình Micro không tương thích!";
+            }
+            statusEl.innerText = errorMsg;
+            statusEl.style.color = "#ff4444";
+        }
+    }
+
+    // ===== Vòng lặp đo âm thanh =====
+    function updateMeter() {
+        if (!isListening || !analyser) return;
+
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+        analyser.getByteFrequencyData(dataArray);
+
+        // Tính trung bình
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+            sum += dataArray[i];
+        }
+        const average = sum / dataArray.length;
+
+        // Đổi sang % (0-100)
+        const level = Math.min(100, Math.round((average / 128) * 100));
+
+        // Cập nhật thanh đo
+        meterFill.style.width = level + "%";
+
+        // Kiểm tra ngưỡng
+        const threshold = parseInt(thresholdInput.value);
+        if (level > threshold && !isCoolingDown) {
+            count++;
+            counterEl.innerText = count;
+            counterEl.style.color = "#ffffff";
+            setTimeout(() => counterEl.style.color = "#00ff66", 200);
+
+            isCoolingDown = true;
+            statusEl.innerText = "🟢 ĐÃ GHI NHẬN (+1)";
+            statusEl.style.color = "#00ff66";
+
+            setTimeout(() => {
+                isCoolingDown = false;
+                if (isListening) {
+                    statusEl.innerText = "🎙️ Đang lắng nghe tiếng khoan...";
+                    statusEl.style.color = "#888";
+                }
+            }, 1200);
+        }
+
+        rafId = requestAnimationFrame(updateMeter);
+    }
+
+    // ===== Dừng Micro =====
+    function stopListening() {
+        isListening = false;
+        if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+        if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+        if (audioContext) { audioContext.close(); audioContext = null; }
+        analyser = null;
+        microphone = null;
+        meterFill.style.width = "0%";
+
+        startBtn.innerText = "BẬT MICRO";
+        startBtn.classList.remove("listening");
+        statusEl.innerText = "Đã dừng.";
+        statusEl.style.color = "#888";
+    }
+</script>
+</body>
+</html>
