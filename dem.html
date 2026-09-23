@@ -7,27 +7,30 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background-color: #000000;
-            color: #ffffff;
+            background-color: #000;
+            color: #fff;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             display: flex; flex-direction: column;
             justify-content: space-between; align-items: center;
             height: 100vh; padding: 15px 10px; overflow: hidden;
             user-select: none; -webkit-user-select: none;
+            transition: padding 0.3s ease;
         }
         .header-title {
             font-size: 14px; letter-spacing: 2px; color: #666;
             text-transform: uppercase; margin-top: 5px;
         }
         .main-counter {
-            font-size: 35vw; font-weight: 900; color: #00ff66; line-height: 1;
-            text-shadow: 0 0 30px rgba(0, 255, 102, 0.3); flex-grow: 1;
-            display: flex; align-items: center; justify-content: center;
-            transition: color 0.15s ease;
+            font-size: 35vw; font-weight: 900; color: #00ff66;
+            line-height: 1; text-shadow: 0 0 30px rgba(0,255,102,0.3);
+            flex-grow: 1; display: flex; align-items: center; justify-content: center;
+            transition: color 0.15s, font-size 0.3s;
+            cursor: pointer;
         }
         .controls-panel {
-            width: 100%; max-width: 400px; background-color: #111111;
-            border: 1px solid #222222; border-radius: 16px; padding: 14px 18px;
+            width: 100%; max-width: 400px;
+            background: #111; border: 1px solid #222;
+            border-radius: 16px; padding: 14px 18px;
             display: flex; flex-direction: column; gap: 10px;
             box-shadow: 0 -10px 30px rgba(0,0,0,0.8);
         }
@@ -35,9 +38,7 @@
             font-size: 13px; color: #888; text-align: center;
             min-height: 36px; display: flex; align-items: center;
             justify-content: center; line-height: 1.4; word-break: break-word;
-            padding: 0 4px;
         }
-        /* Thanh đo âm thanh */
         .meter-wrap {
             width: 100%; height: 8px; background: #1a1a1a;
             border-radius: 4px; overflow: hidden; position: relative;
@@ -49,21 +50,31 @@
         }
         .meter-threshold {
             position: absolute; top: -2px; height: 12px; width: 2px;
-            background: #ffffff; box-shadow: 0 0 4px #fff;
-            transition: left 0.1s ease;
+            background: #fff; box-shadow: 0 0 4px #fff;
+            transition: left 0.1s;
         }
         .btn-group { display: flex; gap: 10px; }
         button {
             flex: 1; padding: 14px; font-size: 15px; font-weight: bold;
             border: none; border-radius: 10px; cursor: pointer;
-            transition: all 0.15s ease;
+            transition: all 0.15s;
+            font-family: inherit;
         }
         button:active { transform: scale(0.97); }
-        .btn-start { background-color: #007bff; color: #ffffff; }
-        .btn-start.listening { background-color: #ff9800; color: #ffffff; }
-        .btn-reset { background-color: #222222; color: #ff4444; border: 1px solid #333; }
-
-        /* Hàng điều chỉnh ngưỡng */
+        .btn-start { background: #007bff; color: #fff; }
+        .btn-start.listening { background: #ff9800; }
+        .btn-reset { background: #222; color: #ff4444; border: 1px solid #333; }
+        .btn-filter {
+            background: #1a1a1a; color: #888;
+            border: 1px solid #333; font-size: 12px;
+            padding: 12px;
+        }
+        .btn-filter.active {
+            background: rgba(0,255,102,0.12);
+            color: #00ff66;
+            border-color: #00ff66;
+            box-shadow: 0 0 12px rgba(0,255,102,0.2);
+        }
         .slider-box { display: flex; flex-direction: column; gap: 8px; }
         .slider-header {
             display: flex; justify-content: space-between;
@@ -82,21 +93,21 @@
         }
         .threshold-input:focus {
             border-color: #00ff66;
-            box-shadow: 0 0 0 2px rgba(0, 255, 102, 0.2);
+            box-shadow: 0 0 0 2px rgba(0,255,102,0.2);
         }
-        /* Bỏ mũi tên spinner của number input trên Chrome/Safari */
         .threshold-input::-webkit-outer-spin-button,
         .threshold-input::-webkit-inner-spin-button {
             -webkit-appearance: none; margin: 0;
         }
         .threshold-input[type=number] { -moz-appearance: textfield; }
-
-        input[type=range] {
-            width: 100%; accent-color: #00ff66;
-            cursor: pointer; height: 20px;
+        input[type=range] { width: 100%; accent-color: #00ff66; cursor: pointer; height: 20px; }
+        
+        .filter-options {
+            display: flex; flex-direction: column; gap: 8px;
+            padding-top: 10px; border-top: 1px solid #222;
         }
-
-        /* Banner cảnh báo */
+        .filter-options.hidden { display: none; }
+        
         .warn-banner {
             display: none;
             width: 100%; max-width: 400px;
@@ -106,22 +117,49 @@
             text-align: center;
         }
         .warn-banner b { color: #ff6666; }
+        
+        /* Nút ẩn/hiện UI */
+        .btn-toggle-ui {
+            position: fixed; top: 12px; right: 12px;
+            width: 42px; height: 42px;
+            background: rgba(255,255,255,0.05);
+            color: #555; border: none; border-radius: 50%;
+            font-size: 18px; cursor: pointer;
+            z-index: 9999; opacity: 0.35;
+            transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center;
+            padding: 0; flex: none;
+        }
+        .btn-toggle-ui:active {
+            opacity: 1; background: rgba(0,255,102,0.15); color: #00ff66;
+        }
+        
+        /* Chế độ ẩn UI */
+        body.ui-hidden { padding: 0; justify-content: center; }
+        body.ui-hidden .header-title,
+        body.ui-hidden .controls-panel,
+        body.ui-hidden .warn-banner { 
+            display: none !important; 
+        }
+        body.ui-hidden .main-counter { font-size: 55vw; }
+        body.ui-hidden .btn-toggle-ui { opacity: 0.12; }
     </style>
 </head>
 <body>
+
+    <button class="btn-toggle-ui" id="btnToggleUI" onclick="toggleUI()">👁</button>
 
     <div class="header-title">SỐ LƯỢNG HÀNG</div>
     <div class="main-counter" id="counter">0</div>
 
     <div class="warn-banner" id="warnBanner">
         ⚠️ Bạn đang mở trong <b>Zalo/Facebook/Messenger</b> — trình duyệt này <b>CHẶN Micro</b>.<br>
-        👉 Bấm <b>3 dấu chấm ⋮</b> ở góc phải trên → chọn <b>"Mở bằng trình duyệt"</b> (Chrome/Safari).
+        👉 Bấm <b>3 dấu chấm ⋮</b> ở góc phải trên → chọn <b>"Mở bằng trình duyệt"</b>.
     </div>
 
     <div class="controls-panel">
         <div class="status-text" id="status">Bấm 'BẬT MICRO' để bắt đầu</div>
 
-        <!-- Thanh đo âm thanh trực quan -->
         <div class="meter-wrap">
             <div class="meter-fill" id="meterFill"></div>
             <div class="meter-threshold" id="meterThreshold" style="left: 30%;"></div>
@@ -132,49 +170,70 @@
             <button class="btn-reset" onclick="resetCount()">Đặt lại (0)</button>
         </div>
 
-        <!-- Ngưỡng: nhập số + thanh trượt -->
+        <button class="btn-filter" id="btnFilter" onclick="toggleFilter()">
+            🎯 BẬT LỌC TIẾNG KHOAN (loại tiếng nói)
+        </button>
+
         <div class="slider-box">
             <div class="slider-header">
-                <span>Ngưỡng tiếng khoan (5-100):</span>
+                <span>Ngưỡng (5-100):</span>
                 <input type="number" id="thresholdInput" class="threshold-input"
                        min="5" max="100" value="30" inputmode="numeric">
             </div>
             <input type="range" id="thresholdSlider" min="5" max="100" value="30">
         </div>
+
+        <div class="filter-options hidden" id="filterOptions">
+            <div class="slider-header">
+                <span style="font-size:11px;">Cắt âm trầm (giọng nói):</span>
+                <span id="hpVal" style="color:#00ff66;font-size:11px;font-weight:bold;">2000 Hz</span>
+            </div>
+            <input type="range" id="hpSlider" min="500" max="4000" step="100" value="2000">
+            
+            <div class="slider-header">
+                <span style="font-size:11px;">Cắt âm rít (ồn nền):</span>
+                <span id="lpVal" style="color:#00ff66;font-size:11px;font-weight:bold;">8000 Hz</span>
+            </div>
+            <input type="range" id="lpSlider" min="4000" max="12000" step="500" value="8000">
+        </div>
     </div>
 
 <script>
-    // ===== Cảnh báo nếu mở trong in-app browser =====
+    // ===== Cảnh báo in-app browser =====
     (function() {
         var ua = navigator.userAgent || "";
         var isInApp = /Zalo|FBAN|FBAV|FB_IAB|Instagram|Messenger|Line|MicroMessenger/i.test(ua);
         var isSecure = (location.protocol === 'https:') || (location.hostname === 'localhost');
         var banner = document.getElementById('warnBanner');
-
-        if (isInApp) {
+        if (isInApp) banner.style.display = 'block';
+        else if (!isSecure) {
             banner.style.display = 'block';
-        } else if (!isSecure) {
-            banner.style.display = 'block';
-            banner.innerHTML = '⚠️ Trang web phải chạy trên <b>HTTPS</b> mới xin được quyền Micro.<br>Hiện tại: <b>' + location.protocol + '</b>';
+            banner.innerHTML = '⚠️ Phải chạy trên <b>HTTPS</b> mới xin được quyền Micro.<br>Hiện tại: <b>' + location.protocol + '</b>';
         }
-
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             banner.style.display = 'block';
-            banner.innerHTML = '❌ Trình duyệt này <b>không hỗ trợ</b> Micro. Hãy dùng Chrome hoặc Safari.';
+            banner.innerHTML = '❌ Trình duyệt không hỗ trợ Micro. Dùng Chrome/Safari.';
         }
     })();
 
     // ===== Biến toàn cục =====
     let count = 0;
     let isListening = false;
-    let audioContext = null;
-    let analyser = null;
-    let microphone = null;
-    let rafId = null;
-    let stream = null;
-    let isCoolingDown = false;
-    let threshold = 30;  // Ngưỡng hiện tại (số nguyên)
-
+    let audioContext = null, analyser = null, microphone = null;
+    let highpass = null, lowpass = null;
+    let rafId = null, stream = null;
+    
+    let threshold = 30;
+    let filterEnabled = false;
+    let armed = true;
+    let overSince = 0;
+    let lastCountTime = 0;
+    let lastTapTime = 0;
+    
+    // Tiếng khoan phải vượt ngưỡng liên tục 220ms mới tính (loại tiếng rơi, vỗ tay)
+    const SUSTAIN_MS = 220;
+    // Sau khi đếm, phải im lặng 300ms mới cho đếm lại (1 lần khoan = 1 lần đếm)
+    const REARM_MS = 300;
     const MIN_THRESHOLD = 5;
     const MAX_THRESHOLD = 100;
 
@@ -185,100 +244,139 @@
     const thresholdSlider = document.getElementById('thresholdSlider');
     const meterFill = document.getElementById('meterFill');
     const meterThreshold = document.getElementById('meterThreshold');
+    const btnFilter = document.getElementById('btnFilter');
+    const filterOptions = document.getElementById('filterOptions');
+    const hpSlider = document.getElementById('hpSlider');
+    const lpSlider = document.getElementById('lpSlider');
+    const hpVal = document.getElementById('hpVal');
+    const lpVal = document.getElementById('lpVal');
 
-    // ===== Hàm cập nhật ngưỡng (dùng chung cho cả input và slider) =====
+    // ===== Ngưỡng =====
     function setThreshold(value, source) {
-        // Chuẩn hoá giá trị
         let v = parseInt(value);
         if (isNaN(v)) v = MIN_THRESHOLD;
-        if (v < MIN_THRESHOLD) v = MIN_THRESHOLD;
-        if (v > MAX_THRESHOLD) v = MAX_THRESHOLD;
-
+        v = Math.max(MIN_THRESHOLD, Math.min(MAX_THRESHOLD, v));
         threshold = v;
-
-        // Cập nhật cả 2 control (không gây vòng lặp)
         if (source !== 'input') thresholdInput.value = v;
         if (source !== 'slider') thresholdSlider.value = v;
-
-        // Cập nhật vạch chỉ ngưỡng trên thanh đo
         const pct = ((v - MIN_THRESHOLD) / (MAX_THRESHOLD - MIN_THRESHOLD)) * 100;
         meterThreshold.style.left = pct + '%';
     }
-
-    // Khi gõ số vào ô input
     thresholdInput.addEventListener('input', function() {
-        // Cho phép người dùng xoá hết để gõ lại — chỉ cập nhật khi có giá trị hợp lệ
         if (this.value === '') return;
         setThreshold(this.value, 'input');
     });
-
-    // Khi rời khỏi ô input → tự sửa nếu để trống hoặc vượt khoảng
-    thresholdInput.addEventListener('blur', function() {
-        setThreshold(this.value, 'input');
-    });
-
-    // Nhấn Enter → xác nhận luôn
-    thresholdInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            this.blur();
-        }
-    });
-
-    // Khi kéo thanh trượt
-    thresholdSlider.addEventListener('input', function() {
-        setThreshold(this.value, 'slider');
-    });
-
-    // Khởi tạo lần đầu
+    thresholdInput.addEventListener('blur', function() { setThreshold(this.value, 'input'); });
+    thresholdInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') this.blur(); });
+    thresholdSlider.addEventListener('input', function() { setThreshold(this.value, 'slider'); });
     setThreshold(30, null);
 
-    function resetCount() {
-        count = 0;
-        counterEl.innerText = count;
+    // ===== Bật/tắt lọc tiếng khoan =====
+    function toggleFilter() {
+        filterEnabled = !filterEnabled;
+        if (filterEnabled) {
+            btnFilter.classList.add('active');
+            btnFilter.innerText = '🎯 ĐANG LỌC TIẾNG KHOAN';
+            filterOptions.classList.remove('hidden');
+        } else {
+            btnFilter.classList.remove('active');
+            btnFilter.innerText = '🎯 BẬT LỌC TIẾNG KHOAN (loại tiếng nói)';
+            filterOptions.classList.add('hidden');
+        }
+        if (isListening) connectAudioGraph();
     }
 
-    // ===== Bật / Tắt Micro =====
-    async function toggleMicrophone() {
-        if (isListening) {
-            stopListening();
-            return;
-        }
+    // ===== Tinh chỉnh filter =====
+    hpSlider.addEventListener('input', function() {
+        hpVal.innerText = this.value + ' Hz';
+        if (highpass) highpass.frequency.value = parseInt(this.value);
+    });
+    lpSlider.addEventListener('input', function() {
+        lpVal.innerText = this.value + ' Hz';
+        if (lowpass) lowpass.frequency.value = parseInt(this.value);
+    });
 
+    // ===== Reset =====
+    function resetCount() { count = 0; counterEl.innerText = count; }
+    counterEl.addEventListener('touchend', function() {
+        const now = Date.now();
+        if (now - lastTapTime < 300) {
+            resetCount();
+            counterEl.style.color = "#ff4444";
+            setTimeout(() => counterEl.style.color = "#00ff66", 200);
+        }
+        lastTapTime = now;
+    });
+    counterEl.addEventListener('dblclick', resetCount);
+
+    // ===== Ẩn/hiện UI =====
+    function toggleUI() {
+        document.body.classList.toggle('ui-hidden');
+    }
+
+    // ===== Kết nối audio graph =====
+    function connectAudioGraph() {
+        if (!microphone || !analyser) return;
+        try { microphone.disconnect(); } catch(e) {}
+        try { highpass.disconnect(); } catch(e) {}
+        try { lowpass.disconnect(); } catch(e) {}
+        
+        if (filterEnabled) {
+            // Mic → Highpass → Lowpass → Analyser (chỉ lấy dải tần cao = tiếng khoan)
+            microphone.connect(highpass);
+            highpass.connect(lowpass);
+            lowpass.connect(analyser);
+        } else {
+            // Bypass: Mic → Analyser (nhận mọi âm thanh)
+            microphone.connect(analyser);
+        }
+    }
+
+    // ===== Bật/tắt Mic =====
+    async function toggleMicrophone() {
+        if (isListening) { stopListening(); return; }
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             statusEl.innerText = "❌ Trình duyệt không hỗ trợ Micro!";
             statusEl.style.color = "#ff4444";
             return;
         }
-
         try {
             statusEl.innerText = "⏳ Đang xin quyền Micro...";
             statusEl.style.color = "#ffc107";
 
             stream = await navigator.mediaDevices.getUserMedia({
-                audio: {
-                    echoCancellation: false,
-                    noiseSuppression: false,
-                    autoGainControl: false
-                }
+                audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
             });
 
             const AudioCtx = window.AudioContext || window.webkitAudioContext;
             audioContext = new AudioCtx();
-            if (audioContext.state === 'suspended') {
-                await audioContext.resume();
-            }
+            if (audioContext.state === 'suspended') await audioContext.resume();
 
             analyser = audioContext.createAnalyser();
             analyser.smoothingTimeConstant = 0.6;
             analyser.fftSize = 512;
 
+            // Bộ lọc Highpass — cắt tiếng nói, tiếng trầm, bass
+            highpass = audioContext.createBiquadFilter();
+            highpass.type = 'highpass';
+            highpass.frequency.value = parseInt(hpSlider.value);
+            highpass.Q.value = 0.7;
+
+            // Bộ lọc Lowpass — cắt tiếng rít cao tần, nhiễu
+            lowpass = audioContext.createBiquadFilter();
+            lowpass.type = 'lowpass';
+            lowpass.frequency.value = parseInt(lpSlider.value);
+            lowpass.Q.value = 0.7;
+
             microphone = audioContext.createMediaStreamSource(stream);
-            microphone.connect(analyser);
+            connectAudioGraph();
 
             isListening = true;
+            armed = true;
+            overSince = 0;
             startBtn.innerText = "DỪNG LẮNG NGHE";
             startBtn.classList.add("listening");
-            statusEl.innerText = "🎙️ Đang lắng nghe tiếng khoan...";
+            statusEl.innerText = filterEnabled ? "🎯 Đang lọc tiếng khoan..." : "🎙️ Đang lắng nghe...";
             statusEl.style.color = "#888";
 
             updateMeter();
@@ -286,22 +384,16 @@
         } catch (err) {
             console.error("Lỗi Micro:", err);
             let errorMsg = "❌ Lỗi: " + (err.message || err.name);
-
-            if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+            if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError')
                 errorMsg = "❌ Quyền bị từ chối! Vào 🔒 trên thanh địa chỉ → cho phép Micro";
-            } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
-                errorMsg = "❌ Không tìm thấy Micro trên thiết bị!";
-            } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
-                errorMsg = "❌ Micro đang bị app khác chiếm dụng!";
-            } else if (err.name === 'OverconstrainedError') {
-                errorMsg = "❌ Cấu hình Micro không tương thích!";
-            }
+            else if (err.name === 'NotFoundError') errorMsg = "❌ Không tìm thấy Micro!";
+            else if (err.name === 'NotReadableError') errorMsg = "❌ Micro đang bị app khác chiếm dụng!";
             statusEl.innerText = errorMsg;
             statusEl.style.color = "#ff4444";
         }
     }
 
-    // ===== Vòng lặp đo âm thanh =====
+    // ===== Vòng lặp đo =====
     function updateMeter() {
         if (!isListening || !analyser) return;
 
@@ -309,47 +401,55 @@
         analyser.getByteFrequencyData(dataArray);
 
         let sum = 0;
-        for (let i = 0; i < dataArray.length; i++) {
-            sum += dataArray[i];
-        }
+        for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
         const average = sum / dataArray.length;
 
-        // Đổi sang % (0-100) để khớp với ngưỡng người dùng nhập
-        const level = Math.min(100, Math.round((average / 128) * 100));
+        let level = Math.min(100, Math.round((average / 128) * 100));
+        // Khi lọc bật, tín hiệu bị cắt dải nên cần khuếch đại lại
+        if (filterEnabled) level = Math.min(100, Math.round(level * 1.6));
 
         meterFill.style.width = level + "%";
 
-        // So sánh với ngưỡng hiện tại
-        if (level > threshold && !isCoolingDown) {
-            count++;
-            counterEl.innerText = count;
-            counterEl.style.color = "#ffffff";
-            setTimeout(() => counterEl.style.color = "#00ff66", 200);
+        const now = performance.now();
 
-            isCoolingDown = true;
-            statusEl.innerText = "🟢 ĐÃ GHI NHẬN (+1) | Ngưỡng: " + threshold;
-            statusEl.style.color = "#00ff66";
+        if (level > threshold) {
+            if (armed) {
+                if (overSince === 0) overSince = now;
+                // Phải vượt ngưỡng LIÊN TỤC 220ms mới đếm (loại tiếng rơi/vỗ tay)
+                if (now - overSince >= SUSTAIN_MS) {
+                    count++;
+                    counterEl.innerText = count;
+                    counterEl.style.color = "#ffffff";
+                    setTimeout(() => counterEl.style.color = "#00ff66", 200);
 
-            setTimeout(() => {
-                isCoolingDown = false;
-                if (isListening) {
-                    statusEl.innerText = "🎙️ Đang lắng nghe tiếng khoan...";
-                    statusEl.style.color = "#888";
+                    armed = false;
+                    overSince = 0;
+                    lastCountTime = now;
+
+                    statusEl.innerText = "🟢 +1 | Ngưỡng: " + threshold;
+                    statusEl.style.color = "#00ff66";
                 }
-            }, 1200);
+            }
+        } else {
+            overSince = 0;
+            // Re-arm sau khi im lặng đủ lâu
+            if (!armed && now - lastCountTime > REARM_MS) {
+                armed = true;
+                statusEl.innerText = filterEnabled ? "🎯 Đang lọc tiếng khoan..." : "🎙️ Đang lắng nghe...";
+                statusEl.style.color = "#888";
+            }
         }
 
         rafId = requestAnimationFrame(updateMeter);
     }
 
-    // ===== Dừng Micro =====
+    // ===== Dừng =====
     function stopListening() {
         isListening = false;
         if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
         if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
         if (audioContext) { audioContext.close(); audioContext = null; }
-        analyser = null;
-        microphone = null;
+        analyser = null; microphone = null; highpass = null; lowpass = null;
         meterFill.style.width = "0%";
 
         startBtn.innerText = "BẬT MICRO";
