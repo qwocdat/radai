@@ -12,31 +12,61 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             display: flex; flex-direction: column;
             justify-content: space-between; align-items: center;
-            height: 100vh; padding: 15px 10px; overflow: hidden;
+            height: 100vh; padding: 10px 10px 15px; overflow: hidden;
             user-select: none; -webkit-user-select: none;
-            transition: padding 0.3s ease;
         }
         .header-title {
-            font-size: 14px; letter-spacing: 2px; color: #666;
+            font-size: 13px; letter-spacing: 2px; color: #666;
             text-transform: uppercase; margin-top: 5px;
         }
         .main-counter {
-            font-size: 35vw; font-weight: 900; color: #00ff66;
+            font-size: 32vw; font-weight: 900; color: #00ff66;
             line-height: 1; text-shadow: 0 0 30px rgba(0,255,102,0.3);
             flex-grow: 1; display: flex; align-items: center; justify-content: center;
             transition: color 0.15s, font-size 0.3s;
-            cursor: pointer;
+            cursor: pointer; min-height: 0;
         }
+
+        /* ===== Stats panel (tốc độ + tiền) ===== */
+        .stats-panel {
+            width: 100%; max-width: 400px;
+            display: grid; grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px; margin-bottom: 8px;
+        }
+        .stat-item {
+            background: #0d0d0d; border: 1px solid #1a1a1a;
+            border-radius: 10px; padding: 7px 4px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .stat-item.earning-item {
+            cursor: pointer;
+            background: rgba(0,255,102,0.04);
+            border-color: rgba(0,255,102,0.15);
+        }
+        .stat-item.earning-item:active {
+            background: rgba(0,255,102,0.12);
+        }
+        .stat-label {
+            font-size: 9px; color: #666; letter-spacing: 0.5px;
+            margin-bottom: 3px; font-weight: 600;
+        }
+        .stat-value {
+            font-size: 13px; font-weight: bold; color: #fff;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .stat-value.green { color: #00ff66; }
+
         .controls-panel {
             width: 100%; max-width: 400px;
             background: #111; border: 1px solid #222;
-            border-radius: 16px; padding: 14px 18px;
-            display: flex; flex-direction: column; gap: 10px;
+            border-radius: 16px; padding: 12px 16px;
+            display: flex; flex-direction: column; gap: 9px;
             box-shadow: 0 -10px 30px rgba(0,0,0,0.8);
         }
         .status-text {
-            font-size: 13px; color: #888; text-align: center;
-            min-height: 36px; display: flex; align-items: center;
+            font-size: 12px; color: #888; text-align: center;
+            min-height: 32px; display: flex; align-items: center;
             justify-content: center; line-height: 1.4; word-break: break-word;
         }
         .meter-wrap {
@@ -53,9 +83,9 @@
             background: #fff; box-shadow: 0 0 4px #fff;
             transition: left 0.1s;
         }
-        .btn-group { display: flex; gap: 10px; }
+        .btn-group { display: flex; gap: 8px; }
         button {
-            flex: 1; padding: 14px; font-size: 15px; font-weight: bold;
+            flex: 1; padding: 12px; font-size: 14px; font-weight: bold;
             border: none; border-radius: 10px; cursor: pointer;
             transition: all 0.15s;
             font-family: inherit;
@@ -67,7 +97,7 @@
         .btn-filter {
             background: #1a1a1a; color: #888;
             border: 1px solid #333; font-size: 12px;
-            padding: 12px;
+            padding: 10px;
         }
         .btn-filter.active {
             background: rgba(0,255,102,0.12);
@@ -75,7 +105,7 @@
             border-color: #00ff66;
             box-shadow: 0 0 12px rgba(0,255,102,0.2);
         }
-        .slider-box { display: flex; flex-direction: column; gap: 8px; }
+        .slider-box { display: flex; flex-direction: column; gap: 6px; }
         .slider-header {
             display: flex; justify-content: space-between;
             align-items: center; gap: 8px;
@@ -84,10 +114,10 @@
             font-size: 12px; color: #aaa; flex: 1;
         }
         .threshold-input {
-            width: 70px; padding: 6px 8px;
+            width: 65px; padding: 5px 6px;
             background: #1a1a1a; color: #00ff66;
             border: 1px solid #333; border-radius: 6px;
-            font-size: 14px; font-weight: bold;
+            font-size: 13px; font-weight: bold;
             text-align: center; outline: none;
             font-family: inherit;
         }
@@ -100,11 +130,11 @@
             -webkit-appearance: none; margin: 0;
         }
         .threshold-input[type=number] { -moz-appearance: textfield; }
-        input[type=range] { width: 100%; accent-color: #00ff66; cursor: pointer; height: 20px; }
+        input[type=range] { width: 100%; accent-color: #00ff66; cursor: pointer; height: 18px; }
         
         .filter-options {
-            display: flex; flex-direction: column; gap: 8px;
-            padding-top: 10px; border-top: 1px solid #222;
+            display: flex; flex-direction: column; gap: 6px;
+            padding-top: 8px; border-top: 1px solid #222;
         }
         .filter-options.hidden { display: none; }
         
@@ -113,12 +143,11 @@
             width: 100%; max-width: 400px;
             background: #4a1010; border: 1px solid #ff4444;
             color: #ffcccc; font-size: 12px; padding: 10px 12px;
-            border-radius: 10px; margin-bottom: 8px; line-height: 1.5;
+            border-radius: 10px; margin-bottom: 6px; line-height: 1.5;
             text-align: center;
         }
         .warn-banner b { color: #ff6666; }
         
-        /* Nút ẩn/hiện UI */
         .btn-toggle-ui {
             position: fixed; top: 12px; right: 12px;
             width: 42px; height: 42px;
@@ -134,23 +163,55 @@
             opacity: 1; background: rgba(0,255,102,0.15); color: #00ff66;
         }
         
-        /* Chế độ ẩn UI */
+        /* Chế độ ẩn UI - hiện thêm overlay tiền nhỏ */
         body.ui-hidden { padding: 0; justify-content: center; }
         body.ui-hidden .header-title,
         body.ui-hidden .controls-panel,
+        body.ui-hidden .stats-panel,
         body.ui-hidden .warn-banner { 
             display: none !important; 
         }
         body.ui-hidden .main-counter { font-size: 55vw; }
         body.ui-hidden .btn-toggle-ui { opacity: 0.12; }
+        
+        /* Overlay nhỏ hiển thị tiền khi ẩn UI */
+        .earn-overlay {
+            position: fixed;
+            top: 12px; left: 12px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(0,255,102,0.3);
+            color: #00ff66; font-size: 13px; font-weight: bold;
+            padding: 6px 12px; border-radius: 20px;
+            z-index: 9998;
+            display: none;
+            backdrop-filter: blur(6px);
+        }
+        body.ui-hidden .earn-overlay { display: block; }
     </style>
 </head>
 <body>
 
     <button class="btn-toggle-ui" id="btnToggleUI" onclick="toggleUI()">👁</button>
+    <div class="earn-overlay" id="earnOverlay">💰 0đ</div>
 
     <div class="header-title">SỐ LƯỢNG HÀNG</div>
     <div class="main-counter" id="counter">0</div>
+
+    <!-- ===== Bảng thống kê ===== -->
+    <div class="stats-panel">
+        <div class="stat-item">
+            <div class="stat-label">⚡ TỐC ĐỘ</div>
+            <div class="stat-value" id="rateVal">--</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-label">💵 ĐƠN GIÁ</div>
+            <div class="stat-value">45đ/cái</div>
+        </div>
+        <div class="stat-item earning-item" id="earningItem" title="Nhấn đúp để reset tiền hôm nay">
+            <div class="stat-label">💰 HÔM NAY</div>
+            <div class="stat-value green" id="earningVal">0đ</div>
+        </div>
+    </div>
 
     <div class="warn-banner" id="warnBanner">
         ⚠️ Bạn đang mở trong <b>Zalo/Facebook/Messenger</b> — trình duyệt này <b>CHẶN Micro</b>.<br>
@@ -216,8 +277,19 @@
         }
     })();
 
+    // ===== Hằng số =====
+    const MIN_THRESHOLD = 5;
+    const MAX_THRESHOLD = 100;
+    const SUSTAIN_MS = 220;   // Phải vượt ngưỡng liên tục 220ms
+    const REARM_MS = 300;     // Im lặng 300ms mới cho đếm lại
+    const RATE_WINDOW_MS = 60000; // Cửa sổ tính tốc độ (60 giây)
+    const RATE_HISTORY_MAX = 30;  // Giữ tối đa 30 timestamp
+    const PRICE_PER_UNIT = 450000 / 10000; // = 45đ/cái (1 túi 10.000 cái = 450.000đ)
+    const STORAGE_KEY = 'demhang_data_v1';
+
     // ===== Biến toàn cục =====
     let count = 0;
+    let todayEarning = 0;
     let isListening = false;
     let audioContext = null, analyser = null, microphone = null;
     let highpass = null, lowpass = null;
@@ -229,13 +301,7 @@
     let overSince = 0;
     let lastCountTime = 0;
     let lastTapTime = 0;
-    
-    // Tiếng khoan phải vượt ngưỡng liên tục 220ms mới tính (loại tiếng rơi, vỗ tay)
-    const SUSTAIN_MS = 220;
-    // Sau khi đếm, phải im lặng 300ms mới cho đếm lại (1 lần khoan = 1 lần đếm)
-    const REARM_MS = 300;
-    const MIN_THRESHOLD = 5;
-    const MAX_THRESHOLD = 100;
+    let countHistory = []; // mảng timestamp (performance.now) các lần đếm gần đây
 
     const counterEl = document.getElementById('counter');
     const statusEl = document.getElementById('status');
@@ -250,6 +316,45 @@
     const lpSlider = document.getElementById('lpSlider');
     const hpVal = document.getElementById('hpVal');
     const lpVal = document.getElementById('lpVal');
+    const rateVal = document.getElementById('rateVal');
+    const earningVal = document.getElementById('earningVal');
+    const earnOverlay = document.getElementById('earnOverlay');
+    const earningItem = document.getElementById('earningItem');
+
+    // ===== Load / Save tiền vào localStorage =====
+    function loadEarning() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return;
+            const data = JSON.parse(raw);
+            const today = new Date().toDateString();
+            if (data.date === today) {
+                todayEarning = parseFloat(data.earning) || 0;
+            } else {
+                todayEarning = 0; // Ngày mới → reset
+            }
+        } catch(e) { todayEarning = 0; }
+        updateEarningUI();
+    }
+    function saveEarning() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                date: new Date().toDateString(),
+                earning: todayEarning
+            }));
+        } catch(e) {}
+    }
+
+    // ===== Format tiền VNĐ =====
+    function formatMoney(v) {
+        return Math.round(v).toLocaleString('vi-VN') + 'đ';
+    }
+
+    function updateEarningUI() {
+        const txt = formatMoney(todayEarning);
+        earningVal.innerText = txt;
+        earnOverlay.innerText = '💰 ' + txt;
+    }
 
     // ===== Ngưỡng =====
     function setThreshold(value, source) {
@@ -271,7 +376,7 @@
     thresholdSlider.addEventListener('input', function() { setThreshold(this.value, 'slider'); });
     setThreshold(30, null);
 
-    // ===== Bật/tắt lọc tiếng khoan =====
+    // ===== Bật/tắt lọc =====
     function toggleFilter() {
         filterEnabled = !filterEnabled;
         if (filterEnabled) {
@@ -286,7 +391,6 @@
         if (isListening) connectAudioGraph();
     }
 
-    // ===== Tinh chỉnh filter =====
     hpSlider.addEventListener('input', function() {
         hpVal.innerText = this.value + ' Hz';
         if (highpass) highpass.frequency.value = parseInt(this.value);
@@ -296,8 +400,32 @@
         if (lowpass) lowpass.frequency.value = parseInt(this.value);
     });
 
-    // ===== Reset =====
-    function resetCount() { count = 0; counterEl.innerText = count; }
+    // ===== Reset số đếm (giữ tiền) =====
+    function resetCount() {
+        count = 0;
+        counterEl.innerText = count;
+        countHistory = [];
+        updateRateUI();
+    }
+
+    // Reset tiền khi double-tap vào ô "HÔM NAY"
+    earningItem.addEventListener('dblclick', resetEarning);
+    earningItem.addEventListener('touchend', function() {
+        const now = Date.now();
+        if (now - lastTapTime < 300) {
+            resetEarning();
+        }
+        lastTapTime = now;
+    });
+
+    function resetEarning() {
+        if (!confirm('Reset thu nhập hôm nay về 0?')) return;
+        todayEarning = 0;
+        updateEarningUI();
+        saveEarning();
+    }
+
+    // Double-tap vào số để reset count
     counterEl.addEventListener('touchend', function() {
         const now = Date.now();
         if (now - lastTapTime < 300) {
@@ -322,12 +450,10 @@
         try { lowpass.disconnect(); } catch(e) {}
         
         if (filterEnabled) {
-            // Mic → Highpass → Lowpass → Analyser (chỉ lấy dải tần cao = tiếng khoan)
             microphone.connect(highpass);
             highpass.connect(lowpass);
             lowpass.connect(analyser);
         } else {
-            // Bypass: Mic → Analyser (nhận mọi âm thanh)
             microphone.connect(analyser);
         }
     }
@@ -356,13 +482,11 @@
             analyser.smoothingTimeConstant = 0.6;
             analyser.fftSize = 512;
 
-            // Bộ lọc Highpass — cắt tiếng nói, tiếng trầm, bass
             highpass = audioContext.createBiquadFilter();
             highpass.type = 'highpass';
             highpass.frequency.value = parseInt(hpSlider.value);
             highpass.Q.value = 0.7;
 
-            // Bộ lọc Lowpass — cắt tiếng rít cao tần, nhiễu
             lowpass = audioContext.createBiquadFilter();
             lowpass.type = 'lowpass';
             lowpass.frequency.value = parseInt(lpSlider.value);
@@ -393,6 +517,33 @@
         }
     }
 
+    // ===== Cập nhật UI tốc độ =====
+    function updateRateUI() {
+        const now = performance.now();
+        // Chỉ lấy các lần đếm trong cửa sổ 60s gần nhất
+        const recent = countHistory.filter(t => now - t < RATE_WINDOW_MS);
+        let rateText = "--";
+        
+        if (recent.length >= 2) {
+            const elapsed = (recent[recent.length - 1] - recent[0]) / 1000; // giây
+            const times = recent.length - 1; // số khoảng giữa các lần đếm
+            if (elapsed > 0.1) {
+                const cps = times / elapsed; // cái / giây
+                if (cps >= 1) {
+                    rateText = cps.toFixed(1) + ' cái/s';
+                } else {
+                    rateText = (1 / cps).toFixed(1) + 's/cái';
+                }
+            }
+        }
+        rateVal.innerText = rateText;
+    }
+
+    // Tự cập nhật tốc độ mỗi giây (để reset về "--" khi ngừng đếm lâu)
+    setInterval(() => {
+        if (count > 0) updateRateUI();
+    }, 1000);
+
     // ===== Vòng lặp đo =====
     function updateMeter() {
         if (!isListening || !analyser) return;
@@ -405,7 +556,6 @@
         const average = sum / dataArray.length;
 
         let level = Math.min(100, Math.round((average / 128) * 100));
-        // Khi lọc bật, tín hiệu bị cắt dải nên cần khuếch đại lại
         if (filterEnabled) level = Math.min(100, Math.round(level * 1.6));
 
         meterFill.style.width = level + "%";
@@ -415,24 +565,33 @@
         if (level > threshold) {
             if (armed) {
                 if (overSince === 0) overSince = now;
-                // Phải vượt ngưỡng LIÊN TỤC 220ms mới đếm (loại tiếng rơi/vỗ tay)
                 if (now - overSince >= SUSTAIN_MS) {
+                    // ===== ĐẾM +1 =====
                     count++;
                     counterEl.innerText = count;
                     counterEl.style.color = "#ffffff";
                     setTimeout(() => counterEl.style.color = "#00ff66", 200);
 
+                    // Ghi nhận timestamp cho tính tốc độ
+                    countHistory.push(now);
+                    if (countHistory.length > RATE_HISTORY_MAX) countHistory.shift();
+                    updateRateUI();
+
+                    // Cộng tiền
+                    todayEarning += PRICE_PER_UNIT;
+                    updateEarningUI();
+                    saveEarning();
+
                     armed = false;
                     overSince = 0;
                     lastCountTime = now;
 
-                    statusEl.innerText = "🟢 +1 | Ngưỡng: " + threshold;
+                    statusEl.innerText = "🟢 +1 | " + formatMoney(PRICE_PER_UNIT) + " | Tổng: " + formatMoney(todayEarning);
                     statusEl.style.color = "#00ff66";
                 }
             }
         } else {
             overSince = 0;
-            // Re-arm sau khi im lặng đủ lâu
             if (!armed && now - lastCountTime > REARM_MS) {
                 armed = true;
                 statusEl.innerText = filterEnabled ? "🎯 Đang lọc tiếng khoan..." : "🎙️ Đang lắng nghe...";
@@ -457,6 +616,10 @@
         statusEl.innerText = "Đã dừng.";
         statusEl.style.color = "#888";
     }
+
+    // ===== Khởi tạo =====
+    loadEarning();
+    updateRateUI();
 </script>
 </body>
 </html>
