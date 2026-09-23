@@ -43,7 +43,8 @@
             border-radius: 4px; overflow: hidden; position: relative;
         }
         .meter-fill {
-            height: 100%; width: 0%; background: linear-gradient(90deg, #00ff66, #ffcc00, #ff4444);
+            height: 100%; width: 0%;
+            background: linear-gradient(90deg, #00ff66, #ffcc00, #ff4444);
             transition: width 0.05s linear; border-radius: 4px;
         }
         .meter-threshold {
@@ -61,10 +62,41 @@
         .btn-start { background-color: #007bff; color: #ffffff; }
         .btn-start.listening { background-color: #ff9800; color: #ffffff; }
         .btn-reset { background-color: #222222; color: #ff4444; border: 1px solid #333; }
-        .slider-box { display: flex; flex-direction: column; gap: 6px; }
-        .slider-label { display: flex; justify-content: space-between; font-size: 12px; color: #aaa; }
-        input[type=range] { width: 100%; accent-color: #00ff66; cursor: pointer; height: 20px; }
-        /* Banner cảnh báo in-app browser */
+
+        /* Hàng điều chỉnh ngưỡng */
+        .slider-box { display: flex; flex-direction: column; gap: 8px; }
+        .slider-header {
+            display: flex; justify-content: space-between;
+            align-items: center; gap: 8px;
+        }
+        .slider-header span:first-child {
+            font-size: 12px; color: #aaa; flex: 1;
+        }
+        .threshold-input {
+            width: 70px; padding: 6px 8px;
+            background: #1a1a1a; color: #00ff66;
+            border: 1px solid #333; border-radius: 6px;
+            font-size: 14px; font-weight: bold;
+            text-align: center; outline: none;
+            font-family: inherit;
+        }
+        .threshold-input:focus {
+            border-color: #00ff66;
+            box-shadow: 0 0 0 2px rgba(0, 255, 102, 0.2);
+        }
+        /* Bỏ mũi tên spinner của number input trên Chrome/Safari */
+        .threshold-input::-webkit-outer-spin-button,
+        .threshold-input::-webkit-inner-spin-button {
+            -webkit-appearance: none; margin: 0;
+        }
+        .threshold-input[type=number] { -moz-appearance: textfield; }
+
+        input[type=range] {
+            width: 100%; accent-color: #00ff66;
+            cursor: pointer; height: 20px;
+        }
+
+        /* Banner cảnh báo */
         .warn-banner {
             display: none;
             width: 100%; max-width: 400px;
@@ -100,12 +132,14 @@
             <button class="btn-reset" onclick="resetCount()">Đặt lại (0)</button>
         </div>
 
+        <!-- Ngưỡng: nhập số + thanh trượt -->
         <div class="slider-box">
-            <div class="slider-label">
-                <span>Ngưỡng tiếng khoan:</span>
-                <span id="thresholdVal" style="color: #00ff66; font-weight: bold;">30</span>
+            <div class="slider-header">
+                <span>Ngưỡng tiếng khoan (5-100):</span>
+                <input type="number" id="thresholdInput" class="threshold-input"
+                       min="5" max="100" value="30" inputmode="numeric">
             </div>
-            <input type="range" id="threshold" min="5" max="100" value="30">
+            <input type="range" id="thresholdSlider" min="5" max="100" value="30">
         </div>
     </div>
 
@@ -139,21 +173,64 @@
     let rafId = null;
     let stream = null;
     let isCoolingDown = false;
+    let threshold = 30;  // Ngưỡng hiện tại (số nguyên)
+
+    const MIN_THRESHOLD = 5;
+    const MAX_THRESHOLD = 100;
 
     const counterEl = document.getElementById('counter');
     const statusEl = document.getElementById('status');
     const startBtn = document.getElementById('startBtn');
-    const thresholdInput = document.getElementById('threshold');
-    const thresholdVal = document.getElementById('thresholdVal');
+    const thresholdInput = document.getElementById('thresholdInput');
+    const thresholdSlider = document.getElementById('thresholdSlider');
     const meterFill = document.getElementById('meterFill');
     const meterThreshold = document.getElementById('meterThreshold');
 
-    // Cập nhật thanh trượt
-    thresholdInput.addEventListener('input', () => {
-        thresholdVal.innerText = thresholdInput.value;
-        meterThreshold.style.left = thresholdInput.value + '%';
+    // ===== Hàm cập nhật ngưỡng (dùng chung cho cả input và slider) =====
+    function setThreshold(value, source) {
+        // Chuẩn hoá giá trị
+        let v = parseInt(value);
+        if (isNaN(v)) v = MIN_THRESHOLD;
+        if (v < MIN_THRESHOLD) v = MIN_THRESHOLD;
+        if (v > MAX_THRESHOLD) v = MAX_THRESHOLD;
+
+        threshold = v;
+
+        // Cập nhật cả 2 control (không gây vòng lặp)
+        if (source !== 'input') thresholdInput.value = v;
+        if (source !== 'slider') thresholdSlider.value = v;
+
+        // Cập nhật vạch chỉ ngưỡng trên thanh đo
+        const pct = ((v - MIN_THRESHOLD) / (MAX_THRESHOLD - MIN_THRESHOLD)) * 100;
+        meterThreshold.style.left = pct + '%';
+    }
+
+    // Khi gõ số vào ô input
+    thresholdInput.addEventListener('input', function() {
+        // Cho phép người dùng xoá hết để gõ lại — chỉ cập nhật khi có giá trị hợp lệ
+        if (this.value === '') return;
+        setThreshold(this.value, 'input');
     });
-    meterThreshold.style.left = thresholdInput.value + '%';
+
+    // Khi rời khỏi ô input → tự sửa nếu để trống hoặc vượt khoảng
+    thresholdInput.addEventListener('blur', function() {
+        setThreshold(this.value, 'input');
+    });
+
+    // Nhấn Enter → xác nhận luôn
+    thresholdInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            this.blur();
+        }
+    });
+
+    // Khi kéo thanh trượt
+    thresholdSlider.addEventListener('input', function() {
+        setThreshold(this.value, 'slider');
+    });
+
+    // Khởi tạo lần đầu
+    setThreshold(30, null);
 
     function resetCount() {
         count = 0;
@@ -167,7 +244,6 @@
             return;
         }
 
-        // Kiểm tra hỗ trợ
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             statusEl.innerText = "❌ Trình duyệt không hỗ trợ Micro!";
             statusEl.style.color = "#ff4444";
@@ -178,7 +254,6 @@
             statusEl.innerText = "⏳ Đang xin quyền Micro...";
             statusEl.style.color = "#ffc107";
 
-            // Yêu cầu quyền Micro (dùng cấu hình đơn giản để tránh lỗi trên mobile)
             stream = await navigator.mediaDevices.getUserMedia({
                 audio: {
                     echoCancellation: false,
@@ -187,7 +262,6 @@
                 }
             });
 
-            // Khởi tạo AudioContext
             const AudioCtx = window.AudioContext || window.webkitAudioContext;
             audioContext = new AudioCtx();
             if (audioContext.state === 'suspended') {
@@ -207,7 +281,6 @@
             statusEl.innerText = "🎙️ Đang lắng nghe tiếng khoan...";
             statusEl.style.color = "#888";
 
-            // Bắt đầu vòng lặp đo âm thanh
             updateMeter();
 
         } catch (err) {
@@ -235,21 +308,18 @@
         const dataArray = new Uint8Array(analyser.frequencyBinCount);
         analyser.getByteFrequencyData(dataArray);
 
-        // Tính trung bình
         let sum = 0;
         for (let i = 0; i < dataArray.length; i++) {
             sum += dataArray[i];
         }
         const average = sum / dataArray.length;
 
-        // Đổi sang % (0-100)
+        // Đổi sang % (0-100) để khớp với ngưỡng người dùng nhập
         const level = Math.min(100, Math.round((average / 128) * 100));
 
-        // Cập nhật thanh đo
         meterFill.style.width = level + "%";
 
-        // Kiểm tra ngưỡng
-        const threshold = parseInt(thresholdInput.value);
+        // So sánh với ngưỡng hiện tại
         if (level > threshold && !isCoolingDown) {
             count++;
             counterEl.innerText = count;
@@ -257,7 +327,7 @@
             setTimeout(() => counterEl.style.color = "#00ff66", 200);
 
             isCoolingDown = true;
-            statusEl.innerText = "🟢 ĐÃ GHI NHẬN (+1)";
+            statusEl.innerText = "🟢 ĐÃ GHI NHẬN (+1) | Ngưỡng: " + threshold;
             statusEl.style.color = "#00ff66";
 
             setTimeout(() => {
