@@ -12,12 +12,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- SCRIPT HCAPTCHA DÀNH CHO FORM ĐĂNG NHẬP / ĐĂNG KÝ -->
+    <!-- SCRIPT HCAPTCHA DUY NHẤT CHO TOÀN BỘ TRANG -->
     <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    
-    <!-- SCRIPT GOOGLE RECAPTCHA V2 DÀNH CHO LẤY MÃ NHIỆM VỤ -->
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
@@ -148,7 +145,7 @@
             </div>
         </div>
 
-        <!-- KHỐI LẤY MÃ NHIỆM VỤ DÙNG GOOGLE RECAPTCHA V2 -->
+        <!-- KHỐI LẤY MÃ NHIỆM VỤ SỬ DỤNG HCAPTCHA -->
         <section class="max-w-xl mx-auto my-6">
             <div id="ios-code-widget" style="
               width: 100%; 
@@ -166,9 +163,9 @@
               </div>
 
               <div id="code-content">
-                <!-- Chú ý: Dùng g-recaptcha cho Google reCAPTCHA v2 -->
+                <!-- Sử dụng hCaptcha chuẩn sitekey của bạn -->
                 <div id="captcha-container" style="display: flex; justify-content: center; margin-bottom: 15px;">
-                  <div class="g-recaptcha" data-sitekey="6LcSwNwtAAAAAAd6ewSJOrVdecKouF-8FDOt-qaB" data-callback="onRecaptchaSuccess"></div>
+                  <div class="h-captcha" id="hcaptcha-task" data-sitekey="a474f7be-8ce0-4940-8830-b3ee33a26abc" data-callback="onHCaptchaTaskSuccess"></div>
                 </div>
 
                 <button id="btn-get-code" disabled style="
@@ -318,7 +315,7 @@
         </div>
     </footer>
 
-    <!-- MODAL ĐĂNG NHẬP DÙNG HCAPTCHA -->
+    <!-- MODAL ĐĂNG NHẬP -->
     <div id="modal-login" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden">
         <div class="glass-modal border border-slate-800 rounded-2xl max-w-md w-full p-5 sm:p-6 space-y-5 max-h-[90vh] overflow-y-auto custom-scrollbar">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -349,7 +346,6 @@
                     </label>
                 </div>
 
-                <!-- Khôi phục đúng hCaptcha cho Đăng Nhập -->
                 <div class="flex justify-center">
                     <div class="h-captcha" id="hcaptcha-login" data-sitekey="a474f7be-8ce0-4940-8830-b3ee33a26abc"></div>
                 </div>
@@ -414,7 +410,7 @@
         </div>
     </div>
 
-    <!-- MODAL ĐĂNG KÝ DÙNG HCAPTCHA -->
+    <!-- MODAL ĐĂNG KÝ -->
     <div id="modal-register" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden">
         <div class="glass-modal border border-slate-800 rounded-2xl max-w-md w-full p-5 sm:p-6 space-y-5 max-h-[90vh] overflow-y-auto custom-scrollbar">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -442,7 +438,6 @@
                     </label>
                 </div>
 
-                <!-- Khôi phục đúng hCaptcha cho Đăng Ký -->
                 <div class="flex justify-center">
                     <div class="h-captcha" id="hcaptcha-register" data-sitekey="a474f7be-8ce0-4940-8830-b3ee33a26abc"></div>
                 </div>
@@ -663,7 +658,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT FIREBASE XỬ LÝ LẤY MÃ (RECAPTCHA V2) -->
+    <!-- SCRIPT FIREBASE XỬ LÝ LẤY MÃ (HCAPTCHA) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -710,8 +705,8 @@
             }
         }
 
-        // Callback chuẩn cho Google reCAPTCHA v2
-        window.onRecaptchaSuccess = function(token) {
+        // Callback cho hCaptcha lấy mã nhiệm vụ
+        window.onHCaptchaTaskSuccess = function(token) {
             const btn = document.getElementById('btn-get-code');
             if (btn) {
                 btn.disabled = false;
@@ -1549,7 +1544,7 @@
             }
         }
 
-        // Lấy Token hCaptcha chuẩn xác cho Form Đăng Nhập / Đăng Ký
+        // Lấy Token hCaptcha chuẩn xác
         function getHCaptchaToken(containerId) {
             if (!window.hcaptcha) return null;
             const container = document.getElementById(containerId);
