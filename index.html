@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- SCRIPT GOOGLE RECAPTCHA V2 -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -142,7 +144,7 @@
             </div>
         </div>
 
-        <!-- KHỐI TÍCH HỢP LẤY MÃ NHIỆM VỤ NÂNG CAO (RANDOM TIME 60-120S + NHIỆM VỤ TƯƠNG TÁC) -->
+        <!-- KHỐI TÍCH HỢP LẤY MÃ NHIỆM VỤ (RECAPTCHA V2 + MULTI-QUEST 3-5 LẦN + CHUẨN UTC) -->
         <section class="max-w-xl mx-auto my-6">
             <div id="ios-code-widget" style="
               width: 100%; 
@@ -160,25 +162,33 @@
               </div>
 
               <div id="code-content">
-                <button id="btn-get-code" style="
+                <!-- Khối reCAPTCHA v2 -->
+                <div id="captcha-container" style="display: flex; justify-content: center; margin-bottom: 15px;">
+                  <div class="g-recaptcha" data-sitekey="6LcSwNwtAAAAAAd6ewSJOrVdecKouF-8FDOt-qaB" data-callback="onRecaptchaSuccess"></div>
+                </div>
+
+                <!-- Nút lấy mã (Chỉ mở khi hoàn thành CAPTCHA) -->
+                <button id="btn-get-code" disabled style="
                   width: 100%; 
                   padding: 16px; 
-                  background: #ffffff; 
-                  color: #000000; 
+                  background: #3a3a3c; 
+                  color: #8e8e93; 
                   border: none; 
                   border-radius: 18px; 
                   font-weight: 700; 
                   font-size: 15px; 
-                  cursor: pointer;
-                  transition: opacity 0.2s;
+                  cursor: not-allowed;
+                  transition: all 0.3s ease;
                 ">
-                  LẤY MÃ XÁC NHẬN NHIỆM VỤ
+                  🔒 HOÀN THÀNH CAPTCHA ĐỂ LẤY MÃ
                 </button>
 
                 <div id="timer-box" style="display: none;">
-                  <div style="font-size: 13px; color: #8e8e93; margin-bottom: 6px;">Thời gian đếm ngược còn lại</div>
+                  <div style="font-size: 13px; color: #8e8e93; margin-bottom: 4px;">Thời gian đếm ngược (Chuẩn UTC)</div>
                   <div id="timer-count" style="font-size: 36px; font-weight: 800; color: #ffffff; letter-spacing: -1px;">--s</div>
                   
+                  <div id="quest-progress-text" style="font-size: 12px; color: #f59e0b; font-weight: 700; margin-top: 4px; display: none;"></div>
+
                   <!-- Khối hiển thị nhiệm vụ phụ ngẫu nhiên -->
                   <div id="quest-card" style="display: none; margin-top: 15px; padding: 14px; background: #2c2c2e; border: 1px dashed #f59e0b; border-radius: 16px;">
                     <div id="quest-title" style="font-size: 13px; font-weight: 700; color: #fbbf24; margin-bottom: 8px;">
@@ -201,7 +211,7 @@
             </div>
         </section>
 
-        <!-- 2 NÚT NỔI BẬT: Đã tối ưu logic bấm lần 1 hiện QC Adsterra, từ lần 2 sang thẳng trang -->
+        <!-- 2 NÚT NỔI BẬT -->
         <section class="space-y-3 sm:space-y-4">
             <button onclick="handleSmartRedirect('nhanacc.html', 'https://www.profitableratecpmnetwork.com/wyz54mnzj?key=9aa535a9480e8308f5caac92971eebfc', 'ads_clicked_nhanacc')" class="w-full text-left btn-glow-amber group relative flex items-center justify-between p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 border-2 border-amber-400/80 hover:scale-[1.01] active:scale-[0.99] transition duration-300 cursor-pointer">
                 <div class="flex items-center gap-3 sm:gap-4">
@@ -306,6 +316,7 @@
         </div>
     </footer>
 
+    <!-- MODAL ĐĂNG NHẬP -->
     <div id="modal-login" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden">
         <div class="glass-modal border border-slate-800 rounded-2xl max-w-md w-full p-5 sm:p-6 space-y-5 max-h-[90vh] overflow-y-auto custom-scrollbar">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -368,6 +379,7 @@
         </div>
     </div>
 
+    <!-- MODAL QUÊN MẬT KHẨU -->
     <div id="modal-forgot-password" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden">
         <div class="glass-modal border border-slate-800 rounded-2xl max-w-md w-full p-5 sm:p-6 space-y-5">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -399,6 +411,7 @@
         </div>
     </div>
 
+    <!-- MODAL ĐĂNG KÝ -->
     <div id="modal-register" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden">
         <div class="glass-modal border border-slate-800 rounded-2xl max-w-md w-full p-5 sm:p-6 space-y-5 max-h-[90vh] overflow-y-auto custom-scrollbar">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -437,6 +450,7 @@
         </div>
     </div>
 
+    <!-- MODAL GIỚI THIỆU -->
     <div id="modal-about" class="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden">
         <div class="glass-modal border border-slate-800 rounded-2xl max-w-2xl w-full p-5 sm:p-6 space-y-4 max-h-[85vh] flex flex-col">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3 shrink-0">
@@ -461,6 +475,7 @@
         </div>
     </div>
 
+    <!-- MODAL BẢO MẬT -->
     <div id="modal-privacy" class="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden">
         <div class="glass-modal border border-slate-800 rounded-2xl max-w-2xl w-full p-5 sm:p-6 space-y-4 max-h-[85vh] flex flex-col">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3 shrink-0">
@@ -487,6 +502,7 @@
         </div>
     </div>
 
+    <!-- MODAL LIÊN HỆ -->
     <div id="modal-contact" class="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden">
         <div class="glass-modal border border-slate-800 rounded-2xl max-w-md w-full p-5 sm:p-6 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -516,6 +532,7 @@
         </div>
     </div>
 
+    <!-- MODAL ĐIỀU KHOẢN -->
     <div id="modal-terms" class="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden">
         <div class="glass-modal border border-slate-800 rounded-2xl max-w-2xl w-full p-5 sm:p-6 space-y-4 max-h-[85vh] flex flex-col">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3 shrink-0">
@@ -642,7 +659,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT TÍCH HỢP FIREBASE CHO NHIỆM VỤ LẤY MÃ NÂNG CAO (FIREBASE SDK v10) -->
+    <!-- SCRIPT FIREBASE XỬ LÝ NHIỆM VỤ LẤY MÃ (RECAPTCHA V2 + MULTI-QUEST 3-5 LẦN + UTC TIME) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -661,16 +678,17 @@
         const taskDb = getDatabase(taskApp);
 
         let serverOffset = 0;
-        let activeQuest = null; 
         let isPausedForQuest = false;
-        let questTriggered = false;
+        let questTriggers = []; 
+        let currentQuestIndex = 0;
+        let totalQuestsCount = 0;
 
         const offsetRef = ref(taskDb, ".info/serverTimeOffset");
         get(offsetRef).then((snap) => {
             serverOffset = snap.val() || 0;
         });
 
-        function getExactServerTime() {
+        function getExactUtcServerTime() {
             return Math.floor((Date.now() + serverOffset) / 1000);
         }
 
@@ -688,14 +706,27 @@
             }
         }
 
+        // Callback khi giải Google reCAPTCHA thành công
+        window.onRecaptchaSuccess = function(token) {
+            const btn = document.getElementById('btn-get-code');
+            if (btn) {
+                btn.disabled = false;
+                btn.style.background = '#ffffff';
+                btn.style.color = '#000000';
+                btn.style.cursor = 'pointer';
+                btn.innerText = 'LẤY MÃ XÁC NHẬN NHIỆM VỤ';
+            }
+            document.getElementById('captcha-container').style.display = 'none';
+        };
+
         async function initTaskProcess() {
             const btn = document.getElementById('btn-get-code');
             btn.disabled = true;
-            btn.innerText = "Đang khởi tạo nhiệm vụ...";
+            btn.innerText = "Đang kết nối Server đếm UTC...";
 
             const ipKey = await getUserIPKey();
             if (!ipKey) {
-                alert("Không thể truy xuất IP thiết bị của bạn!");
+                alert("Không thể truy xuất địa chỉ IP thiết bị!");
                 btn.disabled = false;
                 btn.innerText = "LẤY MÃ XÁC NHẬN NHIỆM VỤ";
                 return;
@@ -703,7 +734,7 @@
 
             const taskRef = ref(taskDb, 'missions/' + ipKey);
             const snapshot = await get(taskRef);
-            const now = getExactServerTime();
+            const nowUtc = getExactUtcServerTime();
 
             let targetTime;
             let totalDuration;
@@ -714,59 +745,81 @@
                     showCodeResult(data.code);
                     return;
                 }
-                if (data.targetTime && data.targetTime > now) {
+                if (data.targetTime && data.targetTime > nowUtc) {
                     targetTime = data.targetTime;
                     totalDuration = data.totalDuration || 60;
                 } else {
-                    // Random thời gian ngẫu nhiên từ 60 đến 120 giây
                     totalDuration = Math.floor(Math.random() * (120 - 60 + 1)) + 60;
-                    targetTime = now + totalDuration;
-                    await set(taskRef, { targetTime: targetTime, totalDuration: totalDuration, code: null });
+                    targetTime = nowUtc + totalDuration;
+                    await set(taskRef, { targetTime: targetTime, totalDuration: totalDuration, code: null, createdAt: nowUtc });
                 }
             } else {
                 totalDuration = Math.floor(Math.random() * (120 - 60 + 1)) + 60;
-                targetTime = now + totalDuration;
-                await set(taskRef, { targetTime: targetTime, totalDuration: totalDuration, code: null });
+                targetTime = nowUtc + totalDuration;
+                await set(taskRef, { targetTime: targetTime, totalDuration: totalDuration, code: null, createdAt: nowUtc });
             }
 
-            runCountdown(taskRef, targetTime, totalDuration);
+            // Tạo ngẫu nhiên từ 3 đến 5 mốc dừng đếm để làm nhiệm vụ tương tác
+            totalQuestsCount = Math.floor(Math.random() * (5 - 3 + 1)) + 3;
+            questTriggers = [];
+            const intervalStep = Math.floor(totalDuration / (totalQuestsCount + 1));
+            
+            for (let i = 1; i <= totalQuestsCount; i++) {
+                questTriggers.push({
+                    triggerTime: targetTime - (intervalStep * i),
+                    completed: false
+                });
+            }
+
+            runCountdown(taskRef, targetTime);
         }
 
-        function runCountdown(taskRef, targetTime, totalDuration) {
+        function runCountdown(taskRef, targetTime) {
             document.getElementById('btn-get-code').style.display = 'none';
             document.getElementById('timer-box').style.display = 'block';
 
-            // Kích hoạt nhiệm vụ ở khoảng 50% tiến trình
-            const questTriggerTime = targetTime - Math.floor(totalDuration * 0.5);
-
             const interval = setInterval(async () => {
-                const current = getExactServerTime();
-                let remaining = targetTime - current;
+                const currentUtc = getExactUtcServerTime();
+                let remaining = targetTime - currentUtc;
 
-                // Kiểm tra kích hoạt nhiệm vụ phụ ngẫu nhiên
-                if (!questTriggered && current >= questTriggerTime && remaining > 15) {
-                    questTriggered = true;
-                    isPausedForQuest = true;
-                    triggerRandomQuest(() => {
-                        isPausedForQuest = false;
-                        document.getElementById('quest-card').style.display = 'none';
-                    });
+                // Kiểm tra các mốc kích hoạt nhiệm vụ tương tác
+                for (let i = 0; i < questTriggers.length; i++) {
+                    const q = questTriggers[i];
+                    if (!q.completed && currentUtc >= q.triggerTime && remaining > 10) {
+                        q.completed = true;
+                        isPausedForQuest = true;
+                        currentQuestIndex = i + 1;
+                        
+                        triggerRandomQuest(() => {
+                            isPausedForQuest = false;
+                            document.getElementById('quest-card').style.display = 'none';
+                        });
+                        break;
+                    }
                 }
 
                 if (isPausedForQuest) {
                     document.getElementById('timer-count').innerText = "TẠM DỪNG";
                     document.getElementById('timer-count').style.color = "#f59e0b";
+                    document.getElementById('quest-progress-text').style.display = 'block';
+                    document.getElementById('quest-progress-text').innerText = `Yêu cầu tương tác (${currentQuestIndex}/${totalQuestsCount})`;
                     return;
                 } else {
                     document.getElementById('timer-count').style.color = "#ffffff";
+                    document.getElementById('quest-progress-text').style.display = 'none';
                 }
 
                 if (remaining <= 0) {
                     clearInterval(interval);
-                    document.getElementById('timer-count').innerText = "Đang tạo mã...";
+                    document.getElementById('timer-count').innerText = "Đang khởi tạo mã...";
                     
                     const generatedCode = 'DIGITALSMOD_' + Math.floor(10000 + Math.random() * 90000);
-                    await update(taskRef, { code: generatedCode });
+                    const completionTimeUtc = getExactUtcServerTime();
+                    
+                    await update(taskRef, { 
+                        code: generatedCode,
+                        completedAt: completionTimeUtc
+                    });
 
                     showCodeResult(generatedCode);
                 } else {
@@ -783,7 +836,7 @@
             questCard.style.display = 'block';
 
             const questTypes = ['TAP_SCREEN', 'SCROLL_BOTTOM', 'SCROLL_TOP'];
-            activeQuest = questTypes[Math.floor(Math.random() * questTypes.length)];
+            const activeQuest = questTypes[Math.floor(Math.random() * questTypes.length)];
 
             if (activeQuest === 'TAP_SCREEN') {
                 questDesc.innerHTML = "👉 Nhấn nút <b>XÁC NHẬN CHẠM</b> bên dưới để tiếp tục đếm ngược!";
@@ -840,29 +893,33 @@
                 const taskRef = ref(taskDb, 'missions/' + ipKey);
                 const snapshot = await get(taskRef);
                 if (snapshot.exists()) {
-                    initTaskProcess();
+                    const data = snapshot.val();
+                    if (data.code) {
+                        showCodeResult(data.code);
+                    } else {
+                        document.getElementById('captcha-container').style.display = 'none';
+                        initTaskProcess();
+                    }
                 }
             }
         });
     </script>
 
+    <!-- SCRIPT QUẢN LÝ BÁN HÀNG & MODAL BÊN DƯỚI -->
     <script>
         const FIREBASE_PROJECT_ID = "quocdat-396fe";
         const BASE_URL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
         const TELEGRAM_BOT_TOKEN = "8997842751:AAHje_VZ_sjw5ffnw64RJNz3bxqxehRlMwo"; 
 
-        // Hàm thông minh xử lý chuyển trang theo yêu cầu: Lần 1 mở QC, lần 2 sang trang luôn
         function handleSmartRedirect(targetUrl, adUrl, storageKey) {
             const hasClickedAds = sessionStorage.getItem(storageKey);
             if (!hasClickedAds) {
-                // Lần bấm đầu tiên: Mở quảng cáo Adsterra ở tab mới, đồng thời chuyển trang đích luôn
                 sessionStorage.setItem(storageKey, 'true');
                 window.open(adUrl, '_blank');
                 setTimeout(() => {
                     window.location.href = targetUrl;
                 }, 200);
             } else {
-                // Từ lần bấm thứ 2 trở đi: Sang thẳng trang đích không hiện quảng cáo nữa
                 window.location.href = targetUrl;
             }
         }
