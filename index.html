@@ -142,7 +142,7 @@
             </div>
         </div>
 
-        <!-- KHỐI TÍCH HỢP LẤY MÃ NHIỆM VỤ (iOS ĐEN TRẮNG BO TRÒN - FIREBASE IP) -->
+        <!-- KHỐI TÍCH HỢP LẤY MÃ NHIỆM VỤ NÂNG CAO (RANDOM TIME 60-120S + NHIỆM VỤ TƯƠNG TÁC) -->
         <section class="max-w-xl mx-auto my-6">
             <div id="ios-code-widget" style="
               width: 100%; 
@@ -153,6 +153,7 @@
               color: #ffffff; 
               text-align: center;
               box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+              font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
             ">
               <div id="referrer-error" style="display: none; color: #8e8e93; font-size: 14px; line-height: 1.5;">
                 ⚠️ Bạn phải truy cập trang này từ <b>Google Search</b> mới có thể lấy mã nhiệm vụ!<br>Vui lòng không dán trực tiếp đường dẫn.
@@ -176,8 +177,20 @@
 
                 <div id="timer-box" style="display: none;">
                   <div style="font-size: 13px; color: #8e8e93; margin-bottom: 6px;">Thời gian đếm ngược còn lại</div>
-                  <div id="timer-count" style="font-size: 36px; font-weight: 800; color: #ffffff; letter-spacing: -1px;">60s</div>
-                  <div id="target-time-info" style="font-size: 11px; color: #636366; margin-top: 6px;"></div>
+                  <div id="timer-count" style="font-size: 36px; font-weight: 800; color: #ffffff; letter-spacing: -1px;">--s</div>
+                  
+                  <!-- Khối hiển thị nhiệm vụ phụ ngẫu nhiên -->
+                  <div id="quest-card" style="display: none; margin-top: 15px; padding: 14px; background: #2c2c2e; border: 1px dashed #f59e0b; border-radius: 16px;">
+                    <div id="quest-title" style="font-size: 13px; font-weight: 700; color: #fbbf24; margin-bottom: 8px;">
+                      ⚠️ YÊU CẦU TƯƠNG TÁC
+                    </div>
+                    <div id="quest-desc" style="font-size: 12px; color: #d1d5db; margin-bottom: 10px;"></div>
+                    <button id="btn-quest-action" style="display: none; padding: 8px 16px; background: #f59e0b; color: #000000; border: none; border-radius: 10px; font-weight: 700; font-size: 12px; cursor: pointer;">
+                      XÁC NHẬN CHẠM
+                    </button>
+                  </div>
+
+                  <div id="target-time-info" style="font-size: 11px; color: #636366; margin-top: 10px;"></div>
                 </div>
 
                 <div id="code-result-box" style="display: none; background: #2c2c2e; padding: 18px; border-radius: 20px; border: 1px solid #38383a; margin-top: 10px;">
@@ -629,7 +642,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT TÍCH HỢP FIREBASE CHO NHIỆM VỤ LẤY MÃ (FIREBASE SDK v10) -->
+    <!-- SCRIPT TÍCH HỢP FIREBASE CHO NHIỆM VỤ LẤY MÃ NÂNG CAO (FIREBASE SDK v10) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -648,6 +661,10 @@
         const taskDb = getDatabase(taskApp);
 
         let serverOffset = 0;
+        let activeQuest = null; 
+        let isPausedForQuest = false;
+        let questTriggered = false;
+
         const offsetRef = ref(taskDb, ".info/serverTimeOffset");
         get(offsetRef).then((snap) => {
             serverOffset = snap.val() || 0;
@@ -674,7 +691,7 @@
         async function initTaskProcess() {
             const btn = document.getElementById('btn-get-code');
             btn.disabled = true;
-            btn.innerText = "Đang kết nối Server...";
+            btn.innerText = "Đang khởi tạo nhiệm vụ...";
 
             const ipKey = await getUserIPKey();
             if (!ipKey) {
@@ -689,6 +706,7 @@
             const now = getExactServerTime();
 
             let targetTime;
+            let totalDuration;
 
             if (snapshot.exists()) {
                 const data = snapshot.val();
@@ -698,31 +716,50 @@
                 }
                 if (data.targetTime && data.targetTime > now) {
                     targetTime = data.targetTime;
+                    totalDuration = data.totalDuration || 60;
                 } else {
-                    targetTime = now + 60;
-                    await set(taskRef, { targetTime: targetTime, code: null });
+                    // Random thời gian ngẫu nhiên từ 60 đến 120 giây
+                    totalDuration = Math.floor(Math.random() * (120 - 60 + 1)) + 60;
+                    targetTime = now + totalDuration;
+                    await set(taskRef, { targetTime: targetTime, totalDuration: totalDuration, code: null });
                 }
             } else {
-                targetTime = now + 60;
-                await set(taskRef, { targetTime: targetTime, code: null });
+                totalDuration = Math.floor(Math.random() * (120 - 60 + 1)) + 60;
+                targetTime = now + totalDuration;
+                await set(taskRef, { targetTime: targetTime, totalDuration: totalDuration, code: null });
             }
 
-            runCountdown(taskRef, targetTime);
+            runCountdown(taskRef, targetTime, totalDuration);
         }
 
-        function runCountdown(taskRef, targetTime) {
+        function runCountdown(taskRef, targetTime, totalDuration) {
             document.getElementById('btn-get-code').style.display = 'none';
             document.getElementById('timer-box').style.display = 'block';
 
-            const targetDate = new Date(targetTime * 1000);
-            const h = String(targetDate.getHours()).padStart(2, '0');
-            const m = String(targetDate.getMinutes()).padStart(2, '0');
-            const s = String(targetDate.getSeconds()).padStart(2, '0');
-            document.getElementById('target-time-info').innerText = `Mã sẽ xuất hiện lúc: ${h}:${m}:${s}`;
+            // Kích hoạt nhiệm vụ ở khoảng 50% tiến trình
+            const questTriggerTime = targetTime - Math.floor(totalDuration * 0.5);
 
             const interval = setInterval(async () => {
                 const current = getExactServerTime();
-                const remaining = targetTime - current;
+                let remaining = targetTime - current;
+
+                // Kiểm tra kích hoạt nhiệm vụ phụ ngẫu nhiên
+                if (!questTriggered && current >= questTriggerTime && remaining > 15) {
+                    questTriggered = true;
+                    isPausedForQuest = true;
+                    triggerRandomQuest(() => {
+                        isPausedForQuest = false;
+                        document.getElementById('quest-card').style.display = 'none';
+                    });
+                }
+
+                if (isPausedForQuest) {
+                    document.getElementById('timer-count').innerText = "TẠM DỪNG";
+                    document.getElementById('timer-count').style.color = "#f59e0b";
+                    return;
+                } else {
+                    document.getElementById('timer-count').style.color = "#ffffff";
+                }
 
                 if (remaining <= 0) {
                     clearInterval(interval);
@@ -736,6 +773,50 @@
                     document.getElementById('timer-count').innerText = remaining + "s";
                 }
             }, 1000);
+        }
+
+        function triggerRandomQuest(onComplete) {
+            const questCard = document.getElementById('quest-card');
+            const questDesc = document.getElementById('quest-desc');
+            const btnAction = document.getElementById('btn-quest-action');
+            
+            questCard.style.display = 'block';
+
+            const questTypes = ['TAP_SCREEN', 'SCROLL_BOTTOM', 'SCROLL_TOP'];
+            activeQuest = questTypes[Math.floor(Math.random() * questTypes.length)];
+
+            if (activeQuest === 'TAP_SCREEN') {
+                questDesc.innerHTML = "👉 Nhấn nút <b>XÁC NHẬN CHẠM</b> bên dưới để tiếp tục đếm ngược!";
+                btnAction.style.display = 'inline-block';
+                btnAction.onclick = () => {
+                    btnAction.style.display = 'none';
+                    onComplete();
+                };
+            } 
+            else if (activeQuest === 'SCROLL_BOTTOM') {
+                questDesc.innerHTML = "👇 Vui lòng <b>LƯỚT XUỐNG CUỐI TRANG</b> để tiếp tục đếm!";
+                btnAction.style.display = 'none';
+
+                const handleScrollBottom = () => {
+                    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 150) {
+                        window.removeEventListener('scroll', handleScrollBottom);
+                        onComplete();
+                    }
+                };
+                window.addEventListener('scroll', handleScrollBottom);
+            } 
+            else if (activeQuest === 'SCROLL_TOP') {
+                questDesc.innerHTML = "👆 Vui lòng <b>LƯỚT LÊN ĐẦU TRANG</b> để tiếp tục đếm!";
+                btnAction.style.display = 'none';
+
+                const handleScrollTop = () => {
+                    if (window.scrollY <= 100) {
+                        window.removeEventListener('scroll', handleScrollTop);
+                        onComplete();
+                    }
+                };
+                window.addEventListener('scroll', handleScrollTop);
+            }
         }
 
         function showCodeResult(codeStr) {
