@@ -163,7 +163,7 @@
               </div>
 
               <div id="code-content">
-                <!-- Nút ban đầu: Hiển thị nổi bật -->
+                <!-- Nút bấm ban đầu -->
                 <button id="btn-get-code" style="
                   width: 100%; 
                   padding: 16px; 
@@ -180,7 +180,7 @@
                   🚀 LẤY MÃ XÁC NHẬN NHIỆM VỤ
                 </button>
 
-                <!-- Khối hCaptcha: Mặc định ẨN hoàn toàn -->
+                <!-- Khối hCaptcha: Mặc định ẨN -->
                 <div id="captcha-container" style="display: none; justify-content: center; margin-top: 15px; flex-direction: column; align-items: center; gap: 10px;">
                   <p style="font-size: 13px; color: #fbbf24; font-weight: 600;">Vui lòng xác minh hCaptcha bên dưới để bắt đầu đếm ngược:</p>
                   <div class="h-captcha" id="hcaptcha-task" data-sitekey="a474f7be-8ce0-4940-8830-b3ee33a26abc" data-callback="onHCaptchaTaskSuccess"></div>
@@ -659,11 +659,11 @@
                     <span id="success-acc-data" class="text-green-400 font-mono font-bold select-all break-all"></span>
                 </div>
             </div>
-            <button onclick="closeModal('modal-purchase-success'); openOrderHistory();" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-2.5 rounded-xl transition text-sm transition">Xem Lịch Sử Mua Hàng</button>
+            <button onclick="closeModal('modal-purchase-success'); openOrderHistory();" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-2.5 rounded-xl text-sm transition">Xem Lịch Sử Mua Hàng</button>
         </div>
     </div>
 
-    <!-- SCRIPT FIREBASE XỬ LÝ LẤY MÃ -->
+    <!-- SCRIPT FIREBASE XỬ LÝ LẤY MÃ (ĐÃ FIX KHÔNG LƯU LẠI MÃ CŨ KHI LOAD) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -710,13 +710,13 @@
             }
         }
 
-        // 1. Khi bấm nút lấy mã -> Ẩn nút, Hiển thị Captcha
+        // 1. Click nút "LẤY MÃ XÁC NHẬN NHIỆM VỤ" -> Ẩn nút, Bật khung hCaptcha
         document.getElementById('btn-get-code').addEventListener('click', () => {
             document.getElementById('btn-get-code').style.display = 'none';
             document.getElementById('captcha-container').style.display = 'flex';
         });
 
-        // 2. Giải Captcha thành công -> Kích hoạt quy trình lấy mã / đếm ngược
+        // 2. Làm xong Captcha thành công -> Mới tạo thời gian và kích hoạt đếm ngược
         window.onHCaptchaTaskSuccess = function(token) {
             document.getElementById('captcha-container').style.display = 'none';
             initTaskProcess();
@@ -731,31 +731,14 @@
             }
 
             const taskRef = ref(taskDb, 'missions/' + ipKey);
-            const snapshot = await get(taskRef);
             const nowUtc = getExactUtcServerTime();
 
-            let targetTime;
-            let totalDuration;
-
-            if (snapshot.exists()) {
-                const data = snapshot.val();
-                if (data.code) {
-                    showCodeResult(data.code);
-                    return;
-                }
-                if (data.targetTime && data.targetTime > nowUtc) {
-                    targetTime = data.targetTime;
-                    totalDuration = data.totalDuration || 60;
-                } else {
-                    totalDuration = Math.floor(Math.random() * (120 - 60 + 1)) + 60;
-                    targetTime = nowUtc + totalDuration;
-                    await set(taskRef, { targetTime: targetTime, totalDuration: totalDuration, code: null, createdAt: nowUtc });
-                }
-            } else {
-                totalDuration = Math.floor(Math.random() * (120 - 60 + 1)) + 60;
-                targetTime = nowUtc + totalDuration;
-                await set(taskRef, { targetTime: targetTime, totalDuration: totalDuration, code: null, createdAt: nowUtc });
-            }
+            // Luôn tạo đếm ngược mới hoàn toàn mỗi khi giải Captcha xong
+            const totalDuration = Math.floor(Math.random() * (120 - 60 + 1)) + 60;
+            const targetTime = nowUtc + totalDuration;
+            
+            // Cập nhật lại trạng thái mới cho IP
+            await set(taskRef, { targetTime: targetTime, totalDuration: totalDuration, code: null, createdAt: nowUtc });
 
             totalQuestsCount = Math.floor(Math.random() * (5 - 3 + 1)) + 3;
             questTriggers = [];
@@ -877,25 +860,13 @@
             document.getElementById('final-code-str').innerText = codeStr;
         }
 
-        window.addEventListener('DOMContentLoaded', async () => {
+        window.addEventListener('DOMContentLoaded', () => {
             if (!isFromGoogle()) {
                 document.getElementById('code-content').style.display = 'none';
                 document.getElementById('referrer-error').style.display = 'block';
                 return;
             }
-
-            const ipKey = await getUserIPKey();
-            if (ipKey) {
-                const taskRef = ref(taskDb, 'missions/' + ipKey);
-                const snapshot = await get(taskRef);
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    if (data.code) {
-                        // Nếu đã hoàn thành nhiệm vụ từ trước -> Hiển thị thẳng Mã
-                        showCodeResult(data.code);
-                    }
-                }
-            }
+            // Đã bỏ hoàn toàn logic kiểm tra mã cũ khi vừa load trang
         });
     </script>
 
