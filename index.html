@@ -142,6 +142,52 @@
             </div>
         </div>
 
+        <!-- KHỐI TÍCH HỢP LẤY MÃ NHIỆM VỤ (iOS ĐEN TRẮNG BO TRÒN - FIREBASE IP) -->
+        <section class="max-w-xl mx-auto my-6">
+            <div id="ios-code-widget" style="
+              width: 100%; 
+              padding: 24px; 
+              background: #1c1c1e; 
+              border-radius: 28px; 
+              border: 1px solid #38383a; 
+              color: #ffffff; 
+              text-align: center;
+              box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            ">
+              <div id="referrer-error" style="display: none; color: #8e8e93; font-size: 14px; line-height: 1.5;">
+                ⚠️ Bạn phải truy cập trang này từ <b>Google Search</b> mới có thể lấy mã nhiệm vụ!<br>Vui lòng không dán trực tiếp đường dẫn.
+              </div>
+
+              <div id="code-content">
+                <button id="btn-get-code" style="
+                  width: 100%; 
+                  padding: 16px; 
+                  background: #ffffff; 
+                  color: #000000; 
+                  border: none; 
+                  border-radius: 18px; 
+                  font-weight: 700; 
+                  font-size: 15px; 
+                  cursor: pointer;
+                  transition: opacity 0.2s;
+                ">
+                  LẤY MÃ XÁC NHẬN NHIỆM VỤ
+                </button>
+
+                <div id="timer-box" style="display: none;">
+                  <div style="font-size: 13px; color: #8e8e93; margin-bottom: 6px;">Thời gian đếm ngược còn lại</div>
+                  <div id="timer-count" style="font-size: 36px; font-weight: 800; color: #ffffff; letter-spacing: -1px;">60s</div>
+                  <div id="target-time-info" style="font-size: 11px; color: #636366; margin-top: 6px;"></div>
+                </div>
+
+                <div id="code-result-box" style="display: none; background: #2c2c2e; padding: 18px; border-radius: 20px; border: 1px solid #38383a; margin-top: 10px;">
+                  <div style="font-size: 12px; color: #8e8e93; margin-bottom: 6px;">Mã xác nhận dành riêng cho IP của bạn:</div>
+                  <div id="final-code-str" style="font-size: 22px; font-weight: 800; color: #ffffff; letter-spacing: 1.5px; user-select: all;"></div>
+                </div>
+              </div>
+            </div>
+        </section>
+
         <!-- 2 NÚT NỔI BẬT: Đã tối ưu logic bấm lần 1 hiện QC Adsterra, từ lần 2 sang thẳng trang -->
         <section class="space-y-3 sm:space-y-4">
             <button onclick="handleSmartRedirect('nhanacc.html', 'https://www.profitableratecpmnetwork.com/wyz54mnzj?key=9aa535a9480e8308f5caac92971eebfc', 'ads_clicked_nhanacc')" class="w-full text-left btn-glow-amber group relative flex items-center justify-between p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 border-2 border-amber-400/80 hover:scale-[1.01] active:scale-[0.99] transition duration-300 cursor-pointer">
@@ -582,6 +628,142 @@
             <button onclick="closeModal('modal-purchase-success'); openOrderHistory();" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-2.5 rounded-xl text-sm transition">Xem Lịch Sử Mua Hàng</button>
         </div>
     </div>
+
+    <!-- SCRIPT TÍCH HỢP FIREBASE CHO NHIỆM VỤ LẤY MÃ (FIREBASE SDK v10) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfigTask = {
+            apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
+            authDomain: "quocdat-396fe.firebaseapp.com",
+            databaseURL: "https://quocdat-396fe-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "quocdat-396fe",
+            storageBucket: "quocdat-396fe.firebasestorage.app",
+            messagingSenderId: "685476439350",
+            appId: "1:685476439350:web:949054ecba7f0a0c383f97"
+        };
+
+        const taskApp = initializeApp(firebaseConfigTask, "taskAppInstance");
+        const taskDb = getDatabase(taskApp);
+
+        let serverOffset = 0;
+        const offsetRef = ref(taskDb, ".info/serverTimeOffset");
+        get(offsetRef).then((snap) => {
+            serverOffset = snap.val() || 0;
+        });
+
+        function getExactServerTime() {
+            return Math.floor((Date.now() + serverOffset) / 1000);
+        }
+
+        function isFromGoogle() {
+            return document.referrer.toLowerCase().includes('google.');
+        }
+
+        async function getUserIPKey() {
+            try {
+                const res = await fetch('https://api.ipify.org?format=json');
+                const data = await res.json();
+                return data.ip.replace(/[\.\:]/g, '_');
+            } catch (e) {
+                return null;
+            }
+        }
+
+        async function initTaskProcess() {
+            const btn = document.getElementById('btn-get-code');
+            btn.disabled = true;
+            btn.innerText = "Đang kết nối Server...";
+
+            const ipKey = await getUserIPKey();
+            if (!ipKey) {
+                alert("Không thể truy xuất IP thiết bị của bạn!");
+                btn.disabled = false;
+                btn.innerText = "LẤY MÃ XÁC NHẬN NHIỆM VỤ";
+                return;
+            }
+
+            const taskRef = ref(taskDb, 'missions/' + ipKey);
+            const snapshot = await get(taskRef);
+            const now = getExactServerTime();
+
+            let targetTime;
+
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                if (data.code) {
+                    showCodeResult(data.code);
+                    return;
+                }
+                if (data.targetTime && data.targetTime > now) {
+                    targetTime = data.targetTime;
+                } else {
+                    targetTime = now + 60;
+                    await set(taskRef, { targetTime: targetTime, code: null });
+                }
+            } else {
+                targetTime = now + 60;
+                await set(taskRef, { targetTime: targetTime, code: null });
+            }
+
+            runCountdown(taskRef, targetTime);
+        }
+
+        function runCountdown(taskRef, targetTime) {
+            document.getElementById('btn-get-code').style.display = 'none';
+            document.getElementById('timer-box').style.display = 'block';
+
+            const targetDate = new Date(targetTime * 1000);
+            const h = String(targetDate.getHours()).padStart(2, '0');
+            const m = String(targetDate.getMinutes()).padStart(2, '0');
+            const s = String(targetDate.getSeconds()).padStart(2, '0');
+            document.getElementById('target-time-info').innerText = `Mã sẽ xuất hiện lúc: ${h}:${m}:${s}`;
+
+            const interval = setInterval(async () => {
+                const current = getExactServerTime();
+                const remaining = targetTime - current;
+
+                if (remaining <= 0) {
+                    clearInterval(interval);
+                    document.getElementById('timer-count').innerText = "Đang tạo mã...";
+                    
+                    const generatedCode = 'DIGITALSMOD_' + Math.floor(10000 + Math.random() * 90000);
+                    await update(taskRef, { code: generatedCode });
+
+                    showCodeResult(generatedCode);
+                } else {
+                    document.getElementById('timer-count').innerText = remaining + "s";
+                }
+            }, 1000);
+        }
+
+        function showCodeResult(codeStr) {
+            document.getElementById('btn-get-code').style.display = 'none';
+            document.getElementById('timer-box').style.display = 'none';
+            document.getElementById('code-result-box').style.display = 'block';
+            document.getElementById('final-code-str').innerText = codeStr;
+        }
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            if (!isFromGoogle()) {
+                document.getElementById('code-content').style.display = 'none';
+                document.getElementById('referrer-error').style.display = 'block';
+                return;
+            }
+
+            document.getElementById('btn-get-code').addEventListener('click', initTaskProcess);
+
+            const ipKey = await getUserIPKey();
+            if (ipKey) {
+                const taskRef = ref(taskDb, 'missions/' + ipKey);
+                const snapshot = await get(taskRef);
+                if (snapshot.exists()) {
+                    initTaskProcess();
+                }
+            }
+        });
+    </script>
 
     <script>
         const FIREBASE_PROJECT_ID = "quocdat-396fe";
