@@ -12,7 +12,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- SCRIPT HCAPTCHA DUY NHẤT CHO TOÀN BỘ TRANG -->
+    <!-- SCRIPT HCAPTCHA -->
     <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
@@ -145,7 +145,7 @@
             </div>
         </div>
 
-        <!-- KHỐI LẤY MÃ NHIỆM VỤ SỬ DỤNG HCAPTCHA -->
+        <!-- KHỐI LẤY MÃ NHIỆM VỤ -->
         <section class="max-w-xl mx-auto my-6">
             <div id="ios-code-widget" style="
               width: 100%; 
@@ -163,26 +163,30 @@
               </div>
 
               <div id="code-content">
-                <!-- Sử dụng hCaptcha chuẩn sitekey của bạn -->
-                <div id="captcha-container" style="display: flex; justify-content: center; margin-bottom: 15px;">
+                <!-- Nút ban đầu: Hiển thị nổi bật -->
+                <button id="btn-get-code" style="
+                  width: 100%; 
+                  padding: 16px; 
+                  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); 
+                  color: #ffffff; 
+                  border: none; 
+                  border-radius: 18px; 
+                  font-weight: 800; 
+                  font-size: 15px; 
+                  cursor: pointer;
+                  transition: all 0.3s ease;
+                  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+                ">
+                  🚀 LẤY MÃ XÁC NHẬN NHIỆM VỤ
+                </button>
+
+                <!-- Khối hCaptcha: Mặc định ẨN hoàn toàn -->
+                <div id="captcha-container" style="display: none; justify-content: center; margin-top: 15px; flex-direction: column; align-items: center; gap: 10px;">
+                  <p style="font-size: 13px; color: #fbbf24; font-weight: 600;">Vui lòng xác minh hCaptcha bên dưới để bắt đầu đếm ngược:</p>
                   <div class="h-captcha" id="hcaptcha-task" data-sitekey="a474f7be-8ce0-4940-8830-b3ee33a26abc" data-callback="onHCaptchaTaskSuccess"></div>
                 </div>
 
-                <button id="btn-get-code" disabled style="
-                  width: 100%; 
-                  padding: 16px; 
-                  background: #3a3a3c; 
-                  color: #8e8e93; 
-                  border: none; 
-                  border-radius: 18px; 
-                  font-weight: 700; 
-                  font-size: 15px; 
-                  cursor: not-allowed;
-                  transition: all 0.3s ease;
-                ">
-                  🔒 HOÀN THÀNH CAPTCHA ĐỂ LẤY MÃ
-                </button>
-
+                <!-- Khối Đồng hồ đếm ngược -->
                 <div id="timer-box" style="display: none;">
                   <div style="font-size: 13px; color: #8e8e93; margin-bottom: 4px;">Thời gian đếm ngược còn lại (UTC)</div>
                   <div id="timer-count" style="font-size: 36px; font-weight: 800; color: #ffffff; letter-spacing: -1px;">--s</div>
@@ -202,6 +206,7 @@
                   <div id="target-time-info" style="font-size: 11px; color: #636366; margin-top: 10px;"></div>
                 </div>
 
+                <!-- Khối Hiển thị Mã -->
                 <div id="code-result-box" style="display: none; background: #2c2c2e; padding: 18px; border-radius: 20px; border: 1px solid #38383a; margin-top: 10px;">
                   <div style="font-size: 12px; color: #8e8e93; margin-bottom: 6px;">Mã xác nhận dành riêng cho IP của bạn:</div>
                   <div id="final-code-str" style="font-size: 22px; font-weight: 800; color: #ffffff; letter-spacing: 1.5px; user-select: all;"></div>
@@ -654,11 +659,11 @@
                     <span id="success-acc-data" class="text-green-400 font-mono font-bold select-all break-all"></span>
                 </div>
             </div>
-            <button onclick="closeModal('modal-purchase-success'); openOrderHistory();" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-2.5 rounded-xl text-sm transition">Xem Lịch Sử Mua Hàng</button>
+            <button onclick="closeModal('modal-purchase-success'); openOrderHistory();" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-2.5 rounded-xl transition text-sm transition">Xem Lịch Sử Mua Hàng</button>
         </div>
     </div>
 
-    <!-- SCRIPT FIREBASE XỬ LÝ LẤY MÃ (HCAPTCHA) -->
+    <!-- SCRIPT FIREBASE XỬ LÝ LẤY MÃ -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -705,29 +710,23 @@
             }
         }
 
-        // Callback cho hCaptcha lấy mã nhiệm vụ
+        // 1. Khi bấm nút lấy mã -> Ẩn nút, Hiển thị Captcha
+        document.getElementById('btn-get-code').addEventListener('click', () => {
+            document.getElementById('btn-get-code').style.display = 'none';
+            document.getElementById('captcha-container').style.display = 'flex';
+        });
+
+        // 2. Giải Captcha thành công -> Kích hoạt quy trình lấy mã / đếm ngược
         window.onHCaptchaTaskSuccess = function(token) {
-            const btn = document.getElementById('btn-get-code');
-            if (btn) {
-                btn.disabled = false;
-                btn.style.background = '#ffffff';
-                btn.style.color = '#000000';
-                btn.style.cursor = 'pointer';
-                btn.innerText = 'LẤY MÃ XÁC NHẬN NHIỆM VỤ';
-            }
             document.getElementById('captcha-container').style.display = 'none';
+            initTaskProcess();
         };
 
         async function initTaskProcess() {
-            const btn = document.getElementById('btn-get-code');
-            btn.disabled = true;
-            btn.innerText = "Đang kết nối Server đếm UTC...";
-
             const ipKey = await getUserIPKey();
             if (!ipKey) {
                 alert("Không thể truy xuất địa chỉ IP thiết bị!");
-                btn.disabled = false;
-                btn.innerText = "LẤY MÃ XÁC NHẬN NHIỆM VỤ";
+                document.getElementById('btn-get-code').style.display = 'block';
                 return;
             }
 
@@ -774,6 +773,7 @@
 
         function runCountdown(taskRef, targetTime) {
             document.getElementById('btn-get-code').style.display = 'none';
+            document.getElementById('captcha-container').style.display = 'none';
             document.getElementById('timer-box').style.display = 'block';
 
             const interval = setInterval(async () => {
@@ -871,6 +871,7 @@
 
         function showCodeResult(codeStr) {
             document.getElementById('btn-get-code').style.display = 'none';
+            document.getElementById('captcha-container').style.display = 'none';
             document.getElementById('timer-box').style.display = 'none';
             document.getElementById('code-result-box').style.display = 'block';
             document.getElementById('final-code-str').innerText = codeStr;
@@ -883,8 +884,6 @@
                 return;
             }
 
-            document.getElementById('btn-get-code').addEventListener('click', initTaskProcess);
-
             const ipKey = await getUserIPKey();
             if (ipKey) {
                 const taskRef = ref(taskDb, 'missions/' + ipKey);
@@ -892,10 +891,8 @@
                 if (snapshot.exists()) {
                     const data = snapshot.val();
                     if (data.code) {
+                        // Nếu đã hoàn thành nhiệm vụ từ trước -> Hiển thị thẳng Mã
                         showCodeResult(data.code);
-                    } else {
-                        document.getElementById('captcha-container').style.display = 'none';
-                        initTaskProcess();
                     }
                 }
             }
@@ -1544,7 +1541,6 @@
             }
         }
 
-        // Lấy Token hCaptcha chuẩn xác
         function getHCaptchaToken(containerId) {
             if (!window.hcaptcha) return null;
             const container = document.getElementById(containerId);
