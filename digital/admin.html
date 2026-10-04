@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdDigital - Quản Trị Video Realtime</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #080b11;
+            color: #f3f4f6;
+        }
+
+        .glass {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-[#080b11] text-gray-100 selection:bg-brand-500 selection:text-white">
+
+    <header class="sticky top-0 z-50 glass border-b border-white/10 px-4 lg:px-8 py-3.5 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-brand-500 flex items-center justify-center shadow-lg shadow-purple-500/30">
+                <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
+            </div>
+            <div>
+                <span class="text-xl font-bold bg-gradient-to-r from-white via-gray-200 to-purple-400 bg-clip-text text-transparent">AdDigital Admin</span>
+                <span class="hidden sm:inline-block text-xs px-2 py-0.5 ml-2 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 font-medium">Dashboard</span>
+            </div>
+        </div>
+
+        <a href="digitaltube.html" target="_blank" class="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-xs font-semibold text-gray-200 transition-all">
+            <i data-lucide="external-link" class="w-4 h-4"></i>
+            <span>Xem Trang Web Xem Phim</span>
+        </a>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left: Form Input (5 Cols) -->
+        <section class="lg:col-span-5 flex flex-col space-y-4">
+            <div class="glass p-5 rounded-2xl border border-white/10 space-y-4">
+                <div class="flex items-center space-x-2 border-b border-white/10 pb-3">
+                    <i data-lucide="plus-circle" class="w-5 h-5 text-brand-500"></i>
+                    <h2 id="formTitle" class="font-bold text-lg text-white">Thêm Tập Phim Mới</h2>
+                </div>
+
+                <form id="episodeForm" onsubmit="handleFormSubmit(event)" class="space-y-3.5">
+                    <input type="hidden" id="editingKey" value="">
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-300 mb-1">Tiêu Đề Tập Phim</label>
+                        <input type="text" id="titleInput" placeholder="VD: Tập 1: Khởi Đầu" required class="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-brand-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-300 mb-1">Tên File GitHub hoặc URL Video Direct</label>
+                        <input type="text" id="urlInput" placeholder="VD: tap1.mp4 HOẶC https://raw.githubusercontent.com/.../tap1.mp4" required class="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-brand-500 font-mono text-xs">
+                        <p class="text-[11px] text-gray-400 mt-1">💡 Nhập <code class="text-brand-400">tap1.mp4</code> sẽ tự động ghép thêm GitHub Prefix ở dưới.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-300 mb-1">GitHub Repo Prefix (Tiền tố)</label>
+                        <input type="text" id="prefixInput" value="https://raw.githubusercontent.com/" class="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2 text-xs text-gray-400 font-mono focus:outline-none focus:border-brand-500">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-300 mb-1">Thời Lượng</label>
+                            <input type="text" id="durationInput" placeholder="VD: 10:45" class="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-300 mb-1">Thứ Tự Sắp Xếp</label>
+                            <input type="number" id="orderInput" placeholder="1" value="1" class="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2 text-sm text-gray-200 focus:outline-none focus:border-brand-500">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-300 mb-1">Mô Tả Tập Phim (Không bắt buộc)</label>
+                        <textarea id="descInput" rows="2" placeholder="Nhập tóm tắt nội dung tập phim..." class="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-brand-500"></textarea>
+                    </div>
+
+                    <div class="flex space-x-2 pt-2">
+                        <button type="submit" id="submitBtn" class="flex-1 py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl transition-colors shadow-lg shadow-brand-600/30 text-sm flex items-center justify-center space-x-1.5">
+                            <i data-lucide="save" class="w-4 h-4"></i>
+                            <span id="submitBtnText">Thêm Tập Phim</span>
+                        </button>
+                        <button type="button" id="cancelEditBtn" onclick="resetForm()" class="hidden px-4 py-2.5 bg-white/10 hover:bg-white/20 text-gray-300 font-semibold rounded-xl text-sm transition-colors">Hủy</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Right: Video List (7 Cols) -->
+        <section class="lg:col-span-7 flex flex-col space-y-4">
+            <div class="glass p-5 rounded-2xl border border-white/10 flex flex-col space-y-4">
+                <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="database" class="w-5 h-5 text-purple-400"></i>
+                        <h2 class="font-bold text-lg text-white">Danh Sách Video Trong Realtime DB</h2>
+                    </div>
+                    <span id="totalBadge" class="text-xs px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300">0 video</span>
+                </div>
+
+                <div id="episodesList" class="space-y-3 max-h-[600px] overflow-y-auto pr-1">
+                    <div class="text-center py-12 text-gray-400 text-sm">
+                        <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-purple-400"></i>
+                        Đang đọc dữ liệu từ Firebase Realtime Database...
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue, push, set, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAVuB8m14zkMPs-JTLAKB0Bp18QBKAMBt4",
+            authDomain: "ideo-dd376.firebaseapp.com",
+            databaseURL: "https://ideo-dd376-default-rtdb.firebaseio.com",
+            projectId: "ideo-dd376",
+            storageBucket: "ideo-dd376.firebasestorage.app",
+            messagingSenderId: "689163185",
+            appId: "1:689163185:web:f4e11f000a5afc3a364b90"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        let currentEpisodes = [];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            listenToDatabase();
+        });
+
+        function listenToDatabase() {
+            const episodesRef = ref(db, 'episodes');
+            onValue(episodesRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    currentEpisodes = Object.keys(data).map(key => ({
+                        firebaseId: key,
+                        ...data[key]
+                    })).sort((a, b) => (a.order || 0) - (b.order || 0));
+
+                    renderEpisodesList(currentEpisodes);
+                } else {
+                    currentEpisodes = [];
+                    document.getElementById('episodesList').innerHTML = `
+                        <div class="text-center py-12 text-gray-400 text-sm">
+                            <i data-lucide="folder-open" class="w-8 h-8 mx-auto mb-2 text-gray-500"></i>
+                            Chưa có tập phim nào. Hãy dùng form bên trái để thêm tập mới!
+                        </div>
+                    `;
+                    document.getElementById('totalBadge').innerText = "0 video";
+                    lucide.createIcons();
+                }
+            });
+        }
+
+        window.handleFormSubmit = function(e) {
+            e.preventDefault();
+
+            const title = document.getElementById('titleInput').value.trim();
+            let rawUrl = document.getElementById('urlInput').value.trim();
+            const prefix = document.getElementById('prefixInput').value.trim();
+            const duration = document.getElementById('durationInput').value.trim() || "10:00";
+            const order = parseInt(document.getElementById('orderInput').value) || (currentEpisodes.length + 1);
+            const description = document.getElementById('descInput').value.trim();
+            const editingKey = document.getElementById('editingKey').value;
+
+            // Auto-complete URL if only filename provided
+            if (!rawUrl.startsWith('http://') && !rawUrl.startsWith('https://')) {
+                rawUrl = prefix + rawUrl;
+            }
+
+            const payload = {
+                title,
+                url: rawUrl,
+                duration,
+                order,
+                description,
+                updatedAt: Date.now()
+            };
+
+            if (editingKey) {
+                // Update
+                const itemRef = ref(db, `episodes/${editingKey}`);
+                update(itemRef, payload).then(() => {
+                    alert("Đã cập nhật thông tin tập phim!");
+                    resetForm();
+                }).catch(err => alert("Lỗi: " + err.message));
+            } else {
+                // Create New
+                const episodesRef = ref(db, 'episodes');
+                const newRef = push(episodesRef);
+                set(newRef, payload).then(() => {
+                    alert("Đã thêm tập phim mới vào Realtime Database!");
+                    resetForm();
+                }).catch(err => alert("Lỗi: " + err.message));
+            }
+        };
+
+        function renderEpisodesList(items) {
+            const listContainer = document.getElementById('episodesList');
+            document.getElementById('totalBadge').innerText = `${items.length} video`;
+            listContainer.innerHTML = '';
+
+            items.forEach((item) => {
+                const card = document.createElement('div');
+                card.className = "glass-card p-3.5 rounded-xl border border-white/5 flex flex-col space-y-2 hover:border-white/20 transition-all";
+
+                card.innerHTML = `
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 font-bold text-xs">STT: ${item.order || 0}</span>
+                            <h3 class="font-bold text-sm text-gray-200">${item.title}</h3>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <button onclick="editEpisode('${item.firebaseId}')" class="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white transition-colors" title="Chỉnh sửa">
+                                <i data-lucide="edit-3" class="w-4 h-4"></i>
+                            </button>
+                            <button onclick="deleteEpisode('${item.firebaseId}')" class="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors" title="Xóa">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-xs font-mono text-gray-400 truncate bg-black/40 p-1.5 rounded border border-white/5">
+                        ${item.url}
+                    </div>
+                    <div class="flex items-center justify-between text-[11px] text-gray-400 pt-1">
+                        <span>Thời lượng: ${item.duration}</span>
+                        <a href="${item.url}" target="_blank" class="text-brand-400 hover:underline flex items-center space-x-1">
+                            <span>Test link direct</span>
+                            <i data-lucide="external-link" class="w-3 h-3"></i>
+                        </a>
+                    </div>
+                `;
+                listContainer.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        window.editEpisode = function(key) {
+            const item = currentEpisodes.find(i => i.firebaseId === key);
+            if (!item) return;
+
+            document.getElementById('editingKey').value = key;
+            document.getElementById('titleInput').value = item.title || '';
+            document.getElementById('urlInput').value = item.url || '';
+            document.getElementById('durationInput').value = item.duration || '';
+            document.getElementById('orderInput').value = item.order || 1;
+            document.getElementById('descInput').value = item.description || '';
+
+            document.getElementById('formTitle').innerText = "Chỉnh Sửa Tập Phim";
+            document.getElementById('submitBtnText').innerText = "Cập Nhật";
+            document.getElementById('cancelEditBtn').classList.remove('hidden');
+        };
+
+        window.deleteEpisode = function(key) {
+            if (confirm("Bạn có chắc chắn muốn xóa tập phim này khỏi Database?")) {
+                const itemRef = ref(db, `episodes/${key}`);
+                remove(itemRef).then(() => {
+                    alert("Đã xóa thành công!");
+                }).catch(err => alert("Lỗi khi xóa: " + err.message));
+            }
+        };
+
+        window.resetForm = function() {
+            document.getElementById('episodeForm').reset();
+            document.getElementById('editingKey').value = '';
+            document.getElementById('formTitle').innerText = "Thêm Tập Phim Mới";
+            document.getElementById('submitBtnText').innerText = "Thêm Tập Phim";
+            document.getElementById('cancelEditBtn').classList.add('hidden');
+            document.getElementById('orderInput').value = currentEpisodes.length + 1;
+        };
+    </script>
+</body>
+</html>
