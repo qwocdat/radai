@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DigitalTube - Tải Video YouTube Full HD</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* [Giữ nguyên phần CSS như file trước] */
+        :root {
+            --bg-base: #05060a;
+            --bg-surface: #0d1018;
+            --bg-card: rgba(18, 22, 33, 0.7);
+            --accent: #6366f1;
+            --accent-2: #a855f7;
+            --accent-3: #ec4899;
+            --accent-glow: rgba(99, 102, 241, 0.55);
+            --accent-glow-strong: rgba(99, 102, 241, 0.9);
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text-main: #f3f4f6;
+            --text-sub: #9ca3af;
+            --border: rgba(255, 255, 255, 0.08);
+            --glass-bg: rgba(13, 16, 24, 0.72);
+            --glass-border: rgba(255, 255, 255, 0.12);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        html { scroll-behavior: smooth; }
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .aurora-bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+        .aurora-blob { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.4; animation: floatBlob 22s ease-in-out infinite; }
+        .blob-1 { width: 520px; height: 520px; background: radial-gradient(circle, #6366f1, transparent 70%); top: -180px; left: -120px; }
+        .blob-2 { width: 480px; height: 480px; background: radial-gradient(circle, #a855f7, transparent 70%); top: 40%; right: -160px; animation-delay: -7s; }
+        .blob-3 { width: 400px; height: 400px; background: radial-gradient(circle, #ec4899, transparent 70%); bottom: -140px; left: 30%; animation-delay: -14s; opacity: 0.28; }
+        @keyframes floatBlob {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(60px, -40px) scale(1.1); }
+            66% { transform: translate(-40px, 50px) scale(0.95); }
+        }
+
+        header {
+            height: 68px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px) saturate(160%);
+            -webkit-backdrop-filter: blur(20px) saturate(160%);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .brand-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; color: #fff; font-weight: 800; font-size: 20px; letter-spacing: -0.5px; position: relative; padding: 6px 4px; transition: transform 0.25s ease; cursor: pointer; user-select: none; }
+        .brand-logo .icon-wrapper { width: 38px; height: 38px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); border-radius: 11px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px var(--accent-glow), 0 0 30px rgba(168, 85, 247, 0.35), inset 0 0 8px rgba(255,255,255,0.25); transition: all 0.35s ease; position: relative; z-index: 2; }
+        .brand-logo .icon-wrapper::after { content: ''; position: absolute; inset: -2px; border-radius: 13px; background: linear-gradient(135deg, var(--accent), var(--accent-2), var(--accent-3)); filter: blur(10px); opacity: 0.6; z-index: -1; animation: pulseGlow 3s ease-in-out infinite; }
+        @keyframes pulseGlow { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 0.9; transform: scale(1.08); } }
+        .brand-text { background: linear-gradient(90deg, #fff 0%, #fff 40%, #a5b4fc 55%, #c4b5fd 65%, #fff 80%); background-size: 220% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .brand-logo:hover .icon-wrapper { box-shadow: 0 0 25px var(--accent-glow-strong), 0 0 50px rgba(168, 85, 247, 0.55), inset 0 0 12px rgba(255,255,255,0.4); transform: rotate(-6deg) scale(1.08); }
+        .brand-logo:hover .brand-text { animation: shimmerText 1.4s linear infinite; }
+        @keyframes shimmerText { to { background-position: 220% center; } }
+
+        .header-nav { display: flex; align-items: center; gap: 12px; }
+        .nav-link { display: inline-flex; align-items: center; gap: 7px; color: var(--text-sub); text-decoration: none; font-size: 13px; font-weight: 600; padding: 8px 14px; border-radius: 9px; border: 1px solid transparent; transition: all 0.25s ease; }
+        .nav-link:hover { color: #fff; background: rgba(99,102,241,0.12); border-color: rgba(99,102,241,0.35); box-shadow: 0 0 16px rgba(99,102,241,0.25); }
+        .nav-link.active { color: #fff; background: rgba(99,102,241,0.18); border-color: var(--accent); box-shadow: 0 0 18px var(--accent-glow); }
+
+        main { flex: 1; padding: 40px 28px; max-width: 900px; margin: 0 auto; width: 100%; position: relative; }
+
+        .page-heading { text-align: center; margin-bottom: 36px; }
+        .page-heading h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 10px; background: linear-gradient(90deg, #fff, #a5b4fc, #c4b5fd, #fff); background-size: 220% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: shimmerText 4s linear infinite; }
+        .page-heading p { color: var(--text-sub); font-size: 14px; }
+
+        .input-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; padding: 24px; backdrop-filter: blur(12px); box-shadow: 0 12px 30px rgba(0,0,0,0.4); }
+
+        .url-input-group { display: flex; gap: 12px; }
+        .url-input-wrapper { flex: 1; position: relative; display: flex; align-items: center; background: rgba(0,0,0,0.35); border: 1px solid var(--border); border-radius: 12px; transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; }
+        .url-input-wrapper:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99,102,241,0.15), 0 0 24px var(--accent-glow); }
+        .url-input-wrapper .input-icon { padding: 0 14px; color: var(--text-sub); transition: color 0.3s ease; }
+        .url-input-wrapper:focus-within .input-icon { color: var(--accent); }
+        .url-input-wrapper input { flex: 1; background: transparent; border: none; outline: none; color: #fff; font-size: 14px; padding: 14px 14px 14px 0; }
+        .url-input-wrapper input::placeholder { color: #6b7280; }
+
+        .paste-btn { background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.3); color: #a5b4fc; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; margin-right: 8px; display: flex; align-items: center; gap: 5px; transition: all 0.2s ease; }
+        .paste-btn:hover { background: rgba(99,102,241,0.3); color: #fff; }
+
+        .fetch-btn { background: linear-gradient(135deg, var(--accent), var(--accent-2)); border: none; color: #fff; padding: 14px 24px; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.25s ease; box-shadow: 0 0 20px var(--accent-glow); white-space: nowrap; }
+        .fetch-btn:hover { transform: translateY(-2px); box-shadow: 0 0 30px var(--accent-glow-strong), 0 0 50px rgba(168,85,247,0.4); }
+        .fetch-btn:active { transform: translateY(0) scale(0.98); }
+        .fetch-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .quality-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-top: 20px; }
+        .quality-option { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 11px; padding: 14px 10px; text-align: center; cursor: pointer; transition: all 0.25s ease; user-select: none; }
+        .quality-option:hover { border-color: rgba(99,102,241,0.5); background: rgba(99,102,241,0.08); }
+        .quality-option.selected { border-color: var(--accent); background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(168,85,247,0.1)); box-shadow: 0 0 18px var(--accent-glow); }
+        .quality-label { font-size: 15px; font-weight: 800; color: #fff; display: block; }
+        .quality-sub { font-size: 10px; color: var(--text-sub); font-weight: 600; margin-top: 3px; display: block; }
+        .quality-option.selected .quality-label { color: #c7d2fe; }
+        .quality-option.disabled { opacity: 0.35; pointer-events: none; }
+
+        .video-info-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; padding: 22px; margin-top: 24px; display: none; animation: fadeSlideIn 0.4s ease; }
+        .video-info-card.show { display: block; }
+        @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+        .video-preview { display: flex; gap: 18px; align-items: flex-start; }
+        .video-thumb-box { width: 220px; flex-shrink: 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); position: relative; }
+        .video-thumb-box img { width: 100%; display: block; }
+        .video-duration-badge { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.85); color: #fff; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 5px; }
+        .video-details { flex: 1; min-width: 0; }
+        .video-details h3 { font-size: 16px; font-weight: 700; color: #fff; line-height: 1.4; margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .video-details .channel { font-size: 13px; color: #a5b4fc; font-weight: 600; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+        .video-details .meta-line { font-size: 12px; color: var(--text-sub); display: flex; gap: 14px; flex-wrap: wrap; }
+
+        .download-btn { width: 100%; margin-top: 18px; background: linear-gradient(135deg, var(--success), #059669); border: none; color: #fff; padding: 15px; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.25s ease; box-shadow: 0 0 20px rgba(16,185,129,0.4); }
+        .download-btn:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(16,185,129,0.6), 0 0 50px rgba(16,185,129,0.3); }
+        .download-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .status-box { display: none; margin-top: 18px; padding: 14px 18px; border-radius: 12px; font-size: 13px; font-weight: 600; align-items: center; gap: 10px; }
+        .status-box.show { display: flex; }
+        .status-box.info { background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.35); color: #a5b4fc; }
+        .status-box.error { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.35); color: #fca5a5; }
+        .status-box.success { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.35); color: #6ee7b7; }
+        .status-box.warning { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.35); color: #fcd34d; }
+
+        .note-card { margin-top: 28px; background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.25); border-radius: 14px; padding: 16px 18px; display: flex; gap: 12px; align-items: flex-start; }
+        .note-card i { color: var(--warning); font-size: 18px; margin-top: 2px; flex-shrink: 0; }
+        .note-card p { font-size: 12.5px; color: #d1d5db; line-height: 1.6; }
+        .note-card p strong { color: #fcd34d; }
+
+        @media (max-width: 700px) {
+            header { padding: 0 14px; height: 60px; }
+            .brand-logo { font-size: 16px; gap: 8px; }
+            .brand-logo .icon-wrapper { width: 32px; height: 32px; }
+            .nav-link span.nav-text { display: none; }
+            main { padding: 24px 14px; }
+            .page-heading h1 { font-size: 24px; }
+            .url-input-group { flex-direction: column; }
+            .fetch-btn { width: 100%; justify-content: center; }
+            .video-preview { flex-direction: column; }
+            .video-thumb-box { width: 100%; }
+            .quality-row { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="aurora-bg">
+        <div class="aurora-blob blob-1"></div>
+        <div class="aurora-blob blob-2"></div>
+        <div class="aurora-blob blob-3"></div>
+    </div>
+
+    <header>
+        <a href="tube.html" class="brand-logo">
+            <div class="icon-wrapper"><i class="fa-solid fa-play"></i></div>
+            <span class="brand-text">DigitalTube</span>
+        </a>
+        <nav class="header-nav">
+            <a href="tube.html" class="nav-link"><i class="fa-solid fa-house"></i> <span class="nav-text">Trang chủ</span></a>
+            <a href="download.html" class="nav-link active"><i class="fa-solid fa-download"></i> <span class="nav-text">Tải video</span></a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="page-heading">
+            <h1>Tải Video YouTube Full HD</h1>
+            <p>Dán link video YouTube để tải xuống chất lượng cao tối đa 1080p</p>
+        </div>
+
+        <div class="input-card">
+            <div class="url-input-group">
+                <div class="url-input-wrapper">
+                    <i class="fa-brands fa-youtube input-icon" style="color: #ef4444;"></i>
+                    <input type="text" id="youtubeUrl" placeholder="https://www.youtube.com/watch?v=...">
+                    <button type="button" class="paste-btn" id="pasteBtn">
+                        <i class="fa-solid fa-paste"></i> Dán
+                    </button>
+                </div>
+                <button type="button" class="fetch-btn" id="fetchBtn">
+                    <i class="fa-solid fa-magnifying-glass"></i> Lấy thông tin
+                </button>
+            </div>
+
+            <div class="quality-row" id="qualityRow" style="display:none;">
+                <!-- Các lựa chọn chất lượng sẽ được tạo động từ API -->
+            </div>
+        </div>
+
+        <div class="status-box" id="statusBox">
+            <i class="fa-solid fa-circle-notch fa-spin"></i>
+            <span id="statusText">Đang xử lý...</span>
+        </div>
+
+        <div class="video-info-card" id="videoInfoCard">
+            <div class="video-preview">
+                <div class="video-thumb-box">
+                    <img id="videoThumb" src="" alt="Thumbnail">
+                    <span class="video-duration-badge" id="videoDuration">00:00</span>
+                </div>
+                <div class="video-details">
+                    <h3 id="videoTitle">—</h3>
+                    <div class="channel"><i class="fa-solid fa-user"></i> <span id="videoChannel">—</span></div>
+                    <div class="meta-line">
+                        <span><i class="fa-solid fa-eye"></i> <span id="videoViews">—</span> lượt xem</span>
+                        <span><i class="fa-solid fa-calendar"></i> <span id="videoDate">—</span></span>
+                    </div>
+                </div>
+            </div>
+            <button class="download-btn" id="downloadBtn">
+                <i class="fa-solid fa-download"></i> Tải xuống
+            </button>
+        </div>
+
+        <div class="note-card">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <p>
+                <strong>Lưu ý:</strong> Trang này sử dụng API YouTube Media Downloader trên RapidAPI.
+                Bạn cần có tài khoản RapidAPI và API key hợp lệ. Nếu gặp lỗi, hãy kiểm tra lại key hoặc gói đăng ký của bạn.
+                <br><br>
+                <strong>Chỉ sử dụng cho mục đích cá nhân / học tập.</strong> Không tải nội dung có bản quyền mà không được phép.
+            </p>
+        </div>
+    </main>
+
+    <script>
+        // ============================================================
+        // CẤU HÌNH RAPIDAPI
+        // ============================================================
+        // ⚠️ THAY THẾ BẰNG API KEY CỦA BẠN
+        const RAPIDAPI_KEY = '9501866ceemsh9971b65b8c55e4bp104004jsn3fdd39dae46c';
+        const RAPIDAPI_HOST = 'youtube-media-downloader.p.rapidapi.com';
+
+        // ============================================================
+        // DOM REFS
+        // ============================================================
+        const urlInput = document.getElementById('youtubeUrl');
+        const pasteBtn = document.getElementById('pasteBtn');
+        const fetchBtn = document.getElementById('fetchBtn');
+        const qualityRow = document.getElementById('qualityRow');
+        const statusBox = document.getElementById('statusBox');
+        const statusText = document.getElementById('statusText');
+        const videoInfoCard = document.getElementById('videoInfoCard');
+        const videoThumb = document.getElementById('videoThumb');
+        const videoTitle = document.getElementById('videoTitle');
+        const videoChannel = document.getElementById('videoChannel');
+        const videoViews = document.getElementById('videoViews');
+        const videoDate = document.getElementById('videoDate');
+        const videoDuration = document.getElementById('videoDuration');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        // ============================================================
+        // STATE
+        // ============================================================
+        let currentVideoInfo = null;
+        let selectedFormat = null;
+
+        // ============================================================
+        // HELPERS
+        // ============================================================
+        function showStatus(type, text, spinning = false) {
+            statusBox.className = 'status-box show ' + type;
+            statusBox.querySelector('i').className = spinning
+                ? 'fa-solid fa-circle-notch fa-spin'
+                : type === 'error' ? 'fa-solid fa-circle-exclamation'
+                : type === 'success' ? 'fa-solid fa-circle-check'
+                : type === 'warning' ? 'fa-solid fa-triangle-exclamation'
+                : 'fa-solid fa-circle-info';
+            statusText.textContent = text;
+        }
+
+        function hideStatus() {
+            statusBox.className = 'status-box';
+        }
+
+        function formatViews(n) {
+            if (!n) return '—';
+            n = parseInt(n, 10);
+            if (n >= 1e9) return (n / 1e9).toFixed(1) + 'B';
+            if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+            if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+            return n.toString();
+        }
+
+        function formatDuration(seconds) {
+            if (!seconds || isNaN(seconds)) return '00:00';
+            seconds = parseInt(seconds, 10);
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = seconds % 60;
+            if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            return `${m}:${String(s).padStart(2, '0')}`;
+        }
+
+        function extractVideoId(url) {
+            if (!url) return null;
+            url = url.trim();
+            const patterns = [
+                /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/|youtube\.com\/embed\/|youtube\.com\/v\/)([a-zA-Z0-9_-]{11})/,
+                /^([a-zA-Z0-9_-]{11})$/
+            ];
+            for (const p of patterns) {
+                const m = url.match(p);
+                if (m) return m[1];
+            }
+            return null;
+        }
+
+        // ============================================================
+        // PASTE BUTTON
+        // ============================================================
+        pasteBtn.addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text) {
+                    urlInput.value = text;
+                    urlInput.focus();
+                }
+            } catch (e) {
+                showStatus('warning', 'Không thể đọc clipboard. Hãy dán thủ công (Ctrl+V).');
+                setTimeout(hideStatus, 3000);
+            }
+        });
+
+        // ============================================================
+        // FETCH VIDEO INFO (SỬ DỤNG RAPIDAPI)
+        // ============================================================
+        fetchBtn.addEventListener('click', async () => {
+            const url = urlInput.value.trim();
+            if (!url) {
+                showStatus('error', 'Vui lòng dán link video YouTube trước.');
+                return;
+            }
+
+            const videoId = extractVideoId(url);
+            if (!videoId) {
+                showStatus('error', 'Link YouTube không hợp lệ. Kiểm tra lại định dạng.');
+                return;
+            }
+
+            fetchBtn.disabled = true;
+            videoInfoCard.classList.remove('show');
+            qualityRow.style.display = 'none';
+            showStatus('info', 'Đang lấy thông tin video từ RapidAPI...', true);
+
+            try {
+                // Gọi API YouTube Media Downloader
+                const response = await fetch(`https://${RAPIDAPI_HOST}/v2/video/details?videoId=${videoId}`, {
+                    method: 'GET',
+                    headers: {
+                        'x-rapidapi-host': RAPIDAPI_HOST,
+                        'x-rapidapi-key': RAPIDAPI_KEY
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status} - ${errorText}`);
+                }
+
+                const data = await response.json();
+                console.log('[API Response]', data);
+
+                // Kiểm tra cấu trúc dữ liệu trả về
+                if (!data || !data.title) {
+                    throw new Error('Dữ liệu trả về không hợp lệ hoặc video không tồn tại.');
+                }
+
+                currentVideoInfo = data;
+                renderVideoInfo(data);
+                renderQualityOptions(data);
+
+                showStatus('success', 'Lấy thông tin thành công! Chọn chất lượng và tải xuống.');
+                setTimeout(hideStatus, 3000);
+
+            } catch (err) {
+                console.error('Fetch error:', err);
+                showStatus('error', 'Lỗi khi lấy thông tin: ' + err.message +
+                    ' — Kiểm tra lại API key RapidAPI hoặc số lượt request còn lại.');
+            } finally {
+                fetchBtn.disabled = false;
+            }
+        });
+
+        // ============================================================
+        // RENDER VIDEO INFO
+        // ============================================================
+        function renderVideoInfo(data) {
+            // Ánh xạ dữ liệu từ API (cấu trúc có thể thay đổi tùy nhà cung cấp)
+            const title = data.title || 'Không có tiêu đề';
+            const channel = data.channel?.name || data.author || 'Không rõ';
+            const views = data.viewCount || data.views || '—';
+            const lengthSeconds = data.lengthSeconds || data.duration || 0;
+
+            videoTitle.textContent = title;
+            videoChannel.textContent = channel;
+            videoViews.textContent = formatViews(views);
+            videoDuration.textContent = formatDuration(lengthSeconds);
+
+            let dateStr = '—';
+            if (data.uploadDate || data.publishedAt) {
+                try {
+                    const d = new Date(data.uploadDate || data.publishedAt);
+                    dateStr = d.toLocaleDateString('vi-VN');
+                } catch (e) { /* ignore */ }
+            }
+            videoDate.textContent = dateStr;
+
+            // Thumbnail
+            const thumbUrl = data.thumbnail?.url ||
+                             data.thumbnails?.[data.thumbnails.length - 1]?.url ||
+                             `https://img.youtube.com/vi/${extractVideoId(urlInput.value)}/maxresdefault.jpg`;
+            videoThumb.src = thumbUrl;
+            videoThumb.onerror = () => {
+                videoThumb.src = `https://img.youtube.com/vi/${extractVideoId(urlInput.value)}/hqdefault.jpg`;
+            };
+
+            videoInfoCard.classList.add('show');
+        }
+
+        // ============================================================
+        // RENDER QUALITY OPTIONS TỪ API
+        // ============================================================
+        function renderQualityOptions(data) {
+            // API có thể trả về mảng `formats` hoặc `videos` / `audios`
+            const formats = data.formats || data.videos || data.adaptiveFormats || [];
+
+            if (!formats.length) {
+                // Nếu không có formats, có thể API trả về link tải trực tiếp
+                if (data.url || data.downloadUrl) {
+                    qualityRow.innerHTML = `
+                        <div class="quality-option selected" data-url="${data.url || data.downloadUrl}" data-quality="default">
+                            <span class="quality-label">Tải xuống</span>
+                            <span class="quality-sub">Có sẵn</span>
+                        </div>
+                    `;
+                    qualityRow.style.display = 'grid';
+                    attachQualityListeners();
+                    selectedFormat = { url: data.url || data.downloadUrl, quality: 'default' };
+                    downloadBtn.innerHTML = `<i class="fa-solid fa-download"></i> Tải xuống`;
+                }
+                return;
+            }
+
+            // Lọc các format có video (MP4) và có độ phân giải
+            const videoFormats = formats.filter(f =>
+                (f.mimeType && f.mimeType.includes('video')) || f.height || f.qualityLabel
+            );
+
+            // Nhóm theo độ phân giải cao nhất
+            const qualityMap = new Map();
+            videoFormats.forEach(f => {
+                const height = f.height || (f.qualityLabel ? parseInt(f.qualityLabel) : 0);
+                const key = height || f.qualityLabel || f.quality || 'unknown';
+                if (!qualityMap.has(key) || (f.bitrate && f.bitrate > (qualityMap.get(key).bitrate || 0))) {
+                    qualityMap.set(key, f);
+                }
+            });
+
+            // Sắp xếp giảm dần theo độ phân giải
+            const sorted = [...qualityMap.entries()].sort((a, b) => {
+                const ha = parseInt(a[0]) || 0;
+                const hb = parseInt(b[0]) || 0;
+                return hb - ha;
+            });
+
+            if (sorted.length === 0) {
+                qualityRow.style.display = 'none';
+                return;
+            }
+
+            let html = '';
+            sorted.forEach(([key, format], index) => {
+                const label = format.qualityLabel || (format.height ? `${format.height}p` : key);
+                const url = format.url || format.downloadUrl;
+                if (!url) return;
+
+                const isSelected = index === 0 ? 'selected' : '';
+                html += `
+                    <div class="quality-option ${isSelected}" data-url="${url}" data-quality="${key}">
+                        <span class="quality-label">${label}</span>
+                        <span class="quality-sub">${format.mimeType ? format.mimeType.split(';')[0].split('/')[1].toUpperCase() : 'MP4'}</span>
+                    </div>
+                `;
+            });
+
+            if (!html) {
+                qualityRow.style.display = 'none';
+                return;
+            }
+
+            qualityRow.innerHTML = html;
+            qualityRow.style.display = 'grid';
+            attachQualityListeners();
+
+            // Mặc định chọn cái đầu tiên
+            selectedFormat = {
+                url: sorted[0][1].url || sorted[0][1].downloadUrl,
+                quality: sorted[0][1].qualityLabel || sorted[0][1].height
+            };
+            downloadBtn.innerHTML = `<i class="fa-solid fa-download"></i> Tải xuống ${selectedFormat.quality}`;
+        }
+
+        // ============================================================
+        // GẮN SỰ KIỆN CHO QUALITY OPTIONS
+        // ============================================================
+        function attachQualityListeners() {
+            document.querySelectorAll('.quality-option').forEach(opt => {
+                opt.addEventListener('click', () => {
+                    if (opt.classList.contains('disabled')) return;
+                    document.querySelectorAll('.quality-option').forEach(o => o.classList.remove('selected'));
+                    opt.classList.add('selected');
+                    selectedFormat = {
+                        url: opt.dataset.url,
+                        quality: opt.dataset.quality
+                    };
+                    const label = opt.querySelector('.quality-label').textContent;
+                    downloadBtn.innerHTML = `<i class="fa-solid fa-download"></i> Tải xuống ${label}`;
+                });
+            });
+        }
+
+        // ============================================================
+        // DOWNLOAD
+        // ============================================================
+        downloadBtn.addEventListener('click', () => {
+            if (!selectedFormat || !selectedFormat.url) {
+                showStatus('error', 'Chưa có link tải xuống. Hãy lấy thông tin video trước.');
+                return;
+            }
+
+            downloadBtn.disabled = true;
+            showStatus('info', 'Đang bắt đầu tải xuống...', true);
+
+            try {
+                // Tạo thẻ <a> để kích hoạt tải xuống
+                const a = document.createElement('a');
+                a.href = selectedFormat.url;
+                a.target = '_blank'; // Mở trong tab mới để tránh bị chặn
+                a.rel = 'noopener noreferrer';
+                a.download = `video_${selectedFormat.quality}.mp4`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+
+                showStatus('success', '✅ Đã bắt đầu tải xuống! Kiểm tra thư mục Downloads của bạn.');
+                setTimeout(hideStatus, 5000);
+            } catch (err) {
+                console.error('Download error:', err);
+                showStatus('error', 'Không thể tải xuống: ' + err.message);
+            } finally {
+                downloadBtn.disabled = false;
+            }
+        });
+
+        // ============================================================
+        // AUTO-DETECT URL KHI PASTE
+        // ============================================================
+        urlInput.addEventListener('input', () => {
+            // Có thể auto-fetch nếu muốn
+        });
+
+        // Enter để fetch
+        urlInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') fetchBtn.click();
+        });
+    </script>
+</body>
+</html>
