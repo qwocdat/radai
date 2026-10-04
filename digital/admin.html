@@ -13,6 +13,7 @@
             --accent: #6366f1;
             --accent-hover: #4f46e5;
             --success: #10b981;
+            --warning: #f59e0b;
             --danger: #ef4444;
             --text-main: #f9fafb;
             --text-sub: #9ca3af;
@@ -30,14 +31,7 @@
             align-items: center;
         }
 
-        .dash-title {
-            font-size: 22px;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
+        .dash-title { font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 12px; }
         .dash-title i { color: var(--accent); }
 
         .client-preview-link {
@@ -72,35 +66,16 @@
             gap: 10px;
         }
 
-        /* Status Check Section */
-        .status-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-        }
+        .status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
 
-        .status-tile {
-            background: rgba(0, 0, 0, 0.25);
-            padding: 16px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-        }
-
+        .status-tile { background: rgba(0, 0, 0, 0.25); padding: 16px; border-radius: 12px; border: 1px solid var(--border); }
         .tile-label { font-size: 12px; color: var(--text-sub); font-weight: 500; margin-bottom: 6px; }
         .tile-value { font-size: 20px; font-weight: 800; }
 
-        .status-pill {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
+        .status-pill { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
         .pill-active { background: rgba(16, 185, 129, 0.2); color: var(--success); }
         .pill-error { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
 
-        /* Forms Layout */
         .forms-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
         @media (max-width: 850px) { .forms-two-col { grid-template-columns: 1fr; } }
 
@@ -118,7 +93,6 @@
             outline: none;
             transition: border-color 0.2s;
         }
-
         input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 
         .submit-btn {
@@ -137,10 +111,8 @@
             justify-content: center;
             gap: 8px;
         }
-
         .submit-btn:hover { background: var(--accent-hover); }
 
-        /* Data List */
         .movie-entry-row {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--border);
@@ -148,7 +120,6 @@
             padding: 16px;
             margin-bottom: 12px;
         }
-
         .movie-row-header { display: flex; justify-content: space-between; align-items: center; }
         .movie-name { font-size: 16px; font-weight: 700; }
 
@@ -162,11 +133,75 @@
             font-weight: 700;
             cursor: pointer;
         }
-
         .delete-btn:hover { background: var(--danger); color: #fff; }
 
         .ep-list-nest { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; padding-left: 12px; border-left: 2px solid var(--border); }
         .ep-nest-item { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-sub); }
+
+        /* ===== LOGS PANEL ===== */
+        .logs-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .logs-toolbar .left { display: flex; align-items: center; gap: 12px; }
+        .logs-counter {
+            font-size: 12px;
+            background: rgba(99, 102, 241, 0.15);
+            color: #a5b4fc;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+        .logs-actions { display: flex; gap: 8px; }
+        .logs-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .logs-btn:hover { background: rgba(255, 255, 255, 0.12); }
+        .logs-btn.danger { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border-color: rgba(239, 68, 68, 0.3); }
+        .logs-btn.danger:hover { background: rgba(239, 68, 68, 0.3); }
+
+        .logs-console {
+            background: #05070c;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+            height: 320px;
+            overflow-y: auto;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 12.5px;
+            line-height: 1.55;
+        }
+        .log-line { display: flex; gap: 10px; padding: 2px 0; word-break: break-word; }
+        .log-time { color: #64748b; flex-shrink: 0; }
+        .log-tag { flex-shrink: 0; font-weight: 700; min-width: 78px; }
+        .log-msg { flex: 1; white-space: pre-wrap; }
+
+        .log-INFO    .log-tag { color: #60a5fa; }
+        .log-SUCCESS .log-tag { color: #34d399; }
+        .log-WARN    .log-tag { color: #fbbf24; }
+        .log-ERROR   .log-tag { color: #f87171; }
+
+        .log-ERROR .log-msg { color: #fca5a5; }
+        .log-WARN  .log-msg { color: #fde68a; }
+        .log-SUCCESS .log-msg { color: #a7f3d0; }
+
+        .logs-console::-webkit-scrollbar { width: 8px; }
+        .logs-console::-webkit-scrollbar-track { background: transparent; }
+        .logs-console::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -252,14 +287,117 @@
                 <div style="text-align: center; color: var(--text-sub); padding: 20px;">Đang tải danh sách phim...</div>
             </div>
         </div>
+
+        <!-- ================= NHẬT KÝ HỆ THỐNG ================= -->
+        <div class="glass-card">
+            <div class="card-header-title"><i class="fa-solid fa-terminal" style="color: var(--accent);"></i> Nhật Ký Hệ Thống (Firebase Logs)</div>
+
+            <div class="logs-toolbar">
+                <div class="left">
+                    <span class="logs-counter" id="logsCounter">0 dòng</span>
+                    <span style="font-size: 12px; color: var(--text-sub);">
+                        <i class="fa-solid fa-circle" style="color: #34d399; font-size: 8px;"></i> Success
+                        &nbsp;<i class="fa-solid fa-circle" style="color: #60a5fa; font-size: 8px;"></i> Info
+                        &nbsp;<i class="fa-solid fa-circle" style="color: #fbbf24; font-size: 8px;"></i> Warn
+                        &nbsp;<i class="fa-solid fa-circle" style="color: #f87171; font-size: 8px;"></i> Error
+                    </span>
+                </div>
+                <div class="logs-actions">
+                    <button type="button" class="logs-btn" id="btnToggleAutoscroll"><i class="fa-solid fa-arrow-down"></i> Auto-scroll: BẬT</button>
+                    <button type="button" class="logs-btn danger" id="btnClearLogs"><i class="fa-solid fa-trash"></i> Xóa log</button>
+                </div>
+            </div>
+
+            <div class="logs-console" id="logsConsole">
+                <div class="log-line log-INFO">
+                    <span class="log-time">--:--:--</span>
+                    <span class="log-tag">[SYSTEM]</span>
+                    <span class="log-msg">Bảng log đã khởi động. Mọi lỗi Firebase sẽ xuất hiện ở đây.</span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        const DB_URL = "https://ideo-dd376-default-rtdb.asia-southeast1.firebasedatabase.app";[span_3](start_span)[span_3](end_span)
-        const GITHUB_PREFIX = "https://raw.githubusercontent.com/qwocdat/radai/main/digital/";[span_4](start_span)[span_4](end_span)
+        /* =========================================================
+           1. LOGGING SYSTEM (phải khai báo trước mọi thứ)
+           ========================================================= */
+        const logsConsole = document.getElementById('logsConsole');
+        const logsCounter = document.getElementById('logsCounter');
+        let autoScroll = true;
+        let logCount = 0;
+
+        function addLog(level, msg, detail) {
+            const now = new Date();
+            const time = now.toTimeString().split(' ')[0];
+
+            const line = document.createElement('div');
+            line.className = `log-line log-${level}`;
+
+            const timeEl = document.createElement('span');
+            timeEl.className = 'log-time';
+            timeEl.textContent = time;
+
+            const tagEl = document.createElement('span');
+            tagEl.className = 'log-tag';
+            tagEl.textContent = `[${level}]`;
+
+            const msgEl = document.createElement('span');
+            msgEl.className = 'log-msg';
+            msgEl.textContent = msg + (detail ? '\n' + detail : '');
+
+            line.appendChild(timeEl);
+            line.appendChild(tagEl);
+            line.appendChild(msgEl);
+            logsConsole.appendChild(line);
+
+            logCount++;
+            logsCounter.textContent = logCount + ' dòng';
+
+            if (autoScroll) logsConsole.scrollTop = logsConsole.scrollHeight;
+
+            // Đồng thời in ra DevTools Console để tiện copy
+            const prefix = `[${time}] [${level}]`;
+            if (level === 'ERROR') console.error(prefix, msg, detail || '');
+            else if (level === 'WARN') console.warn(prefix, msg, detail || '');
+            else console.log(prefix, msg, detail || '');
+        }
+
+        document.getElementById('btnClearLogs').addEventListener('click', () => {
+            logsConsole.innerHTML = '';
+            logCount = 0;
+            logsCounter.textContent = '0 dòng';
+            addLog('INFO', 'Đã xóa toàn bộ log.');
+        });
+
+        const btnAuto = document.getElementById('btnToggleAutoscroll');
+        btnAuto.addEventListener('click', () => {
+            autoScroll = !autoScroll;
+            btnAuto.innerHTML = autoScroll
+                ? '<i class="fa-solid fa-arrow-down"></i> Auto-scroll: BẬT'
+                : '<i class="fa-solid fa-arrow-down"></i> Auto-scroll: TẮT';
+        });
+
+        // Bắt lỗi toàn cục
+        window.addEventListener('error', (e) => {
+            addLog('ERROR', 'Lỗi JavaScript toàn cục: ' + e.message,
+                `File: ${e.filename}:${e.lineno}:${e.colno}`);
+        });
+        window.addEventListener('unhandledrejection', (e) => {
+            addLog('ERROR', 'Promise bị reject không xử lý: ' + (e.reason?.message || e.reason),
+                e.reason?.stack || '');
+        });
+
+        addLog('INFO', 'Khởi tạo module Firebase SDK...');
+
+        /* =========================================================
+           2. FIREBASE CONFIG
+           ========================================================= */
+        const DB_URL = "https://ideo-dd376-default-rtdb.asia-southeast1.firebasedatabase.app";
+        const GITHUB_PREFIX = "https://raw.githubusercontent.com/qwocdat/radai/main/digital/";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAVuB8m14zkMPs-JTLAKB0Bp18QBKAMBt4",
@@ -272,43 +410,93 @@
             measurementId: "G-QP54CZ2BJT"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+        let app, db;
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getDatabase(app);
+            addLog('SUCCESS', 'Firebase initializeApp OK',
+                `DatabaseURL: ${DB_URL}\nProjectId: ${firebaseConfig.projectId}`);
+        } catch (err) {
+            addLog('ERROR', 'Firebase initializeApp thất bại: ' + err.message, err.stack || '');
+        }
 
+        /* =========================================================
+           3. DOM REFS
+           ========================================================= */
         const connStateBadge = document.getElementById('connStateBadge');
         const statPingMs = document.getElementById('statPingMs');
         const statTotalMovies = document.getElementById('statTotalMovies');
         const selectMovieTarget = document.getElementById('selectMovieTarget');
         const movieDataContainer = document.getElementById('movieDataContainer');
 
-        // Hàm REST Ping kiểm tra kết nối
+        /* =========================================================
+           4. REST PING - kiểm tra kết nối + Rules
+           ========================================================= */
+        let pingFailedLogged = false; // tránh spam log lỗi liên tục
+
         async function runDiagnosticPing() {
             const t0 = performance.now();
             try {
                 const res = await fetch(`${DB_URL}/.json?shallow=true`);
+                const t1 = performance.now();
+
                 if (res.ok) {
-                    const t1 = performance.now();
                     connStateBadge.className = "status-pill pill-active";
                     connStateBadge.innerText = "Đã kết nối";
                     statPingMs.innerText = `${Math.round(t1 - t0)} ms`;
+                    if (pingFailedLogged) {
+                        addLog('SUCCESS', `Đã kết nối lại Firebase (${Math.round(t1 - t0)} ms)`);
+                        pingFailedLogged = false;
+                    }
                 } else {
-                    throw new Error();
+                    // Các mã lỗi phổ biến:
+                    // 401 -> Rules yêu cầu auth
+                    // 403 -> Rules cấm truy cập
+                    const bodyText = await res.text().catch(() => '');
+                    connStateBadge.className = "status-pill pill-error";
+                    connStateBadge.innerText = `Lỗi ${res.status}`;
+                    if (!pingFailedLogged) {
+                        addLog('ERROR',
+                            `REST Ping thất bại - HTTP ${res.status} ${res.statusText}`,
+                            `URL: ${DB_URL}/.json?shallow=true\nBody: ${bodyText || '(rỗng)'}\n` +
+                            (res.status === 401 || res.status === 403
+                                ? '➜ Gợi ý: Vào Firebase Console → Realtime Database → Rules. Nếu rules đang là {"rules":{".read":false,".write":false}} thì client sẽ bị chặn. Cần mở quyền đọc/ghi (chỉ dùng cho dev).'
+                                : '')
+                        );
+                        pingFailedLogged = true;
+                    }
                 }
             } catch (e) {
+                const t1 = performance.now();
                 connStateBadge.className = "status-pill pill-error";
                 connStateBadge.innerText = "Lỗi kết nối";
+                statPingMs.innerText = `${Math.round(t1 - t0)} ms`;
+                if (!pingFailedLogged) {
+                    addLog('ERROR',
+                        'REST Ping lỗi network/CORS: ' + e.message,
+                        `URL: ${DB_URL}/.json?shallow=true\nStack: ${e.stack || ''}\n` +
+                        '➜ Gợi ý: Kiểm tra databaseURL có đúng region (asia-southeast1) không, hoặc mở tab Network trong DevTools để xem request có bị CORS chặn không.'
+                    );
+                    pingFailedLogged = true;
+                }
             }
         }
 
         runDiagnosticPing();
         setInterval(runDiagnosticPing, 10000);
 
-        // Form Tạo Phim
+        /* =========================================================
+           5. FORM TẠO PHIM
+           ========================================================= */
         document.getElementById('formNewMovie').addEventListener('submit', (e) => {
             e.preventDefault();
+            if (!db) { addLog('ERROR', 'Không có kết nối database, không thể tạo phim.'); return; }
+
             const title = document.getElementById('inputMovieTitle').value;
             const thumb = document.getElementById('inputMovieThumb').value;
             const desc = document.getElementById('inputMovieDesc').value;
+
+            addLog('INFO', `Đang tạo phim mới: "${title}"...`);
 
             push(ref(db, 'movies'), {
                 title: title,
@@ -316,14 +504,23 @@
                 description: desc,
                 createdAt: Date.now()
             }).then(() => {
+                addLog('SUCCESS', `Tạo phim thành công: "${title}"`);
                 alert('Tạo bộ phim thành công!');
                 document.getElementById('formNewMovie').reset();
+            }).catch((err) => {
+                addLog('ERROR', 'Tạo phim thất bại: ' + err.message,
+                    `Code: ${err.code || 'N/A'}\nStack: ${err.stack || ''}`);
+                alert('Lỗi khi tạo phim: ' + err.message);
             });
         });
 
-        // Form Thêm Tập
+        /* =========================================================
+           6. FORM THÊM TẬP
+           ========================================================= */
         document.getElementById('formNewEpisode').addEventListener('submit', (e) => {
             e.preventDefault();
+            if (!db) { addLog('ERROR', 'Không có kết nối database, không thể thêm tập.'); return; }
+
             const mId = selectMovieTarget.value;
             const order = parseInt(document.getElementById('inputEpOrder').value);
             const title = document.getElementById('inputEpTitle').value;
@@ -331,79 +528,125 @@
 
             if (!rawUrl.startsWith('http://') && !rawUrl.startsWith('https://')) {
                 rawUrl = GITHUB_PREFIX + rawUrl;
+                addLog('INFO', 'Đã ghép prefix GitHub vào URL video.', `URL cuối: ${rawUrl}`);
             }
+
+            addLog('INFO', `Đang thêm tập ${order} cho movieId=${mId}...`);
 
             push(ref(db, `movies/${mId}/episodes`), {
                 order: order,
                 title: title,
                 url: rawUrl
             }).then(() => {
+                addLog('SUCCESS', `Đăng tập "${title}" thành công.`);
                 alert('Đăng tập video thành công!');
                 document.getElementById('formNewEpisode').reset();
+            }).catch((err) => {
+                addLog('ERROR', 'Đăng tập thất bại: ' + err.message,
+                    `Code: ${err.code || 'N/A'}\nStack: ${err.stack || ''}`);
+                alert('Lỗi khi đăng tập: ' + err.message);
             });
         });
 
-        // Tải Danh Sách Phim
-        onValue(ref(db, 'movies'), (snapshot) => {
-            const data = snapshot.val() || {};
-            const keys = Object.keys(data);
+        /* =========================================================
+           7. TẢI DANH SÁCH PHIM (có error callback)
+           ========================================================= */
+        if (db) {
+            addLog('INFO', 'Đang lắng nghe dữ liệu từ /movies ...');
 
-            statTotalMovies.innerText = keys.length;
-            selectMovieTarget.innerHTML = '<option value="">-- Chọn phim --</option>';
-            movieDataContainer.innerHTML = '';
+            onValue(ref(db, 'movies'),
+                (snapshot) => {
+                    const data = snapshot.val() || {};
+                    const keys = Object.keys(data);
 
-            if (keys.length === 0) {
-                movieDataContainer.innerHTML = '<div style="text-align: center; color: var(--text-sub); padding: 20px;">Chưa có phim nào trong Database</div>';
-                return;
-            }
+                    statTotalMovies.innerText = keys.length;
+                    selectMovieTarget.innerHTML = '<option value="">-- Chọn phim --</option>';
+                    movieDataContainer.innerHTML = '';
 
-            keys.forEach(id => {
-                const movie = data[id];
+                    addLog('SUCCESS', `Đã nhận dữ liệu từ Firebase: ${keys.length} bộ phim.`);
 
-                // Nạp vào Select Box
-                const opt = document.createElement('option');
-                opt.value = id;
-                opt.innerText = movie.title;
-                selectMovieTarget.appendChild(opt);
+                    if (keys.length === 0) {
+                        movieDataContainer.innerHTML = '<div style="text-align: center; color: var(--text-sub); padding: 20px;">Chưa có phim nào trong Database</div>';
+                        return;
+                    }
 
-                // Nạp vào danh sách hiển thị
-                const episodes = movie.episodes ? Object.keys(movie.episodes).map(k => ({ id: k, ...movie.episodes[k] })) : [];
-                episodes.sort((a,b) => (a.order||0) - (b.order||0));
+                    keys.forEach(id => {
+                        const movie = data[id];
 
-                let epMarkup = '';
-                episodes.forEach(ep => {
-                    epMarkup += `
-                        <div class="ep-nest-item">
-                            <span>Tập ${ep.order || 1}: ${ep.title} (${ep.url})</span>
-                            <button class="delete-btn" onclick="removeEp('${id}', '${ep.id}')">Xóa tập</button>
-                        </div>
-                    `;
-                });
+                        const opt = document.createElement('option');
+                        opt.value = id;
+                        opt.innerText = movie.title;
+                        selectMovieTarget.appendChild(opt);
 
-                const row = document.createElement('div');
-                row.className = 'movie-entry-row';
-                row.innerHTML = `
-                    <div class="movie-row-header">
-                        <span class="movie-name">🎬 ${movie.title} (${episodes.length} tập)</span>
-                        <button class="delete-btn" onclick="removeMovie('${id}')">Xóa toàn bộ phim</button>
-                    </div>
-                    <div class="ep-list-nest">${epMarkup || '<span style="font-size: 12px;">Chưa có tập phim nào.</span>'}</div>
-                `;
-                movieDataContainer.appendChild(row);
-            });
-        });
+                        const episodes = movie.episodes
+                            ? Object.keys(movie.episodes).map(k => ({ id: k, ...movie.episodes[k] }))
+                            : [];
+                        episodes.sort((a, b) => (a.order || 0) - (b.order || 0));
 
+                        let epMarkup = '';
+                        episodes.forEach(ep => {
+                            epMarkup += `
+                                <div class="ep-nest-item">
+                                    <span>Tập ${ep.order || 1}: ${ep.title} (${ep.url})</span>
+                                    <button class="delete-btn" onclick="removeEp('${id}', '${ep.id}')">Xóa tập</button>
+                                </div>
+                            `;
+                        });
+
+                        const row = document.createElement('div');
+                        row.className = 'movie-entry-row';
+                        row.innerHTML = `
+                            <div class="movie-row-header">
+                                <span class="movie-name">🎬 ${movie.title} (${episodes.length} tập)</span>
+                                <button class="delete-btn" onclick="removeMovie('${id}')">Xóa toàn bộ phim</button>
+                            </div>
+                            <div class="ep-list-nest">${epMarkup || '<span style="font-size: 12px;">Chưa có tập phim nào.</span>'}</div>
+                        `;
+                        movieDataContainer.appendChild(row);
+                    });
+                },
+                // >>>>>> ERROR CALLBACK — cực kỳ quan trọng, đây là chỗ code cũ thiếu <<<<<<
+                (err) => {
+                    addLog('ERROR', 'onValue(/movies) thất bại: ' + err.message,
+                        `Code: ${err.code || 'N/A'}\nStack: ${err.stack || ''}\n` +
+                        '➜ Gợi ý: Nếu code là "PERMISSION_DENIED" thì Firebase Rules đang chặn đọc. ' +
+                        'Vào Realtime Database → Rules và set tạm: {"rules":{".read":true,".write":true}} để test.'
+                    );
+                    movieDataContainer.innerHTML =
+                        '<div style="text-align: center; color: var(--danger); padding: 20px;">' +
+                        'Không thể tải dữ liệu phim. Xem bảng Logs bên dưới để biết chi tiết.</div>';
+                }
+            );
+        } else {
+            addLog('ERROR', 'Bỏ qua onValue vì Firebase chưa được khởi tạo.');
+        }
+
+        /* =========================================================
+           8. HÀM XÓA (có .catch + log)
+           ========================================================= */
         window.removeMovie = (mId) => {
+            if (!db) { addLog('ERROR', 'Không có database để xóa phim.'); return; }
             if (confirm('Xóa bộ phim này cùng toàn bộ các tập phim bên trong?')) {
-                remove(ref(db, `movies/${mId}`));
+                addLog('INFO', `Đang xóa movieId=${mId}...`);
+                remove(ref(db, `movies/${mId}`))
+                    .then(() => addLog('SUCCESS', `Đã xóa phim: ${mId}`))
+                    .catch(err => addLog('ERROR', 'Xóa phim thất bại: ' + err.message,
+                        `Code: ${err.code || 'N/A'}`));
             }
         };
 
         window.removeEp = (mId, epId) => {
+            if (!db) { addLog('ERROR', 'Không có database để xóa tập.'); return; }
             if (confirm('Xóa tập phim này?')) {
-                remove(ref(db, `movies/${mId}/episodes/${epId}`));
+                addLog('INFO', `Đang xóa tập epId=${epId} của movieId=${mId}...`);
+                remove(ref(db, `movies/${mId}/episodes/${epId}`))
+                    .then(() => addLog('SUCCESS', `Đã xóa tập: ${epId}`))
+                    .catch(err => addLog('ERROR', 'Xóa tập thất bại: ' + err.message,
+                        `Code: ${err.code || 'N/A'}`));
             }
         };
+
+        addLog('INFO', 'Hệ thống đã sẵn sàng. Nếu có lỗi, nó sẽ hiện ngay trong bảng log này.');
     </script>
 </body>
 </html>
