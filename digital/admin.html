@@ -3,437 +3,287 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AdDigital Admin - Quản Trị Video Realtime</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>AdDigital - Control Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            500: '#6366f1',
-                            600: '#4f46e5',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0b0f17;
-            color: #f3f4f6;
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #111827;
+            --accent-color: #6366f1;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --text-color: #f9fafb;
+            --text-muted: #9ca3af;
+            --border-color: rgba(255, 255, 255, 0.1);
         }
 
-        .glass {
-            background: rgba(17, 24, 39, 0.75);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); padding: 24px; min-height: 100vh; }
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
+        .header { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto 24px auto; }
+        .title { font-size: 22px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .title i { color: var(--accent-color); }
+        .client-btn { background: rgba(255,255,255,0.05); color: #fff; text-decoration: none; padding: 8px 16px; border-radius: 8px; font-size: 14px; border: 1px solid var(--border-color); }
 
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #0b0f17; }
-        ::-webkit-scrollbar-thumb { background: #272727; border-radius: 4px; }
+        .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 24px; }
+
+        .card { background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color); }
+        .card-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+        .status-box { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 12px; }
+        .stat-item { background: rgba(0,0,0,0.2); padding: 14px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .stat-label { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+        .stat-val { font-size: 18px; font-weight: 700; }
+        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .badge-success { background: rgba(16, 185, 129, 0.2); color: var(--success-color); }
+        .badge-danger { background: rgba(239, 68, 68, 0.2); color: var(--danger-color); }
+
+        .form-group { margin-bottom: 14px; }
+        label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 6px; font-weight: 500; }
+        input, select, textarea { width: 100%; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 6px; color: #fff; font-size: 14px; outline: none; }
+        input:focus, select:focus, textarea:focus { border-color: var(--accent-color); }
+
+        .btn { padding: 10px 20px; background: var(--accent-color); color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        .btn:hover { opacity: 0.9; }
+        .btn-danger { background: var(--danger-color); }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 6px; margin-bottom: 8px; border: 1px solid var(--border-color); }
     </style>
 </head>
-<body class="min-h-screen flex flex-col bg-[#0b0f17] text-gray-100">
+<body>
 
-    <header class="sticky top-0 z-50 glass border-b border-white/10 px-4 lg:px-8 py-3 flex items-center justify-between">
-        <div class="flex items-center space-x-3">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                <i class="fa-solid fa-shield-halved text-white text-sm"></i>
-            </div>
-            <div>
-                <span class="text-lg font-bold bg-gradient-to-r from-white via-gray-200 to-indigo-400 bg-clip-text text-transparent">AdDigital Admin</span>
-                <span class="text-[10px] px-2 py-0.5 ml-2 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-medium">Dashboard v2.0</span>
+    <div class="header">
+        <div class="title"><i class="fa-solid fa-shield-halved"></i> AdDigital Admin Dashboard</div>
+        <a href="tube.html" target="_blank" class="client-btn"><i class="fa-solid fa-arrow-up-right-from-square"></i> Mở Trang Client</a>
+    </div>
+
+    <div class="container">
+        <!-- Bảng kiểm tra kết nối -->
+        <div class="card">
+            <div class="card-title"><i class="fa-solid fa-network-wired"></i> Kiểm Tra Trạng Thái Kết Nối Firebase</div>
+            <div class="status-box">
+                <div class="stat-item">
+                    <div class="stat-label">Trạng Thái Kết Nối</div>
+                    <div id="connStatus" class="status-badge badge-danger">Đang kết nối...</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Tổng Số Phim</div>
+                    <div id="movieCount" class="stat-val">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Độ Trễ (Ping)</div>
+                    <div id="pingVal" class="stat-val">-- ms</div>
+                </div>
             </div>
         </div>
 
-        <a href="tube.html" target="_blank" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-xs font-semibold text-gray-200 transition-all">
-            <i class="fa-solid fa-arrow-up-right-from-square"></i>
-            <span>Mở Trang Client Xem Phim</span>
-        </a>
-    </header>
-
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 space-y-6">
-
-        <!-- FIREBASE STATUS CHECK COMPONENT -->
-        <section class="glass p-5 rounded-2xl border border-white/10 shadow-xl relative overflow-hidden">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
-                <div class="flex items-center space-x-3">
-                    <div class="p-2.5 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-indigo-400">
-                        <i class="fa-solid fa-server text-lg"></i>
+        <div class="grid-2">
+            <!-- Form Tạo Phim Mới -->
+            <div class="card">
+                <div class="card-title"><i class="fa-solid fa-film"></i> 1. Tạo Phim Mới</div>
+                <form id="createMovieForm">
+                    <div class="form-group">
+                        <label>Tên Phim</label>
+                        <input type="text" id="mTitle" placeholder="Ví dụ: Tây Du Ký" required>
                     </div>
-                    <div>
-                        <h2 class="font-bold text-base text-white flex items-center gap-2">
-                            Kiểm Tra Kết Nối Firebase Realtime Database
-                        </h2>
-                        <p class="text-xs text-gray-400 font-mono">ideo-dd376-default-rtdb.firebaseio.com</p>
+                    <div class="form-group">
+                        <label>Link Ảnh Bìa (Thumbnail)</label>
+                        <input type="text" id="mThumb" placeholder="https://..." >
                     </div>
-                </div>
-
-                <div class="flex items-center space-x-3">
-                    <span id="dbStatusBadge" class="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 flex items-center gap-1.5">
-                        <i class="fa-solid fa-spinner animate-spin"></i>
-                        <span>Đang kiểm tra...</span>
-                    </span>
-                    <button onclick="checkFirebaseHealth()" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-medium text-gray-200 transition-all">
-                        <i class="fa-solid fa-rotate-right mr-1"></i> Kiểm tra lại
-                    </button>
-                </div>
+                    <div class="form-group">
+                        <label>Mô Tả Phim</label>
+                        <textarea id="mDesc" rows="3" placeholder="Nội dung tóm tắt..."></textarea>
+                    </div>
+                    <button type="submit" class="btn"><i class="fa-solid fa-plus"></i> Tạo Phim</button>
+                </form>
             </div>
 
-            <!-- Diagnostics Stats Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 pt-4">
-                <div class="bg-black/30 p-3 rounded-xl border border-white/5">
-                    <span class="text-[11px] text-gray-400 block">Trạng thái Read/Write</span>
-                    <span id="diagReadWrite" class="font-semibold text-xs text-gray-200">Đang test...</span>
-                </div>
-                <div class="bg-black/30 p-3 rounded-xl border border-white/5">
-                    <span class="text-[11px] text-gray-400 block">Tổng số phim</span>
-                    <span id="diagMovieCount" class="font-bold text-sm text-indigo-400">0 Phim</span>
-                </div>
-                <div class="bg-black/30 p-3 rounded-xl border border-white/5">
-                    <span class="text-[11px] text-gray-400 block">Tổng số tập phim</span>
-                    <span id="diagEpCount" class="font-bold text-sm text-purple-400">0 Tập</span>
-                </div>
-                <div class="bg-black/30 p-3 rounded-xl border border-white/5">
-                    <span class="text-[11px] text-gray-400 block">Độ trễ Ping (Latency)</span>
-                    <span id="diagPing" class="font-mono text-xs text-emerald-400">-- ms</span>
-                </div>
+            <!-- Form Thêm Tập Video -->
+            <div class="card">
+                <div class="card-title"><i class="fa-solid fa-video"></i> 2. Thêm Tập Phim</div>
+                <form id="addEpForm">
+                    <div class="form-group">
+                        <label>Chọn Phim</label>
+                        <select id="movieSelect" required>
+                            <option value="">-- Chọn phim --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Số Tập (Thứ tự: 1, 2, 3...)</label>
+                        <input type="number" id="epOrder" placeholder="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tên Tập Phim</label>
+                        <input type="text" id="epTitle" placeholder="Tập 1: Mở Đầu" required>
+                    </div>
+                    <div class="form-group">
+                        <label>File Video (.mp4 / GitHub)</label>
+                        <input type="text" id="epUrl" placeholder="tap1.mp4" required>
+                        <span style="font-size: 11px; color: var(--text-muted);">Tự động ghép prefix GitHub nếu chỉ nhập tên file</span>
+                    </div>
+                    <button type="submit" class="btn"><i class="fa-solid fa-upload"></i> Đăng Tập Video</button>
+                </form>
             </div>
-        </section>
-
-        <!-- TWO-TIER MANAGEMENT SECTION (Phim & Tập phim) -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
-            <!-- Left Forms (5 Cols) -->
-            <div class="lg:col-span-5 space-y-5">
-                
-                <!-- FORM 1: Thêm Phim Mới -->
-                <div class="glass p-5 rounded-2xl border border-white/10 space-y-4">
-                    <div class="flex items-center space-x-2 border-b border-white/10 pb-3">
-                        <i class="fa-solid fa-film text-indigo-400"></i>
-                        <h3 class="font-bold text-sm text-white">1. Thêm Phim / Series Mới</h3>
-                    </div>
-
-                    <form id="createMovieForm" onsubmit="handleCreateMovie(event)" class="space-y-3">
-                        <div>
-                            <label class="block text-xs font-medium text-gray-300 mb-1">Tên Phim</label>
-                            <input type="text" id="movieTitle" placeholder="VD: Thần Thoại Ai Cập" required class="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2 text-xs text-gray-200 outline-none focus:border-indigo-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-300 mb-1">Link Ảnh Bìa (Thumbnail URL)</label>
-                            <input type="text" id="movieThumb" placeholder="https://... (Để trống dùng ảnh mặc định)" class="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2 text-xs text-gray-200 outline-none focus:border-indigo-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-300 mb-1">Mô Tả Phim</label>
-                            <textarea id="movieDesc" rows="2" placeholder="Nội dung tóm tắt phim..." class="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2 text-xs text-gray-200 outline-none focus:border-indigo-500"></textarea>
-                        </div>
-                        <button type="submit" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl text-xs transition-colors shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-1.5">
-                            <i class="fa-solid fa-plus"></i>
-                            <span>Tạo Phim Mới</span>
-                        </button>
-                    </form>
-                </div>
-
-                <!-- FORM 2: Thêm Tập Cho Phim Đã Chọn -->
-                <div class="glass p-5 rounded-2xl border border-white/10 space-y-4">
-                    <div class="flex items-center space-x-2 border-b border-white/10 pb-3">
-                        <i class="fa-solid fa-video text-purple-400"></i>
-                        <h3 class="font-bold text-sm text-white">2. Thêm Tập Video Vào Phim</h3>
-                    </div>
-
-                    <form id="createEpForm" onsubmit="handleCreateEpisode(event)" class="space-y-3">
-                        <div>
-                            <label class="block text-xs font-medium text-gray-300 mb-1">Chọn Phim Cần Thêm Tập</label>
-                            <select id="selectedMovieSelect" required class="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2 text-xs text-gray-200 outline-none focus:border-indigo-500">
-                                <option value="">-- Đang tải danh sách phim --</option>
-                            </select>
-                        </div>
-
-                        <div class="grid grid-cols-3 gap-2">
-                            <div class="col-span-1">
-                                <label class="block text-xs font-medium text-gray-300 mb-1">Thứ tự tập</label>
-                                <input type="number" id="epOrder" placeholder="1" value="1" required class="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-xs text-gray-200 outline-none focus:border-indigo-500">
-                            </div>
-                            <div class="col-span-2">
-                                <label class="block text-xs font-medium text-gray-300 mb-1">Tên Tập Phim</label>
-                                <input type="text" id="epTitle" placeholder="Tập 1: Khởi Đầu" required class="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-xs text-gray-200 outline-none focus:border-indigo-500">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-medium text-gray-300 mb-1">Tên File .mp4 Hoặc Full URL</label>
-                            <input type="text" id="epUrl" placeholder="VD: tap1.mp4" required class="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2 text-xs text-gray-200 font-mono outline-none focus:border-indigo-500">
-                            <p class="text-[10px] text-gray-400 mt-1">💡 Nhập <code class="text-indigo-400">tap1.mp4</code> sẽ tự động gắn prefix: <code class="text-indigo-400">.../digital/tap1.mp4</code></p>
-                        </div>
-
-                        <button type="submit" class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-xl text-xs transition-colors shadow-lg shadow-purple-600/30 flex items-center justify-center gap-1.5">
-                            <i class="fa-solid fa-cloud-arrow-up"></i>
-                            <span>Thêm Tập Video</span>
-                        </button>
-                    </form>
-                </div>
-
-            </div>
-
-            <!-- Right Movies & Episodes Management List (7 Cols) -->
-            <div class="lg:col-span-7">
-                <div class="glass p-5 rounded-2xl border border-white/10 space-y-4 min-h-[500px]">
-                    <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                        <div class="flex items-center space-x-2">
-                            <i class="fa-solid fa-database text-indigo-400"></i>
-                            <h3 class="font-bold text-base text-white">Quản Lý Phim & Các Tập</h3>
-                        </div>
-                        <span id="moviesBadge" class="text-xs bg-indigo-500/20 text-indigo-300 px-2.5 py-0.5 rounded-full font-mono">0 phim</span>
-                    </div>
-
-                    <div id="moviesManagerList" class="space-y-3">
-                        <div class="text-center py-12 text-gray-500 text-xs">
-                            <i class="fa-solid fa-spinner animate-spin text-lg mb-2"></i>
-                            <p>Đang đồng bộ dữ liệu Realtime Database...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
 
-    </main>
+        <!-- Danh sách Quản lý Phim & Tập -->
+        <div class="card">
+            <div class="card-title"><i class="fa-solid fa-list-check"></i> Quản Lý Dữ Liệu Phim</div>
+            <div id="movieManager">
+                <div style="text-align: center; color: var(--text-muted); padding: 20px;">Đang đồng bộ dữ liệu...</div>
+            </div>
+        </div>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue, push, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, push, onValue, remove, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // Firebase Configuration (Project ideo-dd376)
         const firebaseConfig = {
             apiKey: "AIzaSyAVuB8m14zkMPs-JTLAKB0Bp18QBKAMBt4",
             authDomain: "ideo-dd376.firebaseapp.com",
+            databaseURL: "https://ideo-dd376-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "ideo-dd376",
             storageBucket: "ideo-dd376.firebasestorage.app",
             messagingSenderId: "689163185",
-            appId: "1:689163185:web:f4e11f000a5afc3a364b90",
-            databaseURL: "https://ideo-dd376-default-rtdb.firebaseio.com"
+            appId: "1:689163185:web:af4091213001180f364b90",
+            measurementId: "G-QP54CZ2BJT"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        const GITHUB_PREFIX = "https://raw.githubusercontent.com/qwocdat/radai/main/digital/";
+        const GITHUB_PREFIX = "https://raw.githubusercontent.com/qwocdat/radai/main/digital/";[span_1](start_span)[span_1](end_span)
 
-        let globalMovies = {};
+        const connStatus = document.getElementById('connStatus');
+        const pingVal = document.getElementById('pingVal');
+        const movieCount = document.getElementById('movieCount');
+        const movieSelect = document.getElementById('movieSelect');
+        const movieManager = document.getElementById('movieManager');
 
-        window.addEventListener('DOMContentLoaded', () => {
-            listenToDatabase();
-            checkFirebaseHealth();
+        // Lắng nghe kết nối hế thống
+        const connectedRef = ref(db, ".info/connected");
+        let startTime = Date.now();
+
+        onValue(connectedRef, (snap) => {
+            if (snap.val() === true) {
+                const latency = Date.now() - startTime;
+                connStatus.className = "status-badge badge-success";
+                connStatus.innerText = "Đã kết nối";
+                pingVal.innerText = `${latency} ms`;
+            } else {
+                connStatus.className = "status-badge badge-danger";
+                connStatus.innerText = "Lỗi kết nối";
+            }
         });
 
-        // 1. Health Check & Diagnostic Logic
-        window.checkFirebaseHealth = function() {
-            const statusBadge = document.getElementById('dbStatusBadge');
-            const diagReadWrite = document.getElementById('diagReadWrite');
-            const diagPing = document.getElementById('diagPing');
-
-            statusBadge.className = "px-3 py-1 rounded-full text-xs font-semibold bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 flex items-center gap-1.5";
-            statusBadge.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i><span>Đang test...</span>`;
-
-            const startTime = Date.now();
-            const healthRef = ref(db, '.info/connected');
-
-            onValue(healthRef, (snap) => {
-                const latency = Date.now() - startTime;
-                diagPing.innerText = `${latency} ms`;
-
-                if (snap.val() === true) {
-                    statusBadge.className = "px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5";
-                    statusBadge.innerHTML = `<i class="fa-solid fa-circle-check"></i><span>Hoạt động tốt</span>`;
-                    diagReadWrite.innerHTML = `<span class="text-emerald-400 font-bold">Thành công (Đọc/Ghi OK)</span>`;
-                } else {
-                    statusBadge.className = "px-3 py-1 rounded-full text-xs font-semibold bg-red-500/20 text-red-300 border border-red-500/30 flex items-center gap-1.5";
-                    statusBadge.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i><span>Lỗi kết nối</span>`;
-                    diagReadWrite.innerHTML = `<span class="text-red-400 font-bold">Thất bại</span>`;
-                }
-            }, { onlyOnce: true });
-        };
-
-        // 2. Realtime Database Listener
-        function listenToDatabase() {
-            const moviesRef = ref(db, 'movies');
-            onValue(moviesRef, (snapshot) => {
-                globalMovies = snapshot.val() || {};
-                
-                updateStats();
-                populateMovieDropdown();
-                renderMoviesList();
-            });
-        }
-
-        function updateStats() {
-            const movieKeys = Object.keys(globalMovies);
-            let totalEps = 0;
-
-            movieKeys.forEach(k => {
-                if (globalMovies[k].episodes) {
-                    totalEps += Object.keys(globalMovies[k].episodes).length;
-                }
-            });
-
-            document.getElementById('diagMovieCount').innerText = `${movieKeys.length} Phim`;
-            document.getElementById('diagEpCount').innerText = `${totalEps} Tập`;
-            document.getElementById('moviesBadge').innerText = `${movieKeys.length} phim`;
-        }
-
-        function populateMovieDropdown() {
-            const select = document.getElementById('selectedMovieSelect');
-            const keys = Object.keys(globalMovies);
-
-            if (keys.length === 0) {
-                select.innerHTML = `<option value="">-- Hãy tạo phim ở trên trước --</option>`;
-                return;
-            }
-
-            select.innerHTML = keys.map(id => `<option value="${id}">${globalMovies[id].title}</option>`).join('');
-        }
-
-        // 3. Render Admin Movies & Episode List
-        function renderMoviesList() {
-            const container = document.getElementById('moviesManagerList');
-            const keys = Object.keys(globalMovies);
-
-            if (keys.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-12 text-gray-500 text-xs">
-                        <i class="fa-solid fa-film text-2xl mb-2"></i>
-                        <p>Database trống. Tạo phim đầu tiên ở cột bên trái!</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = keys.map(id => {
-                const movie = globalMovies[id];
-                const rawEps = movie.episodes ? Object.keys(movie.episodes).map(epId => ({ epId, ...movie.episodes[epId] })) : [];
-                const sortedEps = rawEps.sort((a, b) => (a.order || 0) - (b.order || 0));
-
-                return `
-                    <div class="glass-card p-4 rounded-xl space-y-3 border border-white/5 hover:border-white/15 transition-all">
-                        <div class="flex items-start justify-between gap-3">
-                            <div>
-                                <h4 class="font-bold text-sm text-white flex items-center gap-2">
-                                    <span>${movie.title}</span>
-                                    <span class="text-[10px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded font-mono">${sortedEps.length} tập</span>
-                                </h4>
-                                <p class="text-xs text-gray-400 mt-1 line-clamp-1">${movie.description || 'Không có mô tả'}</p>
-                            </div>
-                            
-                            <div class="flex items-center space-x-1">
-                                <a href="tube.html?v=${id}" target="_blank" class="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-gray-300 hover:text-white" title="Mở link phim">
-                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                                </a>
-                                <button onclick="deleteMovie('${id}')" class="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-xs text-red-400" title="Xóa phim này">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Sub Episodes List -->
-                        <div class="bg-black/40 rounded-xl p-2.5 space-y-1.5 border border-white/5">
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold block px-1">Danh sách tập:</span>
-                            ${sortedEps.length === 0 ? '<div class="text-[11px] text-gray-500 px-1 py-1">Chưa có tập phim nào</div>' : ''}
-                            
-                            ${sortedEps.map(ep => `
-                                <div class="flex items-center justify-between bg-white/5 px-2.5 py-1.5 rounded-lg text-xs">
-                                    <div class="flex items-center space-x-2 truncate pr-2">
-                                        <span class="font-bold text-indigo-400">#${ep.order || 1}</span>
-                                        <span class="text-gray-200 font-medium truncate">${ep.title}</span>
-                                    </div>
-                                    <button onclick="deleteEpisode('${id}', '${ep.epId}')" class="text-red-400 hover:text-red-300 text-xs px-1" title="Xóa tập">
-                                        <i class="fa-solid fa-xmark"></i>
-                                    </button>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // 4. Create Movie Handler
-        window.handleCreateMovie = function(e) {
+        // Tạo phim mới
+        document.getElementById('createMovieForm').addEventListener('submit', (e) => {
             e.preventDefault();
-            const title = document.getElementById('movieTitle').value.trim();
-            const thumbnail = document.getElementById('movieThumb').value.trim() || 'https://placehold.co/600x350/1f1f1f/ffffff?text=' + encodeURIComponent(title);
-            const description = document.getElementById('movieDesc').value.trim();
+            const title = document.getElementById('mTitle').value;
+            const thumb = document.getElementById('mThumb').value;
+            const desc = document.getElementById('mDesc').value;
 
             const moviesRef = ref(db, 'movies');
-            const newRef = push(moviesRef);
-
-            set(newRef, {
-                title,
-                thumbnail,
-                description,
+            push(moviesRef, {
+                title: title,
+                thumbnail: thumb,
+                description: desc,
                 createdAt: Date.now()
             }).then(() => {
-                alert("Đã tạo phim mới thành công!");
+                alert('Tạo phim thành công!');
                 document.getElementById('createMovieForm').reset();
-            }).catch(err => alert("Lỗi: " + err.message));
-        };
+            });
+        });
 
-        // 5. Create Episode Handler
-        window.handleCreateEpisode = function(e) {
+        // Thêm tập video
+        document.getElementById('addEpForm').addEventListener('submit', (e) => {
             e.preventDefault();
-            const movieId = document.getElementById('selectedMovieSelect').value;
-            if (!movieId) {
-                alert("Vui lòng tạo phim trước khi thêm tập!");
+            const mId = movieSelect.value;
+            const order = parseInt(document.getElementById('epOrder').value);
+            const title = document.getElementById('epTitle').value;
+            let url = document.getElementById('epUrl').value.trim();
+
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                url = GITHUB_PREFIX + url;
+            }
+
+            const epRef = ref(db, `movies/${mId}/episodes`);
+            push(epRef, {
+                order: order,
+                title: title,
+                url: url
+            }).then(() => {
+                alert('Đã thêm tập phim mới!');
+                document.getElementById('addEpForm').reset();
+            });
+        });
+
+        // Đọc danh sách phim
+        onValue(ref(db, 'movies'), (snapshot) => {
+            const data = snapshot.val() || {};
+            const keys = Object.keys(data);
+
+            movieCount.innerText = keys.length;
+            movieSelect.innerHTML = '<option value="">-- Chọn phim --</option>';
+            movieManager.innerHTML = '';
+
+            if (keys.length === 0) {
+                movieManager.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 20px;">Chưa có dữ liệu phim</div>';
                 return;
             }
 
-            const order = parseInt(document.getElementById('epOrder').value) || 1;
-            const title = document.getElementById('epTitle').value.trim();
-            let rawUrl = document.getElementById('epUrl').value.trim();
+            keys.forEach(id => {
+                const m = data[id];
+                
+                // Add to Select Box
+                const opt = document.createElement('option');
+                opt.value = id;
+                opt.innerText = m.title;
+                movieSelect.appendChild(opt);
 
-            if (!rawUrl.startsWith('http://') && !rawUrl.startsWith('https://')) {
-                rawUrl = GITHUB_PREFIX + rawUrl;
+                // Add to Manager List
+                const episodes = m.episodes ? Object.keys(m.episodes).map(k => ({ id: k, ...m.episodes[k] })) : [];
+                episodes.sort((a,b) => (a.order||0) - (b.order||0));
+
+                let epListHtml = '';
+                episodes.forEach(ep => {
+                    epListHtml += `
+                        <div class="list-item" style="font-size: 13px; margin-left: 20px;">
+                            <span>Tập ${ep.order || 1}: ${ep.title} (${ep.url})</span>
+                            <button class="btn btn-danger" style="padding: 4px 8px; font-size: 11px;" onclick="deleteEp('${id}', '${ep.id}')">Xóa tập</button>
+                        </div>
+                    `;
+                });
+
+                const mDiv = document.createElement('div');
+                mDiv.className = 'list-item';
+                mDiv.style.flexDirection = 'column';
+                mDiv.style.alignItems = 'stretch';
+                mDiv.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-weight: 600;">
+                        <span>🎬 ${m.title} (${episodes.length} tập)</span>
+                        <button class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="deleteMovie('${id}')">Xóa Phim</button>
+                    </div>
+                    <div style="margin-top: 8px;">${epListHtml}</div>
+                `;
+                movieManager.appendChild(mDiv);
+            });
+        });
+
+        window.deleteMovie = (mId) => {
+            if(confirm('Bạn có chắc chắn muốn xóa toàn bộ phim này và các tập liên quan?')) {
+                remove(ref(db, `movies/${mId}`));
             }
-
-            const epRef = ref(db, `movies/${movieId}/episodes`);
-            const newEpRef = push(epRef);
-
-            set(newEpRef, {
-                order,
-                title,
-                url: rawUrl,
-                createdAt: Date.now()
-            }).then(() => {
-                alert("Đã thêm tập phim mới!");
-                document.getElementById('createEpForm').reset();
-                document.getElementById('epOrder').value = order + 1;
-            }).catch(err => alert("Lỗi: " + err.message));
         };
 
-        // 6. Delete Actions
-        window.deleteMovie = function(id) {
-            if (confirm("Xóa bộ phim này sẽ xóa toàn bộ các tập phim bên trong. Bạn có chắc chắn?")) {
-                const itemRef = ref(db, `movies/${id}`);
-                remove(itemRef);
-            }
-        };
-
-        window.deleteEpisode = function(movieId, epId) {
-            if (confirm("Xóa tập phim này?")) {
-                const epRef = ref(db, `movies/${movieId}/episodes/${epId}`);
-                remove(epRef);
+        window.deleteEp = (mId, epId) => {
+            if(confirm('Xóa tập phim này?')) {
+                remove(ref(db, `movies/${mId}/episodes/${epId}`));
             }
         };
     </script>
