@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DigitalTube - Nền Tảng Xem Video</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #080b11;
+            color: #f3f4f6;
+        }
+
+        .glass {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            transition: all 0.2s ease;
+        }
+        input[type=range]:hover::-webkit-slider-runnable-track {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.35);
+        }
+        input[type=range]::-webkit-slider-thumb {
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+            background: #6366f1;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -4px;
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.8);
+            transition: transform 0.1s ease;
+        }
+        input[type=range]:hover::-webkit-slider-thumb {
+            transform: scale(1.25);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-[#080b11] text-gray-100 selection:bg-brand-500 selection:text-white">
+
+    <header class="sticky top-0 z-50 glass border-b border-white/10 px-4 lg:px-8 py-3.5 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center shadow-lg shadow-brand-500/30">
+                <i data-lucide="play" class="w-5 h-5 text-white fill-white ml-0.5"></i>
+            </div>
+            <div>
+                <span class="text-xl font-bold bg-gradient-to-r from-white via-gray-200 to-brand-500 bg-clip-text text-transparent">DigitalTube</span>
+                <span class="hidden sm:inline-block text-xs px-2 py-0.5 ml-2 rounded-full bg-brand-500/10 text-brand-400 border border-brand-500/20 font-medium">Player</span>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-3">
+            <div class="relative hidden md:block w-64 lg:w-80">
+                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="searchInput" placeholder="Tìm tập phim..." onkeyup="filterEpisodes()" class="w-full bg-white/5 border border-white/10 rounded-full py-1.5 pl-9 pr-4 text-sm text-gray-200 placeholder-gray-400 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all">
+            </div>
+            <a href="addigital.html" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-xs font-semibold text-white shadow-lg shadow-brand-600/30 transition-all">
+                <i data-lucide="settings" class="w-4 h-4"></i>
+                <span>Trang Admin</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-[1700px] w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Video Player Column (8 Cols) -->
+        <section class="lg:col-span-8 flex flex-col space-y-4">
+            
+            <div id="playerContainer" class="relative group w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/10 flex items-center justify-center select-none">
+                
+                <video id="mainVideo" class="w-full h-full object-contain cursor-pointer" playsinline></video>
+
+                <!-- Spinner -->
+                <div id="videoSpinner" class="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-20 pointer-events-none transition-opacity duration-300">
+                    <div class="w-12 h-12 border-4 border-brand-500/30 border-t-brand-500 rounded-full animate-spin"></div>
+                </div>
+
+                <!-- Center Play Overlay Button -->
+                <div id="centerPlayBtn" onclick="togglePlay()" class="absolute z-10 w-16 h-16 rounded-full bg-brand-600/80 backdrop-blur-md flex items-center justify-center cursor-pointer transform transition-all duration-300 hover:scale-110 active:scale-95 shadow-xl shadow-brand-500/30">
+                    <i id="centerPlayIcon" data-lucide="play" class="w-8 h-8 text-white fill-white ml-1"></i>
+                </div>
+
+                <!-- Custom Controls Bar -->
+                <div id="controlsBar" class="absolute bottom-0 inset-x-0 z-30 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4 flex flex-col space-y-2 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-300">
+                    
+                    <!-- Progress / Timeline -->
+                    <div class="relative w-full flex items-center">
+                        <input type="range" id="progressBar" min="0" max="100" value="0" step="0.1" class="w-full z-10">
+                        <div id="bufferedBar" class="absolute top-1/2 -translate-y-1/2 left-0 h-1 bg-white/30 rounded-full pointer-events-none transition-all duration-200"></div>
+                    </div>
+
+                    <!-- Buttons Row -->
+                    <div class="flex items-center justify-between pt-1">
+                        
+                        <div class="flex items-center space-x-3 sm:space-x-4">
+                            <button onclick="playPrevious()" class="text-gray-300 hover:text-white transition-colors" title="Tập trước">
+                                <i data-lucide="skip-back" class="w-5 h-5"></i>
+                            </button>
+                            <button onclick="togglePlay()" class="text-white hover:text-brand-500 transition-colors" title="Phát / Tạm dừng">
+                                <i id="playBtnIcon" data-lucide="play" class="w-6 h-6 fill-current"></i>
+                            </button>
+                            <button onclick="playNext()" class="text-gray-300 hover:text-white transition-colors" title="Tập tiếp theo">
+                                <i data-lucide="skip-forward" class="w-5 h-5"></i>
+                            </button>
+
+                            <div class="flex items-center space-x-2">
+                                <button onclick="toggleMute()" id="muteBtn" class="text-gray-300 hover:text-white transition-colors">
+                                    <i id="volumeIcon" data-lucide="volume-2" class="w-5 h-5"></i>
+                                </button>
+                                <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="1" class="w-16 sm:w-20 hidden sm:block">
+                            </div>
+
+                            <span class="text-xs font-mono text-gray-300 tracking-wider">
+                                <span id="currentTime">00:00</span> / <span id="duration">00:00</span>
+                            </span>
+                        </div>
+
+                        <div class="flex items-center space-x-3">
+                            <!-- Speed Menu -->
+                            <div class="relative">
+                                <button onclick="toggleSpeedMenu()" id="speedBtn" class="text-xs font-semibold px-2 py-1 rounded bg-white/10 hover:bg-white/20 text-gray-200 transition-colors">
+                                    1.0x
+                                </button>
+                                <div id="speedMenu" class="hidden absolute bottom-full right-0 mb-2 w-24 glass rounded-xl py-1 shadow-xl border border-white/10 flex-col z-40">
+                                    <button onclick="setSpeed(0.5)" class="px-3 py-1.5 text-xs text-left hover:bg-white/10 transition-colors">0.5x</button>
+                                    <button onclick="setSpeed(0.75)" class="px-3 py-1.5 text-xs text-left hover:bg-white/10 transition-colors">0.75x</button>
+                                    <button onclick="setSpeed(1.0)" class="px-3 py-1.5 text-xs text-left hover:bg-white/10 text-brand-500 font-bold transition-colors">1.0x</button>
+                                    <button onclick="setSpeed(1.25)" class="px-3 py-1.5 text-xs text-left hover:bg-white/10 transition-colors">1.25x</button>
+                                    <button onclick="setSpeed(1.5)" class="px-3 py-1.5 text-xs text-left hover:bg-white/10 transition-colors">1.5x</button>
+                                    <button onclick="setSpeed(2.0)" class="px-3 py-1.5 text-xs text-left hover:bg-white/10 transition-colors">2.0x</button>
+                                </div>
+                            </div>
+
+                            <button onclick="toggleFullscreen()" class="text-gray-300 hover:text-white transition-colors" title="Toàn màn hình">
+                                <i id="fullscreenIcon" data-lucide="maximize" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Metadata -->
+            <div class="glass p-5 rounded-2xl border border-white/10 space-y-3">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <h1 id="videoTitle" class="text-xl sm:text-2xl font-bold text-white tracking-wide">Đang tải video...</h1>
+                    <button onclick="shareLink()" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-gray-300 hover:text-white">
+                        <i data-lucide="share-2" class="w-4 h-4"></i>
+                        <span>Chia sẻ</span>
+                    </button>
+                </div>
+
+                <div class="flex items-center space-x-4 text-xs text-gray-400 border-b border-white/5 pb-3">
+                    <span id="videoSourceText" class="truncate max-w-md font-mono text-brand-400">Nguồn: ...</span>
+                </div>
+
+                <p id="videoDescription" class="text-sm text-gray-300 leading-relaxed">
+                    Đang đồng bộ dữ liệu từ Realtime Database...
+                </p>
+            </div>
+
+        </section>
+
+        <!-- Playlist Sidebar Column (4 Cols) -->
+        <aside class="lg:col-span-4 flex flex-col space-y-4">
+            <div class="glass rounded-2xl p-4 border border-white/10 flex flex-col h-full max-h-[780px]">
+                
+                <div class="flex items-center justify-between pb-3 mb-3 border-b border-white/10">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="list-video" class="w-5 h-5 text-brand-500"></i>
+                        <h2 class="font-bold text-lg text-white">Danh Sách Tập</h2>
+                    </div>
+                    <span id="episodeCountBadge" class="text-xs px-2.5 py-0.5 rounded-full bg-white/10 text-gray-300">0 tập</span>
+                </div>
+
+                <div class="relative block md:hidden mb-3">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" placeholder="Tìm tập..." onkeyup="filterEpisodesMobile(this.value)" class="w-full bg-white/5 border border-white/10 rounded-xl py-1.5 pl-9 pr-4 text-sm text-gray-200 placeholder-gray-400 focus:outline-none focus:border-brand-500">
+                </div>
+
+                <div id="playlistContainer" class="flex-1 overflow-y-auto space-y-2.5 pr-1">
+                    <div class="text-center py-12 text-gray-400 text-sm">
+                        <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-brand-500"></i>
+                        Đang kết nối Firebase Realtime Database...
+                    </div>
+                </div>
+
+            </div>
+        </aside>
+
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAVuB8m14zkMPs-JTLAKB0Bp18QBKAMBt4",
+            authDomain: "ideo-dd376.firebaseapp.com",
+            databaseURL: "https://ideo-dd376-default-rtdb.firebaseio.com",
+            projectId: "ideo-dd376",
+            storageBucket: "ideo-dd376.firebasestorage.app",
+            messagingSenderId: "689163185",
+            appId: "1:689163185:web:f4e11f000a5afc3a364b90"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        let playlist = [];
+        let currentTrackIndex = 0;
+        let hlsPlayer = null;
+
+        const video = document.getElementById('mainVideo');
+        const playBtnIcon = document.getElementById('playBtnIcon');
+        const centerPlayBtn = document.getElementById('centerPlayBtn');
+        const centerPlayIcon = document.getElementById('centerPlayIcon');
+        const progressBar = document.getElementById('progressBar');
+        const bufferedBar = document.getElementById('bufferedBar');
+        const currentTimeEl = document.getElementById('currentTime');
+        const durationEl = document.getElementById('duration');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const volumeIcon = document.getElementById('volumeIcon');
+        const videoSpinner = document.getElementById('videoSpinner');
+        const playerContainer = document.getElementById('playerContainer');
+
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            setupEventListeners();
+            listenToDatabase();
+        });
+
+        function listenToDatabase() {
+            const episodesRef = ref(db, 'episodes');
+            onValue(episodesRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    playlist = Object.keys(data).map(key => ({
+                        firebaseId: key,
+                        ...data[key]
+                    })).sort((a, b) => (a.order || 0) - (b.order || 0));
+
+                    renderPlaylist(playlist);
+
+                    if (playlist.length > 0 && (!video.src || video.src === '')) {
+                        loadEpisode(0);
+                    }
+                } else {
+                    document.getElementById('playlistContainer').innerHTML = `
+                        <div class="text-center py-12 text-gray-400 text-sm">
+                            <i data-lucide="film" class="w-8 h-8 mx-auto mb-2 text-gray-500"></i>
+                            Chưa có tập phim nào trong Database.<br>
+                            Hãy sang trang Admin để thêm video!
+                        </div>
+                    `;
+                    lucide.createIcons();
+                }
+            });
+        }
+
+        function loadEpisode(index) {
+            if (index < 0 || index >= playlist.length) return;
+            
+            currentTrackIndex = index;
+            const track = playlist[index];
+
+            document.getElementById('videoTitle').innerText = track.title || 'Tập phim không có tiêu đề';
+            document.getElementById('videoSourceText').innerText = `Nguồn: ${track.url}`;
+            document.getElementById('videoDescription').innerText = track.description || 'Không có mô tả chi tiết cho tập phim này.';
+
+            updateActivePlaylistItem();
+
+            videoSpinner.classList.remove('opacity-0');
+
+            if (track.url.endsWith('.m3u8')) {
+                if (Hls.isSupported()) {
+                    if (hlsPlayer) hlsPlayer.destroy();
+                    hlsPlayer = new Hls();
+                    hlsPlayer.loadSource(track.url);
+                    hlsPlayer.attachMedia(video);
+                    hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
+                        video.play().catch(() => {});
+                    });
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = track.url;
+                }
+            } else {
+                if (hlsPlayer) {
+                    hlsPlayer.destroy();
+                    hlsPlayer = null;
+                }
+                video.src = track.url;
+            }
+
+            video.load();
+        }
+
+        window.togglePlay = function() {
+            if (video.paused || video.ended) {
+                video.play();
+            } else {
+                video.pause();
+            }
+        };
+
+        function updatePlayStateUI(isPlaying) {
+            if (isPlaying) {
+                playBtnIcon.setAttribute('data-lucide', 'pause');
+                centerPlayIcon.setAttribute('data-lucide', 'pause');
+                centerPlayBtn.classList.add('opacity-0', 'scale-125', 'pointer-events-none');
+            } else {
+                playBtnIcon.setAttribute('data-lucide', 'play');
+                centerPlayIcon.setAttribute('data-lucide', 'play');
+                centerPlayBtn.classList.remove('opacity-0', 'scale-125', 'pointer-events-none');
+            }
+            lucide.createIcons();
+        }
+
+        window.playNext = function() {
+            if (currentTrackIndex < playlist.length - 1) {
+                loadEpisode(currentTrackIndex + 1);
+                video.play();
+            }
+        };
+
+        window.playPrevious = function() {
+            if (currentTrackIndex > 0) {
+                loadEpisode(currentTrackIndex - 1);
+                video.play();
+            }
+        };
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return "00:00";
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        function setupEventListeners() {
+            video.addEventListener('play', () => updatePlayStateUI(true));
+            video.addEventListener('pause', () => updatePlayStateUI(false));
+            video.addEventListener('ended', () => playNext());
+
+            video.addEventListener('waiting', () => videoSpinner.classList.remove('opacity-0'));
+            video.addEventListener('canplay', () => videoSpinner.classList.add('opacity-0'));
+
+            video.addEventListener('timeupdate', () => {
+                currentTimeEl.innerText = formatTime(video.currentTime);
+                durationEl.innerText = formatTime(video.duration);
+                if (video.duration) {
+                    progressBar.value = (video.currentTime / video.duration) * 100;
+                }
+                if (video.buffered.length > 0) {
+                    const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+                    if (video.duration > 0) {
+                        bufferedBar.style.width = (bufferedEnd / video.duration) * 100 + "%";
+                    }
+                }
+            });
+
+            progressBar.addEventListener('input', (e) => {
+                video.currentTime = (e.target.value / 100) * video.duration;
+            });
+
+            volumeSlider.addEventListener('input', (e) => {
+                video.volume = e.target.value;
+                video.muted = e.target.value == 0;
+                updateVolumeIcon();
+            });
+        }
+
+        window.toggleMute = function() {
+            video.muted = !video.muted;
+            volumeSlider.value = video.muted ? 0 : (video.volume || 1);
+            updateVolumeIcon();
+        };
+
+        function updateVolumeIcon() {
+            if (video.muted || video.volume == 0) {
+                volumeIcon.setAttribute('data-lucide', 'volume-x');
+            } else if (video.volume < 0.5) {
+                volumeIcon.setAttribute('data-lucide', 'volume-1');
+            } else {
+                volumeIcon.setAttribute('data-lucide', 'volume-2');
+            }
+            lucide.createIcons();
+        }
+
+        window.toggleSpeedMenu = function() {
+            const menu = document.getElementById('speedMenu');
+            menu.classList.toggle('hidden');
+            menu.classList.toggle('flex');
+        };
+
+        window.setSpeed = function(speed) {
+            video.playbackRate = speed;
+            document.getElementById('speedBtn').innerText = speed + 'x';
+            toggleSpeedMenu();
+        };
+
+        window.toggleFullscreen = function() {
+            if (!document.fullscreenElement) {
+                playerContainer.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        };
+
+        function renderPlaylist(items) {
+            const container = document.getElementById('playlistContainer');
+            document.getElementById('episodeCountBadge').innerText = `${items.length} tập`;
+            container.innerHTML = '';
+
+            items.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = `episode-card glass-card p-3 rounded-xl flex items-center space-x-3 cursor-pointer hover:bg-white/10 transition-all border border-transparent ${index === currentTrackIndex ? 'border-brand-500/50 bg-brand-500/10' : ''}`;
+                card.onclick = () => {
+                    loadEpisode(index);
+                    video.play();
+                };
+
+                card.innerHTML = `
+                    <div class="relative w-10 h-10 rounded-lg bg-brand-600/20 border border-brand-500/30 flex items-center justify-center flex-shrink-0 text-brand-400 font-bold text-sm">
+                        ${index + 1}
+                        <div class="active-indicator absolute inset-0 bg-brand-600/40 rounded-lg backdrop-blur-[1px] items-center justify-center ${index === currentTrackIndex ? 'flex' : 'hidden'}">
+                            <i data-lucide="play" class="w-4 h-4 text-white fill-white"></i>
+                        </div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h4 class="text-xs sm:text-sm font-semibold text-gray-200 truncate ${index === currentTrackIndex ? 'text-brand-400' : ''}">${item.title}</h4>
+                        <p class="text-[11px] text-gray-400 mt-0.5 flex items-center space-x-2">
+                            <span>Thời lượng: ${item.duration || 'N/A'}</span>
+                        </p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function updateActivePlaylistItem() {
+            const cards = document.querySelectorAll('.episode-card');
+            cards.forEach((card, idx) => {
+                const indicator = card.querySelector('.active-indicator');
+                const title = card.querySelector('h4');
+                if (idx === currentTrackIndex) {
+                    card.classList.add('border-brand-500/50', 'bg-brand-500/10');
+                    indicator?.classList.remove('hidden');
+                    indicator?.classList.add('flex');
+                    title?.classList.add('text-brand-400');
+                } else {
+                    card.classList.remove('border-brand-500/50', 'bg-brand-500/10');
+                    indicator?.classList.add('hidden');
+                    indicator?.classList.remove('flex');
+                    title?.classList.remove('text-brand-400');
+                }
+            });
+        }
+
+        window.filterEpisodes = function() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = playlist.filter(item => item.title.toLowerCase().includes(query));
+            renderPlaylist(filtered);
+        };
+
+        window.filterEpisodesMobile = function(val) {
+            const query = val.toLowerCase();
+            const filtered = playlist.filter(item => item.title.toLowerCase().includes(query));
+            renderPlaylist(filtered);
+        };
+
+        window.shareLink = function() {
+            navigator.clipboard.writeText(window.location.href);
+            alert("Đã sao chép liên kết trang!");
+        };
+    </script>
+</body>
+</html>
