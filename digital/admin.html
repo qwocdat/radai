@@ -3,150 +3,268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AdDigital - Control Panel</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>AdDigital - Bảng Quản Trị Phim</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-color: #0b0f19;
-            --card-bg: #111827;
-            --accent-color: #6366f1;
-            --success-color: #10b981;
-            --danger-color: #ef4444;
-            --text-color: #f9fafb;
-            --text-muted: #9ca3af;
-            --border-color: rgba(255, 255, 255, 0.1);
+            --bg-base: #0a0d14;
+            --bg-surface: #121824;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --success: #10b981;
+            --danger: #ef4444;
+            --text-main: #f9fafb;
+            --text-sub: #9ca3af;
+            --border: rgba(255, 255, 255, 0.08);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-color); padding: 24px; min-height: 100vh; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: var(--bg-base); color: var(--text-main); min-height: 100vh; padding: 28px; }
 
-        .header { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto 24px auto; }
-        .title { font-size: 22px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-        .title i { color: var(--accent-color); }
-        .client-btn { background: rgba(255,255,255,0.05); color: #fff; text-decoration: none; padding: 8px 16px; border-radius: 8px; font-size: 14px; border: 1px solid var(--border-color); }
+        .top-navbar {
+            max-width: 1200px;
+            margin: 0 auto 28px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-        .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 24px; }
+        .dash-title {
+            font-size: 22px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-        .card { background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color); }
-        .card-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .dash-title i { color: var(--accent); }
 
-        .status-box { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 12px; }
-        .stat-item { background: rgba(0,0,0,0.2); padding: 14px; border-radius: 8px; border: 1px solid var(--border-color); }
-        .stat-label { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
-        .stat-val { font-size: 18px; font-weight: 700; }
-        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-        .badge-success { background: rgba(16, 185, 129, 0.2); color: var(--success-color); }
-        .badge-danger { background: rgba(239, 68, 68, 0.2); color: var(--danger-color); }
+        .client-preview-link {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-        .form-group { margin-bottom: 14px; }
-        label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 6px; font-weight: 500; }
-        input, select, textarea { width: 100%; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 6px; color: #fff; font-size: 14px; outline: none; }
-        input:focus, select:focus, textarea:focus { border-color: var(--accent-color); }
+        .main-wrapper { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
 
-        .btn { padding: 10px 20px; background: var(--accent-color); color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
-        .btn:hover { opacity: 0.9; }
-        .btn-danger { background: var(--danger-color); }
+        .glass-card {
+            background: var(--bg-surface);
+            border-radius: 18px;
+            padding: 24px;
+            border: 1px solid var(--border);
+        }
 
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+        .card-header-title {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 6px; margin-bottom: 8px; border: 1px solid var(--border-color); }
+        /* Status Check Section */
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .status-tile {
+            background: rgba(0, 0, 0, 0.25);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .tile-label { font-size: 12px; color: var(--text-sub); font-weight: 500; margin-bottom: 6px; }
+        .tile-value { font-size: 20px; font-weight: 800; }
+
+        .status-pill {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .pill-active { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .pill-error { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+
+        /* Forms Layout */
+        .forms-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        @media (max-width: 850px) { .forms-two-col { grid-template-columns: 1fr; } }
+
+        .input-group { margin-bottom: 16px; }
+        label { display: block; font-size: 13px; color: var(--text-sub); font-weight: 600; margin-bottom: 8px; }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 14px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .submit-btn:hover { background: var(--accent-hover); }
+
+        /* Data List */
+        .movie-entry-row {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .movie-row-header { display: flex; justify-content: space-between; align-items: center; }
+        .movie-name { font-size: 16px; font-weight: 700; }
+
+        .delete-btn {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover { background: var(--danger); color: #fff; }
+
+        .ep-list-nest { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; padding-left: 12px; border-left: 2px solid var(--border); }
+        .ep-nest-item { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-sub); }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="title"><i class="fa-solid fa-shield-halved"></i> AdDigital Admin Dashboard</div>
-        <a href="tube.html" target="_blank" class="client-btn"><i class="fa-solid fa-arrow-up-right-from-square"></i> Mở Trang Client</a>
+    <div class="top-navbar">
+        <div class="dash-title"><i class="fa-solid fa-sliders"></i> AdDigital Control Panel</div>
+        <a href="tube.html" target="_blank" class="client-preview-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> Xem Trang Client</a>
     </div>
 
-    <div class="container">
-        <!-- Bảng kiểm tra kết nối -->
-        <div class="card">
-            <div class="card-title"><i class="fa-solid fa-network-wired"></i> Kiểm Tra Trạng Thái Kết Nối Firebase</div>
-            <div class="status-box">
-                <div class="stat-item">
-                    <div class="stat-label">Trạng Thái Kết Nối</div>
-                    <div id="connStatus" class="status-badge badge-danger">Đang kết nối...</div>
+    <div class="main-wrapper">
+        <!-- Dashboard Status Diagnostic -->
+        <div class="glass-card">
+            <div class="card-header-title"><i class="fa-solid fa-signal" style="color: var(--accent);"></i> Trạng Thái Kết Nối Máy Chủ Firebase</div>
+            <div class="status-grid">
+                <div class="status-tile">
+                    <div class="tile-label">Trạng Thái Database</div>
+                    <div id="connStateBadge" class="status-pill pill-error">Đang kiểm tra...</div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-label">Tổng Số Phim</div>
-                    <div id="movieCount" class="stat-val">0</div>
+                <div class="status-tile">
+                    <div class="tile-label">Tổng Số Phim</div>
+                    <div id="statTotalMovies" class="tile-value">0</div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-label">Độ Trễ (Ping)</div>
-                    <div id="pingVal" class="stat-val">-- ms</div>
+                <div class="status-tile">
+                    <div class="tile-label">Độ Trễ Phản Hồi (Ping)</div>
+                    <div id="statPingMs" class="tile-value">-- ms</div>
                 </div>
             </div>
         </div>
 
-        <div class="grid-2">
-            <!-- Form Tạo Phim Mới -->
-            <div class="card">
-                <div class="card-title"><i class="fa-solid fa-film"></i> 1. Tạo Phim Mới</div>
-                <form id="createMovieForm">
-                    <div class="form-group">
-                        <label>Tên Phim</label>
-                        <input type="text" id="mTitle" placeholder="Ví dụ: Tây Du Ký" required>
+        <div class="forms-two-col">
+            <!-- Form 1: Tạo Phim Mới -->
+            <div class="glass-card">
+                <div class="card-header-title"><i class="fa-solid fa-film"></i> 1. Thêm Phim Mới</div>
+                <form id="formNewMovie">
+                    <div class="input-group">
+                        <label>Tên Bộ Phim</label>
+                        <input type="text" id="inputMovieTitle" placeholder="Ví dụ: Tây Du Ký" required>
                     </div>
-                    <div class="form-group">
-                        <label>Link Ảnh Bìa (Thumbnail)</label>
-                        <input type="text" id="mThumb" placeholder="https://..." >
+                    <div class="input-group">
+                        <label>Đường Dẫn Ảnh Bìa (Thumbnail)</label>
+                        <input type="text" id="inputMovieThumb" placeholder="https://...">
                     </div>
-                    <div class="form-group">
-                        <label>Mô Tả Phim</label>
-                        <textarea id="mDesc" rows="3" placeholder="Nội dung tóm tắt..."></textarea>
+                    <div class="input-group">
+                        <label>Tóm Tắt Nội Dung</label>
+                        <textarea id="inputMovieDesc" rows="3" placeholder="Nhập tóm tắt bộ phim..."></textarea>
                     </div>
-                    <button type="submit" class="btn"><i class="fa-solid fa-plus"></i> Tạo Phim</button>
+                    <button type="submit" class="submit-btn"><i class="fa-solid fa-plus"></i> Tạo Phim</button>
                 </form>
             </div>
 
-            <!-- Form Thêm Tập Video -->
-            <div class="card">
-                <div class="card-title"><i class="fa-solid fa-video"></i> 2. Thêm Tập Phim</div>
-                <form id="addEpForm">
-                    <div class="form-group">
-                        <label>Chọn Phim</label>
-                        <select id="movieSelect" required>
+            <!-- Form 2: Thêm Tập Phim -->
+            <div class="glass-card">
+                <div class="card-header-title"><i class="fa-solid fa-circle-play"></i> 2. Thêm Tập Video</div>
+                <form id="formNewEpisode">
+                    <div class="input-group">
+                        <label>Chọn Bộ Phim</label>
+                        <select id="selectMovieTarget" required>
                             <option value="">-- Chọn phim --</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Số Tập (Thứ tự: 1, 2, 3...)</label>
-                        <input type="number" id="epOrder" placeholder="1" required>
+                    <div class="input-group">
+                        <label>Số Tập (Thứ Tự: 1, 2, 3...)</label>
+                        <input type="number" id="inputEpOrder" placeholder="1" required>
                     </div>
-                    <div class="form-group">
+                    <div class="input-group">
                         <label>Tên Tập Phim</label>
-                        <input type="text" id="epTitle" placeholder="Tập 1: Mở Đầu" required>
+                        <input type="text" id="inputEpTitle" placeholder="Tập 1: Khởi Đầu" required>
                     </div>
-                    <div class="form-group">
-                        <label>File Video (.mp4 / GitHub)</label>
-                        <input type="text" id="epUrl" placeholder="tap1.mp4" required>
-                        <span style="font-size: 11px; color: var(--text-muted);">Tự động ghép prefix GitHub nếu chỉ nhập tên file</span>
+                    <div class="input-group">
+                        <label>Tên File .mp4 Hoặc Link Đầy Đủ</label>
+                        <input type="text" id="inputEpUrl" placeholder="tap1.mp4" required>
+                        <span style="font-size: 11px; color: var(--accent); margin-top: 4px; display: block;">Tự động ghép prefix GitHub (qwocdat/radai/main/digital/) nếu chỉ nhập tên file</span>
                     </div>
-                    <button type="submit" class="btn"><i class="fa-solid fa-upload"></i> Đăng Tập Video</button>
+                    <button type="submit" class="submit-btn"><i class="fa-solid fa-cloud-arrow-up"></i> Đăng Tập Video</button>
                 </form>
             </div>
         </div>
 
-        <!-- Danh sách Quản lý Phim & Tập -->
-        <div class="card">
-            <div class="card-title"><i class="fa-solid fa-list-check"></i> Quản Lý Dữ Liệu Phim</div>
-            <div id="movieManager">
-                <div style="text-align: center; color: var(--text-muted); padding: 20px;">Đang đồng bộ dữ liệu...</div>
+        <!-- Quản Lý Danh Sách -->
+        <div class="glass-card">
+            <div class="card-header-title"><i class="fa-solid fa-database"></i> Dữ Liệu Phim Hiện Có</div>
+            <div id="movieDataContainer">
+                <div style="text-align: center; color: var(--text-sub); padding: 20px;">Đang tải danh sách phim...</div>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, push, onValue, remove, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const DB_URL = "https://ideo-dd376-default-rtdb.asia-southeast1.firebasedatabase.app";[span_3](start_span)[span_3](end_span)
+        const GITHUB_PREFIX = "https://raw.githubusercontent.com/qwocdat/radai/main/digital/";[span_4](start_span)[span_4](end_span)
 
         const firebaseConfig = {
             apiKey: "AIzaSyAVuB8m14zkMPs-JTLAKB0Bp18QBKAMBt4",
             authDomain: "ideo-dd376.firebaseapp.com",
-            databaseURL: "https://ideo-dd376-default-rtdb.asia-southeast1.firebasedatabase.app",
+            databaseURL: DB_URL,
             projectId: "ideo-dd376",
             storageBucket: "ideo-dd376.firebasestorage.app",
             messagingSenderId: "689163185",
@@ -157,132 +275,132 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        const GITHUB_PREFIX = "https://raw.githubusercontent.com/qwocdat/radai/main/digital/";[span_1](start_span)[span_1](end_span)
+        const connStateBadge = document.getElementById('connStateBadge');
+        const statPingMs = document.getElementById('statPingMs');
+        const statTotalMovies = document.getElementById('statTotalMovies');
+        const selectMovieTarget = document.getElementById('selectMovieTarget');
+        const movieDataContainer = document.getElementById('movieDataContainer');
 
-        const connStatus = document.getElementById('connStatus');
-        const pingVal = document.getElementById('pingVal');
-        const movieCount = document.getElementById('movieCount');
-        const movieSelect = document.getElementById('movieSelect');
-        const movieManager = document.getElementById('movieManager');
-
-        // Lắng nghe kết nối hế thống
-        const connectedRef = ref(db, ".info/connected");
-        let startTime = Date.now();
-
-        onValue(connectedRef, (snap) => {
-            if (snap.val() === true) {
-                const latency = Date.now() - startTime;
-                connStatus.className = "status-badge badge-success";
-                connStatus.innerText = "Đã kết nối";
-                pingVal.innerText = `${latency} ms`;
-            } else {
-                connStatus.className = "status-badge badge-danger";
-                connStatus.innerText = "Lỗi kết nối";
+        // Hàm REST Ping kiểm tra kết nối
+        async function runDiagnosticPing() {
+            const t0 = performance.now();
+            try {
+                const res = await fetch(`${DB_URL}/.json?shallow=true`);
+                if (res.ok) {
+                    const t1 = performance.now();
+                    connStateBadge.className = "status-pill pill-active";
+                    connStateBadge.innerText = "Đã kết nối";
+                    statPingMs.innerText = `${Math.round(t1 - t0)} ms`;
+                } else {
+                    throw new Error();
+                }
+            } catch (e) {
+                connStateBadge.className = "status-pill pill-error";
+                connStateBadge.innerText = "Lỗi kết nối";
             }
-        });
+        }
 
-        // Tạo phim mới
-        document.getElementById('createMovieForm').addEventListener('submit', (e) => {
+        runDiagnosticPing();
+        setInterval(runDiagnosticPing, 10000);
+
+        // Form Tạo Phim
+        document.getElementById('formNewMovie').addEventListener('submit', (e) => {
             e.preventDefault();
-            const title = document.getElementById('mTitle').value;
-            const thumb = document.getElementById('mThumb').value;
-            const desc = document.getElementById('mDesc').value;
+            const title = document.getElementById('inputMovieTitle').value;
+            const thumb = document.getElementById('inputMovieThumb').value;
+            const desc = document.getElementById('inputMovieDesc').value;
 
-            const moviesRef = ref(db, 'movies');
-            push(moviesRef, {
+            push(ref(db, 'movies'), {
                 title: title,
                 thumbnail: thumb,
                 description: desc,
                 createdAt: Date.now()
             }).then(() => {
-                alert('Tạo phim thành công!');
-                document.getElementById('createMovieForm').reset();
+                alert('Tạo bộ phim thành công!');
+                document.getElementById('formNewMovie').reset();
             });
         });
 
-        // Thêm tập video
-        document.getElementById('addEpForm').addEventListener('submit', (e) => {
+        // Form Thêm Tập
+        document.getElementById('formNewEpisode').addEventListener('submit', (e) => {
             e.preventDefault();
-            const mId = movieSelect.value;
-            const order = parseInt(document.getElementById('epOrder').value);
-            const title = document.getElementById('epTitle').value;
-            let url = document.getElementById('epUrl').value.trim();
+            const mId = selectMovieTarget.value;
+            const order = parseInt(document.getElementById('inputEpOrder').value);
+            const title = document.getElementById('inputEpTitle').value;
+            let rawUrl = document.getElementById('inputEpUrl').value.trim();
 
-            if (!url.startsWith('http://') && !url.startsWith('https://')) {
-                url = GITHUB_PREFIX + url;
+            if (!rawUrl.startsWith('http://') && !rawUrl.startsWith('https://')) {
+                rawUrl = GITHUB_PREFIX + rawUrl;
             }
 
-            const epRef = ref(db, `movies/${mId}/episodes`);
-            push(epRef, {
+            push(ref(db, `movies/${mId}/episodes`), {
                 order: order,
                 title: title,
-                url: url
+                url: rawUrl
             }).then(() => {
-                alert('Đã thêm tập phim mới!');
-                document.getElementById('addEpForm').reset();
+                alert('Đăng tập video thành công!');
+                document.getElementById('formNewEpisode').reset();
             });
         });
 
-        // Đọc danh sách phim
+        // Tải Danh Sách Phim
         onValue(ref(db, 'movies'), (snapshot) => {
             const data = snapshot.val() || {};
             const keys = Object.keys(data);
 
-            movieCount.innerText = keys.length;
-            movieSelect.innerHTML = '<option value="">-- Chọn phim --</option>';
-            movieManager.innerHTML = '';
+            statTotalMovies.innerText = keys.length;
+            selectMovieTarget.innerHTML = '<option value="">-- Chọn phim --</option>';
+            movieDataContainer.innerHTML = '';
 
             if (keys.length === 0) {
-                movieManager.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 20px;">Chưa có dữ liệu phim</div>';
+                movieDataContainer.innerHTML = '<div style="text-align: center; color: var(--text-sub); padding: 20px;">Chưa có phim nào trong Database</div>';
                 return;
             }
 
             keys.forEach(id => {
-                const m = data[id];
-                
-                // Add to Select Box
+                const movie = data[id];
+
+                // Nạp vào Select Box
                 const opt = document.createElement('option');
                 opt.value = id;
-                opt.innerText = m.title;
-                movieSelect.appendChild(opt);
+                opt.innerText = movie.title;
+                selectMovieTarget.appendChild(opt);
 
-                // Add to Manager List
-                const episodes = m.episodes ? Object.keys(m.episodes).map(k => ({ id: k, ...m.episodes[k] })) : [];
+                // Nạp vào danh sách hiển thị
+                const episodes = movie.episodes ? Object.keys(movie.episodes).map(k => ({ id: k, ...movie.episodes[k] })) : [];
                 episodes.sort((a,b) => (a.order||0) - (b.order||0));
 
-                let epListHtml = '';
+                let epMarkup = '';
                 episodes.forEach(ep => {
-                    epListHtml += `
-                        <div class="list-item" style="font-size: 13px; margin-left: 20px;">
+                    epMarkup += `
+                        <div class="ep-nest-item">
                             <span>Tập ${ep.order || 1}: ${ep.title} (${ep.url})</span>
-                            <button class="btn btn-danger" style="padding: 4px 8px; font-size: 11px;" onclick="deleteEp('${id}', '${ep.id}')">Xóa tập</button>
+                            <button class="delete-btn" onclick="removeEp('${id}', '${ep.id}')">Xóa tập</button>
                         </div>
                     `;
                 });
 
-                const mDiv = document.createElement('div');
-                mDiv.className = 'list-item';
-                mDiv.style.flexDirection = 'column';
-                mDiv.style.alignItems = 'stretch';
-                mDiv.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center; font-weight: 600;">
-                        <span>🎬 ${m.title} (${episodes.length} tập)</span>
-                        <button class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="deleteMovie('${id}')">Xóa Phim</button>
+                const row = document.createElement('div');
+                row.className = 'movie-entry-row';
+                row.innerHTML = `
+                    <div class="movie-row-header">
+                        <span class="movie-name">🎬 ${movie.title} (${episodes.length} tập)</span>
+                        <button class="delete-btn" onclick="removeMovie('${id}')">Xóa toàn bộ phim</button>
                     </div>
-                    <div style="margin-top: 8px;">${epListHtml}</div>
+                    <div class="ep-list-nest">${epMarkup || '<span style="font-size: 12px;">Chưa có tập phim nào.</span>'}</div>
                 `;
-                movieManager.appendChild(mDiv);
+                movieDataContainer.appendChild(row);
             });
         });
 
-        window.deleteMovie = (mId) => {
-            if(confirm('Bạn có chắc chắn muốn xóa toàn bộ phim này và các tập liên quan?')) {
+        window.removeMovie = (mId) => {
+            if (confirm('Xóa bộ phim này cùng toàn bộ các tập phim bên trong?')) {
                 remove(ref(db, `movies/${mId}`));
             }
         };
 
-        window.deleteEp = (mId, epId) => {
-            if(confirm('Xóa tập phim này?')) {
+        window.removeEp = (mId, epId) => {
+            if (confirm('Xóa tập phim này?')) {
                 remove(ref(db, `movies/${mId}/episodes/${epId}`));
             }
         };
