@@ -8,27 +8,78 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-base: #090a0f;
-            --bg-surface: #12151e;
-            --bg-card: rgba(22, 27, 38, 0.7);
+            --bg-base: #05060a;
+            --bg-surface: #0d1018;
+            --bg-card: rgba(18, 22, 33, 0.7);
             --accent: #6366f1;
-            --accent-glow: rgba(99, 102, 241, 0.35);
+            --accent-2: #a855f7;
+            --accent-3: #ec4899;
+            --accent-glow: rgba(99, 102, 241, 0.55);
+            --accent-glow-strong: rgba(99, 102, 241, 0.9);
             --text-main: #f3f4f6;
             --text-sub: #9ca3af;
             --border: rgba(255, 255, 255, 0.08);
-            --glass-bg: rgba(18, 21, 30, 0.75);
+            --glass-bg: rgba(13, 16, 24, 0.72);
             --glass-border: rgba(255, 255, 255, 0.12);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background-color: var(--bg-base); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+        html { scroll-behavior: smooth; }
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            position: relative;
+        }
 
-        /* Header UI */
+        /* ===== AURORA BACKGROUND BLOBS ===== */
+        .aurora-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .aurora-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.4;
+            animation: floatBlob 22s ease-in-out infinite;
+        }
+        .blob-1 {
+            width: 520px; height: 520px;
+            background: radial-gradient(circle, #6366f1, transparent 70%);
+            top: -180px; left: -120px;
+        }
+        .blob-2 {
+            width: 480px; height: 480px;
+            background: radial-gradient(circle, #a855f7, transparent 70%);
+            top: 40%; right: -160px;
+            animation-delay: -7s;
+        }
+        .blob-3 {
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, #ec4899, transparent 70%);
+            bottom: -140px; left: 30%;
+            animation-delay: -14s;
+            opacity: 0.28;
+        }
+        @keyframes floatBlob {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(60px, -40px) scale(1.1); }
+            66% { transform: translate(-40px, 50px) scale(0.95); }
+        }
+
+        /* ===== HEADER ===== */
         header {
-            height: 64px;
+            height: 68px;
             background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(20px) saturate(160%);
+            -webkit-backdrop-filter: blur(20px) saturate(160%);
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
@@ -39,6 +90,7 @@
             z-index: 1000;
         }
 
+        /* ===== LOGO GLOW (ĐIỂM NHẤN CHÍNH) ===== */
         .brand-logo {
             display: flex;
             align-items: center;
@@ -48,19 +100,93 @@
             font-weight: 800;
             font-size: 20px;
             letter-spacing: -0.5px;
+            position: relative;
+            padding: 6px 4px;
+            transition: transform 0.25s ease;
+            cursor: pointer;
+            user-select: none;
         }
 
         .brand-logo .icon-wrapper {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, var(--accent), #4f46e5);
-            border-radius: 10px;
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            border-radius: 11px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 15px var(--accent-glow);
+            box-shadow:
+                0 0 15px var(--accent-glow),
+                0 0 30px rgba(168, 85, 247, 0.35),
+                inset 0 0 8px rgba(255,255,255,0.25);
+            transition: all 0.35s ease;
+            position: relative;
+            z-index: 2;
         }
 
+        .brand-logo .icon-wrapper::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 13px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2), var(--accent-3));
+            filter: blur(10px);
+            opacity: 0.6;
+            z-index: -1;
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.08); }
+        }
+
+        .brand-text {
+            background: linear-gradient(90deg, #fff 0%, #fff 40%, #a5b4fc 55%, #c4b5fd 65%, #fff 80%);
+            background-size: 220% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-position: 0% center;
+            transition: all 0.3s ease;
+        }
+
+        /* Hiệu ứng khi HOVER */
+        .brand-logo:hover {
+            transform: translateY(-1px);
+        }
+        .brand-logo:hover .icon-wrapper {
+            box-shadow:
+                0 0 25px var(--accent-glow-strong),
+                0 0 50px rgba(168, 85, 247, 0.55),
+                0 0 80px rgba(236, 72, 153, 0.35),
+                inset 0 0 12px rgba(255,255,255,0.4);
+            transform: rotate(-6deg) scale(1.08);
+        }
+        .brand-logo:hover .brand-text {
+            animation: shimmerText 1.4s linear infinite;
+            filter: drop-shadow(0 0 12px rgba(165, 180, 252, 0.7));
+        }
+
+        @keyframes shimmerText {
+            to { background-position: 220% center; }
+        }
+
+        /* Hiệu ứng khi CLICK (active) */
+        .brand-logo:active {
+            transform: scale(0.97);
+        }
+        .brand-logo.clicked .icon-wrapper {
+            animation: clickBurst 0.6s ease-out;
+        }
+        @keyframes clickBurst {
+            0% { transform: scale(1) rotate(0); }
+            30% { transform: scale(1.35) rotate(-12deg); box-shadow: 0 0 60px #fff, 0 0 100px var(--accent-glow-strong); }
+            60% { transform: scale(0.95) rotate(6deg); }
+            100% { transform: scale(1) rotate(0); }
+        }
+
+        /* ===== SEARCH ===== */
         .search-container {
             display: flex;
             align-items: center;
@@ -68,15 +194,20 @@
             border: 1px solid var(--border);
             border-radius: 50px;
             padding: 8px 20px;
-            width: 36%;
+            width: 38%;
             max-width: 480px;
-            transition: all 0.3s ease;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
         }
 
         .search-container:focus-within {
             border-color: var(--accent);
-            box-shadow: 0 0 12px var(--accent-glow);
+            box-shadow:
+                0 0 0 3px rgba(99, 102, 241, 0.15),
+                0 0 24px var(--accent-glow),
+                inset 0 0 12px rgba(99, 102, 241, 0.08);
             background: rgba(255, 255, 255, 0.07);
+            transform: translateY(-1px);
         }
 
         .search-container input {
@@ -87,20 +218,39 @@
             width: 100%;
             font-size: 14px;
         }
+        .search-container input::placeholder { color: #6b7280; }
 
-        .search-container i { color: var(--text-sub); margin-left: 10px; }
+        .search-container i {
+            color: var(--text-sub);
+            margin-left: 10px;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+        .search-container:focus-within i {
+            color: var(--accent);
+            transform: scale(1.15);
+            filter: drop-shadow(0 0 6px var(--accent-glow));
+        }
 
-        /* Main Area */
-        main { flex: 1; padding: 32px 28px; max-width: 1680px; margin: 0 auto; width: 100%; }
+        /* ===== MAIN ===== */
+        main { flex: 1; padding: 36px 28px; max-width: 1680px; margin: 0 auto; width: 100%; position: relative; }
 
-        /* Home Grid */
+        /* ===== HOME ===== */
         .home-section-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 24px;
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 26px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            letter-spacing: -0.3px;
+        }
+        .home-section-title i {
+            filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.8));
+            animation: fireFlicker 2s ease-in-out infinite;
+        }
+        @keyframes fireFlicker {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.12); opacity: 0.85; }
         }
 
         .movies-grid {
@@ -118,15 +268,48 @@
             color: inherit;
             display: flex;
             flex-direction: column;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
+            isolation: isolate;
+        }
+
+        .movie-card::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: 16px;
+            padding: 1px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2), var(--accent-3));
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .movie-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(99,102,241,0.15), transparent 60%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+            z-index: 2;
         }
 
         .movie-card:hover {
-            transform: translateY(-6px);
-            border-color: var(--glass-border);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+            transform: translateY(-8px) scale(1.015);
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.6),
+                0 0 30px rgba(99, 102, 241, 0.25),
+                0 0 60px rgba(168, 85, 247, 0.15);
         }
+        .movie-card:hover::before { opacity: 1; }
+        .movie-card:hover::after { opacity: 1; }
 
         .thumb-wrapper {
             width: 100%;
@@ -140,10 +323,13 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.5s ease;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), filter 0.4s ease;
         }
 
-        .movie-card:hover .movie-thumb { transform: scale(1.06); }
+        .movie-card:hover .movie-thumb {
+            transform: scale(1.08);
+            filter: brightness(1.05) saturate(1.1);
+        }
 
         .ep-badge-tag {
             position: absolute;
@@ -154,16 +340,73 @@
             color: #fff;
             font-size: 11px;
             font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 5px 11px;
+            border-radius: 7px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+        .movie-card:hover .ep-badge-tag {
+            background: rgba(99, 102, 241, 0.9);
+            box-shadow: 0 0 20px var(--accent-glow-strong);
+            border-color: rgba(255,255,255,0.3);
         }
 
-        .movie-meta { padding: 16px; }
-        .movie-title { font-size: 16px; font-weight: 700; line-height: 1.4; margin-bottom: 8px; color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .movie-desc { font-size: 13px; color: var(--text-sub); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .movie-meta { padding: 16px; position: relative; z-index: 2; }
+        .movie-title {
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 8px;
+            color: #fff;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            transition: color 0.3s ease;
+        }
+        .movie-card:hover .movie-title {
+            color: #c7d2fe;
+        }
+        .movie-desc {
+            font-size: 13px;
+            color: var(--text-sub);
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
 
-        /* Watch Layout */
+        /* ===== WATCH LAYOUT ===== */
+        .back-bar {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 9px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.25s ease;
+        }
+        .back-btn:hover {
+            background: rgba(99,102,241,0.15);
+            border-color: var(--accent);
+            box-shadow: 0 0 18px var(--accent-glow);
+            transform: translateX(-3px);
+        }
+
         .player-layout { display: grid; grid-template-columns: 1fr 380px; gap: 28px; }
         @media (max-width: 1100px) { .player-layout { grid-template-columns: 1fr; } }
 
@@ -173,14 +416,59 @@
             border-radius: 20px;
             overflow: hidden;
             aspect-ratio: 16/9;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            box-shadow:
+                0 25px 50px rgba(0,0,0,0.85),
+                0 0 40px rgba(99, 102, 241, 0.18);
             border: 1px solid var(--border);
+            position: relative;
+            transition: box-shadow 0.4s ease;
+        }
+        .video-wrapper:hover {
+            box-shadow:
+                0 25px 50px rgba(0,0,0,0.85),
+                0 0 55px rgba(99, 102, 241, 0.35),
+                0 0 90px rgba(168, 85, 247, 0.15);
+        }
+        .video-wrapper::after {
+            content: 'ĐANG PHÁT';
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            padding: 5px 12px;
+            border-radius: 6px;
+            box-shadow: 0 0 16px var(--accent-glow-strong);
+            z-index: 3;
+            animation: livePulse 2s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes livePulse {
+            0%, 100% { box-shadow: 0 0 16px var(--accent-glow-strong); }
+            50% { box-shadow: 0 0 26px var(--accent-glow-strong), 0 0 40px rgba(168,85,247,0.6); }
         }
 
-        video { width: 100%; height: 100%; outline: none; }
+        video { width: 100%; height: 100%; outline: none; display: block; background: #000; }
 
-        .video-info-box { margin-top: 20px; }
-        .video-headline { font-size: 22px; font-weight: 800; margin-bottom: 12px; color: #fff; }
+        .video-info-box { margin-top: 22px; }
+        .video-headline {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 14px;
+            color: #fff;
+            letter-spacing: -0.3px;
+            line-height: 1.3;
+        }
+        .video-headline span {
+            background: linear-gradient(90deg, #a5b4fc, #c4b5fd);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
         .video-description {
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -188,10 +476,20 @@
             border-radius: 14px;
             font-size: 14px;
             color: var(--text-sub);
-            line-height: 1.6;
+            line-height: 1.65;
+            position: relative;
+            overflow: hidden;
+        }
+        .video-description::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, var(--accent), var(--accent-2));
+            box-shadow: 0 0 12px var(--accent-glow);
         }
 
-        /* Episode List Sidebar */
+        /* ===== SIDEBAR ===== */
         .episodes-sidebar {
             background: var(--bg-card);
             border-radius: 20px;
@@ -201,6 +499,7 @@
             max-height: 82vh;
             display: flex;
             flex-direction: column;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.4);
         }
 
         .sidebar-title {
@@ -213,8 +512,31 @@
             justify-content: space-between;
             align-items: center;
         }
+        .sidebar-title span:last-child {
+            font-size: 12px;
+            color: #a5b4fc;
+            background: rgba(99,102,241,0.15);
+            padding: 3px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(99,102,241,0.3);
+        }
 
-        .episodes-list-scroll { overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .episodes-list-scroll {
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-right: 4px;
+        }
+        .episodes-list-scroll::-webkit-scrollbar { width: 6px; }
+        .episodes-list-scroll::-webkit-scrollbar-track { background: transparent; }
+        .episodes-list-scroll::-webkit-scrollbar-thumb {
+            background: rgba(99,102,241,0.3);
+            border-radius: 4px;
+        }
+        .episodes-list-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(99,102,241,0.6);
+        }
 
         .ep-card-item {
             display: flex;
@@ -225,35 +547,165 @@
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid transparent;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
 
-        .ep-card-item:hover { background: rgba(255, 255, 255, 0.08); }
+        .ep-card-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(3px);
+            border-color: rgba(99,102,241,0.3);
+        }
+
         .ep-card-item.active {
-            background: rgba(99, 102, 241, 0.15);
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.08));
             border-color: var(--accent);
+            box-shadow:
+                0 0 20px rgba(99,102,241,0.35),
+                inset 0 0 20px rgba(99,102,241,0.08);
+        }
+        .ep-card-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, var(--accent), var(--accent-2));
+            box-shadow: 0 0 10px var(--accent-glow-strong);
         }
 
         .ep-card-num {
-            background: var(--accent);
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
             color: #fff;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 800;
-            padding: 4px 8px;
-            border-radius: 6px;
+            padding: 5px 9px;
+            border-radius: 7px;
+            box-shadow: 0 0 10px var(--accent-glow);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .ep-card-item.active .ep-card-num {
+            box-shadow: 0 0 18px var(--accent-glow-strong);
         }
 
-        .ep-card-title { font-size: 14px; font-weight: 600; color: #fff; flex: 1; }
+        .ep-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .ep-card-item i.fa-circle-play {
+            color: var(--text-sub);
+            transition: all 0.25s ease;
+        }
+        .ep-card-item:hover i.fa-circle-play,
+        .ep-card-item.active i.fa-circle-play {
+            color: var(--accent);
+            filter: drop-shadow(0 0 6px var(--accent-glow));
+            transform: scale(1.15);
+        }
 
-        .loading-view { text-align: center; padding: 80px 0; color: var(--text-sub); font-size: 15px; }
+        /* ===== LOADING SKELETON ===== */
+        .skeleton-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 24px;
+        }
+        .skeleton-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .skeleton-thumb {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: linear-gradient(90deg, #1a1d28 25%, #232736 50%, #1a1d28 75%);
+            background-size: 200% 100%;
+            animation: shimmerSkeleton 1.5s infinite;
+        }
+        .skeleton-meta { padding: 16px; }
+        .skeleton-line {
+            height: 12px;
+            border-radius: 6px;
+            background: linear-gradient(90deg, #1a1d28 25%, #232736 50%, #1a1d28 75%);
+            background-size: 200% 100%;
+            animation: shimmerSkeleton 1.5s infinite;
+            margin-bottom: 10px;
+        }
+        .skeleton-line.short { width: 60%; }
+        @keyframes shimmerSkeleton {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .loading-view {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text-sub);
+            font-size: 15px;
+        }
+        .loading-view i {
+            font-size: 32px;
+            color: var(--accent);
+            margin-bottom: 12px;
+            display: inline-block;
+            filter: drop-shadow(0 0 15px var(--accent-glow));
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(239, 68, 68, 0.95);
+            color: #fff;
+            padding: 12px 22px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(239,68,68,0.4);
+            z-index: 9999;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            max-width: 90vw;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* ===== MOBILE ===== */
+        @media (max-width: 700px) {
+            header { padding: 0 16px; height: 62px; }
+            .brand-logo { font-size: 17px; gap: 9px; }
+            .brand-logo .icon-wrapper { width: 32px; height: 32px; }
+            .search-container { width: 48%; padding: 7px 14px; }
+            .search-container input { font-size: 13px; }
+            main { padding: 22px 16px; }
+            .home-section-title { font-size: 19px; }
+            .movies-grid, .skeleton-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
+            .movie-meta { padding: 12px; }
+            .movie-title { font-size: 14px; }
+            .movie-desc { font-size: 12px; }
+            .video-headline { font-size: 18px; }
+        }
     </style>
 </head>
 <body>
 
+    <!-- Aurora background -->
+    <div class="aurora-bg">
+        <div class="aurora-blob blob-1"></div>
+        <div class="aurora-blob blob-2"></div>
+        <div class="aurora-blob blob-3"></div>
+    </div>
+
     <header>
-        <a href="tube.html" class="brand-logo">
+        <a href="tube.html" class="brand-logo" id="brandLogo">
             <div class="icon-wrapper"><i class="fa-solid fa-play"></i></div>
-            DigitalTube
+            <span class="brand-text">DigitalTube</span>
         </a>
         <div class="search-container">
             <input type="text" id="searchInput" placeholder="Tìm kiếm bộ phim ưa thích...">
@@ -262,13 +714,42 @@
     </header>
 
     <main id="appContainer">
-        <div class="loading-view"><i class="fa-solid fa-circle-notch fa-spin"></i> Đang tải dữ liệu từ máy chủ...</div>
+        <div class="skeleton-grid" id="skeletonLoader">
+            <div class="skeleton-card"><div class="skeleton-thumb"></div><div class="skeleton-meta"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div></div>
+            <div class="skeleton-card"><div class="skeleton-thumb"></div><div class="skeleton-meta"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div></div>
+            <div class="skeleton-card"><div class="skeleton-thumb"></div><div class="skeleton-meta"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div></div>
+            <div class="skeleton-card"><div class="skeleton-thumb"></div><div class="skeleton-meta"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div></div>
+        </div>
     </main>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
+        /* =================== TOAST =================== */
+        function showToast(msg) {
+            let t = document.querySelector('.toast');
+            if (!t) {
+                t = document.createElement('div');
+                t.className = 'toast';
+                document.body.appendChild(t);
+            }
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(t._tid);
+            t._tid = setTimeout(() => t.classList.remove('show'), 4000);
+        }
+
+        /* =================== LOGO GLOW CLICK =================== */
+        const brandLogo = document.getElementById('brandLogo');
+        brandLogo.addEventListener('click', () => {
+            brandLogo.classList.remove('clicked');
+            void brandLogo.offsetWidth; // restart animation
+            brandLogo.classList.add('clicked');
+            setTimeout(() => brandLogo.classList.remove('clicked'), 650);
+        });
+
+        /* =================== FIREBASE =================== */
         const firebaseConfig = {
             apiKey: "AIzaSyAVuB8m14zkMPs-JTLAKB0Bp18QBKAMBt4",
             authDomain: "ideo-dd376.firebaseapp.com",
@@ -291,33 +772,56 @@
         const currentEpIdx = parseInt(urlParams.get('ep') || '0');
 
         let moviesDataset = {};
+        let isFirstLoad = true;
 
-        // Lắng nghe dữ liệu
-        onValue(ref(db, 'movies'), (snapshot) => {
-            moviesDataset = snapshot.val() || {};
-            
-            if (movieId && moviesDataset[movieId]) {
-                renderPlayerScreen(movieId, currentEpIdx);
-            } else {
-                renderHomeScreen();
+        // Lắng nghe dữ liệu — có error callback
+        onValue(ref(db, 'movies'),
+            (snapshot) => {
+                moviesDataset = snapshot.val() || {};
+                isFirstLoad = false;
+
+                if (movieId && moviesDataset[movieId]) {
+                    renderPlayerScreen(movieId, currentEpIdx);
+                } else {
+                    renderHomeScreen();
+                }
+            },
+            (err) => {
+                console.error('[Firebase Error]', err);
+                showToast('❌ Lỗi kết nối Firebase: ' + (err?.code || err?.message || 'UNKNOWN'));
+                appContainer.innerHTML = `
+                    <div class="loading-view">
+                        <i class="fa-solid fa-triangle-exclamation" style="color: var(--danger);"></i>
+                        <div style="margin-top:10px;">Không thể tải dữ liệu. Kiểm tra Rules Firebase hoặc kết nối mạng.</div>
+                        <div style="margin-top:8px; font-size:12px; color:#6b7280;">Mã lỗi: ${err?.code || err?.message || 'UNKNOWN'}</div>
+                    </div>
+                `;
             }
-        });
+        );
 
+        /* =================== HOME =================== */
         function renderHomeScreen(filterQuery = '') {
             const keys = Object.keys(moviesDataset);
-            
+
             const filteredKeys = keys.filter(k => {
                 const title = (moviesDataset[k].title || '').toLowerCase();
                 return title.includes(filterQuery.toLowerCase());
             });
 
             if (filteredKeys.length === 0) {
-                appContainer.innerHTML = '<div class="loading-view">Không tìm thấy bộ phim nào phù hợp.</div>';
+                appContainer.innerHTML = `
+                    <div class="loading-view">
+                        <i class="fa-solid fa-film"></i>
+                        <div style="margin-top:10px;">Không tìm thấy bộ phim nào phù hợp.</div>
+                    </div>
+                `;
                 return;
             }
 
             let gridHtml = `
-                <div class="home-section-title"><i class="fa-solid fa-fire" style="color: var(--accent);"></i> Danh Sách Phim Mới Nhất</div>
+                <div class="home-section-title">
+                    <i class="fa-solid fa-fire"></i> Danh Sách Phim Mới Nhất
+                </div>
                 <div class="movies-grid">
             `;
 
@@ -325,16 +829,19 @@
                 const item = moviesDataset[id];
                 const epCount = item.episodes ? Object.keys(item.episodes).length : 0;
                 const thumbUrl = item.thumbnail || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&q=80';
+                const safeTitle = (item.title || '').replace(/"/g, '&quot;');
+                const safeDesc = (item.description || 'Chưa cập nhật mô tả cho bộ phim này.').replace(/</g, '&lt;');
 
                 gridHtml += `
-                    <a href="tube.html?v=${id}" class="movie-card">
+                    <a href="tube.html?v=${id}" class="movie-card" data-id="${id}">
                         <div class="thumb-wrapper">
-                            <img class="movie-thumb" src="${thumbUrl}" alt="${item.title}" onerror="this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&q=80'">
+                            <img class="movie-thumb" src="${thumbUrl}" alt="${safeTitle}" loading="lazy"
+                                 onerror="this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&q=80'">
                             <span class="ep-badge-tag">${epCount} Tập</span>
                         </div>
                         <div class="movie-meta">
-                            <div class="movie-title">${item.title}</div>
-                            <div class="movie-desc">${item.description || 'Chưa cập nhật mô tả cho bộ phim này.'}</div>
+                            <div class="movie-title">${safeTitle}</div>
+                            <div class="movie-desc">${safeDesc}</div>
                         </div>
                     </a>
                 `;
@@ -342,47 +849,77 @@
 
             gridHtml += '</div>';
             appContainer.innerHTML = gridHtml;
+
+            // Hiệu ứng ánh sáng bám chuột trên mỗi card
+            document.querySelectorAll('.movie-card').forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = ((e.clientX - rect.left) / rect.width) * 100;
+                    const y = ((e.clientY - rect.top) / rect.height) * 100;
+                    card.style.setProperty('--mx', x + '%');
+                    card.style.setProperty('--my', y + '%');
+                });
+            });
         }
 
+        /* =================== PLAYER =================== */
         function renderPlayerScreen(mId, epIdx) {
             const movie = moviesDataset[mId];
-            const episodes = movie.episodes ? Object.values(movie.episodes).sort((a,b) => (a.order || 0) - (b.order || 0)) : [];
+            const episodes = movie.episodes
+                ? Object.values(movie.episodes).sort((a, b) => (a.order || 0) - (b.order || 0))
+                : [];
 
             if (episodes.length === 0) {
-                appContainer.innerHTML = '<div class="loading-view">Bộ phim này hiện chưa được bổ sung tập phim nào.</div>';
+                appContainer.innerHTML = `
+                    <div class="back-bar"><a href="tube.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Quay lại</a></div>
+                    <div class="loading-view">
+                        <i class="fa-solid fa-video-slash"></i>
+                        <div style="margin-top:10px;">Bộ phim này hiện chưa được bổ sung tập phim nào.</div>
+                    </div>
+                `;
                 return;
             }
 
-            const epData = episodes[epIdx] || episodes[0];
+            if (epIdx < 0 || epIdx >= episodes.length) epIdx = 0;
+            const epData = episodes[epIdx];
+            const safeMovieTitle = (movie.title || '').replace(/</g, '&lt;');
+            const safeEpTitle = (epData.title || '').replace(/</g, '&lt;');
+            const safeDesc = (movie.description || 'Không có mô tả chi tiết.').replace(/</g, '&lt;');
 
             let epListMarkup = '';
             episodes.forEach((ep, index) => {
                 const isActive = index === epIdx ? 'active' : '';
+                const safeTitle = (ep.title || '').replace(/</g, '&lt;');
                 epListMarkup += `
                     <div class="ep-card-item ${isActive}" onclick="window.location.href='tube.html?v=${mId}&ep=${index}'">
                         <span class="ep-card-num">Tập ${ep.order || index + 1}</span>
-                        <span class="ep-card-title">${ep.title}</span>
-                        <i class="fa-solid fa-circle-play" style="color: var(--text-sub);"></i>
+                        <span class="ep-card-title">${safeTitle}</span>
+                        <i class="fa-solid fa-circle-play"></i>
                     </div>
                 `;
             });
 
             appContainer.innerHTML = `
+                <div class="back-bar">
+                    <a href="tube.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Quay lại danh sách</a>
+                </div>
                 <div class="player-layout">
                     <div>
                         <div class="video-wrapper">
-                            <video id="streamPlayer" controls autoplay src="${epData.url}"></video>
+                            <video id="streamPlayer" controls autoplay playsinline
+                                   src="${epData.url}"
+                                   poster="${movie.thumbnail || ''}"></video>
                         </div>
                         <div class="video-info-box">
-                            <h1 class="video-headline">${movie.title} - ${epData.title}</h1>
-                            <div class="video-description">${movie.description || 'Không có mô tả chi tiết.'}</div>
+                            <h1 class="video-headline">${safeMovieTitle} — <span>${safeEpTitle}</span></h1>
+                            <div class="video-description">${safeDesc}</div>
                         </div>
                     </div>
 
                     <div class="episodes-sidebar">
                         <div class="sidebar-title">
-                            <span>Danh Sách Tập</span>
-                            <span style="font-size: 13px; color: var(--text-sub);">${episodes.length} Tập</span>
+                            <span><i class="fa-solid fa-list" style="color: var(--accent); margin-right:6px;"></i>Danh Sách Tập</span>
+                            <span>${episodes.length} Tập</span>
                         </div>
                         <div class="episodes-list-scroll">
                             ${epListMarkup}
@@ -392,15 +929,34 @@
             `;
 
             const player = document.getElementById('streamPlayer');
+
+            player.onerror = () => {
+                showToast('⚠️ Không phát được video. Kiểm tra link .mp4 hoặc prefix GitHub.');
+            };
+
             player.onended = () => {
                 if (epIdx + 1 < episodes.length) {
                     window.location.href = `tube.html?v=${mId}&ep=${epIdx + 1}`;
+                } else {
+                    showToast('🎉 Bạn đã xem hết bộ phim!');
                 }
             };
         }
 
+        /* =================== SEARCH =================== */
+        let searchDebounce;
         searchInput.addEventListener('input', (e) => {
-            if (!movieId) renderHomeScreen(e.target.value);
+            if (movieId) {
+                // Nếu đang ở trang xem phim → chuyển về home và search
+                clearTimeout(searchDebounce);
+                searchDebounce = setTimeout(() => {
+                    window.location.href = 'tube.html';
+                }, 400);
+                return;
+            }
+            const q = e.target.value;
+            clearTimeout(searchDebounce);
+            searchDebounce = setTimeout(() => renderHomeScreen(q), 180);
         });
     </script>
 </body>
