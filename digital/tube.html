@@ -3,105 +3,266 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DigitalTube - Xem Phim Online</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>DigitalTube - Trình Phát Video</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-main: #0f0f0f;
-            --bg-card: #1f1f1f;
-            --accent: #ff0000;
-            --accent-hover: #cc0000;
-            --text-primary: #f1f1f1;
-            --text-secondary: #aaaaaa;
-            --border-color: rgba(255, 255, 255, 0.1);
+            --bg-base: #090a0f;
+            --bg-surface: #12151e;
+            --bg-card: rgba(22, 27, 38, 0.7);
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.35);
+            --text-main: #f3f4f6;
+            --text-sub: #9ca3af;
+            --border: rgba(255, 255, 255, 0.08);
+            --glass-bg: rgba(18, 21, 30, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.12);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background-color: var(--bg-main); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: var(--bg-base); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
 
+        /* Header UI */
         header {
-            height: 56px;
-            background-color: var(--bg-main);
+            height: 64px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 24px;
+            padding: 0 28px;
             position: sticky;
             top: 0;
-            z-index: 100;
-            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
         }
 
-        .brand { display: flex; align-items: center; gap: 8px; text-decoration: none; color: #fff; font-weight: 700; font-size: 18px; }
-        .brand i { color: var(--accent); font-size: 22px; }
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: #fff;
+            font-weight: 800;
+            font-size: 20px;
+            letter-spacing: -0.5px;
+        }
 
-        .search-bar { display: flex; align-items: center; background: #121212; border: 1px solid var(--border-color); border-radius: 40px; padding: 6px 16px; width: 40%; max-width: 500px; }
-        .search-bar input { background: transparent; border: none; outline: none; color: #fff; width: 100%; font-size: 14px; }
-        .search-bar i { color: var(--text-secondary); }
+        .brand-logo .icon-wrapper {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent), #4f46e5);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
 
-        main { flex: 1; padding: 24px; max-width: 1600px; margin: 0 auto; width: 100%; }
+        .search-container {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 8px 20px;
+            width: 36%;
+            max-width: 480px;
+            transition: all 0.3s ease;
+        }
+
+        .search-container:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 12px var(--accent-glow);
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        .search-container input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #fff;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .search-container i { color: var(--text-sub); margin-left: 10px; }
+
+        /* Main Area */
+        main { flex: 1; padding: 32px 28px; max-width: 1680px; margin: 0 auto; width: 100%; }
+
+        /* Home Grid */
+        .home-section-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
         .movies-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 24px;
         }
 
         .movie-card {
             background: var(--bg-card);
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid var(--border);
             text-decoration: none;
             color: inherit;
             display: flex;
             flex-direction: column;
-            border: 1px solid var(--border-color);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
         }
 
-        .movie-card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
-        .movie-thumb { width: 100%; aspect-ratio: 16/9; object-fit: cover; background: #2a2a2a; }
-        .movie-info { padding: 12px; }
-        .movie-title { font-size: 15px; font-weight: 600; line-height: 1.3; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .movie-desc { font-size: 13px; color: var(--text-secondary); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .movie-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--glass-border);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+        }
 
-        .player-layout { display: grid; grid-template-columns: 1fr 380px; gap: 24px; }
-        @media (max-width: 1024px) { .player-layout { grid-template-columns: 1fr; } }
+        .thumb-wrapper {
+            width: 100%;
+            aspect-ratio: 16/9;
+            position: relative;
+            overflow: hidden;
+            background: #1a1d28;
+        }
 
-        .video-container { width: 100%; background: #000; border-radius: 12px; overflow: hidden; aspect-ratio: 16/9; }
+        .movie-thumb {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .movie-card:hover .movie-thumb { transform: scale(1.06); }
+
+        .ep-badge-tag {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(9, 10, 15, 0.85);
+            backdrop-filter: blur(8px);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .movie-meta { padding: 16px; }
+        .movie-title { font-size: 16px; font-weight: 700; line-height: 1.4; margin-bottom: 8px; color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .movie-desc { font-size: 13px; color: var(--text-sub); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+        /* Watch Layout */
+        .player-layout { display: grid; grid-template-columns: 1fr 380px; gap: 28px; }
+        @media (max-width: 1100px) { .player-layout { grid-template-columns: 1fr; } }
+
+        .video-wrapper {
+            width: 100%;
+            background: #000;
+            border-radius: 20px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            border: 1px solid var(--border);
+        }
+
         video { width: 100%; height: 100%; outline: none; }
 
-        .video-details { margin-top: 16px; }
-        .video-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
-        .video-desc { font-size: 14px; color: var(--text-secondary); background: var(--bg-card); padding: 12px; border-radius: 8px; line-height: 1.5; margin-top: 12px; }
+        .video-info-box { margin-top: 20px; }
+        .video-headline { font-size: 22px; font-weight: 800; margin-bottom: 12px; color: #fff; }
+        .video-description {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 18px;
+            border-radius: 14px;
+            font-size: 14px;
+            color: var(--text-sub);
+            line-height: 1.6;
+        }
 
-        .episodes-panel { background: var(--bg-card); border-radius: 12px; padding: 16px; border: 1px solid var(--border-color); height: fit-content; max-height: 80vh; display: flex; flex-direction: column; }
-        .episodes-header { font-size: 16px; font-weight: 600; padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-        .episodes-list { overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        /* Episode List Sidebar */
+        .episodes-sidebar {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            height: fit-content;
+            max-height: 82vh;
+            display: flex;
+            flex-direction: column;
+        }
 
-        .ep-item { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 8px; background: rgba(255,255,255,0.03); cursor: pointer; transition: 0.2s; border: 1px solid transparent; }
-        .ep-item:hover { background: rgba(255,255,255,0.08); }
-        .ep-item.active { border-color: var(--accent); background: rgba(255,0,0,0.1); }
-        .ep-badge { font-size: 12px; font-weight: 700; background: var(--accent); color: #fff; padding: 2px 8px; border-radius: 4px; }
-        .ep-name { font-size: 14px; font-weight: 500; flex: 1; }
+        .sidebar-title {
+            font-size: 17px;
+            font-weight: 700;
+            padding-bottom: 14px;
+            margin-bottom: 14px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-        .loading-spinner { text-align: center; padding: 40px; color: var(--text-secondary); }
+        .episodes-list-scroll { overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+
+        .ep-card-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .ep-card-item:hover { background: rgba(255, 255, 255, 0.08); }
+        .ep-card-item.active {
+            background: rgba(99, 102, 241, 0.15);
+            border-color: var(--accent);
+        }
+
+        .ep-card-num {
+            background: var(--accent);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .ep-card-title { font-size: 14px; font-weight: 600; color: #fff; flex: 1; }
+
+        .loading-view { text-align: center; padding: 80px 0; color: var(--text-sub); font-size: 15px; }
     </style>
 </head>
 <body>
 
     <header>
-        <a href="tube.html" class="brand"><i class="fa-solid fa-circle-play"></i> DigitalTube</a>
-        <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="Tìm kiếm phim...">
+        <a href="tube.html" class="brand-logo">
+            <div class="icon-wrapper"><i class="fa-solid fa-play"></i></div>
+            DigitalTube
+        </a>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Tìm kiếm bộ phim ưa thích...">
             <i class="fa-solid fa-magnifying-glass"></i>
         </div>
     </header>
 
-    <main id="mainContent">
-        <div class="loading-spinner"><i class="fa-solid fa-circle-notch fa-spin"></i> Đang tải dữ liệu phim...</div>
+    <main id="appContainer">
+        <div class="loading-view"><i class="fa-solid fa-circle-notch fa-spin"></i> Đang tải dữ liệu từ máy chủ...</div>
     </main>
 
     <script type="module">
@@ -122,105 +283,125 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        const mainContent = document.getElementById('mainContent');
+        const appContainer = document.getElementById('appContainer');
+        const searchInput = document.getElementById('searchInput');
+
         const urlParams = new URLSearchParams(window.location.search);
         const movieId = urlParams.get('v');
-        const epIndex = parseInt(urlParams.get('ep') || '0');
+        const currentEpIdx = parseInt(urlParams.get('ep') || '0');
 
-        let allMovies = {};
+        let moviesDataset = {};
 
+        // Lắng nghe dữ liệu
         onValue(ref(db, 'movies'), (snapshot) => {
-            allMovies = snapshot.val() || {};
+            moviesDataset = snapshot.val() || {};
             
-            if (movieId && allMovies[movieId]) {
-                renderPlayerView(movieId, epIndex);
+            if (movieId && moviesDataset[movieId]) {
+                renderPlayerScreen(movieId, currentEpIdx);
             } else {
-                renderHomeGrid();
+                renderHomeScreen();
             }
         });
 
-        function renderHomeGrid() {
-            const keys = Object.keys(allMovies);
-            if (keys.length === 0) {
-                mainContent.innerHTML = '<div class="loading-spinner">Chưa có phim nào được đăng tải.</div>';
+        function renderHomeScreen(filterQuery = '') {
+            const keys = Object.keys(moviesDataset);
+            
+            const filteredKeys = keys.filter(k => {
+                const title = (moviesDataset[k].title || '').toLowerCase();
+                return title.includes(filterQuery.toLowerCase());
+            });
+
+            if (filteredKeys.length === 0) {
+                appContainer.innerHTML = '<div class="loading-view">Không tìm thấy bộ phim nào phù hợp.</div>';
                 return;
             }
 
-            let html = '<div class="movies-grid">';
-            keys.forEach(id => {
-                const m = allMovies[id];
-                const epCount = m.episodes ? Object.keys(m.episodes).length : 0;
-                const thumb = m.thumbnail || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500&q=80';
-                
-                html += `
+            let gridHtml = `
+                <div class="home-section-title"><i class="fa-solid fa-fire" style="color: var(--accent);"></i> Danh Sách Phim Mới Nhất</div>
+                <div class="movies-grid">
+            `;
+
+            filteredKeys.forEach(id => {
+                const item = moviesDataset[id];
+                const epCount = item.episodes ? Object.keys(item.episodes).length : 0;
+                const thumbUrl = item.thumbnail || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&q=80';
+
+                gridHtml += `
                     <a href="tube.html?v=${id}" class="movie-card">
-                        <img class="movie-thumb" src="${thumb}" alt="${m.title}" onerror="this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500&q=80'">
-                        <div class="movie-info">
-                            <div class="movie-title">${m.title}</div>
-                            <div class="movie-desc">${epCount} tập • ${m.description || 'Chưa có mô tả'}</div>
+                        <div class="thumb-wrapper">
+                            <img class="movie-thumb" src="${thumbUrl}" alt="${item.title}" onerror="this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&q=80'">
+                            <span class="ep-badge-tag">${epCount} Tập</span>
+                        </div>
+                        <div class="movie-meta">
+                            <div class="movie-title">${item.title}</div>
+                            <div class="movie-desc">${item.description || 'Chưa cập nhật mô tả cho bộ phim này.'}</div>
                         </div>
                     </a>
                 `;
             });
-            html += '</div>';
-            mainContent.innerHTML = html;
+
+            gridHtml += '</div>';
+            appContainer.innerHTML = gridHtml;
         }
 
-        function renderPlayerView(mId, currentEpIdx) {
-            const movie = allMovies[mId];
+        function renderPlayerScreen(mId, epIdx) {
+            const movie = moviesDataset[mId];
             const episodes = movie.episodes ? Object.values(movie.episodes).sort((a,b) => (a.order || 0) - (b.order || 0)) : [];
-            
+
             if (episodes.length === 0) {
-                mainContent.innerHTML = '<div class="loading-spinner">Phim này chưa cập nhật tập video nào.</div>';
+                appContainer.innerHTML = '<div class="loading-view">Bộ phim này hiện chưa được bổ sung tập phim nào.</div>';
                 return;
             }
 
-            const currentEp = episodes[currentEpIdx] || episodes[0];
+            const epData = episodes[epIdx] || episodes[0];
 
-            let epListHtml = '';
-            episodes.forEach((ep, idx) => {
-                const active = idx === currentEpIdx ? 'active' : '';
-                epListHtml += `
-                    <div class="ep-item ${active}" onclick="window.location.href='tube.html?v=${mId}&ep=${idx}'">
-                        <span class="ep-badge">Tập ${ep.order || idx + 1}</span>
-                        <span class="ep-name">${ep.title}</span>
-                        <i class="fa-solid fa-play" style="font-size: 12px; color: var(--text-secondary);"></i>
+            let epListMarkup = '';
+            episodes.forEach((ep, index) => {
+                const isActive = index === epIdx ? 'active' : '';
+                epListMarkup += `
+                    <div class="ep-card-item ${isActive}" onclick="window.location.href='tube.html?v=${mId}&ep=${index}'">
+                        <span class="ep-card-num">Tập ${ep.order || index + 1}</span>
+                        <span class="ep-card-title">${ep.title}</span>
+                        <i class="fa-solid fa-circle-play" style="color: var(--text-sub);"></i>
                     </div>
                 `;
             });
 
-            mainContent.innerHTML = `
+            appContainer.innerHTML = `
                 <div class="player-layout">
                     <div>
-                        <div class="video-container">
-                            <video id="videoPlayer" controls autoplay src="${currentEp.url}"></video>
+                        <div class="video-wrapper">
+                            <video id="streamPlayer" controls autoplay src="${epData.url}"></video>
                         </div>
-                        <div class="video-details">
-                            <div class="video-title">${movie.title} - ${currentEp.title}</div>
-                            <div class="video-desc">${movie.description || 'Không có mô tả chi tiết cho phim này.'}</div>
+                        <div class="video-info-box">
+                            <h1 class="video-headline">${movie.title} - ${epData.title}</h1>
+                            <div class="video-description">${movie.description || 'Không có mô tả chi tiết.'}</div>
                         </div>
                     </div>
 
-                    <div class="episodes-panel">
-                        <div class="episodes-header">
+                    <div class="episodes-sidebar">
+                        <div class="sidebar-title">
                             <span>Danh Sách Tập</span>
-                            <span style="font-size: 13px; color: var(--text-secondary);">${episodes.length} Tập</span>
+                            <span style="font-size: 13px; color: var(--text-sub);">${episodes.length} Tập</span>
                         </div>
-                        <div class="episodes-list">
-                            ${epListHtml}
+                        <div class="episodes-list-scroll">
+                            ${epListMarkup}
                         </div>
                     </div>
                 </div>
             `;
 
-            // Autoplay tiếp theo khi hết video
-            const p = document.getElementById('videoPlayer');
-            p.onended = () => {
-                if (currentEpIdx + 1 < episodes.length) {
-                    window.location.href = `tube.html?v=${mId}&ep=${currentEpIdx + 1}`;
+            const player = document.getElementById('streamPlayer');
+            player.onended = () => {
+                if (epIdx + 1 < episodes.length) {
+                    window.location.href = `tube.html?v=${mId}&ep=${epIdx + 1}`;
                 }
             };
         }
+
+        searchInput.addEventListener('input', (e) => {
+            if (!movieId) renderHomeScreen(e.target.value);
+        });
     </script>
 </body>
 </html>
