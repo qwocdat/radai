@@ -90,7 +90,7 @@
             z-index: 1000;
         }
 
-        /* ===== LOGO GLOW (ĐIỂM NHẤN CHÍNH) ===== */
+        /* ===== LOGO GLOW ===== */
         .brand-logo {
             display: flex;
             align-items: center;
@@ -151,10 +151,7 @@
             transition: all 0.3s ease;
         }
 
-        /* Hiệu ứng khi HOVER */
-        .brand-logo:hover {
-            transform: translateY(-1px);
-        }
+        .brand-logo:hover { transform: translateY(-1px); }
         .brand-logo:hover .icon-wrapper {
             box-shadow:
                 0 0 25px var(--accent-glow-strong),
@@ -168,17 +165,10 @@
             filter: drop-shadow(0 0 12px rgba(165, 180, 252, 0.7));
         }
 
-        @keyframes shimmerText {
-            to { background-position: 220% center; }
-        }
+        @keyframes shimmerText { to { background-position: 220% center; } }
 
-        /* Hiệu ứng khi CLICK (active) */
-        .brand-logo:active {
-            transform: scale(0.97);
-        }
-        .brand-logo.clicked .icon-wrapper {
-            animation: clickBurst 0.6s ease-out;
-        }
+        .brand-logo:active { transform: scale(0.97); }
+        .brand-logo.clicked .icon-wrapper { animation: clickBurst 0.6s ease-out; }
         @keyframes clickBurst {
             0% { transform: scale(1) rotate(0); }
             30% { transform: scale(1.35) rotate(-12deg); box-shadow: 0 0 60px #fff, 0 0 100px var(--accent-glow-strong); }
@@ -366,9 +356,7 @@
             overflow: hidden;
             transition: color 0.3s ease;
         }
-        .movie-card:hover .movie-title {
-            color: #c7d2fe;
-        }
+        .movie-card:hover .movie-title { color: #c7d2fe; }
         .movie-desc {
             font-size: 13px;
             color: var(--text-sub);
@@ -740,11 +728,64 @@
             t._tid = setTimeout(() => t.classList.remove('show'), 4000);
         }
 
+        /* =========================================================
+           [MỚI] CHUẨN HOÁ LINK VIDEO
+           - Dropbox share link  → dl.dropboxusercontent.com (direct)
+           - Google Drive share  → uc?export=download&id=...
+           - Link khác giữ nguyên
+           ========================================================= */
+        function normalizeVideoUrl(url) {
+            if (!url || typeof url !== 'string') return url;
+            url = url.trim();
+
+            /* ---------- DROPBOX ---------- */
+            if (/dropbox\.com/i.test(url)) {
+                try {
+                    const u = new URL(url);
+                    const rlkey = u.searchParams.get('rlkey');
+
+                    // Link dạng mới: /scl/fi/<id>/<filename>
+                    // Link dạng cũ:   /s/<id>/<filename>
+                    // Giữ nguyên path, chuyển host sang dl.dropboxusercontent.com
+                    const newUrl = new URL('https://dl.dropboxusercontent.com' + u.pathname);
+                    if (rlkey) newUrl.searchParams.set('rlkey', rlkey);
+
+                    return newUrl.toString();
+                } catch (e) {
+                    // Fallback nếu URL constructor lỗi
+                    return url
+                        .replace('www.dropbox.com', 'dl.dropboxusercontent.com')
+                        .replace('dropbox.com/s/', 'dropboxusercontent.com/s/')
+                        .replace(/[?&](dl|raw|st|e)=[^&]*/g, '')
+                        .replace(/\?&/, '?')
+                        .replace(/[?&]$/, '');
+                }
+            }
+
+            /* ---------- GOOGLE DRIVE ---------- */
+            if (/drive\.google\.com/i.test(url)) {
+                const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+                if (m) {
+                    return `https://drive.google.com/uc?export=download&id=${m[1]}`;
+                }
+            }
+
+            /* ---------- ONEDRIVE ---------- */
+            if (/1drv\.ms|onedrive\.live\.com/i.test(url)) {
+                // Thêm download=1 nếu chưa có
+                if (!/[?&]download=1/.test(url)) {
+                    return url + (url.includes('?') ? '&' : '?') + 'download=1';
+                }
+            }
+
+            return url;
+        }
+
         /* =================== LOGO GLOW CLICK =================== */
         const brandLogo = document.getElementById('brandLogo');
         brandLogo.addEventListener('click', () => {
             brandLogo.classList.remove('clicked');
-            void brandLogo.offsetWidth; // restart animation
+            void brandLogo.offsetWidth;
             brandLogo.classList.add('clicked');
             setTimeout(() => brandLogo.classList.remove('clicked'), 650);
         });
@@ -791,7 +832,7 @@
                 showToast('❌ Lỗi kết nối Firebase: ' + (err?.code || err?.message || 'UNKNOWN'));
                 appContainer.innerHTML = `
                     <div class="loading-view">
-                        <i class="fa-solid fa-triangle-exclamation" style="color: var(--danger);"></i>
+                        <i class="fa-solid fa-triangle-exclamation" style="color: #ef4444;"></i>
                         <div style="margin-top:10px;">Không thể tải dữ liệu. Kiểm tra Rules Firebase hoặc kết nối mạng.</div>
                         <div style="margin-top:8px; font-size:12px; color:#6b7280;">Mã lỗi: ${err?.code || err?.message || 'UNKNOWN'}</div>
                     </div>
@@ -886,6 +927,13 @@
             const safeEpTitle = (epData.title || '').replace(/</g, '&lt;');
             const safeDesc = (movie.description || 'Không có mô tả chi tiết.').replace(/</g, '&lt;');
 
+            // [MỚI] Chuẩn hoá link video (Dropbox / Google Drive / OneDrive)
+            const rawUrl = epData.url || '';
+            const videoUrl = normalizeVideoUrl(rawUrl);
+            if (rawUrl && videoUrl !== rawUrl) {
+                console.log('[normalizeVideoUrl] Đã chuyển link:\n  Gốc: ' + rawUrl + '\n  Mới: ' + videoUrl);
+            }
+
             let epListMarkup = '';
             episodes.forEach((ep, index) => {
                 const isActive = index === epIdx ? 'active' : '';
@@ -907,7 +955,7 @@
                     <div>
                         <div class="video-wrapper">
                             <video id="streamPlayer" controls autoplay playsinline
-                                   src="${epData.url}"
+                                   src="${videoUrl}"
                                    poster="${movie.thumbnail || ''}"></video>
                         </div>
                         <div class="video-info-box">
@@ -931,7 +979,13 @@
             const player = document.getElementById('streamPlayer');
 
             player.onerror = () => {
-                showToast('⚠️ Không phát được video. Kiểm tra link .mp4 hoặc prefix GitHub.');
+                const src = player.currentSrc || player.src || '';
+                if (/dropbox/i.test(rawUrl)) {
+                    showToast('⚠️ Không phát được Dropbox. Hãy chắc chắn file đã bật chia sẻ công khai (Anyone with the link).');
+                } else {
+                    showToast('⚠️ Không phát được video. Kiểm tra lại link.');
+                }
+                console.error('[player error]', src, player.error);
             };
 
             player.onended = () => {
@@ -947,7 +1001,6 @@
         let searchDebounce;
         searchInput.addEventListener('input', (e) => {
             if (movieId) {
-                // Nếu đang ở trang xem phim → chuyển về home và search
                 clearTimeout(searchDebounce);
                 searchDebounce = setTimeout(() => {
                     window.location.href = 'tube.html';
