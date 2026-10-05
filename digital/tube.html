@@ -21,8 +21,6 @@
             --border: rgba(255, 255, 255, 0.08);
             --glass-bg: rgba(13, 16, 24, 0.72);
             --glass-border: rgba(255, 255, 255, 0.12);
-            box-sizing: border-box;
-            padding-top: env(safe-area-inset-top, 0px);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -35,31 +33,76 @@
             flex-direction: column;
             overflow-x: hidden;
             position: relative;
-            padding-bottom: 90px; /* Thêm khoảng trống để không bị thanh Tabbar che nội dung */
+            padding-bottom: 90px;
         }
 
-        /* ===== LIQUID GLASS TABBAR STYLES ===== */
-        #gl { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; pointer-events: none; z-index: 999; }
-        nav.liquid-nav {
+        /* ===== TABBAR FLOATING LIQUID GLASS CONTAINER ===== */
+        .tabbar-fixed-wrapper {
             position: fixed;
-            left: 14px; right: 14px;
+            left: 14px;
+            right: 14px;
             bottom: calc(14px + env(safe-area-inset-bottom, 0px));
             max-width: 380px;
             margin: 0 auto;
+            z-index: 2000;
+            pointer-events: auto;
+        }
+
+        nav.liquid-nav {
+            position: relative;
             padding: 5px;
             touch-action: none;
             user-select: none;
             -webkit-user-select: none;
-            -webkit-touch-callout: none;
-            z-index: 1000;
+            border-radius: 999px;
+            background: rgba(23, 23, 26, 0.85);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.65), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+            overflow: hidden;
         }
-        .row { position: relative; display: flex; gap: 4px; }
-        .tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 7px 0 6px; border: 0; border-radius: 999px; background: transparent; color: transparent; font: 500 12px/1 Roboto, "Segoe UI", system-ui, sans-serif; cursor: pointer; }
-        .tab svg { width: 23px; height: 23px; opacity: 0; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+        .row { position: relative; display: flex; gap: 4px; z-index: 2; }
+        .tab {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            padding: 7px 0 6px;
+            border: 0;
+            border-radius: 999px;
+            background: transparent;
+            color: #f2f2f5;
+            font: 500 12px/1 'Plus Jakarta Sans', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .tab svg {
+            width: 23px;
+            height: 23px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: transform 0.2s ease;
+        }
+        .tab:active svg { transform: scale(0.9); }
+        .tab[aria-current="true"] { color: #a58cff; font-weight: 700; }
         .ico { height: 23px; display: block; }
-        .nogl .tab { color: #f2f2f5; }
-        .nogl .tab svg { opacity: 1; }
-        .nogl .tab[aria-current="true"] { color: #a58cff; }
+
+        /* Canvas riêng cho Tabbar không làm đè màn hình */
+        #gl-tabbar {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 999px;
+            pointer-events: none;
+            z-index: 1;
+        }
 
         /* ===== AURORA BACKGROUND BLOBS ===== */
         .aurora-bg {
@@ -113,7 +156,7 @@
             padding: 0 28px;
             position: sticky;
             top: 0;
-            z-index: 900;
+            z-index: 1000;
         }
 
         /* ===== LOGO GLOW ===== */
@@ -716,25 +759,7 @@
         <div class="aurora-blob blob-3"></div>
     </div>
 
-    <!-- WebGL Canvas cho hiệu ứng Liquid Glass Tabbar -->
-    <canvas id="gl"></canvas>
-
-    <!-- Liquid Glass Floating Tabbar -->
-    <nav class="liquid-nav" aria-label="Điều hướng"><div class="row" id="row">
-      <button class="tab" data-tab="Video" aria-label="Video">
-        <span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="12.5" height="12" rx="3"/><path d="M15.5 10.5 21 7.5v9l-5.5-3"/></svg></span><span class="lbl">Video</span>
-      </button>
-      <button class="tab" data-tab="Audio" aria-label="Audio">
-        <span class="ico"><svg viewBox="0 0 24 24"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4.5" height="6.5" rx="2"/><rect x="16.5" y="14" width="4.5" height="6.5" rx="2"/></svg></span><span class="lbl">Audio</span>
-      </button>
-      <button class="tab" data-tab="Settings" aria-label="Settings">
-        <span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l2-1.6-2-3.4-2.4 1a7.6 7.6 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.5a7.6 7.6 0 0 0-2.6 1.5l-2.4-1-2 3.4 2 1.6a7.8 7.8 0 0 0 0 3l-2 1.6 2 3.4 2.4-1c.8.7 1.6 1.2 2.6 1.5l.4 2.5h4l.4-2.5c1-.3 1.8-.8 2.6-1.5l2.4 1 2-3.4z"/></svg></span><span class="lbl">Settings</span>
-      </button>
-      <button class="tab" data-tab="Profile" aria-label="Profile">
-        <span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="10" r="3"/><path d="M6.2 18.2c1.3-2 3.3-3 5.8-3s4.5 1 5.8 3"/></svg></span><span class="lbl">Profile</span>
-      </button>
-    </div></nav>
-
+    <!-- Header -->
     <header>
         <a href="tube.html" class="brand-logo" id="brandLogo">
             <div class="icon-wrapper"><i class="fa-solid fa-play"></i></div>
@@ -746,6 +771,7 @@
         </div>
     </header>
 
+    <!-- App Main Container -->
     <main id="appContainer">
         <div class="skeleton-grid" id="skeletonLoader">
             <div class="skeleton-card"><div class="skeleton-thumb"></div><div class="skeleton-meta"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div></div>
@@ -755,232 +781,129 @@
         </div>
     </main>
 
-    <!-- WebGL Engine Script cho Liquid Glass Tabbar -->
+    <!-- Floating Liquid Glass Tabbar -->
+    <div class="tabbar-fixed-wrapper">
+        <nav class="liquid-nav" aria-label="Điều hướng">
+            <canvas id="gl-tabbar"></canvas>
+            <div class="row" id="row">
+              <button class="tab" data-tab="Video" aria-label="Video" aria-current="true">
+                <span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="12.5" height="12" rx="3"/><path d="M15.5 10.5 21 7.5v9l-5.5-3"/></svg></span>
+                <span class="lbl">Video</span>
+              </button>
+              <button class="tab" data-tab="Audio" aria-label="Audio">
+                <span class="ico"><svg viewBox="0 0 24 24"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4.5" height="6.5" rx="2"/><rect x="16.5" y="14" width="4.5" height="6.5" rx="2"/></svg></span>
+                <span class="lbl">Audio</span>
+              </button>
+              <button class="tab" data-tab="Settings" aria-label="Settings">
+                <span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l2-1.6-2-3.4-2.4 1a7.6 7.6 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.5a7.6 7.6 0 0 0-2.6 1.5l-2.4-1-2 3.4 2 1.6a7.8 7.8 0 0 0 0 3l-2 1.6 2 3.4 2.4-1c.8.7 1.6 1.2 2.6 1.5l.4 2.5h4l.4-2.5c1-.3 1.8-.8 2.6-1.5l2.4 1 2-3.4z"/></svg></span>
+                <span class="lbl">Settings</span>
+              </button>
+              <button class="tab" data-tab="Profile" aria-label="Profile">
+                <span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="10" r="3"/><path d="M6.2 18.2c1.3-2 3.3-3 5.8-3s4.5 1 5.8 3"/></svg></span>
+                <span class="lbl">Profile</span>
+              </button>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Liquid Glass Tabbar Engine -->
     <script>
-    /* ============ Liquid Glass tab bar (WebGL) ============ */
-    const VS='attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
-    const FS=`precision highp float;
-    uniform vec2 uRes,uView,uLight;uniform float uDpr,uHeld,uGrow,uTouch,uVel,uDisp,uDark;
-    uniform sampler2D uA,uBn,uBp;
-    uniform vec4 uNav,uPill,uMask;uniform vec3 uPtr;uniform vec3 uTint,uPillCol;uniform float uTintA;
-    float sdRB(vec2 q,vec2 b,float r){vec2 d=abs(q)-(b-r);return length(max(d,0.))+min(max(d.x,d.y),0.)-r;}
-    float sdCap(vec2 q,float hw,float hh){return length(vec2(max(abs(q.x)-(hw-hh),0.),q.y))-hh;}
-    vec3 scn(vec2 p){return texture2D(uA,clamp(p/uView,0.001,0.999)).rgb;}
-    vec3 compose(vec2 p,float cl){
-      vec3 bg=scn(p);
-      vec2 nc=uNav.xy+uNav.zw*.5;
-      float dn=sdCap(p-nc,uNav.z*.5,uNav.w*.5);
-      float sdw=sdCap(p-nc-vec2(0.,7.),uNav.z*.5,uNav.w*.5);
-      bg*=1.-.32*(1.-smoothstep(-6.,24.,sdw));
-      float a=smoothstep(.8,-.8,dn);
-      vec3 f=scn(p);
-      for(int i=0;i<8;i++){float an=float(i)*.785398;f+=scn(p+vec2(cos(an),sin(an))*9.);}
-      f/=9.;
-      f=mix(f,scn(p),cl);vec3 bc=mix(f,uTint,uTintA*(1.-.75*cl));
-      bc+=vec3(1.)*.16*(1.-smoothstep(0.,1.6,abs(dn+.8)));
-      float dp=sdCap(p-uPill.xy,uPill.z,uPill.w);
-      float m=smoothstep(.8,-.8,dp);
-      bc=mix(bc,uPillCol,m*(1.-clamp(uHeld*3.,0.,1.)));
-      vec2 uv=(p-uNav.xy)/uNav.zw;
-      float inside=step(0.,uv.x)*step(uv.x,1.)*step(0.,uv.y)*step(uv.y,1.);
-      uv=clamp(uv,0.,1.);
-      float mi=smoothstep(.8,-.8,sdCap(p-uMask.xy,uMask.z,uMask.w));
-      vec4 ic=mix(texture2D(uBn,uv),texture2D(uBp,uv),mi);
-      bc=mix(bc,ic.rgb,ic.a*inside);
-      vec3 gc=mix(vec3(.55,.45,.95),vec3(.78,.72,1.),uDark);
-      float gd=length(p-uPtr.xy);
-      float glw=exp(-gd*gd/(2.*85.*85.))*uPtr.z;
-      float edgeW=1.-smoothstep(0.,7.,abs(dn+1.));
-      float glw2=exp(-gd*gd/(2.*115.*115.))*uPtr.z;
-      bc+=gc*(glw*.6*edgeW+glw2*.26);
-      return mix(bg,bc,a)+gc*glw*.12*exp(-max(dn,0.)/14.)*(1.-a);
-    }
-    void main(){
-      vec2 p=vec2(gl_FragCoord.x,uRes.y-gl_FragCoord.y)/uDpr;
-      vec3 col=compose(p,0.);
-      if(uHeld>.001){
-        float hc=clamp(uHeld,0.,1.);
-        vec2 c=uPill.xy+vec2(uVel*4.,0.);
-        float hw=uPill.z+uGrow+abs(uVel)*6.;
-        float hh=uPill.w+uGrow-abs(uVel)*2.;
-        float rr=hh;
-        vec2 bb=vec2(hw,hh),q=p-c;
-        float d=sdRB(q,bb,rr);
-        float shd=1.-smoothstep(-6.,26.,sdRB(q-vec2(0.,6.+uGrow),bb,rr));
-        col*=1.-.24*hc*shd*smoothstep(-1.,3.,d);
-        if(d<1.5){
-          float depth=max(-d,0.);
-          vec2 e=vec2(.75,0.);
-          vec2 nrm=normalize(vec2(sdRB(q+e.xy,bb,rr)-sdRB(q-e.xy,bb,rr),sdRB(q+e.yx,bb,rr)-sdRB(q-e.yx,bb,rr))+vec2(1e-5));
-          float edge=1.-clamp(depth/(hh*.9),0.,1.);
-          float eD=1.-clamp(depth/13.,0.,1.);
-          float eM=1.-clamp(depth/(hh*.95),0.,1.);
-          float disp=uTouch*(20.*eD*eD+2.*eM*eM);
-          vec2 pm=c+q*(1.+.14*uTouch);
-          vec2 off=-nrm*disp;
-          off+=vec2(uVel,0.)*7.*eD*uTouch*(.5+.5*dot(nrm,vec2(sign(uVel+1e-4),0.)));
-          float k=.09*uDisp,cl=hc*.85;
-          vec3 g;
-          g.r=compose(pm+off*(1.+k),cl).r;g.g=compose(pm+off,cl).g;g.b=compose(pm+off*(1.-k),cl).b;
-          float lum=dot(g,vec3(.299,.587,.114));
-          g=mix(vec3(lum),g,1.+.18*uTouch);
-          vec2 L=normalize(uLight);
-          float sl=clamp(edge,0.,1.),lk=mix(.8,1.,uDark);
-          float rim=pow(edge,2.6),lit=max(dot(nrm,L),0.),back=max(dot(nrm,-L),0.);
-          g+=vec3(1.)*rim*(lit*.7+back*.3)*uTouch*lk;
-          g+=vec3(1.,.98,.95)*pow(lit,4.)*pow(sl,2.4)*(.35+.35*hc)*uTouch*lk;
-          g+=vec3(.85,.92,1.)*pow(sl,3.)*max(nrm.y,0.)*.12*uTouch;
-          vec3 n3=normalize(vec3(nrm*sl,1.-.9*sl));
-          g+=vec3(.9,.95,1.)*pow(1.-n3.z,3.)*(.16+.14*hc)*uTouch*lk;
-          g+=vec3(1.)*(1.-smoothstep(0.,1.8,depth))*.14*uTouch;
-          float ring=exp(-pow((depth-6.)/4.,2.));
-          g*=1.-.12*ring*uTouch;
-          g*=1.-.07*uTouch*smoothstep(-hh,hh,q.y);
-          g+=vec3(1.)*.05*uTouch*lk*(1.-smoothstep(-hh,.1*hh,q.y))*smoothstep(0.,6.,depth);
-          g+=g*back*pow(sl,2.2)*.45*uTouch;
-          col=mix(col,g,smoothstep(.8,-.8,d));
+    (function(){
+        const VS='attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
+        const FS=`precision highp float;
+        uniform vec2 uRes;
+        uniform float uPillX, uHeld, uDark;
+        float sdCap(vec2 q, float hw, float hh){return length(vec2(max(abs(q.x)-(hw-hh),0.),q.y))-hh;}
+        void main(){
+            vec2 p = gl_FragCoord.xy;
+            vec2 c = vec2(uPillX, uRes.y * 0.5);
+            float d = sdCap(p - c, uRes.x * 0.11, uRes.y * 0.38);
+            float m = smoothstep(1.5, -1.5, d);
+            vec3 pillCol = mix(vec3(0.23, 0.21, 0.34), vec3(0.89, 0.87, 0.98), 1.0 - uDark);
+            vec3 col = pillCol * m * (0.35 + 0.65 * uHeld);
+            float glow = exp(-max(d, 0.0) / 12.0) * 0.4;
+            col += vec3(0.65, 0.55, 1.0) * glow;
+            gl_FragColor = vec4(col, m * 0.85);
+        }`;
+
+        const cv = document.getElementById('gl-tabbar');
+        const row = document.getElementById('row');
+        const tabs = [...document.querySelectorAll('.tab')];
+        const gl = cv.getContext('webgl', {antialias: true, alpha: true});
+
+        if(!gl) return;
+
+        const sh = (t, s) => {
+            const o = gl.createShader(t); gl.shaderSource(o, s); gl.compileShader(o); return o;
+        };
+        const pr = gl.createProgram();
+        gl.attachShader(pr, sh(gl.VERTEX_SHADER, VS));
+        gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, FS));
+        gl.linkProgram(pr); gl.useProgram(pr);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+        const loc = gl.getAttribLocation(pr, 'a');
+        gl.enableVertexAttribArray(loc);
+        gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+        const uRes = gl.getUniformLocation(pr, 'uRes');
+        const uPillX = gl.getUniformLocation(pr, 'uPillX');
+        const uHeld = gl.getUniformLocation(pr, 'uHeld');
+        const uDark = gl.getUniformLocation(pr, 'uDark');
+
+        let cur = 0, targetX = 0, curX = 0, held = 0;
+
+        function resize() {
+            const rect = cv.getBoundingClientRect();
+            cv.width = rect.width * devicePixelRatio;
+            cv.height = rect.height * devicePixelRatio;
+            gl.viewport(0, 0, cv.width, cv.height);
+            gl.uniform2f(uRes, cv.width, cv.height);
+            gl.uniform1f(uDark, 1.0);
+            updateTarget(cur, false);
         }
-      }
-      gl_FragColor=vec4(col,1.);
-    }`;
 
-    const cv=document.getElementById('gl'),row=document.getElementById('row'),nav=document.querySelector('nav.liquid-nav');
-    const tabs=[...document.querySelectorAll('.tab')];
-    const gl=cv.getContext('webgl',{antialias:false,alpha:false});
-    const mq=matchMedia('(prefers-color-scheme: dark)');
-    const rmq=matchMedia('(prefers-reduced-motion: reduce)');let reduce=rmq.matches;rmq.addEventListener('change',e=>reduce=e.matches);
-    const sc=document.createElement('canvas'),sctx=sc.getContext('2d');
-    const bn=document.createElement('canvas'),bp=document.createElement('canvas');
-    let customBg=null,scrollY=0,curTitle='Video';
-    let tv=0,px=0,py=0,sx=0,sy=0,pv=0,ptrT=0,TH=null,xt=0,xv=0,hv=0,vel=0,prevX=0,settling=false,dprCap=2.5,aSize='',navR,rowR,dpr=1,cur=0,x=0,held=0,heldTarget=0,dragging=false,start=null,justDragged=false,raf=0,lightA=-2.2,P={};
+        function updateTarget(index, anim = true) {
+            cur = index;
+            tabs.forEach((t, i) => t.setAttribute('aria-current', i === index));
+            const tab = tabs[index];
+            if(tab) {
+                targetX = (tab.offsetLeft + tab.offsetWidth / 2) * devicePixelRatio;
+                if(!anim) curX = targetX;
+            }
+        }
 
-    if(!gl){document.body.classList.add('nogl')}
-    else{
-    const sh=(t,s)=>{const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))console.error(gl.getShaderInfoLog(o));return o};
-    const pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,VS));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(pr);gl.useProgram(pr);
-    gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer());gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
-    const loc=gl.getAttribLocation(pr,'a');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
-    const _u={};const U=n=>_u[n]||(_u[n]=gl.getUniformLocation(pr,n));
-    const mk=u=>{const t=gl.createTexture();gl.activeTexture(gl.TEXTURE0+u);gl.bindTexture(gl.TEXTURE_2D,t);
-      [[gl.TEXTURE_MIN_FILTER,gl.LINEAR],[gl.TEXTURE_MAG_FILTER,gl.LINEAR],[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE]].forEach(([k,v])=>gl.texParameteri(gl.TEXTURE_2D,k,v));return t};
-    const up=(u,c)=>{gl.activeTexture(gl.TEXTURE0+u);gl.bindTexture(gl.TEXTURE_2D,u===0?tA:u===1?tN:tP);
-      if(u===0&&aSize===c.width+'x'+c.height)gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,gl.RGBA,gl.UNSIGNED_BYTE,c);
-      else{gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,c);if(u===0)aSize=c.width+'x'+c.height}};
-    const tA=mk(0),tN=mk(1),tP=mk(2);
-    gl.uniform1i(U('uA'),0);gl.uniform1i(U('uBn'),1);gl.uniform1i(U('uBp'),2);
+        tabs.forEach((t, i) => {
+            t.addEventListener('click', () => {
+                held = 1.0;
+                updateTarget(i);
+            });
+        });
 
-    const theme=()=>mq.matches?{dark:1,fg:'#f2f2f5',acc:'#a58cff',pill:[58,53,86],tint:[44,44,52],ta:.5}:{dark:0,fg:'#17171b',acc:'#6b4fd6',pill:[227,222,250],tint:[255,255,255],ta:.55};
+        function render() {
+            curX += (targetX - curX) * 0.18;
+            held += (0.0 - held) * 0.1;
 
-    function rr(g,x,y,w,h,r){g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
-    function pathOf(el){
-      const n=el.tagName.toLowerCase(),a=k=>+el.getAttribute(k)||0;
-      if(n==='path')return new Path2D(el.getAttribute('d'));
-      const p=new Path2D();
-      if(n==='circle')p.arc(a('cx'),a('cy'),a('r'),0,Math.PI*2);
-      if(n==='rect'){const g={moveTo:(...v)=>p.moveTo(...v),arcTo:(...v)=>p.arcTo(...v),closePath:()=>p.closePath()};rr(g,a('x'),a('y'),a('width'),a('height'),a('rx'))}
-      return p;
-    }
-    function drawBar(c,color,alpha,weight){
-      c.width=Math.round(navR.width*dpr);c.height=Math.round(navR.height*dpr);
-      const g=c.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,navR.width,navR.height);g.globalAlpha=alpha;
-      tabs.forEach(t=>{
-        const svg=t.querySelector('svg'),r=svg.getBoundingClientRect(),s=r.width/24;
-        g.save();g.translate(r.left-navR.left,r.top-navR.top);g.scale(s,s);
-        g.lineWidth=1.75;g.lineCap='round';g.lineJoin='round';g.strokeStyle=color;
-        [...svg.children].forEach(el=>g.stroke(pathOf(el)));g.restore();
-        const l=t.querySelector('.lbl'),lr=l.getBoundingClientRect();
-        g.fillStyle=color;g.font=weight+' 12px Roboto,"Segoe UI",system-ui,sans-serif';g.textAlign='center';g.textBaseline='middle';
-        g.fillText(l.textContent,lr.left+lr.width/2-navR.left,lr.top+lr.height/2-navR.top+.5);
-      });
-    }
-    function layout(){
-      dpr=Math.min(devicePixelRatio||1,dprCap);PW=tabs[0].offsetWidth;PR=row.offsetWidth;
-      cv.width=Math.round(innerWidth*dpr);cv.height=Math.round(innerHeight*dpr);gl.viewport(0,0,cv.width,cv.height);
-      sc.width=innerWidth;sc.height=innerHeight;
-      navR=nav.getBoundingClientRect();rowR=row.getBoundingClientRect();
-      TH=theme();const T=TH;drawBar(bn,T.fg,.78,500);drawBar(bp,T.acc,1,600);up(1,bn);up(2,bp);
-      gl.uniform3f(U('uTint'),...T.tint.map(v=>v/255));gl.uniform1f(U('uTintA'),T.ta);gl.uniform3f(U('uPillCol'),...T.pill.map(v=>v/255));
-      gl.uniform2f(U('uRes'),cv.width,cv.height);gl.uniform1f(U('uDpr'),cv.width/innerWidth);gl.uniform2f(U('uView'),innerWidth,innerHeight);
-      gl.uniform4f(U('uNav'),navR.left,navR.top,navR.width,navR.height);
-      select(cur,false);
-    }
-    function drawScene(t){
-      const w=sc.width,h=sc.height,g=sctx,T=TH;
-      if(customBg){try{g.drawImage(customBg,0,0,w,h)}catch(e){}return}
-      g.clearRect(0,0,w,h);
-    }
-    let last=performance.now(),avg=.0167,lastAdj=0;
-    function frame(now){
-      const dt=Math.min((now-last)/1000,.05)||.0167;last=now;
-      if(!reduce)scrollY+=dt*16;
-      const kk=heldTarget?520:300,cc=reduce?60:(heldTarget?30:26),hs=dt/2;
-      for(let i=0;i<2;i++){hv+=(kk*(heldTarget-held)-cc*hv)*hs;held+=hv*hs}
-      if(held<0){held=0;hv=0}
-      if(!heldTarget&&held<.002&&Math.abs(hv)<.05){held=0;hv=0}
-      if(!dragging){
-        const cx=reduce?70:34;
-        for(let i=0;i<2;i++){xv+=(420*(xt-x)-cx*xv)*hs;x+=xv*hs}
-        if(settling&&Math.abs(xt-x)<.4&&Math.abs(xv)<8){x=xt;xv=0;settling=false;if(!start)heldTarget=0}
-      }
-      tv+=((heldTarget?1:0)-tv)*(1-Math.exp(-dt*(heldTarget?40:14)));
-      pv+=((ptrT?1:0)-pv)*(1-Math.exp(-dt*(ptrT?14:5)));
-      if(ptrT&&pv<.03){sx=px;sy=py}else{const kp=1-Math.exp(-dt*28);sx+=(px-sx)*kp;sy+=(py-sy)*kp}
-      vel+=((x-prevX)/dt-vel)*Math.min(1,dt*12);prevX=x;
-      if(!document.hidden){avg+=(dt-avg)*.05;if(avg>.024&&now-lastAdj>2500&&dprCap>1){dprCap=dprCap>2?2:dprCap>1.5?1.5:1;lastAdj=now;avg=.0167;layout()}}
-      drawScene(now/1000);up(0,sc);
-      const w=PW,h=rowR.height,fr=x/Math.max(maxX(),1);
-      const a=lightA+(fr-.5)*1.3+(reduce?0:Math.sin(now/1100)*.12);
-      gl.uniform4f(U('uPill'),rowR.left+x+w/2,rowR.top+h/2,w/2,h/2);
-      const vc=Math.max(-1,Math.min(1,vel/700))*(reduce?.3:1),gw=8*held;
-      gl.uniform4f(U('uMask'),rowR.left+x+w/2+vc*4,rowR.top+h/2,w/2+gw+Math.abs(vc)*6,h/2+gw-Math.abs(vc)*2);
-      gl.uniform1f(U('uHeld'),held);gl.uniform1f(U('uTouch'),tv);gl.uniform1f(U('uGrow'),8*held);
-      gl.uniform1f(U('uVel'),vc);gl.uniform1f(U('uDisp'),reduce?.5:1);gl.uniform1f(U('uDark'),TH.dark);
-      gl.uniform3f(U('uPtr'),sx,sy,pv);
-      gl.uniform2f(U('uLight'),Math.cos(a),Math.sin(a));
-      gl.drawArrays(gl.TRIANGLE_STRIP,0,4);requestAnimationFrame(frame);
-    }
-    let PW=0,PR=0;window.W=()=>PW;window.maxX=()=>PR-PW;
-    window.select=function(i,animate=true){
-      cur=i;curTitle=tabs[i].dataset.tab;
-      tabs.forEach((t,k)=>t.setAttribute('aria-current',k===i));
-      xt=tabs[i].offsetLeft;
-      if(!animate){x=xt;xv=0;prevX=x;settling=false;return}
-      heldTarget=1;settling=true;
-    };
-    tabs.forEach((t,i)=>t.addEventListener('click',()=>{if(justDragged){justDragged=false;return}if(i!==cur)select(i)}));
-    nav.addEventListener('pointerdown',e=>{
-      const rx=e.clientX-rowR.left;
-      if(rx>=x&&rx<=x+W()){xv=0;settling=false;heldTarget=1;start={id:e.pointerId,off:rx-x,sx:e.clientX}}
-    });
-    nav.addEventListener('pointermove',e=>{
-      if(!start||e.pointerId!==start.id)return;
-      if(!dragging){if(Math.abs(e.clientX-start.sx)<4)return;dragging=true;nav.setPointerCapture(e.pointerId)}
-      x=Math.min(Math.max(e.clientX-rowR.left-start.off,0),maxX());
-    });
-    function end(e){
-      if(!start||e.pointerId!==start.id)return;
-      heldTarget=0;
-      if(dragging){
-        justDragged=true;setTimeout(()=>justDragged=false,0);
-        const c=x+W()/2;let best=0,d=1e9;
-        tabs.forEach((t,i)=>{const dd=Math.abs(t.offsetLeft+W()/2-c);if(dd<d){d=dd;best=i}});
-        select(best);
-      }
-      dragging=false;start=null;
-    }
-    nav.addEventListener('contextmenu',e=>e.preventDefault());
-    nav.addEventListener('pointerup',end);nav.addEventListener('pointercancel',end);
-    const pset=e=>{px=e.clientX;py=e.clientY;ptrT=1};
-    addEventListener('pointermove',pset,{passive:true});addEventListener('pointerdown',pset,{passive:true});
-    addEventListener('pointerup',e=>{if(e.pointerType!=='mouse')ptrT=0});addEventListener('pointercancel',()=>ptrT=0);
-    document.documentElement.addEventListener('pointerleave',()=>ptrT=0);
-    addEventListener('resize',layout);addEventListener('orientationchange',()=>setTimeout(layout,200));if(document.fonts&&document.fonts.ready)document.fonts.ready.then(layout);mq.addEventListener('change',layout);
-    window.liquidGlass={setBackground:s=>{customBg=s}};
-    layout();select(0,false);requestAnimationFrame(frame);
-    }
+            gl.uniform1f(uPillX, curX);
+            gl.uniform1f(uHeld, held);
+
+            gl.clearColor(0, 0, 0, 0);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+            requestAnimationFrame(render);
+        }
+
+        window.addEventListener('resize', resize);
+        setTimeout(() => { resize(); render(); }, 100);
+    })();
     </script>
 
-    <!-- App Main Script (Firebase & Tube Logic) -->
+    <!-- Firebase & Client App Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -1000,10 +923,9 @@
         }
 
         /* =========================================================
-           [MỚI] CHUẨN HOÁ LINK VIDEO
+           CHUẨN HOÁ LINK VIDEO
            - Dropbox share link  → dl.dropboxusercontent.com (direct)
            - Google Drive share  → uc?export=download&id=...
-           - Link khác giữ nguyên
            ========================================================= */
         function normalizeVideoUrl(url) {
             if (!url || typeof url !== 'string') return url;
@@ -1015,15 +937,11 @@
                     const u = new URL(url);
                     const rlkey = u.searchParams.get('rlkey');
 
-                    // Link dạng mới: /scl/fi/<id>/<filename>
-                    // Link dạng cũ:   /s/<id>/<filename>
-                    // Giữ nguyên path, chuyển host sang dl.dropboxusercontent.com
                     const newUrl = new URL('https://dl.dropboxusercontent.com' + u.pathname);
                     if (rlkey) newUrl.searchParams.set('rlkey', rlkey);
 
                     return newUrl.toString();
                 } catch (e) {
-                    // Fallback nếu URL constructor lỗi
                     return url
                         .replace('www.dropbox.com', 'dl.dropboxusercontent.com')
                         .replace('dropbox.com/s/', 'dropboxusercontent.com/s/')
@@ -1043,7 +961,6 @@
 
             /* ---------- ONEDRIVE ---------- */
             if (/1drv\.ms|onedrive\.live\.com/i.test(url)) {
-                // Thêm download=1 nếu chưa có
                 if (!/[?&]download=1/.test(url)) {
                     return url + (url.includes('?') ? '&' : '?') + 'download=1';
                 }
@@ -1084,13 +1001,10 @@
         const currentEpIdx = parseInt(urlParams.get('ep') || '0');
 
         let moviesDataset = {};
-        let isFirstLoad = true;
 
-        // Lắng nghe dữ liệu — có error callback
         onValue(ref(db, 'movies'),
             (snapshot) => {
                 moviesDataset = snapshot.val() || {};
-                isFirstLoad = false;
 
                 if (movieId && moviesDataset[movieId]) {
                     renderPlayerScreen(movieId, currentEpIdx);
@@ -1162,7 +1076,7 @@
             gridHtml += '</div>';
             appContainer.innerHTML = gridHtml;
 
-            // Hiệu ứng ánh sáng bám chuột trên mỗi card
+            // Light tracking hover card effect
             document.querySelectorAll('.movie-card').forEach(card => {
                 card.addEventListener('mousemove', (e) => {
                     const rect = card.getBoundingClientRect();
@@ -1198,12 +1112,8 @@
             const safeEpTitle = (epData.title || '').replace(/</g, '&lt;');
             const safeDesc = (movie.description || 'Không có mô tả chi tiết.').replace(/</g, '&lt;');
 
-            // [MỚI] Chuẩn hoá link video (Dropbox / Google Drive / OneDrive)
             const rawUrl = epData.url || '';
             const videoUrl = normalizeVideoUrl(rawUrl);
-            if (rawUrl && videoUrl !== rawUrl) {
-                console.log('[normalizeVideoUrl] Đã chuyển link:\n  Gốc: ' + rawUrl + '\n  Mới: ' + videoUrl);
-            }
 
             let epListMarkup = '';
             episodes.forEach((ep, index) => {
@@ -1250,13 +1160,11 @@
             const player = document.getElementById('streamPlayer');
 
             player.onerror = () => {
-                const src = player.currentSrc || player.src || '';
                 if (/dropbox/i.test(rawUrl)) {
-                    showToast('⚠️ Không phát được Dropbox. Hãy chắc chắn file đã bật chia sẻ công khai (Anyone with the link).');
+                    showToast('⚠️ Không phát được Dropbox. Hãy chắc chắn file đã bật chia sẻ công khai.');
                 } else {
                     showToast('⚠️ Không phát được video. Kiểm tra lại link.');
                 }
-                console.error('[player error]', src, player.error);
             };
 
             player.onended = () => {
