@@ -23,7 +23,7 @@
             --glass-border: rgba(255, 255, 255, 0.12);
         }
 
-        /* ===== KHÓA TÔ XANH HTML (DISABLE SELECTION) ===== */
+        /* KHÓA TÔ XANH HTML (DISABLE SELECTION) */
         * { 
             box-sizing: border-box; 
             margin: 0; 
@@ -54,7 +54,7 @@
             position: relative;
         }
 
-        /* ===== AURORA BACKGROUND BLOBS ===== */
+        /* AURORA BACKGROUND BLOBS */
         .aurora-bg {
             position: fixed;
             inset: 0;
@@ -93,7 +93,7 @@
             66% { transform: translate(-40px, 50px) scale(0.95); }
         }
 
-        /* ===== HEADER ===== */
+        /* HEADER */
         header {
             height: 68px;
             background: var(--glass-bg);
@@ -109,7 +109,7 @@
             z-index: 1000;
         }
 
-        /* ===== LOGO GLOW ===== */
+        /* LOGO GLOW */
         .brand-logo {
             display: flex;
             align-items: center;
@@ -194,7 +194,7 @@
             100% { transform: scale(1) rotate(0); }
         }
 
-        /* ===== SEARCH ===== */
+        /* SEARCH */
         .search-container {
             display: flex;
             align-items: center;
@@ -239,10 +239,10 @@
             filter: drop-shadow(0 0 6px var(--accent-glow));
         }
 
-        /* ===== MAIN ===== */
+        /* MAIN */
         main { flex: 1; padding: 36px 28px; max-width: 1680px; margin: 0 auto; width: 100%; position: relative; }
 
-        /* ===== HOME ===== */
+        /* HOME */
         .home-section-title {
             font-size: 24px;
             font-weight: 800;
@@ -386,7 +386,7 @@
             overflow: hidden;
         }
 
-        /* ===== WATCH LAYOUT ===== */
+        /* WATCH LAYOUT */
         .back-bar {
             margin-bottom: 20px;
             display: flex;
@@ -498,7 +498,7 @@
             box-shadow: 0 0 12px var(--accent-glow);
         }
 
-        /* ===== SIDEBAR ===== */
+        /* SIDEBAR */
         .episodes-sidebar {
             background: var(--bg-card);
             border-radius: 20px;
@@ -618,7 +618,7 @@
             transform: scale(1.15);
         }
 
-        /* ===== LOADING SKELETON ===== */
+        /* LOADING SKELETON */
         .skeleton-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -666,7 +666,7 @@
             filter: drop-shadow(0 0 15px var(--accent-glow));
         }
 
-        /* ===== TOAST ===== */
+        /* TOAST */
         .toast {
             position: fixed;
             bottom: 28px;
@@ -685,7 +685,7 @@
         }
         .toast.show { transform: translateX(-50%) translateY(0); }
 
-        /* ===== MOBILE ===== */
+        /* MOBILE */
         @media (max-width: 700px) {
             header { padding: 0 16px; height: 62px; }
             .brand-logo { font-size: 17px; gap: 9px; }
@@ -701,9 +701,7 @@
             .video-headline { font-size: 18px; }
         }
 
-        /* =====================================================
-           LIQUID GLASS TAB BAR + CÁC TAB (Audio / Settings / Profile)
-           ===================================================== */
+        /* LIQUID GLASS TAB BAR */
         :root { --accent-rgb: 99,102,241; --accent2-rgb: 168,85,247; --accent3-rgb: 236,72,153; --glass-acc: #a58cff; }
 
         main { padding-bottom: 130px; }
@@ -716,7 +714,7 @@
         #appContainer.view-in > * { animation: viewIn .35s cubic-bezier(.4,0,.2,1) both; }
         body.reduce-motion #appContainer.view-in > * { animation: none; }
 
-        /* ---- Glass nav ---- */
+        /* Glass nav */
         #glGlass { position: fixed; left: 0; bottom: 0; width: 100%; height: 120px; display: block; pointer-events: none; z-index: 901; }
         #glassNav {
             position: fixed; left: 14px; right: 14px;
@@ -745,7 +743,7 @@
         .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); }
         body.has-mini .toast { bottom: calc(170px + env(safe-area-inset-bottom, 0px)); }
 
-        /* ---- Mini audio player ---- */
+        /* Mini audio player */
         .mini-player {
             position: fixed; left: 14px; right: 14px; max-width: 380px; margin: 0 auto;
             bottom: calc(86px + env(safe-area-inset-bottom, 0px));
@@ -765,7 +763,7 @@
         .mini-btn.main { background: linear-gradient(135deg, var(--accent), var(--accent-2)); border: 0; box-shadow: 0 0 14px var(--accent-glow); }
         .mini-seek { width: 100%; margin-top: 8px; accent-color: var(--accent); height: 4px; cursor: pointer; }
 
-        /* ---- Audio tab ---- */
+        /* Audio tab */
         .audio-group { background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; padding: 16px; margin-bottom: 18px; }
         .audio-group-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
         .audio-group-head img { width: 64px; aspect-ratio: 16/9; object-fit: cover; border-radius: 9px; background: #1a1d28; }
@@ -774,7 +772,7 @@
         .audio-group .list { display: flex; flex-direction: column; gap: 8px; }
         .ep-card-item.playing i.fa-circle-play { color: var(--accent); }
 
-        /* ---- Cards chung cho Settings / Profile ---- */
+        /* Settings / Profile */
         .page-title { font-size: 24px; font-weight: 800; margin-bottom: 22px; display: flex; align-items: center; gap: 12px; letter-spacing: -0.3px; }
         .page-title i { color: var(--accent); filter: drop-shadow(0 0 10px var(--accent-glow)); }
         .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; padding: 6px 18px; margin-bottom: 18px; max-width: 760px; }
@@ -784,7 +782,7 @@
         .set-row .lbl { font-size: 14px; font-weight: 600; color: #fff; }
         .set-row .sub { font-size: 12px; color: var(--text-sub); margin-top: 3px; line-height: 1.4; }
 
-        /* ---- Liquid glass switch ---- */
+        /* Liquid glass switch */
         .lg-switch { position: relative; width: 77px; height: 33px; flex-shrink: 0; touch-action: pan-y; cursor: pointer;
             user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; outline: none; }
         .lg-switch::before { content: ""; position: absolute; inset: -10px; }
@@ -807,7 +805,7 @@
         .dt-btn:hover { background: rgba(var(--accent-rgb), .18); border-color: var(--accent); }
         .dt-btn.danger:hover { background: rgba(239,68,68,.2); border-color: #ef4444; }
 
-        /* ---- Profile ---- */
+        /* Profile */
         .profile-card { display: flex; align-items: center; gap: 18px; max-width: 760px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 18px; position: relative; overflow: hidden; }
         .profile-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: linear-gradient(180deg, var(--accent), var(--accent-2)); }
         .avatar { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent-2), var(--accent-3)); display: grid; place-items: center; font-size: 30px; font-weight: 800; box-shadow: 0 0 24px var(--accent-glow); flex-shrink: 0; }
@@ -821,7 +819,7 @@
         .hist-list { display: flex; flex-direction: column; gap: 10px; max-width: 760px; }
         .hist-item { display: flex; gap: 14px; align-items: center; background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 10px; text-decoration: none; color: inherit; transition: all .25s ease; cursor: pointer; }
         .hist-item:hover { border-color: rgba(var(--accent-rgb), .5); transform: translateX(3px); box-shadow: 0 0 20px rgba(var(--accent-rgb), .2); }
-        .hist-item img { width: 96px; aspect-ratio: 16/9; object-fit: cover; border-radius: 9px; background: #1a1d28; flex-shrink: 0; }
+        .hist-item img { width: 96px; aspect-ratio: 16/9; object-fit: cover; border-radius: 99px; background: #1a1d28; flex-shrink: 0; }
         .hist-item .t { font-size: 14px; font-weight: 700; color: #fff; }
         .hist-item .s { font-size: 12px; color: var(--text-sub); margin-top: 3px; }
         .hist-bar { height: 4px; background: rgba(255,255,255,.1); border-radius: 4px; margin-top: 8px; overflow: hidden; }
@@ -835,7 +833,7 @@
             .hist-item img { width: 80px; }
         }
 
-        /* ---------- Liquid glass slider (tốc độ phát) ---------- */
+        /* Liquid glass slider (tốc độ phát) */
         .set-row.gs-row { flex-direction: column; align-items: stretch; gap: 2px; }
         .gs-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
         .gs-val { font-size: 15px; font-weight: 700; color: var(--accent, #0a7aff); font-variant-numeric: tabular-nums; }
@@ -851,7 +849,7 @@
             box-shadow: inset 0 0 0 1px #ffffff59, inset 0 2px 3px #ffffffb3, inset 0 -2px 3px #ffffff40, inset 0 0 12px #ffffff1f, 0 5px 14px #00000047, 0 1px 3px #00000033; }
         .gs-glass::after { content: ""; position: absolute; left: 16%; right: 16%; top: 5%; height: 18%; border-radius: 50%; background: linear-gradient(#ffffff66, #fff0); opacity: .6; }
 
-        /* ===== [MỚI] CUSTOM MODAL / DIALOGS (KHÔNG DÙNG NATIVE ALERT) ===== */
+        /* CUSTOM MODALS / DIALOGS */
         .custom-modal-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(10px);
             z-index: 3000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
@@ -884,12 +882,13 @@
     </div>
 
     <header>
-        <a href="tube.html" class="brand-logo" id="brandLogo">
+        <!-- [ĐÃ SỬA] Đổi tube.html -> index.html -->
+        <a href="index.html" class="brand-logo" id="brandLogo">
             <div class="icon-wrapper"><i class="fa-solid fa-play"></i></div>
             <span class="brand-text">DigitalTube</span>
         </a>
         <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Tìm kiếm bộ phim, audio ưa thích...">
+            <input type="text" id="searchInput" placeholder="Tìm kiếm bộ phim, nhạc audio MP3...">
             <i class="fa-solid fa-magnifying-glass"></i>
         </div>
     </header>
@@ -937,12 +936,11 @@
       </button>
     </div></nav>
 
-    <!-- ===== [MỚI] CUSTOM MODALS (ĐĂNG NHẬP, ALERT, HẸN GIỜ, CONFIRM) ===== -->
-    <!-- MODAL ĐĂNG NHẬP / ĐĂNG KÝ -->
+    <!-- CUSTOM MODALS -->
     <div class="custom-modal-overlay" id="authModal">
         <div class="custom-modal-box">
             <div class="modal-title"><i class="fa-solid fa-lock" style="color: var(--accent);"></i> Yêu Cầu Tài Khoản</div>
-            <div class="modal-desc">Bạn có thể trải nghiệm giao diện tự do, nhưng cần Đăng Nhập hoặc Đăng Ký để bắt đầu xem Video / Audio.</div>
+            <div class="modal-desc">Bạn có thể trải nghiệm giao diện tự do, nhưng cần Đăng Nhập hoặc Đăng Ký để bắt đầu xem Video / MP3 Audio.</div>
             <input type="text" id="inputAuthUser" class="modal-input" placeholder="Tên tài khoản...">
             <input type="password" id="inputAuthPass" class="modal-input" placeholder="Mật khẩu...">
             <button class="modal-btn" id="btnSubmitAuth">Đăng Nhập / Đăng Ký</button>
@@ -950,7 +948,6 @@
         </div>
     </div>
 
-    <!-- MODAL THÔNG BÁO TỰ TẠO (THAY THẾ ALERT MẶC ĐỊNH) -->
     <div class="custom-modal-overlay" id="customAlertModal">
         <div class="custom-modal-box">
             <div class="modal-title" id="customAlertTitle">Thông Báo</div>
@@ -959,7 +956,6 @@
         </div>
     </div>
 
-    <!-- MODAL XÁC NHẬN TỰ TẠO (THAY THẾ CONFIRM MẶC ĐỊNH) -->
     <div class="custom-modal-overlay" id="customConfirmModal">
         <div class="custom-modal-box">
             <div class="modal-title" id="customConfirmTitle">Xác Nhận</div>
@@ -969,7 +965,6 @@
         </div>
     </div>
 
-    <!-- MODAL HẸN GIỜ ĐI NGỦ -->
     <div class="custom-modal-overlay" id="sleepModal">
         <div class="custom-modal-box">
             <div class="modal-title"><i class="fa-solid fa-moon" style="color: #a855f7;"></i> Hẹn Giờ Đi Ngủ</div>
@@ -984,7 +979,7 @@
     </div>
 
     <script>
-    /* ============ Liquid Glass tab bar (WebGL) ============ */
+    /* Liquid Glass tab bar (WebGL) */
     (function () {
     const VS='attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
     const FS=`precision highp float;
@@ -1415,9 +1410,7 @@ void main(){
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        /* =========================================================
-           [MỚI] DIALOG & TOAST SYSTEM (KHÔNG DÙNG NATIVE ALERT)
-           ========================================================= */
+        /* DIALOG & TOAST SYSTEM */
         function showToast(msg) {
             let t = document.querySelector('.toast');
             if (!t) {
@@ -1460,9 +1453,7 @@ void main(){
             btnNo.onclick = () => { cleanup(); };
         }
 
-        /* =========================================================
-           [MỚI] QUẢN LÝ ĐĂNG NHẬP / YÊU CẦU TÀI KHOẢN
-           ========================================================= */
+        /* QUẢN LÝ ĐĂNG NHẬP / YÊU CẦU TÀI KHOẢN */
         let currentUser = localStorage.getItem('dt_user_account') || null;
 
         function requireUserAuth(callback) {
@@ -1496,9 +1487,7 @@ void main(){
             }
         };
 
-        /* =========================================================
-           [MỚI] HẸN GIỜ ĐI NGỦ (SLEEP TIMER)
-           ========================================================= */
+        /* HẸN GIỜ ĐI NGỦ (SLEEP TIMER) */
         let sleepTimerTimeout = null;
         let sleepEndTime = null;
 
@@ -1540,9 +1529,7 @@ void main(){
 
         document.getElementById('miniSleep').onclick = window.openSleepModal;
 
-        /* =========================================================
-           CHUẨN HOÁ LINK MEDIA
-           ========================================================= */
+        /* CHUẨN HOÁ LINK MEDIA */
         function normalizeVideoUrl(url) {
             if (!url || typeof url !== 'string') return url;
             url = url.trim();
@@ -1615,15 +1602,15 @@ void main(){
             showToast('❌ Lỗi kết nối Firebase Movies: ' + err?.message);
         });
 
-        // [MỚI] Lắng nghe dữ liệu Audio riêng từ node /audios
+        // Lắng nghe dữ liệu MP3 Audio riêng từ node /audios
         onValue(ref(db, 'audios'), (snapshot) => {
             audiosDataset = snapshot.val() || {};
             if (currentTab === 'audio') renderCurrent();
         }, (err) => {
-            console.log('Chưa có node /audios riêng hoặc lỗi:', err?.message);
+            console.log('Chưa có node /audios hoặc lỗi:', err?.message);
         });
 
-        /* =================== HOME (VIDEO GRID) =================== */
+        /* HOME (VIDEO GRID) */
         function renderHomeScreen(filterQuery = '') {
             const keys = Object.keys(moviesDataset);
             const filteredKeys = keys.filter(k => (moviesDataset[k].title || '').toLowerCase().includes(filterQuery.toLowerCase()));
@@ -1667,19 +1654,20 @@ void main(){
             appContainer.innerHTML = gridHtml;
         }
 
+        /* [ĐÃ SỬA] Thay tube.html -> index.html */
         window.playMovieWithAuth = (mId) => {
-            window.__pendingAuthCallback = () => { window.location.href = `tube.html?v=${mId}`; };
+            window.__pendingAuthCallback = () => { window.location.href = `index.html?v=${mId}`; };
             requireUserAuth(window.__pendingAuthCallback);
         };
 
-        /* =================== VIDEO PLAYER (LƯU VỊ TRÍ PHÚT XEM) =================== */
+        /* VIDEO PLAYER (LƯU VỊ TRÍ PHÚT XEM) */
         function renderPlayerScreen(mId, epIdx) {
             const movie = moviesDataset[mId];
             const episodes = movie.episodes ? Object.values(movie.episodes).sort((a, b) => (a.order || 0) - (b.order || 0)) : [];
 
             if (episodes.length === 0) {
                 appContainer.innerHTML = `
-                    <div class="back-bar"><a href="tube.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Quay lại</a></div>
+                    <div class="back-bar"><a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Quay lại</a></div>
                     <div class="loading-view"><i class="fa-solid fa-video-slash"></i><div style="margin-top:10px;">Bộ phim này chưa có tập nào.</div></div>
                 `;
                 return;
@@ -1709,7 +1697,7 @@ void main(){
 
             appContainer.innerHTML = `
                 <div class="back-bar">
-                    <a href="tube.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Quay lại danh sách</a>
+                    <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Quay lại danh sách</a>
                     <button class="back-btn" onclick="window.openSleepModal()"><i class="fa-solid fa-moon"></i> Hẹn Giờ Đi Ngủ</button>
                 </div>
                 <div class="player-layout">
@@ -1738,15 +1726,16 @@ void main(){
             player.onended = () => {
                 if (epIdx + 1 < episodes.length) {
                     if (!settings.autoNext) { showToast('✅ Đã xem xong tập này.'); return; }
-                    window.location.href = `tube.html?v=${mId}&ep=${epIdx + 1}`;
+                    window.location.href = `index.html?v=${mId}&ep=${epIdx + 1}`;
                 } else {
                     showToast('🎉 Bạn đã xem hết bộ phim!');
                 }
             };
         }
 
+        /* [ĐÃ SỬA] Thay tube.html -> index.html */
         window.playMovieEpWithAuth = (mId, epIdx) => {
-            window.__pendingAuthCallback = () => { window.location.href = `tube.html?v=${mId}&ep=${epIdx}`; };
+            window.__pendingAuthCallback = () => { window.location.href = `index.html?v=${mId}&ep=${epIdx}`; };
             requireUserAuth(window.__pendingAuthCallback);
         };
 
@@ -1818,7 +1807,7 @@ void main(){
         }
         window.addEventListener('tabchange', (e) => setTab(e.detail));
         window.addEventListener('tabtap', (e) => {
-            if (e.detail === 'video' && movieId) { window.location.href = 'tube.html'; return; }
+            if (e.detail === 'video' && movieId) { window.location.href = 'index.html'; return; }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
         window.addEventListener('hashchange', () => {
@@ -1826,7 +1815,7 @@ void main(){
             if (TAB_IDS.includes(t) && t !== currentTab) window.liquidGlass.setTab(t, true);
         });
 
-        /* LƯU TIẾN TRÌNH XEM (LẦN SAU VÀO LẠI VẪN Ở PHÚT ĐÓ) */
+        /* LƯU TIẾN TRÌNH XEM */
         function setupPlayer(player, mId, epIdx, movie, epData) {
             const key = mId + '|' + epIdx;
             const saved = progress[key];
@@ -1861,9 +1850,7 @@ void main(){
         }
         window.addEventListener('pagehide', () => window.__dtSave && window.__dtSave(true));
 
-        /* =========================================================
-           [MỚI] TAB AUDIO DẠNG SPOTIFY PLAYLIST
-           ========================================================= */
+        /* TAB AUDIO MP3 SPOTIFY PLAYLIST */
         const mini = {
             box: document.getElementById('miniPlayer'), thumb: document.getElementById('miniThumb'),
             title: document.getElementById('miniTitle'), sub: document.getElementById('miniSub'),
@@ -1882,8 +1869,8 @@ void main(){
             const q = (filterQuery || '').toLowerCase();
             audioGroups = {};
 
-            // Kết hợp cả node /audios (nếu có) và node /movies
-            const combinedData = { ...moviesDataset, ...audiosDataset };
+            // Đọc dữ liệu node MP3 Audio riêng (/audios) cùng node /movies
+            const combinedData = { ...audiosDataset, ...moviesDataset };
             const mids = Object.keys(combinedData).filter(mid => (combinedData[mid].title || '').toLowerCase().includes(q));
 
             mids.forEach(mid => {
@@ -1899,12 +1886,12 @@ void main(){
                 appContainer.innerHTML = `
                     <div class="loading-view">
                         <i class="fa-solid fa-headphones"></i>
-                        <div style="margin-top:10px;">Không có nội dung âm thanh phù hợp.</div>
+                        <div style="margin-top:10px;">Không có nội dung MP3 Audio phù hợp.</div>
                     </div>`;
                 return;
             }
 
-            let html = `<div class="page-title"><i class="fa-solid fa-headphones"></i> Nghe Audio Playlist</div>`;
+            let html = `<div class="page-title"><i class="fa-solid fa-headphones"></i> Nghe Audio MP3 Playlist</div>`;
             withEps.forEach(mid => {
                 const items = audioGroups[mid];
                 html += `
@@ -1912,7 +1899,7 @@ void main(){
                         <div class="audio-group-head">
                             <img src="${esc(items[0].thumb)}" alt="" loading="lazy" onerror="this.src='${FALLBACK_THUMB}'">
                             <div class="t">${esc(items[0].movie)}</div>
-                            <span class="c">${items.length} Tập</span>
+                            <span class="c">${items.length} Bài MP3</span>
                         </div>
                         <div class="list">
                             ${items.map((it, i) => `
@@ -1966,7 +1953,7 @@ void main(){
             }, { once: true });
 
             mini.thumb.src = it.thumb;
-            mini.title.textContent = it.title || ('Tập ' + it.num);
+            mini.title.textContent = it.title || ('Bài MP3 ' + it.num);
             mini.sub.textContent = it.movie;
             mini.seek.value = 0;
             document.body.classList.add('has-mini');
@@ -1999,10 +1986,9 @@ void main(){
             }
         });
 
-        /* TỰ ĐỘNG CHUYỂN TẬP TIẾP THEO TRONG SPOTIFY PLAYLIST */
         audioEl.addEventListener('ended', () => {
             if (audioIdx + 1 < audioQueue.length) {
-                showToast(`🎵 Đang phát tiếp Tập ${audioQueue[audioIdx + 1].num}...`);
+                showToast(`🎵 Đang phát tiếp Bài ${audioQueue[audioIdx + 1].num}...`);
                 loadAudio(audioIdx + 1, true);
             } else {
                 showToast('🎧 Bạn đã nghe hết playlist audio này!');
@@ -2010,7 +1996,7 @@ void main(){
         });
 
         audioEl.addEventListener('error', () => {
-            if (audioEl.getAttribute('src')) showToast('⚠️ Không phát được audio. Kiểm tra lại đường dẫn.');
+            if (audioEl.getAttribute('src')) showToast('⚠️ Không phát được audio MP3. Kiểm tra lại đường dẫn file.');
         });
 
         mini.play.addEventListener('click', () => { audioEl.paused ? audioEl.play().catch(() => {}) : audioEl.pause(); });
@@ -2245,7 +2231,7 @@ void main(){
                 profile.name = nameInput.value.trim() || 'Khách';
                 nameInput.value = profile.name;
                 store.set('dt_profile', profile);
-                showToast(' Đã lưu thông tin hồ sơ.');
+                showToast('✅ Đã lưu thông tin hồ sơ.');
             });
 
             const b2 = document.getElementById('btnClearHist2');
@@ -2278,7 +2264,7 @@ void main(){
             }
             if (currentTab !== 'video') window.liquidGlass.setTab('video', true);
             if (movieId) {
-                searchDebounce = setTimeout(() => { window.location.href = 'tube.html'; }, 400);
+                searchDebounce = setTimeout(() => { window.location.href = 'index.html'; }, 400);
                 return;
             }
             searchDebounce = setTimeout(() => renderHomeScreen(q), 180);
