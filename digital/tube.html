@@ -805,6 +805,22 @@
             .stat b { font-size: 19px; }
             .hist-item img { width: 80px; }
         }
+
+        /* ---------- Liquid glass slider (tốc độ phát) ---------- */
+        .set-row.gs-row { flex-direction: column; align-items: stretch; gap: 2px; }
+        .gs-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+        .gs-val { font-size: 15px; font-weight: 700; color: var(--accent, #0a7aff); font-variant-numeric: tabular-nums; }
+        .gs-zone { position: relative; height: 70px; margin: 2px 0 -6px; touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; }
+        .gs-track { position: absolute; left: 0; right: 0; top: 29px; height: 12px; border-radius: 12px; background: rgba(255,255,255,.16); overflow: hidden; }
+        .gs-fill { height: 100%; width: 0; background: var(--accent, #0a7aff); }
+        .gs-thumb { position: absolute; top: 10px; left: 0; width: 80px; height: 50px; pointer-events: none; will-change: transform; }
+        .gs-thumb > div { position: absolute; inset: 0; border-radius: 25px; }
+        .gs-pill { background: #fff; box-shadow: 0 2px 8px #0006; }
+        .gs-glass { opacity: 0; background: rgba(255,255,255,.04);
+            backdrop-filter: blur(.3px) saturate(1.25); -webkit-backdrop-filter: blur(.3px) saturate(1.25);
+            backdrop-filter: blur(.3px) url(#gsRefr) saturate(1.25) brightness(1.04);
+            box-shadow: inset 0 0 0 1px #ffffff59, inset 0 2px 3px #ffffffb3, inset 0 -2px 3px #ffffff40, inset 0 0 12px #ffffff1f, 0 5px 14px #00000047, 0 1px 3px #00000033; }
+        .gs-glass::after { content: ""; position: absolute; left: 16%; right: 16%; top: 5%; height: 18%; border-radius: 50%; background: linear-gradient(#ffffff66, #fff0); opacity: .6; }
     </style>
 </head>
 <body>
@@ -1709,13 +1725,82 @@ void main(){
             if (currentTab === 'profile') renderProfileScreen();
         }
 
+        /* ---------- Liquid glass slider ---------- */
+        const GS = { W: 80, H: 50, R: 25, BEZ: 18, IDLE: .64, ready: false };
+        function gsEnsureFilter() {
+            if (GS.ready) return; GS.ready = true;
+            const { W, H, R, BEZ } = GS;
+            const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+            const cx = cv.getContext('2d'), im = cx.createImageData(W, H);
+            for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) {
+                const px = i + .5 - W / 2, py = j + .5 - H / 2;
+                const qx = Math.abs(px) - (W / 2 - R), qy = Math.abs(py) - (H / 2 - R);
+                const ox = Math.max(qx, 0), oy = Math.max(qy, 0), len = Math.hypot(ox, oy);
+                const d = len + Math.min(Math.max(qx, qy), 0) - R; let r = 128, g = 128;
+                if (d < 0 && -d < BEZ) {
+                    const m = Math.pow(1 + d / BEZ, 2.2); let nx, ny;
+                    if (len > 0) { nx = Math.sign(px) * ox / len; ny = Math.sign(py) * oy / len; }
+                    else if (qx > qy) { nx = Math.sign(px); ny = 0; } else { nx = 0; ny = Math.sign(py); }
+                    r = 128 - nx * m * 127; g = 128 - ny * m * 127;
+                }
+                const k = (j * W + i) * 4; im.data[k] = r; im.data[k + 1] = g; im.data[k + 2] = 128; im.data[k + 3] = 255;
+            }
+            cx.putImageData(im, 0, 0);
+            const wrap = document.createElement('div');
+            wrap.innerHTML = '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="gsRefr" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">'
+                + '<feImage x="0" y="0" width="' + W + '" height="' + H + '" preserveAspectRatio="none" result="m" href="' + cv.toDataURL() + '"/>'
+                + '<feDisplacementMap in="SourceGraphic" in2="m" scale="36" xChannelSelector="R" yChannelSelector="G"/></filter></svg>';
+            document.body.appendChild(wrap.firstChild);
+        }
+        function initGlassSlider(zone, { min, max, step, value, onChange, onValue }) {
+            gsEnsureFilter();
+            const { W, IDLE } = GS, PAD = W * IDLE / 2;
+            const thumb = zone.querySelector('.gs-thumb'), pill = zone.querySelector('.gs-pill'),
+                  glass = zone.querySelector('.gs-glass'), fill = zone.querySelector('.gs-fill');
+            const sp = (v, k, c) => ({ x: v, v: 0, t: v, k, c });
+            const stepS = (s, dt) => { s.v += (-s.k * (s.x - s.t) - s.c * s.v) * dt; s.x += s.v * dt; };
+            const px = sp(0, 600, 34), sc = sp(IDLE, 260, 15);
+            const span = () => zone.clientWidth - 2 * PAD;
+            const snap = v => Math.min(max, Math.max(min, Math.round((v - min) / step) * step + min));
+            const toFrac = v => (v - min) / (max - min);
+            let down = false, cur = value, frac = toFrac(value), running = false, prev = 0;
+            px.x = px.t = PAD + frac * span();
+            const wake = () => { if (!running) { running = true; prev = performance.now(); requestAnimationFrame(frame); } };
+            function setFrom(cx) {
+                const r = zone.getBoundingClientRect();
+                frac = Math.min(Math.max((cx - r.left - PAD) / (r.width - 2 * PAD), 0), 1);
+                if (frac > .985) frac = 1; if (frac < .015) frac = 0;
+                px.t = PAD + frac * span();
+                const v = snap(min + frac * (max - min));
+                if (v !== cur) { cur = v; onValue && onValue(v); onChange && onChange(v); }
+                wake();
+            }
+            zone.addEventListener('pointerdown', e => { down = true; zone.setPointerCapture(e.pointerId); setFrom(e.clientX); });
+            zone.addEventListener('pointermove', e => { if (down) setFrom(e.clientX); });
+            const up = () => { if (!down) return; down = false; frac = toFrac(cur); px.t = PAD + frac * span(); wake(); };
+            zone.addEventListener('pointerup', up); zone.addEventListener('pointercancel', up);
+            function frame(now) {
+                if (!zone.isConnected) { running = false; return; }
+                const dt = Math.min((now - prev) / 1000, .033); prev = now;
+                sc.t = down ? 1 : IDLE; stepS(px, dt); stepS(sc, dt);
+                const p = Math.min(Math.max((sc.x - IDLE) / (1 - IDLE), 0), 1);
+                const q = Math.min(Math.abs(px.v) / 5000, .07);
+                thumb.style.transform = 'translate(' + (px.x - W / 2) + 'px,0) scale(' + (sc.x * (1 + q)) + ',' + (sc.x * (1 - q * .7)) + ')';
+                pill.style.opacity = 1 - Math.min(p * 1.6, 1); glass.style.opacity = Math.min(p * 1.4, 1);
+                fill.style.width = px.x + 'px';
+                const rest = !down && Math.abs(px.v) < .05 && Math.abs(px.x - px.t) < .05 && Math.abs(sc.v) < .001 && Math.abs(sc.x - sc.t) < .001;
+                if (rest) { running = false; return; }
+                requestAnimationFrame(frame);
+            }
+            wake();
+        }
+
         function renderSettingsScreen() {
             const sw = (id, label, sub) => `
                 <div class="set-row">
                     <div><div class="lbl">${label}</div><div class="sub">${sub}</div></div>
                     <label class="switch"><input type="checkbox" data-set="${id}" ${settings[id] ? 'checked' : ''}><span class="knob"></span></label>
                 </div>`;
-            const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
             appContainer.innerHTML = `
                 <div class="page-title"><i class="fa-solid fa-gear"></i> Cài Đặt</div>
 
@@ -1724,11 +1809,15 @@ void main(){
                     ${sw('autoplay', 'Tự động phát', 'Phát ngay khi mở một tập phim.')}
                     ${sw('autoNext', 'Tự chuyển tập kế tiếp', 'Hết tập thì sang tập sau.')}
                     ${sw('resume', 'Xem tiếp từ vị trí cũ', 'Nhớ thời điểm bạn dừng ở mỗi tập.')}
-                    <div class="set-row">
-                        <div><div class="lbl">Tốc độ phát mặc định</div><div class="sub">Áp dụng cho video và âm thanh.</div></div>
-                        <select class="dt-select" id="setSpeed">
-                            ${speeds.map(s => `<option value="${s}" ${s === settings.speed ? 'selected' : ''}>${s}x</option>`).join('')}
-                        </select>
+                    <div class="set-row gs-row">
+                        <div class="gs-top">
+                            <div><div class="lbl">Tốc độ phát mặc định</div><div class="sub">Áp dụng cho video và âm thanh.</div></div>
+                            <span class="gs-val" id="gsVal">${settings.speed}x</span>
+                        </div>
+                        <div class="gs-zone" id="setSpeed">
+                            <div class="gs-track"><div class="gs-fill"></div></div>
+                            <div class="gs-thumb"><div class="gs-pill"></div><div class="gs-glass"></div></div>
+                        </div>
                     </div>
                 </div>
 
@@ -1765,10 +1854,14 @@ void main(){
                     if (inp.dataset.set === 'reduceMotion') applyTheme();
                 });
             });
-            document.getElementById('setSpeed').addEventListener('change', (e) => {
-                settings.speed = parseFloat(e.target.value);
-                audioEl.defaultPlaybackRate = audioEl.playbackRate = settings.speed;
-                saveSettings();
+            initGlassSlider(document.getElementById('setSpeed'), {
+                min: 0.5, max: 2, step: 0.25, value: settings.speed,
+                onValue: v => { document.getElementById('gsVal').textContent = v + 'x'; },
+                onChange: v => {
+                    settings.speed = v;
+                    audioEl.defaultPlaybackRate = audioEl.playbackRate = settings.speed;
+                    saveSettings();
+                }
             });
             appContainer.querySelectorAll('.swatch').forEach(el => {
                 el.addEventListener('click', () => {
