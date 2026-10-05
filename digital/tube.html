@@ -762,12 +762,20 @@
         .set-row:last-child { border-bottom: 0; }
         .set-row .lbl { font-size: 14px; font-weight: 600; color: #fff; }
         .set-row .sub { font-size: 12px; color: var(--text-sub); margin-top: 3px; line-height: 1.4; }
-        .switch { position: relative; width: 46px; height: 26px; flex-shrink: 0; }
-        .switch input { opacity: 0; width: 100%; height: 100%; position: absolute; inset: 0; cursor: pointer; z-index: 2; }
-        .switch .knob { position: absolute; inset: 0; background: rgba(255,255,255,.12); border-radius: 20px; transition: all .25s ease; }
-        .switch .knob::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform .25s cubic-bezier(.4,0,.2,1); }
-        .switch input:checked + .knob { background: linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow: 0 0 14px var(--accent-glow); }
-        .switch input:checked + .knob::after { transform: translateX(20px); }
+        /* ---- Liquid glass switch (thay công tắc cũ) ---- */
+        .lg-switch { position: relative; width: 77px; height: 33px; flex-shrink: 0; touch-action: pan-y; cursor: pointer;
+            user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; outline: none; }
+        .lg-switch::before { content: ""; position: absolute; inset: -10px; }
+        .lg-tr { position: absolute; inset: 0; border-radius: 17px; background: rgba(255,255,255,.14); overflow: hidden; }
+        .lg-tr i { position: absolute; inset: 0; opacity: 0; background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
+        .lg-switch:focus-visible .lg-tr { box-shadow: 0 0 0 3px #0a7aff88; }
+        .lg-th { position: absolute; left: 0; top: 0; pointer-events: none; will-change: transform, width, height; }
+        .lg-th > div { position: absolute; inset: 0; border-radius: 9999px; }
+        .lg-pill { background: #fff; box-shadow: 0 2px 8px #0006; }
+        .lg-glass { opacity: 0; background: rgba(255,255,255,.02);
+            -webkit-backdrop-filter: blur(.2px) saturate(1.2); backdrop-filter: blur(.2px) saturate(1.2);
+            backdrop-filter: blur(.2px) url(#lgRefr) saturate(1.1);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,.22), inset 0 1px 1.5px rgba(255,255,255,.45), inset 0 -1px 1.5px rgba(255,255,255,.2), 0 3px 10px rgba(0,0,0,.18); }
         .dt-select, .dt-input { background: rgba(255,255,255,.06); border: 1px solid var(--border); color: #fff; border-radius: 10px; padding: 8px 12px; font-size: 13px; outline: none; }
         .dt-select:focus, .dt-input:focus { border-color: var(--accent); box-shadow: 0 0 14px var(--accent-glow); }
         .dt-select option { background: #0d1018; }
@@ -1795,11 +1803,116 @@ void main(){
             wake();
         }
 
+        /* ---------- Liquid glass switch ---------- */
+        const LGS = { K: .55, W: 116, H: 74, R: 37, DISP: 46, IDLE: 82 / 116, map: null, uid: 0 };
+        LGS.SW = 140 * LGS.K; LGS.SH = 60 * LGS.K; LGS.CMIN = 4 * LGS.K + 82 * LGS.K / 2; LGS.CMAX = LGS.SW - LGS.CMIN;
+        function lgsMap() {
+            if (LGS.map) return LGS.map;
+            const { W, H, R, DISP } = LGS;
+            const PTS = [[0, -8], [3.5, -3.5], [5, 3], [11, 11], [12, 4], [26, 0]];
+            const sstep = (a, b, x) => { const t = Math.min(Math.max((x - a) / (b - a), 0), 1); return t * t * (3 - 2 * t); };
+            const prof = dd => { for (let i = 1; i < PTS.length; i++) if (dd <= PTS[i][0]) { const [x0, y0] = PTS[i - 1], [x1, y1] = PTS[i]; return y0 + (y1 - y0) * (dd - x0) / (x1 - x0); } return 0; };
+            const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+            const cx = cv.getContext('2d'), im = cx.createImageData(W, H);
+            for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) {
+                const px = i + .5 - W / 2, py = j + .5 - H / 2;
+                const qx = Math.abs(px) - (W / 2 - R), qy = Math.abs(py) - (H / 2 - R);
+                const d = Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - R;
+                const dd = Math.max(-d, 0), ramp = sstep(0, 24, dd), ddY = H / 2 - Math.abs(py);
+                const ex = Math.max(Math.abs(px) - (W / 2 - R), 0), cf = 1 - sstep(10, 30, ex);
+                const wt = (1 - sstep(12, 20, ddY)) * cf, bez = Math.sign(py) * prof(ddY);
+                let dx = .15 * px * ramp, dy = .15 * py * ramp * (1 - wt) + bez * wt;
+                dx = Math.max(-W / 2 + .5 - px, Math.min(W / 2 - .5 - px, dx));
+                dy = Math.max(-H / 2 + .5 - py, Math.min(H / 2 - .5 - py, dy));
+                const k = (j * W + i) * 4;
+                im.data[k] = 128 + dx / (.498 * DISP) * 127; im.data[k + 1] = 128 + dy / (.498 * DISP) * 127; im.data[k + 2] = 128; im.data[k + 3] = 255;
+            }
+            cx.putImageData(im, 0, 0);
+            return (LGS.map = cv.toDataURL());
+        }
+        function initGlassSwitch(el, { value = false, onChange } = {}) {
+            const { K, W, H, DISP, IDLE, SH, CMIN, CMAX } = LGS;
+            const id = 'lgRefr' + (++LGS.uid);
+            const th = el.querySelector('.lg-th'), pill = el.querySelector('.lg-pill'),
+                  glass = el.querySelector('.lg-glass'), onL = el.querySelector('.lg-tr i');
+            // mỗi switch có bộ lọc khúc xạ riêng để nhiều switch không ghi đè nhau
+            const holder = document.createElement('div');
+            holder.innerHTML = '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="' + id + '" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">'
+                + '<feImage x="0" y="0" width="' + (W * K * IDLE) + '" height="' + (H * K * IDLE) + '" preserveAspectRatio="none" result="m" href="' + lgsMap() + '"/>'
+                + '<feDisplacementMap in="SourceGraphic" in2="m" scale="' + (DISP * K) + '" xChannelSelector="R" yChannelSelector="G"/></filter></svg>';
+            const svg = holder.firstChild; el.appendChild(svg);
+            const fi = svg.querySelector('feImage'), dm = svg.querySelector('feDisplacementMap');
+            glass.style.backdropFilter = 'blur(.2px) url(#' + id + ') saturate(1.1)';
+
+            const sp = (v, k, c) => ({ x: v, v: 0, t: v, k, c });
+            const stepS = (s, dt) => { s.v += (-s.k * (s.x - s.t) - s.c * s.v) * dt; s.x += s.v * dt; };
+            const px = sp(value ? CMAX : CMIN, 520, 30), sc = sp(IDLE, 300, 22), col = { x: value ? 1 : 0, t: value ? 1 : 0 };
+            let on = value, down = false, moved = false, pid = null, dx0 = 0, x0 = 0, running = false, prev = 0;
+
+            const wake = () => { if (!running) { running = true; prev = performance.now(); requestAnimationFrame(frame); } };
+            function setOn(v, notify = true) {
+                const changed = v !== on; on = v;
+                el.setAttribute('aria-checked', v ? 'true' : 'false');
+                px.t = v ? CMAX : CMIN; col.t = v ? 1 : 0;
+                if (changed && notify && onChange) onChange(v);
+                wake();
+            }
+            el.addEventListener('pointerdown', e => {
+                e.preventDefault();
+                down = true; moved = false; pid = e.pointerId; dx0 = e.clientX; x0 = px.x; sc.t = 1;
+                try { el.setPointerCapture(e.pointerId); } catch (_) {}
+                wake();
+            });
+            el.addEventListener('pointermove', e => {
+                if (!down || e.pointerId !== pid) return;
+                const d = e.clientX - dx0;
+                if (Math.abs(d) > 4) moved = true;
+                if (moved) { px.t = Math.min(Math.max(x0 + d, CMIN), CMAX); wake(); }
+            });
+            function finish(e, cancelled) {
+                if (!down || (e && e.pointerId !== pid)) return;
+                const wasMoved = moved, fx = px.x;
+                down = false; moved = false; pid = null; sc.t = IDLE;
+                if (wasMoved) setOn(fx > (CMIN + CMAX) / 2);
+                else if (cancelled) { px.t = on ? CMAX : CMIN; wake(); }   // cuộn trang → không đổi trạng thái
+                else setOn(!on);
+                try { if (e && el.hasPointerCapture(e.pointerId)) el.releasePointerCapture(e.pointerId); } catch (_) {}
+                wake();
+            }
+            el.addEventListener('pointerup', e => finish(e, false));
+            el.addEventListener('pointercancel', e => finish(e, true));
+            el.addEventListener('lostpointercapture', e => { if (down) finish(e, true); });
+            el.addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); setOn(!on); } });
+
+            function frame(now) {
+                if (!el.isConnected) { running = false; return; }
+                const dt = Math.min((now - prev) / 1000, .033); prev = now;
+                sc.t = down ? 1 : IDLE;
+                stepS(px, dt); stepS(sc, dt);
+                col.x += (col.t - col.x) * (1 - Math.exp(-dt * 14));
+                const s = Math.max(sc.x, IDLE * .9);
+                const p = Math.min(Math.max((s - IDLE) / (1 - IDLE), 0), 1);
+                const q = Math.min(Math.abs(px.v) / 5000 / K, .07);
+                const w = W * K * s * (1 + q), h = H * K * s * (1 - q * .7);
+                th.style.width = w + 'px'; th.style.height = h + 'px';
+                th.style.transform = 'translate(' + (px.x - w / 2) + 'px,' + (SH / 2 - h / 2) + 'px)';
+                fi.setAttribute('width', w); fi.setAttribute('height', h);
+                dm.setAttribute('scale', DISP * K * s);
+                pill.style.opacity = 1 - Math.min(p * 1.6, 1);
+                glass.style.opacity = Math.min(p * 1.4, 1);
+                onL.style.opacity = col.x;
+                if (!down && Math.abs(px.v) < .05 && Math.abs(px.x - px.t) < .05 && Math.abs(sc.v) < .001 &&
+                    Math.abs(sc.x - sc.t) < .001 && Math.abs(col.x - col.t) < .003) { running = false; return; }
+                requestAnimationFrame(frame);
+            }
+            wake();
+        }
+
         function renderSettingsScreen() {
             const sw = (id, label, sub) => `
                 <div class="set-row">
                     <div><div class="lbl">${label}</div><div class="sub">${sub}</div></div>
-                    <label class="switch"><input type="checkbox" data-set="${id}" ${settings[id] ? 'checked' : ''}><span class="knob"></span></label>
+                    <div class="lg-switch" role="switch" tabindex="0" data-set="${id}" data-on="${settings[id] ? 1 : 0}" aria-checked="${settings[id] ? 'true' : 'false'}" aria-label="${label}"><div class="lg-tr"><i></i></div><div class="lg-th"><div class="lg-pill"></div><div class="lg-glass"></div></div></div>
                 </div>`;
             appContainer.innerHTML = `
                 <div class="page-title"><i class="fa-solid fa-gear"></i> Cài Đặt</div>
@@ -1847,11 +1960,14 @@ void main(){
                 </div>
             `;
 
-            appContainer.querySelectorAll('input[data-set]').forEach(inp => {
-                inp.addEventListener('change', () => {
-                    settings[inp.dataset.set] = inp.checked;
-                    saveSettings();
-                    if (inp.dataset.set === 'reduceMotion') applyTheme();
+            appContainer.querySelectorAll('.lg-switch[data-set]').forEach(el => {
+                initGlassSwitch(el, {
+                    value: el.dataset.on === '1',
+                    onChange: v => {
+                        settings[el.dataset.set] = v;
+                        saveSettings();
+                        if (el.dataset.set === 'reduceMotion') applyTheme();
+                    }
                 });
             });
             initGlassSlider(document.getElementById('setSpeed'), {
@@ -1859,103 +1975,4 @@ void main(){
                 onValue: v => { document.getElementById('gsVal').textContent = v + 'x'; },
                 onChange: v => {
                     settings.speed = v;
-                    audioEl.defaultPlaybackRate = audioEl.playbackRate = settings.speed;
-                    saveSettings();
-                }
-            });
-            appContainer.querySelectorAll('.swatch').forEach(el => {
-                el.addEventListener('click', () => {
-                    settings.accent = el.dataset.acc; saveSettings(); applyTheme();
-                    appContainer.querySelectorAll('.swatch').forEach(s => s.classList.toggle('on', s === el));
-                });
-            });
-            document.getElementById('btnClearHist').addEventListener('click', clearHistory);
-            document.getElementById('btnResetSet').addEventListener('click', () => {
-                settings = { ...DEFAULTS }; saveSettings(); applyTheme();
-                audioEl.defaultPlaybackRate = audioEl.playbackRate = 1;
-                renderSettingsScreen();
-                showInfo('✅ Đã khôi phục cài đặt mặc định.');
-            });
-        }
-
-        /* ---------- TAB PROFILE ---------- */
-        function renderProfileScreen() {
-            const entries = Object.values(progress);
-            const byMovie = {};
-            entries.forEach(e => { if (!byMovie[e.mid] || e.u > byMovie[e.mid].u) byMovie[e.mid] = e; });
-            const hist = Object.values(byMovie).sort((a, b) => b.u - a.u);
-            const hours = entries.reduce((s, e) => s + (e.t || 0), 0) / 3600;
-            const initial = (profile.name || 'K').trim().charAt(0).toUpperCase() || 'K';
-
-            appContainer.innerHTML = `
-                <div class="page-title"><i class="fa-solid fa-user"></i> Hồ Sơ</div>
-                <div class="profile-card">
-                    <div class="avatar" id="avatarBox">${esc(initial)}</div>
-                    <div style="flex:1;min-width:0;">
-                        <input class="dt-input" id="profileName" maxlength="24" value="${esc(profile.name)}" placeholder="Tên của bạn">
-                        <div class="hint">Chạm vào tên để chỉnh sửa. Dữ liệu lưu trên thiết bị này.</div>
-                    </div>
-                </div>
-                <div class="stats">
-                    <div class="stat"><b>${hist.length}</b><span>Phim đã xem</span></div>
-                    <div class="stat"><b>${entries.length}</b><span>Tập đã xem</span></div>
-                    <div class="stat"><b>${hours < 10 ? hours.toFixed(1) : Math.round(hours)}</b><span>Giờ xem</span></div>
-                </div>
-                <div class="section-sub">Xem gần đây</div>
-                ${hist.length ? `<div class="hist-list">${hist.map(e => {
-                    const pct = e.d ? Math.min(100, Math.round(e.t / e.d * 100)) : 0;
-                    return `
-                    <a class="hist-item" href="tube.html?v=${encodeURIComponent(e.mid)}&ep=${e.ep}">
-                        <img src="${esc(e.th || FALLBACK_THUMB)}" alt="" loading="lazy" onerror="this.src='${FALLBACK_THUMB}'">
-                        <div style="flex:1;min-width:0;">
-                            <div class="t">${esc(e.mt)}</div>
-                            <div class="s">Tập ${e.ep + 1}${e.et ? ' — ' + esc(e.et) : ''} · ${fmtTime(e.t)} / ${fmtTime(e.d)}</div>
-                            <div class="hist-bar"><i style="width:${pct}%"></i></div>
-                        </div>
-                        <i class="fa-solid fa-circle-play" style="color:var(--accent);font-size:20px;"></i>
-                    </a>`;
-                }).join('')}</div>
-                <div style="margin-top:16px;"><button class="dt-btn danger" id="btnClearHist2">Xoá lịch sử xem</button></div>`
-                : `<div class="loading-view" style="padding:40px 20px;max-width:760px;"><i class="fa-solid fa-clock-rotate-left"></i><div style="margin-top:10px;">Bạn chưa xem phim nào. Mở một tập ở tab Video để bắt đầu.</div></div>`}
-            `;
-
-            const nameInput = document.getElementById('profileName');
-            nameInput.addEventListener('input', () => {
-                document.getElementById('avatarBox').textContent = (nameInput.value.trim().charAt(0) || 'K').toUpperCase();
-            });
-            nameInput.addEventListener('change', () => {
-                profile.name = nameInput.value.trim() || 'Khách';
-                nameInput.value = profile.name;
-                store.set('dt_profile', profile);
-                showInfo('✅ Đã lưu tên.');
-            });
-            const b2 = document.getElementById('btnClearHist2');
-            if (b2) b2.addEventListener('click', clearHistory);
-        }
-
-        /* =================== SEARCH (theo tab) =================== */
-        let searchDebounce;
-        searchInput.addEventListener('input', (e) => {
-            clearTimeout(searchDebounce);
-            const q = e.target.value;
-            if (currentTab === 'audio') {
-                searchDebounce = setTimeout(() => renderAudioScreen(q), 180);
-                return;
-            }
-            if (currentTab !== 'video') window.liquidGlass.setTab('video', true);
-            if (movieId) {
-                searchDebounce = setTimeout(() => {
-                    window.location.href = 'tube.html';
-                }, 400);
-                return;
-            }
-            searchDebounce = setTimeout(() => renderHomeScreen(q), 180);
-        });
-
-        /* =================== KHỞI TẠO TAB =================== */
-        applyTheme();
-        window.liquidGlass.setTab(currentTab, false);
-        if (currentTab === 'settings' || currentTab === 'profile') renderCurrent();
-    </script>
-</body>
-</html>
+                    audioEl.d
