@@ -762,7 +762,7 @@
         .set-row:last-child { border-bottom: 0; }
         .set-row .lbl { font-size: 14px; font-weight: 600; color: #fff; }
         .set-row .sub { font-size: 12px; color: var(--text-sub); margin-top: 3px; line-height: 1.4; }
-        /* ---- Liquid glass switch ---- */
+        /* ---- Liquid glass switch (thay công tắc cũ) ---- */
         .lg-switch { position: relative; width: 77px; height: 33px; flex-shrink: 0; touch-action: pan-y; cursor: pointer;
             user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; outline: none; }
         .lg-switch::before { content: ""; position: absolute; inset: -10px; }
@@ -774,7 +774,6 @@
         .lg-pill { background: #fff; box-shadow: 0 2px 8px #0006; }
         .lg-glass { opacity: 0; background: rgba(255,255,255,.02);
             -webkit-backdrop-filter: blur(.2px) saturate(1.2); backdrop-filter: blur(.2px) saturate(1.2);
-            backdrop-filter: blur(.2px) url(#lgRefr) saturate(1.1);
             box-shadow: inset 0 0 0 1px rgba(255,255,255,.22), inset 0 1px 1.5px rgba(255,255,255,.45), inset 0 -1px 1.5px rgba(255,255,255,.2), 0 3px 10px rgba(0,0,0,.18); }
         .dt-select, .dt-input { background: rgba(255,255,255,.06); border: 1px solid var(--border); color: #fff; border-radius: 10px; padding: 8px 12px; font-size: 13px; outline: none; }
         .dt-select:focus, .dt-input:focus { border-color: var(--accent); box-shadow: 0 0 14px var(--accent-glow); }
@@ -860,7 +859,7 @@
         </div>
     </main>
 
-    <!-- Liquid Glass tab bar + mini audio player -->
+    <!-- [MỚI] Liquid Glass tab bar + mini audio player -->
     <audio id="audioEl" preload="none"></audio>
     <div class="mini-player" id="miniPlayer">
         <div class="mini-top">
@@ -894,7 +893,13 @@
     </div></nav>
 
     <script>
-    /* ============ Liquid Glass tab bar (WebGL) ============ */
+    /* ============ [MỚI] Liquid Glass tab bar (WebGL) ============
+       Shader khúc xạ / tán sắc / glow giữ nguyên từ index-2.html.
+       Thay đổi để chạy trên trang thật:
+        - canvas trong suốt, chỉ phủ dải dưới cùng màn hình (nhẹ GPU)
+        - thanh nav bán trong suốt, phía sau là backdrop-filter thật của trình duyệt
+        - phát sự kiện 'tabchange' / 'tabtap' để app chuyển nội dung thật
+        - API: liquidGlass.setTab(name) / setAccent(a1,a2,a3) / setReduce(bool) / setBackground(src) */
     (function () {
     const VS='attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
     const FS=`precision highp float;
@@ -1083,6 +1088,7 @@ void main(){
       gl.uniform4f(U('uNav'),navR.left,navR.top,navR.width,navR.height);
       xt=tabs[cur].offsetLeft;if(!dragging&&!settling){x=xt;xv=0;prevX=x}
     }
+    /* ---- nền giả lập (mô phỏng aurora + lưới phim) cho kính khúc xạ ---- */
     function drawScene(){
       const g=sctx,w=innerWidth,h=innerHeight,kx=sc.width/w,ky=sc.height/SH;
       g.setTransform(kx,0,0,ky,0,-origY*ky);
@@ -1111,6 +1117,7 @@ void main(){
         }
       }
     }
+    /* ---- vòng lặp vẽ ---- */
     let last=performance.now(),avg=.0167,lastAdj=0;
     function frame(now){
       const dt=Math.min((now-last)/1000,.05)||.0167;last=now;
@@ -1141,6 +1148,7 @@ void main(){
       gl.uniform2f(U('uLight'),Math.cos(a),Math.sin(a));
       gl.drawArrays(gl.TRIANGLE_STRIP,0,4);requestAnimationFrame(frame);
     }
+    /* ---- kéo / chọn tab ---- */
     G={
       moveTo(i,animate){
         xt=tabs[i].offsetLeft;
@@ -1191,6 +1199,139 @@ void main(){
     })();
     </script>
 
+    <script>
+    /* =========================================================
+       Liquid Glass Switch - isolated from Firebase module
+       Chỉ xử lý hiệu ứng/công tắc, không đụng vào loader phim.
+       ========================================================= */
+    (function () {
+        const LGS = { K: .55, W: 116, H: 74, R: 37, DISP: 46, IDLE: 82 / 116, map: null, uid: 0 };
+        LGS.SW = 140 * LGS.K;
+        LGS.SH = 60 * LGS.K;
+        LGS.CMIN = 4 * LGS.K + 82 * LGS.K / 2;
+        LGS.CMAX = LGS.SW - LGS.CMIN;
+
+        function lgsMap() {
+            if (LGS.map) return LGS.map;
+            const { W, H, R, DISP } = LGS;
+            const PTS = [[0, -8], [3.5, -3.5], [5, 3], [11, 11], [12, 4], [26, 0]];
+            const sstep = (a, b, x) => {
+                const t = Math.min(Math.max((x - a) / (b - a), 0), 1);
+                return t * t * (3 - 2 * t);
+            };
+            const prof = dd => {
+                for (let i = 1; i < PTS.length; i++) {
+                    if (dd <= PTS[i][0]) {
+                        const [x0, y0] = PTS[i - 1], [x1, y1] = PTS[i];
+                        return y0 + (y1 - y0) * (dd - x0) / (x1 - x0);
+                    }
+                }
+                return 0;
+            };
+            const cv = document.createElement('canvas');
+            cv.width = W; cv.height = H;
+            const cx = cv.getContext('2d');
+            if (!cx) return '';
+            const im = cx.createImageData(W, H);
+            for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) {
+                const px = i + .5 - W / 2, py = j + .5 - H / 2;
+                const qx = Math.abs(px) - (W / 2 - R), qy = Math.abs(py) - (H / 2 - R);
+                const d = Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - R;
+                const dd = Math.max(-d, 0), ramp = sstep(0, 24, dd), ddY = H / 2 - Math.abs(py);
+                const ex = Math.max(Math.abs(px) - (W / 2 - R), 0), cf = 1 - sstep(10, 30, ex);
+                const wt = (1 - sstep(12, 20, ddY)) * cf, bez = Math.sign(py) * prof(ddY);
+                let dx = .15 * px * ramp, dy = .15 * py * ramp * (1 - wt) + bez * wt;
+                dx = Math.max(-W / 2 + .5 - px, Math.min(W / 2 - .5 - px, dx));
+                dy = Math.max(-H / 2 + .5 - py, Math.min(H / 2 - .5 - py, dy));
+                const k = (j * W + i) * 4;
+                im.data[k] = 128 + dx / (.498 * DISP) * 127;
+                im.data[k + 1] = 128 + dy / (.498 * DISP) * 127;
+                im.data[k + 2] = 128; im.data[k + 3] = 255;
+            }
+            cx.putImageData(im, 0, 0);
+            return (LGS.map = cv.toDataURL());
+        }
+
+        window.initGlassSwitch = function initGlassSwitch(el, { value = false, onChange } = {}) {
+            const { K, W, H, DISP, IDLE, SH, CMIN, CMAX } = LGS;
+            const id = 'lgRefr' + (++LGS.uid);
+            const th = el.querySelector('.lg-th'), pill = el.querySelector('.lg-pill'),
+                  glass = el.querySelector('.lg-glass'), onL = el.querySelector('.lg-tr i');
+            if (!th || !pill || !glass || !onL) return;
+
+            const map = lgsMap();
+            if (map) {
+                const holder = document.createElement('div');
+                holder.innerHTML = '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="' + id + '" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">'
+                    + '<feImage x="0" y="0" width="' + (W * K * IDLE) + '" height="' + (H * K * IDLE) + '" preserveAspectRatio="none" result="m" href="' + map + '"/>'
+                    + '<feDisplacementMap in="SourceGraphic" in2="m" scale="' + (DISP * K) + '" xChannelSelector="R" yChannelSelector="G"/></filter></svg>';
+                const svg = holder.firstChild;
+                el.appendChild(svg);
+                const fi = svg.querySelector('feImage'), dm = svg.querySelector('feDisplacementMap');
+                glass.style.backdropFilter = 'blur(.2px) url(#' + id + ') saturate(1.1)';
+
+                const sp = (v, k, c) => ({ x: v, v: 0, t: v, k, c });
+                const stepS = (s, dt) => { s.v += (-s.k * (s.x - s.t) - s.c * s.v) * dt; s.x += s.v * dt; };
+                const px = sp(value ? CMAX : CMIN, 520, 30), sc = sp(IDLE, 300, 22), col = { x: value ? 1 : 0, t: value ? 1 : 0 };
+                let on = value, down = false, moved = false, pid = null, dx0 = 0, x0 = 0, running = false, prev = 0;
+
+                const wake = () => { if (!running) { running = true; prev = performance.now(); requestAnimationFrame(frame); } };
+                function setOn(v, notify = true) {
+                    const changed = v !== on; on = v;
+                    el.setAttribute('aria-checked', v ? 'true' : 'false');
+                    px.t = v ? CMAX : CMIN; col.t = v ? 1 : 0;
+                    if (changed && notify && onChange) onChange(v);
+                    wake();
+                }
+                el.addEventListener('pointerdown', e => {
+                    e.preventDefault(); down = true; moved = false; pid = e.pointerId; dx0 = e.clientX; x0 = px.x; sc.t = 1;
+                    try { el.setPointerCapture(e.pointerId); } catch (_) {}
+                    wake();
+                });
+                el.addEventListener('pointermove', e => {
+                    if (!down || e.pointerId !== pid) return;
+                    const d = e.clientX - dx0;
+                    if (Math.abs(d) > 4) moved = true;
+                    if (moved) { px.t = Math.min(Math.max(x0 + d, CMIN), CMAX); wake(); }
+                });
+                function finish(e, cancelled) {
+                    if (!down || (e && e.pointerId !== pid)) return;
+                    const wasMoved = moved, fx = px.x;
+                    down = false; moved = false; pid = null; sc.t = IDLE;
+                    if (wasMoved) setOn(fx > (CMIN + CMAX) / 2);
+                    else if (cancelled) { px.t = on ? CMAX : CMIN; wake(); }
+                    else setOn(!on);
+                    try { if (e && el.hasPointerCapture(e.pointerId)) el.releasePointerCapture(e.pointerId); } catch (_) {}
+                    wake();
+                }
+                el.addEventListener('pointerup', e => finish(e, false));
+                el.addEventListener('pointercancel', e => finish(e, true));
+                el.addEventListener('lostpointercapture', e => { if (down) finish(e, true); });
+                el.addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); setOn(!on); } });
+
+                function frame(now) {
+                    if (!el.isConnected) { running = false; return; }
+                    const dt = Math.min((now - prev) / 1000, .033); prev = now;
+                    sc.t = down ? 1 : IDLE; stepS(px, dt); stepS(sc, dt);
+                    col.x += (col.t - col.x) * (1 - Math.exp(-dt * 14));
+                    const s = Math.max(sc.x, IDLE * .9);
+                    const p = Math.min(Math.max((s - IDLE) / (1 - IDLE), 0), 1);
+                    const q = Math.min(Math.abs(px.v) / 5000 / K, .07);
+                    const w = W * K * s * (1 + q), h = H * K * s * (1 - q * .7);
+                    th.style.width = w + 'px'; th.style.height = h + 'px';
+                    th.style.transform = 'translate(' + (px.x - w / 2) + 'px,' + (SH / 2 - h / 2) + 'px)';
+                    fi.setAttribute('width', w); fi.setAttribute('height', h); dm.setAttribute('scale', DISP * K * s);
+                    pill.style.opacity = 1 - Math.min(p * 1.6, 1);
+                    glass.style.opacity = Math.min(p * 1.4, 1); onL.style.opacity = col.x;
+                    if (!down && Math.abs(px.v) < .05 && Math.abs(px.x - px.t) < .05 && Math.abs(sc.v) < .001 && Math.abs(sc.x - sc.t) < .001 && Math.abs(col.x - col.t) < .003) { running = false; return; }
+                    requestAnimationFrame(frame);
+                }
+                wake();
+            }
+        };
+    })();
+    </script>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -1211,20 +1352,30 @@ void main(){
         }
 
         /* =========================================================
-           CHUẨN HOÁ LINK VIDEO
+           [MỚI] CHUẨN HOÁ LINK VIDEO
+           - Dropbox share link  → dl.dropboxusercontent.com (direct)
+           - Google Drive share  → uc?export=download&id=...
+           - Link khác giữ nguyên
            ========================================================= */
         function normalizeVideoUrl(url) {
             if (!url || typeof url !== 'string') return url;
             url = url.trim();
 
+            /* ---------- DROPBOX ---------- */
             if (/dropbox\.com/i.test(url)) {
                 try {
                     const u = new URL(url);
                     const rlkey = u.searchParams.get('rlkey');
+
+                    // Link dạng mới: /scl/fi/<id>/<filename>
+                    // Link dạng cũ:   /s/<id>/<filename>
+                    // Giữ nguyên path, chuyển host sang dl.dropboxusercontent.com
                     const newUrl = new URL('https://dl.dropboxusercontent.com' + u.pathname);
                     if (rlkey) newUrl.searchParams.set('rlkey', rlkey);
+
                     return newUrl.toString();
                 } catch (e) {
+                    // Fallback nếu URL constructor lỗi
                     return url
                         .replace('www.dropbox.com', 'dl.dropboxusercontent.com')
                         .replace('dropbox.com/s/', 'dropboxusercontent.com/s/')
@@ -1234,6 +1385,7 @@ void main(){
                 }
             }
 
+            /* ---------- GOOGLE DRIVE ---------- */
             if (/drive\.google\.com/i.test(url)) {
                 const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
                 if (m) {
@@ -1241,7 +1393,9 @@ void main(){
                 }
             }
 
+            /* ---------- ONEDRIVE ---------- */
             if (/1drv\.ms|onedrive\.live\.com/i.test(url)) {
+                // Thêm download=1 nếu chưa có
                 if (!/[?&]download=1/.test(url)) {
                     return url + (url.includes('?') ? '&' : '?') + 'download=1';
                 }
@@ -1284,10 +1438,12 @@ void main(){
         let moviesDataset = {};
         let isFirstLoad = true;
 
+        // Lắng nghe dữ liệu — có error callback
         onValue(ref(db, 'movies'),
             (snapshot) => {
                 moviesDataset = snapshot.val() || {};
                 isFirstLoad = false;
+
                 renderCurrent();
             },
             (err) => {
@@ -1354,6 +1510,7 @@ void main(){
             gridHtml += '</div>';
             appContainer.innerHTML = gridHtml;
 
+            // Hiệu ứng ánh sáng bám chuột trên mỗi card
             document.querySelectorAll('.movie-card').forEach(card => {
                 card.addEventListener('mousemove', (e) => {
                     const rect = card.getBoundingClientRect();
@@ -1389,8 +1546,12 @@ void main(){
             const safeEpTitle = (epData.title || '').replace(/</g, '&lt;');
             const safeDesc = (movie.description || 'Không có mô tả chi tiết.').replace(/</g, '&lt;');
 
+            // [MỚI] Chuẩn hoá link video (Dropbox / Google Drive / OneDrive)
             const rawUrl = epData.url || '';
             const videoUrl = normalizeVideoUrl(rawUrl);
+            if (rawUrl && videoUrl !== rawUrl) {
+                console.log('[normalizeVideoUrl] Đã chuyển link:\n  Gốc: ' + rawUrl + '\n  Mới: ' + videoUrl);
+            }
 
             let epListMarkup = '';
             episodes.forEach((ep, index) => {
@@ -1444,6 +1605,7 @@ void main(){
                 } else {
                     showToast('⚠️ Không phát được video. Kiểm tra lại link.');
                 }
+                console.error('[player error]', src, player.error);
             };
 
             player.onended = () => {
@@ -1457,7 +1619,7 @@ void main(){
         }
 
         /* =========================================================
-           TABS (Video / Audio / Settings / Profile)
+           [MỚI] TABS (Video / Audio / Settings / Profile)
            ========================================================= */
         const store = {
             get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch (e) { return d; } },
@@ -1468,7 +1630,7 @@ void main(){
         let profile = { name: 'Khách', ...store.get('dt_profile', {}) };
         let progress = store.get('dt_progress', {});
 
-        const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace/>/g, '&gt;').replace(/"/g, '&quot;');
+        const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         const FALLBACK_THUMB = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&q=80';
         const skeletonHTML = appContainer.innerHTML;
         const audioEl = document.getElementById('audioEl');
@@ -1485,6 +1647,7 @@ void main(){
             return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(sec).padStart(2, '0');
         }
 
+        /* ---------- Giao diện / màu nhấn ---------- */
         const ACCENTS = {
             indigo:  ['#6366f1', '#a855f7', '#ec4899'],
             ocean:   ['#3b82f6', '#06b6d4', '#6366f1'],
@@ -1502,6 +1665,7 @@ void main(){
         }
         const saveSettings = () => store.set('dt_settings', settings);
 
+        /* ---------- Định tuyến tab ---------- */
         const TAB_IDS = ['video', 'audio', 'settings', 'profile'];
         let currentTab = TAB_IDS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'video';
 
@@ -1538,6 +1702,7 @@ void main(){
             if (TAB_IDS.includes(t) && t !== currentTab) window.liquidGlass.setTab(t, true);
         });
 
+        /* ---------- Phát video: nhớ vị trí, tốc độ, tự chuyển tập ---------- */
         function setupPlayer(player, mId, epIdx, movie, epData) {
             const key = mId + '|' + epIdx;
             const saved = progress[key];
@@ -1578,7 +1743,7 @@ void main(){
             next: document.getElementById('miniNext'), close: document.getElementById('miniClose'),
             seek: document.getElementById('miniSeek')
         };
-        let audioGroups = {};
+        let audioGroups = {};   // mid -> [items]
         let audioQueue = [], audioIdx = -1;
 
         function getEpisodes(m) {
@@ -1765,113 +1930,6 @@ void main(){
                 fill.style.width = px.x + 'px';
                 const rest = !down && Math.abs(px.v) < .05 && Math.abs(px.x - px.t) < .05 && Math.abs(sc.v) < .001 && Math.abs(sc.x - sc.t) < .001;
                 if (rest) { running = false; return; }
-                requestAnimationFrame(frame);
-            }
-            wake();
-        }
-
-        /* ---------- Liquid glass switch ---------- */
-        const LGS = { K: .55, W: 116, H: 74, R: 37, DISP: 46, IDLE: 82 / 116, map: null, uid: 0 };
-        LGS.SW = 140 * LGS.K; LGS.SH = 60 * LGS.K; LGS.CMIN = 4 * LGS.K + 82 * LGS.K / 2; LGS.CMAX = LGS.SW - LGS.CMIN;
-
-        function lgsMap() {
-            if (LGS.map) return LGS.map;
-            const { W, H, R, DISP } = LGS;
-            const PTS = [[0, -8], [3.5, -3.5], [5, 3], [11, 11], [12, 4], [26, 0]];
-            const sstep = (a, b, x) => { const t = Math.min(Math.max((x - a) / (b - a), 0), 1); return t * t * (3 - 2 * t); };
-            const prof = dd => { for (let i = 1; i < PTS.length; i++) if (dd <= PTS[i][0]) { const [x0, y0] = PTS[i - 1], [x1, y1] = PTS[i]; return y0 + (y1 - y0) * (dd - x0) / (x1 - x0); } return 0; };
-            const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
-            const cx = cv.getContext('2d'), im = cx.createImageData(W, H);
-            for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) {
-                const px = i + .5 - W / 2, py = j + .5 - H / 2;
-                const qx = Math.abs(px) - (W / 2 - R), qy = Math.abs(py) - (H / 2 - R);
-                const d = Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - R;
-                const dd = Math.max(-d, 0), ramp = sstep(0, 24, dd), ddY = H / 2 - Math.abs(py);
-                const ex = Math.max(Math.abs(px) - (W / 2 - R), 0), cf = 1 - sstep(10, 30, ex);
-                const wt = (1 - sstep(12, 20, ddY)) * cf, bez = Math.sign(py) * prof(ddY);
-                let dx = .15 * px * ramp, dy = .15 * py * ramp * (1 - wt) + bez * wt;
-                dx = Math.max(-W / 2 + .5 - px, Math.min(W / 2 - .5 - px, dx));
-                dy = Math.max(-H / 2 + .5 - py, Math.min(H / 2 - .5 - py, dy));
-                const k = (j * W + i) * 4;
-                im.data[k] = 128 + dx / (.498 * DISP) * 127; im.data[k + 1] = 128 + dy / (.498 * DISP) * 127; im.data[k + 2] = 128; im.data[k + 3] = 255;
-            }
-            cx.putImageData(im, 0, 0);
-            return (LGS.map = cv.toDataURL());
-        }
-
-        function initGlassSwitch(el, { value = false, onChange } = {}) {
-            const { K, W, H, DISP, IDLE, SH, CMIN, CMAX } = LGS;
-            const id = 'lgRefr' + (++LGS.uid);
-            const th = el.querySelector('.lg-th'), pill = el.querySelector('.lg-pill'),
-                  glass = el.querySelector('.lg-glass'), onL = el.querySelector('.lg-tr i');
-
-            const holder = document.createElement('div');
-            holder.innerHTML = '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="' + id + '" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">'
-                + '<feImage x="0" y="0" width="' + (W * K * IDLE) + '" height="' + (H * K * IDLE) + '" preserveAspectRatio="none" result="m" href="' + lgsMap() + '"/>'
-                + '<feDisplacementMap in="SourceGraphic" in2="m" scale="' + (DISP * K) + '" xChannelSelector="R" yChannelSelector="G"/></filter></svg>';
-            const svg = holder.firstChild; el.appendChild(svg);
-            const fi = svg.querySelector('feImage'), dm = svg.querySelector('feDisplacementMap');
-            glass.style.backdropFilter = 'blur(.2px) url(#' + id + ') saturate(1.1)';
-
-            const sp = (v, k, c) => ({ x: v, v: 0, t: v, k, c });
-            const stepS = (s, dt) => { s.v += (-s.k * (s.x - s.t) - s.c * s.v) * dt; s.x += s.v * dt; };
-            const px = sp(value ? CMAX : CMIN, 520, 30), sc = sp(IDLE, 300, 22), col = { x: value ? 1 : 0, t: value ? 1 : 0 };
-            let on = value, down = false, moved = false, pid = null, dx0 = 0, x0 = 0, running = false, prev = 0;
-
-            const wake = () => { if (!running) { running = true; prev = performance.now(); requestAnimationFrame(frame); } };
-            function setOn(v, notify = true) {
-                const changed = v !== on; on = v;
-                el.setAttribute('aria-checked', v ? 'true' : 'false');
-                px.t = v ? CMAX : CMIN; col.t = v ? 1 : 0;
-                if (changed && notify && onChange) onChange(v);
-                wake();
-            }
-            el.addEventListener('pointerdown', e => {
-                e.preventDefault();
-                down = true; moved = false; pid = e.pointerId; dx0 = e.clientX; x0 = px.x; sc.t = 1;
-                try { el.setPointerCapture(e.pointerId); } catch (_) {}
-                wake();
-            });
-            el.addEventListener('pointermove', e => {
-                if (!down || e.pointerId !== pid) return;
-                const d = e.clientX - dx0;
-                if (Math.abs(d) > 4) moved = true;
-                if (moved) { px.t = Math.min(Math.max(x0 + d, CMIN), CMAX); wake(); }
-            });
-            function finish(e, cancelled) {
-                if (!down || (e && e.pointerId !== pid)) return;
-                const wasMoved = moved, fx = px.x;
-                down = false; moved = false; pid = null; sc.t = IDLE;
-                if (wasMoved) setOn(fx > (CMIN + CMAX) / 2);
-                else if (cancelled) { px.t = on ? CMAX : CMIN; wake(); }
-                else setOn(!on);
-                try { if (e && el.hasPointerCapture(e.pointerId)) el.releasePointerCapture(e.pointerId); } catch (_) {}
-                wake();
-            }
-            el.addEventListener('pointerup', e => finish(e, false));
-            el.addEventListener('pointercancel', e => finish(e, true));
-            el.addEventListener('lostpointercapture', e => { if (down) finish(e, true); });
-            el.addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); setOn(!on); } });
-
-            function frame(now) {
-                if (!el.isConnected) { running = false; return; }
-                const dt = Math.min((now - prev) / 1000, .033); prev = now;
-                sc.t = down ? 1 : IDLE;
-                stepS(px, dt); stepS(sc, dt);
-                col.x += (col.t - col.x) * (1 - Math.exp(-dt * 14));
-                const s = Math.max(sc.x, IDLE * .9);
-                const p = Math.min(Math.max((s - IDLE) / (1 - IDLE), 0), 1);
-                const q = Math.min(Math.abs(px.v) / 5000 / K, .07);
-                const w = W * K * s * (1 + q), h = H * K * s * (1 - q * .7);
-                th.style.width = w + 'px'; th.style.height = h + 'px';
-                th.style.transform = 'translate(' + (px.x - w / 2) + 'px,' + (SH / 2 - h / 2) + 'px)';
-                fi.setAttribute('width', w); fi.setAttribute('height', h);
-                dm.setAttribute('scale', DISP * K * s);
-                pill.style.opacity = 1 - Math.min(p * 1.6, 1);
-                glass.style.opacity = Math.min(p * 1.4, 1);
-                onL.style.opacity = col.x;
-                if (!down && Math.abs(px.v) < .05 && Math.abs(px.x - px.t) < .05 && Math.abs(sc.v) < .001 &&
-                    Math.abs(sc.x - sc.t) < .001 && Math.abs(col.x - col.t) < .003) { running = false; return; }
                 requestAnimationFrame(frame);
             }
             wake();
