@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>DigitalTube - Trình Phát Video</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,8 +14,8 @@
             --accent: #6366f1;
             --accent-2: #a855f7;
             --accent-3: #ec4899;
-            --accent-glow: rgba(99, 102, 241, 0.55);
-            --accent-glow-strong: rgba(99, 102, 241, 0.9);
+            --accent-glow: rgba(var(--accent-rgb), 0.55);
+            --accent-glow-strong: rgba(var(--accent-rgb), 0.9);
             --text-main: #f3f4f6;
             --text-sub: #9ca3af;
             --border: rgba(255, 255, 255, 0.08);
@@ -52,18 +52,18 @@
         }
         .blob-1 {
             width: 520px; height: 520px;
-            background: radial-gradient(circle, #6366f1, transparent 70%);
+            background: radial-gradient(circle, var(--accent), transparent 70%);
             top: -180px; left: -120px;
         }
         .blob-2 {
             width: 480px; height: 480px;
-            background: radial-gradient(circle, #a855f7, transparent 70%);
+            background: radial-gradient(circle, var(--accent-2), transparent 70%);
             top: 40%; right: -160px;
             animation-delay: -7s;
         }
         .blob-3 {
             width: 400px; height: 400px;
-            background: radial-gradient(circle, #ec4899, transparent 70%);
+            background: radial-gradient(circle, var(--accent-3), transparent 70%);
             bottom: -140px; left: 30%;
             animation-delay: -14s;
             opacity: 0.28;
@@ -117,7 +117,7 @@
             justify-content: center;
             box-shadow:
                 0 0 15px var(--accent-glow),
-                0 0 30px rgba(168, 85, 247, 0.35),
+                0 0 30px rgba(var(--accent2-rgb), 0.35),
                 inset 0 0 8px rgba(255,255,255,0.25);
             transition: all 0.35s ease;
             position: relative;
@@ -155,8 +155,8 @@
         .brand-logo:hover .icon-wrapper {
             box-shadow:
                 0 0 25px var(--accent-glow-strong),
-                0 0 50px rgba(168, 85, 247, 0.55),
-                0 0 80px rgba(236, 72, 153, 0.35),
+                0 0 50px rgba(var(--accent2-rgb), 0.55),
+                0 0 80px rgba(var(--accent3-rgb), 0.35),
                 inset 0 0 12px rgba(255,255,255,0.4);
             transform: rotate(-6deg) scale(1.08);
         }
@@ -193,9 +193,9 @@
         .search-container:focus-within {
             border-color: var(--accent);
             box-shadow:
-                0 0 0 3px rgba(99, 102, 241, 0.15),
+                0 0 0 3px rgba(var(--accent-rgb), 0.15),
                 0 0 24px var(--accent-glow),
-                inset 0 0 12px rgba(99, 102, 241, 0.08);
+                inset 0 0 12px rgba(var(--accent-rgb), 0.08);
             background: rgba(255, 255, 255, 0.07);
             transform: translateY(-1px);
         }
@@ -235,7 +235,7 @@
             letter-spacing: -0.3px;
         }
         .home-section-title i {
-            filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.8));
+            filter: drop-shadow(0 0 10px rgba(var(--accent-rgb), 0.8));
             animation: fireFlicker 2s ease-in-out infinite;
         }
         @keyframes fireFlicker {
@@ -284,7 +284,7 @@
             position: absolute;
             inset: 0;
             border-radius: 16px;
-            background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(99,102,241,0.15), transparent 60%);
+            background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(var(--accent-rgb), 0.15), transparent 60%);
             opacity: 0;
             transition: opacity 0.4s ease;
             pointer-events: none;
@@ -295,8 +295,8 @@
             transform: translateY(-8px) scale(1.015);
             box-shadow:
                 0 20px 40px rgba(0, 0, 0, 0.6),
-                0 0 30px rgba(99, 102, 241, 0.25),
-                0 0 60px rgba(168, 85, 247, 0.15);
+                0 0 30px rgba(var(--accent-rgb), 0.25),
+                0 0 60px rgba(var(--accent2-rgb), 0.15);
         }
         .movie-card:hover::before { opacity: 1; }
         .movie-card:hover::after { opacity: 1; }
@@ -333,12 +333,12 @@
             padding: 5px 11px;
             border-radius: 7px;
             border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.4);
             transition: all 0.3s ease;
             z-index: 2;
         }
         .movie-card:hover .ep-badge-tag {
-            background: rgba(99, 102, 241, 0.9);
+            background: rgba(var(--accent-rgb), 0.9);
             box-shadow: 0 0 20px var(--accent-glow-strong);
             border-color: rgba(255,255,255,0.3);
         }
@@ -389,7 +389,7 @@
             transition: all 0.25s ease;
         }
         .back-btn:hover {
-            background: rgba(99,102,241,0.15);
+            background: rgba(var(--accent-rgb), 0.15);
             border-color: var(--accent);
             box-shadow: 0 0 18px var(--accent-glow);
             transform: translateX(-3px);
@@ -406,7 +406,7 @@
             aspect-ratio: 16/9;
             box-shadow:
                 0 25px 50px rgba(0,0,0,0.85),
-                0 0 40px rgba(99, 102, 241, 0.18);
+                0 0 40px rgba(var(--accent-rgb), 0.18);
             border: 1px solid var(--border);
             position: relative;
             transition: box-shadow 0.4s ease;
@@ -414,8 +414,8 @@
         .video-wrapper:hover {
             box-shadow:
                 0 25px 50px rgba(0,0,0,0.85),
-                0 0 55px rgba(99, 102, 241, 0.35),
-                0 0 90px rgba(168, 85, 247, 0.15);
+                0 0 55px rgba(var(--accent-rgb), 0.35),
+                0 0 90px rgba(var(--accent2-rgb), 0.15);
         }
         .video-wrapper::after {
             content: 'ĐANG PHÁT';
@@ -436,7 +436,7 @@
         }
         @keyframes livePulse {
             0%, 100% { box-shadow: 0 0 16px var(--accent-glow-strong); }
-            50% { box-shadow: 0 0 26px var(--accent-glow-strong), 0 0 40px rgba(168,85,247,0.6); }
+            50% { box-shadow: 0 0 26px var(--accent-glow-strong), 0 0 40px rgba(var(--accent2-rgb), 0.6); }
         }
 
         video { width: 100%; height: 100%; outline: none; display: block; background: #000; }
@@ -503,10 +503,10 @@
         .sidebar-title span:last-child {
             font-size: 12px;
             color: #a5b4fc;
-            background: rgba(99,102,241,0.15);
+            background: rgba(var(--accent-rgb), 0.15);
             padding: 3px 10px;
             border-radius: 20px;
-            border: 1px solid rgba(99,102,241,0.3);
+            border: 1px solid rgba(var(--accent-rgb), 0.3);
         }
 
         .episodes-list-scroll {
@@ -519,11 +519,11 @@
         .episodes-list-scroll::-webkit-scrollbar { width: 6px; }
         .episodes-list-scroll::-webkit-scrollbar-track { background: transparent; }
         .episodes-list-scroll::-webkit-scrollbar-thumb {
-            background: rgba(99,102,241,0.3);
+            background: rgba(var(--accent-rgb), 0.3);
             border-radius: 4px;
         }
         .episodes-list-scroll::-webkit-scrollbar-thumb:hover {
-            background: rgba(99,102,241,0.6);
+            background: rgba(var(--accent-rgb), 0.6);
         }
 
         .ep-card-item {
@@ -543,15 +543,15 @@
         .ep-card-item:hover {
             background: rgba(255, 255, 255, 0.08);
             transform: translateX(3px);
-            border-color: rgba(99,102,241,0.3);
+            border-color: rgba(var(--accent-rgb), 0.3);
         }
 
         .ep-card-item.active {
-            background: linear-gradient(90deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.08));
+            background: linear-gradient(90deg, rgba(var(--accent-rgb), 0.2), rgba(var(--accent2-rgb), 0.08));
             border-color: var(--accent);
             box-shadow:
-                0 0 20px rgba(99,102,241,0.35),
-                inset 0 0 20px rgba(99,102,241,0.08);
+                0 0 20px rgba(var(--accent-rgb), 0.35),
+                inset 0 0 20px rgba(var(--accent-rgb), 0.08);
         }
         .ep-card-item.active::before {
             content: '';
@@ -680,72 +680,131 @@
             .video-headline { font-size: 18px; }
         }
 
-        /* ================================================================
-           ===== LIQUID GLASS TAB BAR (tích hợp từ index-2.html) ==========
-           ================================================================ */
-        #gl {
-            position: fixed;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            display: block;
-            pointer-events: none;   /* để không chặn thao tác trang */
-            z-index: 9998;
-        }
+        /* =====================================================
+           [MỚI] LIQUID GLASS TAB BAR + CÁC TAB (Audio / Settings / Profile)
+           ===================================================== */
+        :root { --accent-rgb: 99,102,241; --accent2-rgb: 168,85,247; --accent3-rgb: 236,72,153; --glass-acc: #a58cff; }
 
-        #tabbar {
-            position: fixed;
-            left: 14px;
-            right: 14px;
+        main { padding-bottom: 130px; }
+        body.has-mini main { padding-bottom: 200px; }
+        body.reduce-motion .aurora-blob,
+        body.reduce-motion .home-section-title i,
+        body.reduce-motion .brand-logo .icon-wrapper::after { animation: none !important; }
+
+        @keyframes viewIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+        #appContainer.view-in > * { animation: viewIn .35s cubic-bezier(.4,0,.2,1) both; }
+        body.reduce-motion #appContainer.view-in > * { animation: none; }
+
+        /* ---- Glass nav ---- */
+        #glGlass { position: fixed; left: 0; bottom: 0; width: 100%; height: 120px; display: block; pointer-events: none; z-index: 901; }
+        #glassNav {
+            position: fixed; left: 14px; right: 14px;
             bottom: calc(14px + env(safe-area-inset-bottom, 0px));
-            max-width: 380px;
-            margin: 0 auto;
-            padding: 5px;
-            touch-action: none;
-            user-select: none;
-            -webkit-user-select: none;
-            -webkit-touch-callout: none;
-            z-index: 9999;
+            max-width: 380px; margin: 0 auto; padding: 5px;
+            touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+            z-index: 900; -webkit-tap-highlight-color: transparent;
         }
-        #tabbar .row {
-            position: relative;
-            display: flex;
-            gap: 4px;
+        #glassNav::before {
+            content: ''; position: absolute; inset: 0; border-radius: 999px; z-index: -1;
+            backdrop-filter: blur(16px) saturate(1.7); -webkit-backdrop-filter: blur(16px) saturate(1.7);
         }
-        #tabbar .tab {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2px;
-            padding: 7px 0 6px;
-            border: 0;
-            border-radius: 999px;
-            background: transparent;
-            color: transparent;
-            font: 500 12px/1 Roboto, "Segoe UI", system-ui, sans-serif;
-            cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
+        #glassNav .row { position: relative; display: flex; gap: 4px; }
+        #glassNav .tab {
+            flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+            padding: 7px 0 6px; border: 0; border-radius: 999px; background: transparent; color: transparent;
+            font: 500 12px/1 Roboto, "Segoe UI", system-ui, sans-serif; cursor: pointer;
         }
-        #tabbar .tab svg {
-            width: 23px;
-            height: 23px;
-            opacity: 0;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 1.8;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-        #tabbar .ico { height: 23px; display: block; }
+        #glassNav .tab svg { width: 23px; height: 23px; opacity: 0; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+        #glassNav .ico { height: 23px; display: block; }
+        .nogl #glassNav::before { background: rgba(16,18,26,.78); border: 1px solid var(--glass-border); }
+        .nogl #glassNav .tab { color: #f2f2f5; }
+        .nogl #glassNav .tab svg { opacity: 1; }
+        .nogl #glassNav .tab[aria-current="true"] { color: var(--glass-acc); }
 
-        /* Fallback khi trình duyệt không hỗ trợ WebGL */
-        body.nogl #tabbar .tab { color: #f2f2f5; }
-        body.nogl #tabbar .tab svg { opacity: 1; }
-        body.nogl #tabbar .tab[aria-current="true"] { color: #c7d2fe; }
+        .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); }
+        body.has-mini .toast { bottom: calc(170px + env(safe-area-inset-bottom, 0px)); }
 
-        /* Chừa khoảng trống cuối trang để nội dung không bị tab bar che */
-        main#appContainer { padding-bottom: 130px; }
+        /* ---- Mini audio player ---- */
+        .mini-player {
+            position: fixed; left: 14px; right: 14px; max-width: 380px; margin: 0 auto;
+            bottom: calc(86px + env(safe-area-inset-bottom, 0px));
+            background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 18px;
+            backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%);
+            padding: 10px 12px 8px; z-index: 890; display: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,.5), 0 0 24px rgba(var(--accent-rgb), .18);
+        }
+        body.has-mini .mini-player { display: block; }
+        .mini-top { display: flex; align-items: center; gap: 10px; }
+        .mini-thumb { width: 38px; height: 38px; border-radius: 9px; object-fit: cover; background: #1a1d28; flex-shrink: 0; }
+        .mini-info { flex: 1; min-width: 0; }
+        .mini-title { font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mini-sub { font-size: 11px; color: var(--text-sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mini-btn { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border); background: rgba(255,255,255,.06); color: #fff; cursor: pointer; display: grid; place-items: center; transition: all .2s ease; flex-shrink: 0; }
+        .mini-btn:hover { background: rgba(var(--accent-rgb), .25); border-color: var(--accent); }
+        .mini-btn.main { background: linear-gradient(135deg, var(--accent), var(--accent-2)); border: 0; box-shadow: 0 0 14px var(--accent-glow); }
+        .mini-seek { width: 100%; margin-top: 8px; accent-color: var(--accent); height: 4px; cursor: pointer; }
+
+        /* ---- Audio tab ---- */
+        .audio-group { background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; padding: 16px; margin-bottom: 18px; }
+        .audio-group-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .audio-group-head img { width: 64px; aspect-ratio: 16/9; object-fit: cover; border-radius: 9px; background: #1a1d28; }
+        .audio-group-head .t { font-size: 16px; font-weight: 700; flex: 1; min-width: 0; }
+        .audio-group-head .c { font-size: 12px; color: #a5b4fc; background: rgba(var(--accent-rgb), .15); border: 1px solid rgba(var(--accent-rgb), .3); padding: 3px 10px; border-radius: 20px; }
+        .audio-group .list { display: flex; flex-direction: column; gap: 8px; }
+        .ep-card-item.playing i.fa-circle-play { color: var(--accent); }
+
+        /* ---- Cards chung cho Settings / Profile ---- */
+        .page-title { font-size: 24px; font-weight: 800; margin-bottom: 22px; display: flex; align-items: center; gap: 12px; letter-spacing: -0.3px; }
+        .page-title i { color: var(--accent); filter: drop-shadow(0 0 10px var(--accent-glow)); }
+        .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; padding: 6px 18px; margin-bottom: 18px; max-width: 760px; }
+        .panel-head { font-size: 12px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: #a5b4fc; padding: 14px 0 6px; }
+        .set-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+        .set-row:last-child { border-bottom: 0; }
+        .set-row .lbl { font-size: 14px; font-weight: 600; color: #fff; }
+        .set-row .sub { font-size: 12px; color: var(--text-sub); margin-top: 3px; line-height: 1.4; }
+        .switch { position: relative; width: 46px; height: 26px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 100%; height: 100%; position: absolute; inset: 0; cursor: pointer; z-index: 2; }
+        .switch .knob { position: absolute; inset: 0; background: rgba(255,255,255,.12); border-radius: 20px; transition: all .25s ease; }
+        .switch .knob::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform .25s cubic-bezier(.4,0,.2,1); }
+        .switch input:checked + .knob { background: linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow: 0 0 14px var(--accent-glow); }
+        .switch input:checked + .knob::after { transform: translateX(20px); }
+        .dt-select, .dt-input { background: rgba(255,255,255,.06); border: 1px solid var(--border); color: #fff; border-radius: 10px; padding: 8px 12px; font-size: 13px; outline: none; }
+        .dt-select:focus, .dt-input:focus { border-color: var(--accent); box-shadow: 0 0 14px var(--accent-glow); }
+        .dt-select option { background: #0d1018; }
+        .swatches { display: flex; gap: 10px; }
+        .swatch { width: 30px; height: 30px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: all .2s ease; }
+        .swatch.on { border-color: #fff; box-shadow: 0 0 14px currentColor; transform: scale(1.1); }
+        .dt-btn { background: rgba(255,255,255,.06); border: 1px solid var(--border); color: #fff; border-radius: 10px; padding: 9px 16px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s ease; }
+        .dt-btn:hover { background: rgba(var(--accent-rgb), .18); border-color: var(--accent); }
+        .dt-btn.danger:hover { background: rgba(239,68,68,.2); border-color: #ef4444; }
+
+        /* ---- Profile ---- */
+        .profile-card { display: flex; align-items: center; gap: 18px; max-width: 760px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 18px; position: relative; overflow: hidden; }
+        .profile-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: linear-gradient(180deg, var(--accent), var(--accent-2)); }
+        .avatar { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent-2), var(--accent-3)); display: grid; place-items: center; font-size: 30px; font-weight: 800; box-shadow: 0 0 24px var(--accent-glow); flex-shrink: 0; }
+        .profile-card .dt-input { font-size: 18px; font-weight: 700; width: 100%; max-width: 280px; background: transparent; border-color: transparent; padding-left: 0; }
+        .profile-card .dt-input:hover, .profile-card .dt-input:focus { border-color: var(--border); padding-left: 12px; }
+        .profile-card .hint { font-size: 12px; color: var(--text-sub); margin-top: 4px; }
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 760px; margin-bottom: 18px; }
+        .stat { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; text-align: center; }
+        .stat b { display: block; font-size: 24px; font-weight: 800; background: linear-gradient(90deg, #a5b4fc, #c4b5fd); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .stat span { font-size: 12px; color: var(--text-sub); }
+        .hist-list { display: flex; flex-direction: column; gap: 10px; max-width: 760px; }
+        .hist-item { display: flex; gap: 14px; align-items: center; background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 10px; text-decoration: none; color: inherit; transition: all .25s ease; }
+        .hist-item:hover { border-color: rgba(var(--accent-rgb), .5); transform: translateX(3px); box-shadow: 0 0 20px rgba(var(--accent-rgb), .2); }
+        .hist-item img { width: 96px; aspect-ratio: 16/9; object-fit: cover; border-radius: 9px; background: #1a1d28; flex-shrink: 0; }
+        .hist-item .t { font-size: 14px; font-weight: 700; color: #fff; }
+        .hist-item .s { font-size: 12px; color: var(--text-sub); margin-top: 3px; }
+        .hist-bar { height: 4px; background: rgba(255,255,255,.1); border-radius: 4px; margin-top: 8px; overflow: hidden; }
+        .hist-bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+        .section-sub { font-size: 17px; font-weight: 700; margin: 8px 0 14px; }
+
+        @media (max-width: 700px) {
+            .page-title { font-size: 19px; }
+            .stats { gap: 8px; }
+            .stat b { font-size: 19px; }
+            .hist-item img { width: 80px; }
+        }
     </style>
 </head>
 <body>
@@ -777,24 +836,345 @@
         </div>
     </main>
 
-    <!-- ================= LIQUID GLASS TAB BAR ================= -->
-    <canvas id="gl"></canvas>
-    <nav id="tabbar" aria-label="Điều hướng">
-        <div class="row" id="tabRow">
-            <button class="tab" data-tab="Video" aria-label="Video" aria-current="true">
-                <span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="12.5" height="12" rx="3"/><path d="M15.5 10.5 21 7.5v9l-5.5-3"/></svg></span><span class="lbl">Video</span>
-            </button>
-            <button class="tab" data-tab="Audio" aria-label="Audio">
-                <span class="ico"><svg viewBox="0 0 24 24"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4.5" height="6.5" rx="2"/><rect x="16.5" y="14" width="4.5" height="6.5" rx="2"/></svg></span><span class="lbl">Audio</span>
-            </button>
-            <button class="tab" data-tab="Settings" aria-label="Settings">
-                <span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l2-1.6-2-3.4-2.4 1a7.6 7.6 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.5a7.6 7.6 0 0 0-2.6 1.5l-2.4-1-2 3.4 2 1.6a7.8 7.8 0 0 0 0 3l-2 1.6 2 3.4 2.4-1c.8.7 1.6 1.2 2.6 1.5l.4 2.5h4l.4-2.5c1-.3 1.8-.8 2.6-1.5l2.4 1 2-3.4z"/></svg></span><span class="lbl">Settings</span>
-            </button>
-            <button class="tab" data-tab="Profile" aria-label="Profile">
-                <span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="10" r="3"/><path d="M6.2 18.2c1.3-2 3.3-3 5.8-3s4.5 1 5.8 3"/></svg></span><span class="lbl">Profile</span>
-            </button>
+    <!-- [MỚI] Liquid Glass tab bar + mini audio player -->
+    <audio id="audioEl" preload="none"></audio>
+    <div class="mini-player" id="miniPlayer">
+        <div class="mini-top">
+            <img class="mini-thumb" id="miniThumb" alt="">
+            <div class="mini-info">
+                <div class="mini-title" id="miniTitle">—</div>
+                <div class="mini-sub" id="miniSub">—</div>
+            </div>
+            <button class="mini-btn" id="miniPrev" aria-label="Trước"><i class="fa-solid fa-backward-step"></i></button>
+            <button class="mini-btn main" id="miniPlay" aria-label="Phát/Dừng"><i class="fa-solid fa-play"></i></button>
+            <button class="mini-btn" id="miniNext" aria-label="Sau"><i class="fa-solid fa-forward-step"></i></button>
+            <button class="mini-btn" id="miniClose" aria-label="Đóng"><i class="fa-solid fa-xmark"></i></button>
         </div>
-    </nav>
+        <input class="mini-seek" id="miniSeek" type="range" min="0" max="100" step="0.1" value="0">
+    </div>
+
+    <canvas id="glGlass"></canvas>
+    <nav id="glassNav" aria-label="Điều hướng"><div class="row" id="glassRow">
+      <button class="tab" data-tab="Video" aria-label="Video">
+        <span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="12.5" height="12" rx="3"/><path d="M15.5 10.5 21 7.5v9l-5.5-3"/></svg></span><span class="lbl">Video</span>
+      </button>
+      <button class="tab" data-tab="Audio" aria-label="Audio">
+        <span class="ico"><svg viewBox="0 0 24 24"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4.5" height="6.5" rx="2"/><rect x="16.5" y="14" width="4.5" height="6.5" rx="2"/></svg></span><span class="lbl">Audio</span>
+      </button>
+      <button class="tab" data-tab="Settings" aria-label="Settings">
+        <span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l2-1.6-2-3.4-2.4 1a7.6 7.6 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.5a7.6 7.6 0 0 0-2.6 1.5l-2.4-1-2 3.4 2 1.6a7.8 7.8 0 0 0 0 3l-2 1.6 2 3.4 2.4-1c.8.7 1.6 1.2 2.6 1.5l.4 2.5h4l.4-2.5c1-.3 1.8-.8 2.6-1.5l2.4 1 2-3.4z"/></svg></span><span class="lbl">Settings</span>
+      </button>
+      <button class="tab" data-tab="Profile" aria-label="Profile">
+        <span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="10" r="3"/><path d="M6.2 18.2c1.3-2 3.3-3 5.8-3s4.5 1 5.8 3"/></svg></span><span class="lbl">Profile</span>
+      </button>
+    </div></nav>
+
+    <script>
+    /* ============ [MỚI] Liquid Glass tab bar (WebGL) ============
+       Shader khúc xạ / tán sắc / glow giữ nguyên từ index-2.html.
+       Thay đổi để chạy trên trang thật:
+        - canvas trong suốt, chỉ phủ dải dưới cùng màn hình (nhẹ GPU)
+        - thanh nav bán trong suốt, phía sau là backdrop-filter thật của trình duyệt
+        - phát sự kiện 'tabchange' / 'tabtap' để app chuyển nội dung thật
+        - API: liquidGlass.setTab(name) / setAccent(a1,a2,a3) / setReduce(bool) / setBackground(src) */
+    (function () {
+    const VS='attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
+    const FS=`precision highp float;
+uniform vec2 uRes,uView,uLight,uOrig;uniform float uDpr,uHeld,uGrow,uTouch,uVel,uDisp,uDark,uOp;
+uniform sampler2D uA,uBn,uBp;
+uniform vec4 uNav,uPill,uMask;uniform vec3 uPtr;uniform vec3 uTint,uPillCol,uGc;uniform float uTintA;
+float sdRB(vec2 q,vec2 b,float r){vec2 d=abs(q)-(b-r);return length(max(d,0.))+min(max(d.x,d.y),0.)-r;}
+float sdCap(vec2 q,float hw,float hh){return length(vec2(max(abs(q.x)-(hw-hh),0.),q.y))-hh;}
+vec3 scn(vec2 p){return texture2D(uA,clamp((p-uOrig)/uView,0.001,0.999)).rgb;}
+vec4 compose(vec2 p,float cl,out vec3 opq){
+  vec3 bg=scn(p);
+  vec2 nc=uNav.xy+uNav.zw*.5;
+  float dn=sdCap(p-nc,uNav.z*.5,uNav.w*.5);
+  float sdw=sdCap(p-nc-vec2(0.,7.),uNav.z*.5,uNav.w*.5);
+  float sh=.32*(1.-smoothstep(-6.,24.,sdw));
+  vec3 bgS=bg*(1.-sh);
+  float a=smoothstep(.8,-.8,dn);
+  vec3 f=scn(p);
+  for(int i=0;i<8;i++){float an=float(i)*.785398;f+=scn(p+vec2(cos(an),sin(an))*9.);}
+  f/=9.;
+  f=mix(f,scn(p),cl);vec3 bc=mix(f,uTint,uTintA*(1.-.75*cl));
+  bc+=vec3(1.)*.16*(1.-smoothstep(0.,1.6,abs(dn+.8)));
+  float dp=sdCap(p-uPill.xy,uPill.z,uPill.w);
+  float m=smoothstep(.8,-.8,dp);
+  bc=mix(bc,uPillCol,m*(1.-clamp(uHeld*3.,0.,1.)));
+  vec2 uv=(p-uNav.xy)/uNav.zw;
+  float inside=step(0.,uv.x)*step(uv.x,1.)*step(0.,uv.y)*step(uv.y,1.);
+  uv=clamp(uv,0.,1.);
+  float mi=smoothstep(.8,-.8,sdCap(p-uMask.xy,uMask.z,uMask.w));
+  vec4 ic=mix(texture2D(uBn,uv),texture2D(uBp,uv),mi);
+  bc=mix(bc,ic.rgb,ic.a*inside);
+  float gd=length(p-uPtr.xy);
+  float glw=exp(-gd*gd/(2.*85.*85.))*uPtr.z;
+  float edgeW=1.-smoothstep(0.,7.,abs(dn+1.));
+  float glw2=exp(-gd*gd/(2.*115.*115.))*uPtr.z;
+  bc+=uGc*(glw*.6*edgeW+glw2*.26);
+  bc=min(bc,vec3(1.));
+  float ga=glw*.12*exp(-max(dn,0.)/14.)*(1.-a);
+  opq=mix(bgS,bc,a)+uGc*ga;
+  float al=a*mix(uOp,1.,clamp(ic.a*inside+m*.85,0.,1.));
+  float oa=clamp(sh*(1.-a)+ga,0.,1.);
+  vec3 prem=bc*al+uGc*ga*(1.-al);
+  return vec4(prem,al+(1.-al)*oa);
+}
+void main(){
+  vec2 p=vec2(gl_FragCoord.x,uRes.y-gl_FragCoord.y)/uDpr+uOrig;
+  vec3 o0;
+  vec4 col=compose(p,0.,o0);
+  if(uHeld>.001){
+    float hc=clamp(uHeld,0.,1.);
+    vec2 c=uPill.xy+vec2(uVel*4.,0.);
+    float hw=uPill.z+uGrow+abs(uVel)*6.;
+    float hh=uPill.w+uGrow-abs(uVel)*2.;
+    float rr=hh;
+    vec2 bb=vec2(hw,hh),q=p-c;
+    float d=sdRB(q,bb,rr);
+    float shd=1.-smoothstep(-6.,26.,sdRB(q-vec2(0.,6.+uGrow),bb,rr));
+    float sA=.24*hc*shd*smoothstep(-1.,3.,d);
+    col=vec4(col.rgb*(1.-sA),col.a*(1.-sA)+sA);
+    if(d<1.5){
+      float depth=max(-d,0.);
+      vec2 e=vec2(.75,0.);
+      vec2 nrm=normalize(vec2(sdRB(q+e.xy,bb,rr)-sdRB(q-e.xy,bb,rr),sdRB(q+e.yx,bb,rr)-sdRB(q-e.yx,bb,rr))+vec2(1e-5));
+      float edge=1.-clamp(depth/(hh*.9),0.,1.);
+      float eD=1.-clamp(depth/13.,0.,1.);
+      float eM=1.-clamp(depth/(hh*.95),0.,1.);
+      float disp=uTouch*(20.*eD*eD+2.*eM*eM);
+      vec2 pm=c+q*(1.+.14*uTouch);
+      vec2 off=-nrm*disp;
+      off+=vec2(uVel,0.)*7.*eD*uTouch*(.5+.5*dot(nrm,vec2(sign(uVel+1e-4),0.)));
+      float k=.09*uDisp,cl=hc*.85;
+      vec3 o1,o2,o3;
+      compose(pm+off*(1.+k),cl,o1);compose(pm+off,cl,o2);compose(pm+off*(1.-k),cl,o3);
+      vec3 g=vec3(o1.r,o2.g,o3.b);
+      float lum=dot(g,vec3(.299,.587,.114));
+      g=mix(vec3(lum),g,1.+.18*uTouch);
+      vec2 L=normalize(uLight);
+      float sl=clamp(edge,0.,1.),lk=mix(.8,1.,uDark);
+      float rim=pow(edge,2.6),lit=max(dot(nrm,L),0.),back=max(dot(nrm,-L),0.);
+      g+=vec3(1.)*rim*(lit*.7+back*.3)*uTouch*lk;
+      g+=vec3(1.,.98,.95)*pow(lit,4.)*pow(sl,2.4)*(.35+.35*hc)*uTouch*lk;
+      g+=vec3(.85,.92,1.)*pow(sl,3.)*max(nrm.y,0.)*.12*uTouch;
+      vec3 n3=normalize(vec3(nrm*sl,1.-.9*sl));
+      g+=vec3(.9,.95,1.)*pow(1.-n3.z,3.)*(.16+.14*hc)*uTouch*lk;
+      g+=vec3(1.)*(1.-smoothstep(0.,1.8,depth))*.14*uTouch;
+      float ring=exp(-pow((depth-6.)/4.,2.));
+      g*=1.-.12*ring*uTouch;
+      g*=1.-.07*uTouch*smoothstep(-hh,hh,q.y);
+      g+=vec3(1.)*.05*uTouch*lk*(1.-smoothstep(-hh,.1*hh,q.y))*smoothstep(0.,6.,depth);
+      g+=g*back*pow(sl,2.2)*.45*uTouch;
+      g=clamp(g,0.,1.);
+      float A=smoothstep(.8,-.8,d)*.92;
+      col=vec4(g*A+col.rgb*(1.-A),A+col.a*(1.-A));
+    }
+  }
+  gl_FragColor=col;
+}`;
+
+    const cv=document.getElementById('glGlass'),row=document.getElementById('glassRow'),nav=document.getElementById('glassNav');
+    const tabs=[...nav.querySelectorAll('.tab')];
+    const evt=(n,d)=>window.dispatchEvent(new CustomEvent(n,{detail:d}));
+    const tabName=i=>tabs[i].dataset.tab.toLowerCase();
+    const rmq=matchMedia('(prefers-reduced-motion: reduce)');
+    let reduceUser=false,reduce=rmq.matches;
+    rmq.addEventListener('change',e=>{reduce=e.matches||reduceUser});
+
+    let cur=0,justDragged=false,G=null;
+    let ACC={acc:'#a58cff',pill:[58,53,86],gc:[.78,.72,1]},BLOBS=['#6366f1','#a855f7','#ec4899'];
+    const hexRgb=h=>{const n=parseInt(h.slice(1),16);return[n>>16&255,n>>8&255,n&255]};
+    function computeAcc(hex){
+      const [r,g,b]=hexRgb(hex),lt=v=>Math.round(v+(255-v)*.35);
+      ACC={acc:'#'+[lt(r),lt(g),lt(b)].map(v=>v.toString(16).padStart(2,'0')).join(''),
+           pill:[22+r*.24,22+g*.24,24+b*.24].map(Math.round),gc:[lt(r)/255,lt(g)/255,lt(b)/255]};
+      document.documentElement.style.setProperty('--glass-acc',ACC.acc);
+    }
+
+    function select(i,animate=true){
+      cur=i;
+      tabs.forEach((t,k)=>t.setAttribute('aria-current',k===i));
+      if(G)G.moveTo(i,animate);
+      if(animate)evt('tabchange',tabName(i));
+    }
+    tabs.forEach((t,i)=>t.addEventListener('click',()=>{
+      if(justDragged){justDragged=false;return}
+      if(i!==cur)select(i);else evt('tabtap',tabName(i));
+    }));
+
+    const gl=cv.getContext('webgl',{antialias:false,alpha:true,premultipliedAlpha:true});
+    if(!gl){document.body.classList.add('nogl')}
+    else{
+    const sc=document.createElement('canvas'),sctx=sc.getContext('2d');
+    const bn=document.createElement('canvas'),bp=document.createElement('canvas');
+    let customBg=null,sceneKey='',curDark=1;
+    let tv=0,px=0,py=0,sx=0,sy=0,pv=0,ptrT=0,xt=0,xv=0,hv=0,vel=0,prevX=0,settling=false,dprCap=2.5,aSize='',navR,rowR,dpr=1,x=0,held=0,heldTarget=0,dragging=false,start=null,lightA=-2.2;
+    let PW=0,PR=0,SH=120,origY=0;
+    const maxX=()=>PR-PW;
+
+    const sh=(t,s)=>{const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))console.error(gl.getShaderInfoLog(o));return o};
+    const pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,VS));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(pr);gl.useProgram(pr);
+    gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer());gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+    const loc=gl.getAttribLocation(pr,'a');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+    const _u={};const U=n=>_u[n]||(_u[n]=gl.getUniformLocation(pr,n));
+    const mk=u=>{const t=gl.createTexture();gl.activeTexture(gl.TEXTURE0+u);gl.bindTexture(gl.TEXTURE_2D,t);
+      [[gl.TEXTURE_MIN_FILTER,gl.LINEAR],[gl.TEXTURE_MAG_FILTER,gl.LINEAR],[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE]].forEach(([k,v])=>gl.texParameteri(gl.TEXTURE_2D,k,v));return t};
+    const tA=mk(0),tN=mk(1),tP=mk(2);
+    const up=(u,c)=>{gl.activeTexture(gl.TEXTURE0+u);gl.bindTexture(gl.TEXTURE_2D,u===0?tA:u===1?tN:tP);
+      if(u===0&&aSize===c.width+'x'+c.height)gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,gl.RGBA,gl.UNSIGNED_BYTE,c);
+      else{gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,c);if(u===0)aSize=c.width+'x'+c.height}};
+    gl.uniform1i(U('uA'),0);gl.uniform1i(U('uBn'),1);gl.uniform1i(U('uBp'),2);
+
+    function rr(g,x,y,w,h,r){g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
+    function pathOf(el){
+      const n=el.tagName.toLowerCase(),a=k=>+el.getAttribute(k)||0;
+      if(n==='path')return new Path2D(el.getAttribute('d'));
+      const p=new Path2D();
+      if(n==='circle')p.arc(a('cx'),a('cy'),a('r'),0,Math.PI*2);
+      if(n==='rect'){const g={moveTo:(...v)=>p.moveTo(...v),arcTo:(...v)=>p.arcTo(...v),closePath:()=>p.closePath()};rr(g,a('x'),a('y'),a('width'),a('height'),a('rx'))}
+      return p;
+    }
+    function drawBar(c,color,alpha,weight){
+      c.width=Math.round(navR.width*dpr);c.height=Math.round(navR.height*dpr);
+      const g=c.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,navR.width,navR.height);g.globalAlpha=alpha;
+      tabs.forEach(t=>{
+        const svg=t.querySelector('svg'),r=svg.getBoundingClientRect(),s=r.width/24;
+        g.save();g.translate(r.left-navR.left,r.top-navR.top);g.scale(s,s);
+        g.lineWidth=1.75;g.lineCap='round';g.lineJoin='round';g.strokeStyle=color;
+        [...svg.children].forEach(el=>g.stroke(pathOf(el)));g.restore();
+        const l=t.querySelector('.lbl'),lr=l.getBoundingClientRect();
+        g.fillStyle=color;g.font=weight+' 12px Roboto,"Segoe UI",system-ui,sans-serif';g.textAlign='center';g.textBaseline='middle';
+        g.fillText(l.textContent,lr.left+lr.width/2-navR.left,lr.top+lr.height/2-navR.top+.5);
+      });
+    }
+    function layout(){
+      dpr=Math.min(devicePixelRatio||1,dprCap);PW=tabs[0].offsetWidth;PR=row.offsetWidth;
+      navR=nav.getBoundingClientRect();rowR=row.getBoundingClientRect();
+      SH=Math.min(innerHeight,Math.ceil(innerHeight-navR.top+90));origY=innerHeight-SH;
+      cv.style.height=SH+'px';
+      cv.width=Math.round(innerWidth*dpr);cv.height=Math.round(SH*dpr);gl.viewport(0,0,cv.width,cv.height);
+      sc.width=Math.ceil(innerWidth/2);sc.height=Math.ceil(SH/2);sceneKey='';
+      drawBar(bn,'#f2f2f5',.78,500);drawBar(bp,ACC.acc,1,600);up(1,bn);up(2,bp);
+      gl.uniform3f(U('uTint'),24/255,26/255,36/255);gl.uniform1f(U('uTintA'),.5);
+      gl.uniform3f(U('uPillCol'),...ACC.pill.map(v=>v/255));gl.uniform3f(U('uGc'),...ACC.gc);
+      gl.uniform1f(U('uOp'),.6);
+      gl.uniform2f(U('uRes'),cv.width,cv.height);gl.uniform1f(U('uDpr'),cv.width/innerWidth);
+      gl.uniform2f(U('uView'),innerWidth,SH);gl.uniform2f(U('uOrig'),0,origY);
+      gl.uniform4f(U('uNav'),navR.left,navR.top,navR.width,navR.height);
+      xt=tabs[cur].offsetLeft;if(!dragging&&!settling){x=xt;xv=0;prevX=x}
+    }
+    /* ---- nền giả lập (mô phỏng aurora + lưới phim) cho kính khúc xạ ---- */
+    function drawScene(){
+      const g=sctx,w=innerWidth,h=innerHeight,kx=sc.width/w,ky=sc.height/SH;
+      g.setTransform(kx,0,0,ky,0,-origY*ky);
+      if(customBg){try{g.drawImage(customBg,0,0,w,h)}catch(e){}return}
+      g.fillStyle='#05060a';g.fillRect(0,origY,w,SH);
+      const blob=(cx,cy,r,c,al)=>{const rg=g.createRadialGradient(cx,cy,0,cx,cy,r);rg.addColorStop(0,c+al);rg.addColorStop(1,c+'00');g.fillStyle=rg;g.fillRect(cx-r,cy-r,r*2,r*2)};
+      blob(140,80,320,BLOBS[0],'66');
+      blob(w-80,h*.4+240,300,BLOBS[1],'66');
+      blob(w*.3+200,h-60,260,BLOBS[2],'48');
+      const mob=w<=700,pad=mob?16:28,gap=mob?14:24,minW=mob?160:260;
+      const cols=Math.max(1,Math.floor((w-2*pad+gap)/(minW+gap)));
+      const cw=(w-2*pad-(cols-1)*gap)/cols,th=cw*9/16,ch=th+74;
+      const top=(mob?62:68)+(mob?22:36)+60-(window.scrollY||0);
+      for(let r=0;r<400;r++){
+        const y=top+r*(ch+gap);
+        if(y>h)break;
+        if(y+ch<origY)continue;
+        for(let c=0;c<cols;c++){
+          const cx=pad+c*(cw+gap),idx=r*cols+c,hue=(idx*47+230)%360;
+          g.fillStyle='rgba(18,22,33,.85)';g.beginPath();rr(g,cx,y,cw,ch,16);g.fill();
+          const gr=g.createLinearGradient(cx,y,cx+cw,y+th);
+          gr.addColorStop(0,`hsl(${hue} 55% 34%)`);gr.addColorStop(1,`hsl(${(hue+50)%360} 60% 22%)`);
+          g.fillStyle=gr;g.beginPath();rr(g,cx,y,cw,th,16);g.fill();
+          g.fillStyle='rgba(255,255,255,.8)';g.beginPath();rr(g,cx+14,y+th+16,cw*.6,10,5);g.fill();
+          g.fillStyle='rgba(255,255,255,.3)';g.beginPath();rr(g,cx+14,y+th+38,cw*.8,8,4);g.fill();
+        }
+      }
+    }
+    /* ---- vòng lặp vẽ ---- */
+    let last=performance.now(),avg=.0167,lastAdj=0;
+    function frame(now){
+      const dt=Math.min((now-last)/1000,.05)||.0167;last=now;
+      const kk=heldTarget?520:300,cc=reduce?60:(heldTarget?30:26),hs=dt/2;
+      for(let i=0;i<2;i++){hv+=(kk*(heldTarget-held)-cc*hv)*hs;held+=hv*hs}
+      if(held<0){held=0;hv=0}
+      if(!heldTarget&&held<.002&&Math.abs(hv)<.05){held=0;hv=0}
+      if(!dragging){
+        const cx=reduce?70:34;
+        for(let i=0;i<2;i++){xv+=(420*(xt-x)-cx*xv)*hs;x+=xv*hs}
+        if(settling&&Math.abs(xt-x)<.4&&Math.abs(xv)<8){x=xt;xv=0;settling=false;if(!start)heldTarget=0}
+      }
+      tv+=((heldTarget?1:0)-tv)*(1-Math.exp(-dt*(heldTarget?40:14)));
+      pv+=((ptrT?1:0)-pv)*(1-Math.exp(-dt*(ptrT?14:5)));
+      if(ptrT&&pv<.03){sx=px;sy=py}else{const kp=1-Math.exp(-dt*28);sx+=(px-sx)*kp;sy+=(py-sy)*kp}
+      vel+=((x-prevX)/dt-vel)*Math.min(1,dt*12);prevX=x;
+      if(!document.hidden){avg+=(dt-avg)*.05;if(avg>.024&&now-lastAdj>2500&&dprCap>1){dprCap=dprCap>2?2:dprCap>1.5?1.5:1;lastAdj=now;avg=.0167;layout()}}
+      const key=(window.scrollY||0)+'|'+SH+'|'+innerWidth;
+      if(key!==sceneKey){sceneKey=key;drawScene();up(0,sc)}
+      const w=PW,h=rowR.height,fr=x/Math.max(maxX(),1);
+      const a=lightA+(fr-.5)*1.3+(reduce?0:Math.sin(now/1100)*.12);
+      gl.uniform4f(U('uPill'),rowR.left+x+w/2,rowR.top+h/2,w/2,h/2);
+      const vc=Math.max(-1,Math.min(1,vel/700))*(reduce?.3:1),gw=8*held;
+      gl.uniform4f(U('uMask'),rowR.left+x+w/2+vc*4,rowR.top+h/2,w/2+gw+Math.abs(vc)*6,h/2+gw-Math.abs(vc)*2);
+      gl.uniform1f(U('uHeld'),held);gl.uniform1f(U('uTouch'),tv);gl.uniform1f(U('uGrow'),8*held);
+      gl.uniform1f(U('uVel'),vc);gl.uniform1f(U('uDisp'),reduce?.5:1);gl.uniform1f(U('uDark'),curDark);
+      gl.uniform3f(U('uPtr'),sx,sy,pv);
+      gl.uniform2f(U('uLight'),Math.cos(a),Math.sin(a));
+      gl.drawArrays(gl.TRIANGLE_STRIP,0,4);requestAnimationFrame(frame);
+    }
+    /* ---- kéo / chọn tab ---- */
+    G={
+      moveTo(i,animate){
+        xt=tabs[i].offsetLeft;
+        if(!animate){x=xt;xv=0;prevX=x;settling=false;return}
+        heldTarget=1;settling=true;
+      },
+      relayout(){layout()},
+      setBackground(s){customBg=s;sceneKey=''}
+    };
+    nav.addEventListener('pointerdown',e=>{
+      const rx=e.clientX-rowR.left;
+      if(rx>=x&&rx<=x+PW){xv=0;settling=false;heldTarget=1;start={id:e.pointerId,off:rx-x,sx:e.clientX}}
+    });
+    nav.addEventListener('pointermove',e=>{
+      if(!start||e.pointerId!==start.id)return;
+      if(!dragging){if(Math.abs(e.clientX-start.sx)<4)return;dragging=true;nav.setPointerCapture(e.pointerId)}
+      x=Math.min(Math.max(e.clientX-rowR.left-start.off,0),maxX());
+    });
+    function end(e){
+      if(!start||e.pointerId!==start.id)return;
+      heldTarget=0;
+      if(dragging){
+        justDragged=true;setTimeout(()=>justDragged=false,0);
+        const c=x+PW/2;let best=0,d=1e9;
+        tabs.forEach((t,i)=>{const dd=Math.abs(t.offsetLeft+PW/2-c);if(dd<d){d=dd;best=i}});
+        select(best);
+      }
+      dragging=false;start=null;
+    }
+    nav.addEventListener('contextmenu',e=>e.preventDefault());
+    nav.addEventListener('pointerup',end);nav.addEventListener('pointercancel',end);
+    const pset=e=>{px=e.clientX;py=e.clientY;ptrT=1};
+    addEventListener('pointermove',pset,{passive:true});addEventListener('pointerdown',pset,{passive:true});
+    addEventListener('pointerup',e=>{if(e.pointerType!=='mouse')ptrT=0});addEventListener('pointercancel',()=>ptrT=0);
+    document.documentElement.addEventListener('pointerleave',()=>ptrT=0);
+    addEventListener('resize',layout);addEventListener('orientationchange',()=>setTimeout(layout,200));
+    if(document.fonts&&document.fonts.ready)document.fonts.ready.then(layout);
+    layout();requestAnimationFrame(frame);
+    }
+
+    window.liquidGlass={
+      setTab(name,animate=false){const i=tabs.findIndex(t=>t.dataset.tab.toLowerCase()===name);if(i>=0)select(i,animate)},
+      setAccent(a1,a2,a3){if(a1)BLOBS=[a1,a2||a1,a3||a2||a1];computeAcc(a2||a1);if(G)G.relayout()},
+      setReduce(v){reduceUser=!!v;reduce=rmq.matches||reduceUser},
+      setBackground(s){if(G)G.setBackground(s)}
+    };
+    select(0,false);
+    })();
+    </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -809,6 +1189,7 @@
                 document.body.appendChild(t);
             }
             t.textContent = msg;
+            t.style.background = ''; t.style.boxShadow = '';
             t.classList.add('show');
             clearTimeout(t._tid);
             t._tid = setTimeout(() => t.classList.remove('show'), 4000);
@@ -907,11 +1288,7 @@
                 moviesDataset = snapshot.val() || {};
                 isFirstLoad = false;
 
-                if (movieId && moviesDataset[movieId]) {
-                    renderPlayerScreen(movieId, currentEpIdx);
-                } else {
-                    renderHomeScreen();
-                }
+                renderCurrent();
             },
             (err) => {
                 console.error('[Firebase Error]', err);
@@ -1040,7 +1417,7 @@
                 <div class="player-layout">
                     <div>
                         <div class="video-wrapper">
-                            <video id="streamPlayer" controls autoplay playsinline
+                            <video id="streamPlayer" controls ${settings.autoplay ? 'autoplay' : ''} playsinline
                                    src="${videoUrl}"
                                    poster="${movie.thumbnail || ''}"></video>
                         </div>
@@ -1063,6 +1440,7 @@
             `;
 
             const player = document.getElementById('streamPlayer');
+            setupPlayer(player, mId, epIdx, movie, epData);
 
             player.onerror = () => {
                 const src = player.currentSrc || player.src || '';
@@ -1076,6 +1454,7 @@
 
             player.onended = () => {
                 if (epIdx + 1 < episodes.length) {
+                    if (!settings.autoNext) { showToast('✅ Đã xem xong tập này.'); return; }
                     window.location.href = `tube.html?v=${mId}&ep=${epIdx + 1}`;
                 } else {
                     showToast('🎉 Bạn đã xem hết bộ phim!');
@@ -1083,415 +1462,407 @@
             };
         }
 
-        /* =================== SEARCH =================== */
+        /* =========================================================
+           [MỚI] TABS (Video / Audio / Settings / Profile)
+           ========================================================= */
+        const store = {
+            get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch (e) { return d; } },
+            set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+        };
+        const DEFAULTS = { autoplay: true, autoNext: true, resume: true, speed: 1, reduceMotion: false, accent: 'indigo' };
+        let settings = { ...DEFAULTS, ...store.get('dt_settings', {}) };
+        let profile = { name: 'Khách', ...store.get('dt_profile', {}) };
+        let progress = store.get('dt_progress', {});
+
+        const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        const FALLBACK_THUMB = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&q=80';
+        const skeletonHTML = appContainer.innerHTML;
+        const audioEl = document.getElementById('audioEl');
+
+        function showInfo(msg) {
+            showToast(msg);
+            const t = document.querySelector('.toast');
+            t.style.background = 'rgba(var(--accent-rgb), .95)';
+            t.style.boxShadow = '0 10px 30px rgba(var(--accent-rgb), .4)';
+        }
+        function fmtTime(s) {
+            s = Math.max(0, Math.floor(s || 0));
+            const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), sec = s % 60;
+            return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(sec).padStart(2, '0');
+        }
+
+        /* ---------- Giao diện / màu nhấn ---------- */
+        const ACCENTS = {
+            indigo:  ['#6366f1', '#a855f7', '#ec4899'],
+            ocean:   ['#3b82f6', '#06b6d4', '#6366f1'],
+            rose:    ['#f43f5e', '#f97316', '#ec4899'],
+            emerald: ['#10b981', '#06b6d4', '#84cc16']
+        };
+        const rgbStr = hex => { const n = parseInt(hex.slice(1), 16); return `${n >> 16 & 255},${n >> 8 & 255},${n & 255}`; };
+        function applyTheme() {
+            const [a1, a2, a3] = ACCENTS[settings.accent] || ACCENTS.indigo;
+            const st = document.documentElement.style;
+            st.setProperty('--accent', a1); st.setProperty('--accent-2', a2); st.setProperty('--accent-3', a3);
+            st.setProperty('--accent-rgb', rgbStr(a1)); st.setProperty('--accent2-rgb', rgbStr(a2)); st.setProperty('--accent3-rgb', rgbStr(a3));
+            document.body.classList.toggle('reduce-motion', !!settings.reduceMotion);
+            window.liquidGlass && (window.liquidGlass.setAccent(a1, a2, a3), window.liquidGlass.setReduce(!!settings.reduceMotion));
+        }
+        const saveSettings = () => store.set('dt_settings', settings);
+
+        /* ---------- Định tuyến tab ---------- */
+        const TAB_IDS = ['video', 'audio', 'settings', 'profile'];
+        let currentTab = TAB_IDS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'video';
+
+        function renderCurrent() {
+            const needsData = currentTab === 'video' || currentTab === 'audio';
+            if (needsData && isFirstLoad) { appContainer.innerHTML = skeletonHTML; return; }
+            switch (currentTab) {
+                case 'audio': renderAudioScreen(searchInput.value); break;
+                case 'settings': renderSettingsScreen(); break;
+                case 'profile': renderProfileScreen(); break;
+                default:
+                    if (movieId && moviesDataset[movieId]) renderPlayerScreen(movieId, currentEpIdx);
+                    else renderHomeScreen(searchInput.value);
+            }
+            appContainer.classList.remove('view-in');
+            void appContainer.offsetWidth;
+            appContainer.classList.add('view-in');
+        }
+
+        function setTab(t) {
+            if (!TAB_IDS.includes(t) || t === currentTab) return;
+            currentTab = t;
+            history.replaceState(null, '', location.pathname + location.search + '#' + t);
+            window.scrollTo({ top: 0, behavior: 'instant' });
+            renderCurrent();
+        }
+        window.addEventListener('tabchange', (e) => setTab(e.detail));
+        window.addEventListener('tabtap', (e) => {
+            if (e.detail === 'video' && movieId) { window.location.href = 'tube.html'; return; }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        window.addEventListener('hashchange', () => {
+            const t = location.hash.slice(1);
+            if (TAB_IDS.includes(t) && t !== currentTab) window.liquidGlass.setTab(t, true);
+        });
+
+        /* ---------- Phát video: nhớ vị trí, tốc độ, tự chuyển tập ---------- */
+        function setupPlayer(player, mId, epIdx, movie, epData) {
+            const key = mId + '|' + epIdx;
+            const saved = progress[key];
+            player.defaultPlaybackRate = settings.speed;
+            player.playbackRate = settings.speed;
+            player.addEventListener('loadedmetadata', () => {
+                player.playbackRate = settings.speed;
+                if (settings.resume && saved && saved.t > 5 && saved.d && saved.t < saved.d - 10) player.currentTime = saved.t;
+            }, { once: true });
+
+            let lastSave = 0;
+            const save = (force) => {
+                const now = Date.now();
+                if (!force && now - lastSave < 3000) return;
+                if (!player.duration || isNaN(player.duration)) return;
+                lastSave = now;
+                progress[key] = {
+                    mid: mId, ep: epIdx, t: player.currentTime, d: player.duration, u: now,
+                    mt: movie.title || '', et: epData.title || '', th: movie.thumbnail || ''
+                };
+                store.set('dt_progress', progress);
+            };
+            window.__dtSave = save;
+            player.addEventListener('timeupdate', () => save(false));
+            player.addEventListener('pause', () => save(true));
+            player.addEventListener('ended', () => {
+                if (progress[key]) { progress[key].t = progress[key].d; store.set('dt_progress', progress); }
+            });
+            player.addEventListener('play', () => { if (!audioEl.paused) audioEl.pause(); });
+        }
+        window.addEventListener('pagehide', () => window.__dtSave && window.__dtSave(true));
+
+        /* ---------- TAB AUDIO ---------- */
+        const mini = {
+            box: document.getElementById('miniPlayer'), thumb: document.getElementById('miniThumb'),
+            title: document.getElementById('miniTitle'), sub: document.getElementById('miniSub'),
+            play: document.getElementById('miniPlay'), prev: document.getElementById('miniPrev'),
+            next: document.getElementById('miniNext'), close: document.getElementById('miniClose'),
+            seek: document.getElementById('miniSeek')
+        };
+        let audioGroups = {};   // mid -> [items]
+        let audioQueue = [], audioIdx = -1;
+
+        function getEpisodes(m) {
+            return m.episodes ? Object.values(m.episodes).sort((a, b) => (a.order || 0) - (b.order || 0)) : [];
+        }
+
+        function renderAudioScreen(filterQuery = '') {
+            const q = (filterQuery || '').toLowerCase();
+            audioGroups = {};
+            const mids = Object.keys(moviesDataset).filter(mid => (moviesDataset[mid].title || '').toLowerCase().includes(q));
+            mids.forEach(mid => {
+                const m = moviesDataset[mid];
+                audioGroups[mid] = getEpisodes(m).map((ep, i) => ({
+                    mid, ep: i, movie: m.title || '', title: ep.title || '', num: ep.order || i + 1,
+                    url: ep.url || '', thumb: m.thumbnail || FALLBACK_THUMB
+                }));
+            });
+            const withEps = mids.filter(mid => audioGroups[mid].length);
+            if (withEps.length === 0) {
+                appContainer.innerHTML = `
+                    <div class="loading-view">
+                        <i class="fa-solid fa-headphones"></i>
+                        <div style="margin-top:10px;">Không có nội dung âm thanh phù hợp.</div>
+                    </div>`;
+                return;
+            }
+            let html = `<div class="page-title"><i class="fa-solid fa-headphones"></i> Nghe Âm Thanh</div>`;
+            withEps.forEach(mid => {
+                const items = audioGroups[mid];
+                html += `
+                    <div class="audio-group">
+                        <div class="audio-group-head">
+                            <img src="${esc(items[0].thumb)}" alt="" loading="lazy" onerror="this.src='${FALLBACK_THUMB}'">
+                            <div class="t">${esc(items[0].movie)}</div>
+                            <span class="c">${items.length} Tập</span>
+                        </div>
+                        <div class="list">
+                            ${items.map((it, i) => `
+                                <div class="ep-card-item audio-item" data-mid="${esc(mid)}" data-i="${i}">
+                                    <span class="ep-card-num">Tập ${it.num}</span>
+                                    <span class="ep-card-title">${esc(it.title)}</span>
+                                    <i class="fa-solid fa-circle-play"></i>
+                                </div>`).join('')}
+                        </div>
+                    </div>`;
+            });
+            appContainer.innerHTML = html;
+            appContainer.querySelectorAll('.audio-item').forEach(el => {
+                el.addEventListener('click', () => {
+                    audioQueue = audioGroups[el.dataset.mid];
+                    loadAudio(parseInt(el.dataset.i), true);
+                });
+            });
+            markPlaying();
+        }
+
+        function markPlaying() {
+            const cur = audioQueue[audioIdx];
+            document.querySelectorAll('.audio-item').forEach(el => {
+                const on = !!cur && cur.mid === el.dataset.mid && parseInt(el.dataset.i) === audioIdx;
+                el.classList.toggle('active', on);
+                el.classList.toggle('playing', on);
+            });
+        }
+
+        function loadAudio(i, autoplay) {
+            const it = audioQueue[i];
+            if (!it) return;
+            audioIdx = i;
+            audioEl.defaultPlaybackRate = settings.speed;
+            audioEl.src = normalizeVideoUrl(it.url);
+            audioEl.playbackRate = settings.speed;
+            mini.thumb.src = it.thumb;
+            mini.title.textContent = it.title || ('Tập ' + it.num);
+            mini.sub.textContent = it.movie;
+            mini.seek.value = 0;
+            document.body.classList.add('has-mini');
+            if (autoplay) audioEl.play().catch(() => {});
+            markPlaying();
+        }
+
+        function setPlayIcon() {
+            mini.play.innerHTML = `<i class="fa-solid fa-${audioEl.paused ? 'play' : 'pause'}"></i>`;
+        }
+        audioEl.addEventListener('play', () => {
+            setPlayIcon();
+            const v = document.getElementById('streamPlayer');
+            if (v && !v.paused) v.pause();
+        });
+        audioEl.addEventListener('pause', setPlayIcon);
+        audioEl.addEventListener('timeupdate', () => {
+            if (document.activeElement !== mini.seek && audioEl.duration) mini.seek.value = (audioEl.currentTime / audioEl.duration) * 100;
+        });
+        audioEl.addEventListener('ended', () => {
+            if (audioIdx + 1 < audioQueue.length) loadAudio(audioIdx + 1, true);
+            else showInfo('🎧 Đã nghe hết danh sách.');
+        });
+        audioEl.addEventListener('error', () => {
+            if (audioEl.getAttribute('src')) showToast('⚠️ Không phát được âm thanh. Kiểm tra lại link.');
+        });
+        mini.play.addEventListener('click', () => { audioEl.paused ? audioEl.play().catch(() => {}) : audioEl.pause(); });
+        mini.prev.addEventListener('click', () => {
+            if (audioEl.currentTime > 4 || audioIdx <= 0) audioEl.currentTime = 0; else loadAudio(audioIdx - 1, true);
+        });
+        mini.next.addEventListener('click', () => { if (audioIdx + 1 < audioQueue.length) loadAudio(audioIdx + 1, true); });
+        mini.close.addEventListener('click', () => {
+            audioEl.pause(); audioEl.removeAttribute('src'); audioEl.load();
+            audioIdx = -1; document.body.classList.remove('has-mini'); markPlaying();
+        });
+        mini.seek.addEventListener('input', () => {
+            if (audioEl.duration) audioEl.currentTime = (mini.seek.value / 100) * audioEl.duration;
+        });
+
+        /* ---------- TAB SETTINGS ---------- */
+        function clearHistory() {
+            if (!confirm('Xoá toàn bộ lịch sử xem?')) return;
+            progress = {}; store.set('dt_progress', progress);
+            showInfo('✅ Đã xoá lịch sử xem.');
+            if (currentTab === 'profile') renderProfileScreen();
+        }
+
+        function renderSettingsScreen() {
+            const sw = (id, label, sub) => `
+                <div class="set-row">
+                    <div><div class="lbl">${label}</div><div class="sub">${sub}</div></div>
+                    <label class="switch"><input type="checkbox" data-set="${id}" ${settings[id] ? 'checked' : ''}><span class="knob"></span></label>
+                </div>`;
+            const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
+            appContainer.innerHTML = `
+                <div class="page-title"><i class="fa-solid fa-gear"></i> Cài Đặt</div>
+
+                <div class="panel">
+                    <div class="panel-head">Trình phát</div>
+                    ${sw('autoplay', 'Tự động phát', 'Phát ngay khi mở một tập phim.')}
+                    ${sw('autoNext', 'Tự chuyển tập kế tiếp', 'Hết tập thì sang tập sau.')}
+                    ${sw('resume', 'Xem tiếp từ vị trí cũ', 'Nhớ thời điểm bạn dừng ở mỗi tập.')}
+                    <div class="set-row">
+                        <div><div class="lbl">Tốc độ phát mặc định</div><div class="sub">Áp dụng cho video và âm thanh.</div></div>
+                        <select class="dt-select" id="setSpeed">
+                            ${speeds.map(s => `<option value="${s}" ${s === settings.speed ? 'selected' : ''}>${s}x</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-head">Giao diện</div>
+                    <div class="set-row">
+                        <div><div class="lbl">Màu nhấn</div><div class="sub">Đổi màu toàn bộ giao diện và thanh tab.</div></div>
+                        <div class="swatches">
+                            ${Object.entries(ACCENTS).map(([k, c]) => `
+                                <div class="swatch ${k === settings.accent ? 'on' : ''}" data-acc="${k}" title="${k}"
+                                     style="background:linear-gradient(135deg,${c[0]},${c[1]});color:${c[0]}"></div>`).join('')}
+                        </div>
+                    </div>
+                    ${sw('reduceMotion', 'Giảm hiệu ứng chuyển động', 'Tắt aurora và animation để mượt hơn trên máy yếu.')}
+                </div>
+
+                <div class="panel">
+                    <div class="panel-head">Dữ liệu</div>
+                    <div class="set-row">
+                        <div><div class="lbl">Lịch sử xem</div><div class="sub">Lưu trên thiết bị này.</div></div>
+                        <button class="dt-btn danger" id="btnClearHist">Xoá lịch sử</button>
+                    </div>
+                    <div class="set-row">
+                        <div><div class="lbl">Khôi phục mặc định</div><div class="sub">Đưa mọi cài đặt về ban đầu.</div></div>
+                        <button class="dt-btn" id="btnResetSet">Khôi phục</button>
+                    </div>
+                </div>
+            `;
+
+            appContainer.querySelectorAll('input[data-set]').forEach(inp => {
+                inp.addEventListener('change', () => {
+                    settings[inp.dataset.set] = inp.checked;
+                    saveSettings();
+                    if (inp.dataset.set === 'reduceMotion') applyTheme();
+                });
+            });
+            document.getElementById('setSpeed').addEventListener('change', (e) => {
+                settings.speed = parseFloat(e.target.value);
+                audioEl.defaultPlaybackRate = audioEl.playbackRate = settings.speed;
+                saveSettings();
+            });
+            appContainer.querySelectorAll('.swatch').forEach(el => {
+                el.addEventListener('click', () => {
+                    settings.accent = el.dataset.acc; saveSettings(); applyTheme();
+                    appContainer.querySelectorAll('.swatch').forEach(s => s.classList.toggle('on', s === el));
+                });
+            });
+            document.getElementById('btnClearHist').addEventListener('click', clearHistory);
+            document.getElementById('btnResetSet').addEventListener('click', () => {
+                settings = { ...DEFAULTS }; saveSettings(); applyTheme();
+                audioEl.defaultPlaybackRate = audioEl.playbackRate = 1;
+                renderSettingsScreen();
+                showInfo('✅ Đã khôi phục cài đặt mặc định.');
+            });
+        }
+
+        /* ---------- TAB PROFILE ---------- */
+        function renderProfileScreen() {
+            const entries = Object.values(progress);
+            const byMovie = {};
+            entries.forEach(e => { if (!byMovie[e.mid] || e.u > byMovie[e.mid].u) byMovie[e.mid] = e; });
+            const hist = Object.values(byMovie).sort((a, b) => b.u - a.u);
+            const hours = entries.reduce((s, e) => s + (e.t || 0), 0) / 3600;
+            const initial = (profile.name || 'K').trim().charAt(0).toUpperCase() || 'K';
+
+            appContainer.innerHTML = `
+                <div class="page-title"><i class="fa-solid fa-user"></i> Hồ Sơ</div>
+                <div class="profile-card">
+                    <div class="avatar" id="avatarBox">${esc(initial)}</div>
+                    <div style="flex:1;min-width:0;">
+                        <input class="dt-input" id="profileName" maxlength="24" value="${esc(profile.name)}" placeholder="Tên của bạn">
+                        <div class="hint">Chạm vào tên để chỉnh sửa. Dữ liệu lưu trên thiết bị này.</div>
+                    </div>
+                </div>
+                <div class="stats">
+                    <div class="stat"><b>${hist.length}</b><span>Phim đã xem</span></div>
+                    <div class="stat"><b>${entries.length}</b><span>Tập đã xem</span></div>
+                    <div class="stat"><b>${hours < 10 ? hours.toFixed(1) : Math.round(hours)}</b><span>Giờ xem</span></div>
+                </div>
+                <div class="section-sub">Xem gần đây</div>
+                ${hist.length ? `<div class="hist-list">${hist.map(e => {
+                    const pct = e.d ? Math.min(100, Math.round(e.t / e.d * 100)) : 0;
+                    return `
+                    <a class="hist-item" href="tube.html?v=${encodeURIComponent(e.mid)}&ep=${e.ep}">
+                        <img src="${esc(e.th || FALLBACK_THUMB)}" alt="" loading="lazy" onerror="this.src='${FALLBACK_THUMB}'">
+                        <div style="flex:1;min-width:0;">
+                            <div class="t">${esc(e.mt)}</div>
+                            <div class="s">Tập ${e.ep + 1}${e.et ? ' — ' + esc(e.et) : ''} · ${fmtTime(e.t)} / ${fmtTime(e.d)}</div>
+                            <div class="hist-bar"><i style="width:${pct}%"></i></div>
+                        </div>
+                        <i class="fa-solid fa-circle-play" style="color:var(--accent);font-size:20px;"></i>
+                    </a>`;
+                }).join('')}</div>
+                <div style="margin-top:16px;"><button class="dt-btn danger" id="btnClearHist2">Xoá lịch sử xem</button></div>`
+                : `<div class="loading-view" style="padding:40px 20px;max-width:760px;"><i class="fa-solid fa-clock-rotate-left"></i><div style="margin-top:10px;">Bạn chưa xem phim nào. Mở một tập ở tab Video để bắt đầu.</div></div>`}
+            `;
+
+            const nameInput = document.getElementById('profileName');
+            nameInput.addEventListener('input', () => {
+                document.getElementById('avatarBox').textContent = (nameInput.value.trim().charAt(0) || 'K').toUpperCase();
+            });
+            nameInput.addEventListener('change', () => {
+                profile.name = nameInput.value.trim() || 'Khách';
+                nameInput.value = profile.name;
+                store.set('dt_profile', profile);
+                showInfo('✅ Đã lưu tên.');
+            });
+            const b2 = document.getElementById('btnClearHist2');
+            if (b2) b2.addEventListener('click', clearHistory);
+        }
+
+        /* =================== SEARCH (theo tab) =================== */
         let searchDebounce;
         searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchDebounce);
+            const q = e.target.value;
+            if (currentTab === 'audio') {
+                searchDebounce = setTimeout(() => renderAudioScreen(q), 180);
+                return;
+            }
+            if (currentTab !== 'video') window.liquidGlass.setTab('video', true);
             if (movieId) {
-                clearTimeout(searchDebounce);
                 searchDebounce = setTimeout(() => {
                     window.location.href = 'tube.html';
                 }, 400);
                 return;
             }
-            const q = e.target.value;
-            clearTimeout(searchDebounce);
             searchDebounce = setTimeout(() => renderHomeScreen(q), 180);
         });
-    </script>
 
-    <!-- ================================================================
-         ===== LIQUID GLASS TAB BAR SCRIPT (tích hợp từ index-2.html) ====
-         Hiệu ứng kính lỏng được tính thật trong fragment shader:
-         khúc xạ, tán sắc RGB, phản xạ môi trường, glow, ánh sáng động.
-         Canvas trong suốt phủ toàn màn hình (pointer-events:none) nên
-         nội dung trang thật vẫn hiển thị xuyên qua lớp kính.
-         ================================================================ -->
-    <script>
-    (function () {
-        const VS = 'attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
-
-        const FS = `precision highp float;
-uniform vec2 uRes,uLight;uniform float uDpr,uHeld,uGrow,uTouch,uVel,uDisp,uDark;
-uniform sampler2D uBn,uBp;
-uniform vec4 uNav,uPill,uMask;uniform vec3 uPtr;uniform vec3 uTint,uPillCol;uniform float uTintA;
-float sdRB(vec2 q,vec2 b,float r){vec2 d=abs(q)-(b-r);return length(max(d,0.))+min(max(d.x,d.y),0.)-r;}
-float sdCap(vec2 q,float hw,float hh){return length(vec2(max(abs(q.x)-(hw-hh),0.),q.y))-hh;}
-vec4 compose(vec2 p,float cl){
-  vec2 nc=uNav.xy+uNav.zw*.5;
-  float dn=sdCap(p-nc,uNav.z*.5,uNav.w*.5);
-  float a=smoothstep(.8,-.8,dn);
-  vec3 col=uTint;
-  float ga=uTintA*(1.-.45*cl);
-  /* viền sáng mảnh bên trong thành kính */
-  col+=vec3(1.)*.26*(1.-smoothstep(0.,1.6,abs(dn+.8)));
-  /* gradient nhẹ: phía trên sáng hơn */
-  col+=vec3(1.)*.05*(1.-smoothstep(-uNav.w*.5,uNav.w*.5,p.y-nc.y));
-  /* viên thuốc (pill) của tab đang chọn */
-  float dp=sdCap(p-uPill.xy,uPill.z,uPill.w);
-  float m=smoothstep(.8,-.8,dp);
-  float pk=m*(1.-clamp(uHeld*3.,0.,1.));
-  col=mix(col,uPillCol,pk);
-  ga=mix(ga,max(ga,.88),pk);
-  /* icon + nhãn vẽ sẵn trong texture, mask theo pill */
-  vec2 uv=(p-uNav.xy)/uNav.zw;
-  float inside=step(0.,uv.x)*step(uv.x,1.)*step(0.,uv.y)*step(uv.y,1.);
-  uv=clamp(uv,0.,1.);
-  float mi=smoothstep(.8,-.8,sdCap(p-uMask.xy,uMask.z,uMask.w));
-  vec4 ic=mix(texture2D(uBn,uv),texture2D(uBp,uv),mi);
-  col=mix(col,ic.rgb,ic.a*inside);
-  ga=mix(ga,1.,ic.a*inside);
-  /* quầng sáng bám theo con trỏ */
-  vec3 gc=mix(vec3(.55,.45,.95),vec3(.78,.72,1.),uDark);
-  float gd=length(p-uPtr.xy);
-  float glw=exp(-gd*gd/(2.*85.*85.))*uPtr.z;
-  float edgeW=1.-smoothstep(0.,7.,abs(dn+1.));
-  float glw2=exp(-gd*gd/(2.*115.*115.))*uPtr.z;
-  float glow=glw*.6*edgeW+glw2*.26;
-  col+=gc*glow;
-  ga=max(ga,clamp(glow*2.,0.,1.));
-  /* ánh sáng tràn ra ngoài viền kính */
-  float outer=glw*.14*exp(-max(dn,0.)/16.)*(1.-a);
-  float oA=clamp(outer*3.,0.,1.);
-  vec3 finalCol=mix(gc,col,a);
-  float outA=max(ga*a,oA);
-  return vec4(finalCol,outA);
-}
-void main(){
-  vec2 p=vec2(gl_FragCoord.x,uRes.y-gl_FragCoord.y)/uDpr;
-  vec4 base=compose(p,0.);
-  vec3 col=base.rgb;
-  float alpha=base.a;
-  if(uHeld>.001){
-    float hc=clamp(uHeld,0.,1.);
-    vec2 c=uPill.xy+vec2(uVel*4.,0.);
-    float hw=uPill.z+uGrow+abs(uVel)*6.;
-    float hh=uPill.w+uGrow-abs(uVel)*2.;
-    float rr=hh;
-    vec2 bb=vec2(hw,hh),q=p-c;
-    float d=sdRB(q,bb,rr);
-    float shd=1.-smoothstep(-6.,26.,sdRB(q-vec2(0.,6.+uGrow),bb,rr));
-    col*=1.-.28*hc*shd*smoothstep(-1.,3.,d);
-    if(d<1.5){
-      float depth=max(-d,0.);
-      vec2 e=vec2(.75,0.);
-      vec2 nrm=normalize(vec2(sdRB(q+e.xy,bb,rr)-sdRB(q-e.xy,bb,rr),sdRB(q+e.yx,bb,rr)-sdRB(q-e.yx,bb,rr))+vec2(1e-5));
-      float edge=1.-clamp(depth/(hh*.9),0.,1.);
-      float eD=1.-clamp(depth/13.,0.,1.);
-      float eM=1.-clamp(depth/(hh*.95),0.,1.);
-      float disp=uTouch*(20.*eD*eD+2.*eM*eM);
-      vec2 pm=c+q*(1.+.14*uTouch);
-      vec2 off=-nrm*disp;
-      off+=vec2(uVel,0.)*7.*eD*uTouch*(.5+.5*dot(nrm,vec2(sign(uVel+1e-4),0.)));
-      float k=.09*uDisp,cl=hc*.85;
-      vec3 g;
-      g.r=compose(pm+off*(1.+k),cl).r;
-      g.g=compose(pm+off,cl).g;
-      g.b=compose(pm+off*(1.-k),cl).b;
-      float lum=dot(g,vec3(.299,.587,.114));
-      g=mix(vec3(lum),g,1.+.18*uTouch);
-      vec2 L=normalize(uLight);
-      float sl=clamp(edge,0.,1.),lk=mix(.8,1.,uDark);
-      float rim=pow(edge,2.6),lit=max(dot(nrm,L),0.),back=max(dot(nrm,-L),0.);
-      g+=vec3(1.)*rim*(lit*.7+back*.3)*uTouch*lk;
-      g+=vec3(1.,.98,.95)*pow(lit,4.)*pow(sl,2.4)*(.35+.35*hc)*uTouch*lk;
-      g+=vec3(.85,.92,1.)*pow(sl,3.)*max(nrm.y,0.)*.12*uTouch;
-      vec3 n3=normalize(vec3(nrm*sl,1.-.9*sl));
-      g+=vec3(.9,.95,1.)*pow(1.-n3.z,3.)*(.16+.14*hc)*uTouch*lk;
-      g+=vec3(1.)*(1.-smoothstep(0.,1.8,depth))*.14*uTouch;
-      float ring=exp(-pow((depth-6.)/4.,2.));
-      g*=1.-.12*ring*uTouch;
-      g*=1.-.07*uTouch*smoothstep(-hh,hh,q.y);
-      g+=vec3(1.)*.05*uTouch*lk*(1.-smoothstep(-hh,.1*hh,q.y))*smoothstep(0.,6.,depth);
-      g+=g*back*pow(sl,2.2)*.45*uTouch;
-      float msk=smoothstep(.8,-.8,d);
-      col=mix(col,g,msk);
-      alpha=max(alpha,msk*hc);
-    }
-  }
-  gl_FragColor=vec4(col*alpha,alpha);
-}`;
-
-        const cv    = document.getElementById('gl');
-        const nav   = document.getElementById('tabbar');
-        const row   = document.getElementById('tabRow');
-        const tabs  = [...nav.querySelectorAll('.tab')];
-
-        const gl = cv.getContext('webgl', { antialias: false, alpha: true, premultipliedAlpha: true });
-        const rmq = matchMedia('(prefers-reduced-motion: reduce)');
-        let reduce = rmq.matches;
-        rmq.addEventListener('change', e => reduce = e.matches);
-
-        const bn = document.createElement('canvas');
-        const bp = document.createElement('canvas');
-
-        /* Theme cố định — trang DigitalTube luôn tối */
-        const TH = { dark: 1, fg: '#f2f2f5', acc: '#c7d2fe', pill: [62, 58, 100], tint: [44, 47, 64], ta: 0.5 };
-
-        let dpr = 1, dprCap = 2.5, aSize = '', navR, rowR;
-        let cur = 0, x = 0, xt = 0, xv = 0, prevX = 0, settling = false;
-        let held = 0, heldTarget = 0, hv = 0, dragging = false, start = null, justDragged = false;
-        let px = 0, py = 0, sx = 0, sy = 0, pv = 0, ptrT = 0, tv = 0, vel = 0;
-        let PW = 0, PR = 0, lightA = -2.2;
-        let last = performance.now(), avg = 0.0167, lastAdj = 0;
-        const _u = {};
-
-        if (!gl) {
-            document.body.classList.add('nogl');
-        } else {
-            /* ---------- Shader setup ---------- */
-            const sh = (t, s) => {
-                const o = gl.createShader(t);
-                gl.shaderSource(o, s);
-                gl.compileShader(o);
-                if (!gl.getShaderParameter(o, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(o));
-                return o;
-            };
-            const pr = gl.createProgram();
-            gl.attachShader(pr, sh(gl.VERTEX_SHADER, VS));
-            gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, FS));
-            gl.linkProgram(pr);
-            gl.useProgram(pr);
-
-            gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
-            const loc = gl.getAttribLocation(pr, 'a');
-            gl.enableVertexAttribArray(loc);
-            gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-
-            const U = n => _u[n] || (_u[n] = gl.getUniformLocation(pr, n));
-
-            const mk = u => {
-                const t = gl.createTexture();
-                gl.activeTexture(gl.TEXTURE0 + u);
-                gl.bindTexture(gl.TEXTURE_2D, t);
-                [[gl.TEXTURE_MIN_FILTER, gl.LINEAR],
-                 [gl.TEXTURE_MAG_FILTER, gl.LINEAR],
-                 [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE],
-                 [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]].forEach(([k, v]) => gl.texParameteri(gl.TEXTURE_2D, k, v));
-                return t;
-            };
-            const up = (u, c) => {
-                gl.activeTexture(gl.TEXTURE0 + u);
-                gl.bindTexture(gl.TEXTURE_2D, u === 0 ? tN : tP);
-                if (u === 0 && aSize === c.width + 'x' + c.height) {
-                    gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, c);
-                } else {
-                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, c);
-                    if (u === 0) aSize = c.width + 'x' + c.height;
-                }
-            };
-
-            const tN = mk(0), tP = mk(1);
-            gl.uniform1i(U('uBn'), 0);
-            gl.uniform1i(U('uBp'), 1);
-            gl.clearColor(0, 0, 0, 0);
-
-            /* ---------- Vẽ icon + nhãn ra canvas 2D ---------- */
-            function rr(g, x, y, w, h, r) {
-                g.moveTo(x + r, y);
-                g.arcTo(x + w, y, x + w, y + h, r);
-                g.arcTo(x + w, y + h, x, y + h, r);
-                g.arcTo(x, y + h, x, y, r);
-                g.arcTo(x, y, x + w, y, r);
-                g.closePath();
-            }
-            function pathOf(el) {
-                const n = el.tagName.toLowerCase(), a = k => +el.getAttribute(k) || 0;
-                if (n === 'path') return new Path2D(el.getAttribute('d'));
-                const p = new Path2D();
-                if (n === 'circle') p.arc(a('cx'), a('cy'), a('r'), 0, Math.PI * 2);
-                if (n === 'rect') {
-                    const g = { moveTo: (...v) => p.moveTo(...v), arcTo: (...v) => p.arcTo(...v), closePath: () => p.closePath() };
-                    rr(g, a('x'), a('y'), a('width'), a('height'), a('rx'));
-                }
-                return p;
-            }
-            function drawBar(c, color, alpha, weight) {
-                const w = Math.max(1, Math.round(navR.width * dpr));
-                const h = Math.max(1, Math.round(navR.height * dpr));
-                c.width = w; c.height = h;
-                const g = c.getContext('2d');
-                g.setTransform(dpr, 0, 0, dpr, 0, 0);
-                g.clearRect(0, 0, navR.width, navR.height);
-                g.globalAlpha = alpha;
-                tabs.forEach(t => {
-                    const svg = t.querySelector('svg'), r = svg.getBoundingClientRect(), s = r.width / 24;
-                    g.save();
-                    g.translate(r.left - navR.left, r.top - navR.top);
-                    g.scale(s, s);
-                    g.lineWidth = 1.75; g.lineCap = 'round'; g.lineJoin = 'round';
-                    g.strokeStyle = color;
-                    [...svg.children].forEach(el => g.stroke(pathOf(el)));
-                    g.restore();
-                    const l = t.querySelector('.lbl'), lr = l.getBoundingClientRect();
-                    g.fillStyle = color;
-                    g.font = weight + ' 12px Roboto,"Segoe UI",system-ui,sans-serif';
-                    g.textAlign = 'center';
-                    g.textBaseline = 'middle';
-                    g.fillText(l.textContent, lr.left + lr.width / 2 - navR.left, lr.top + lr.height / 2 - navR.top + 0.5);
-                });
-            }
-
-            /* ---------- Layout ---------- */
-            function maxX() { return PR - PW; }
-
-            function select(i, animate) {
-                cur = i;
-                tabs.forEach((t, k) => t.setAttribute('aria-current', k === i));
-                xt = tabs[i].offsetLeft;
-                if (!animate) { x = xt; xv = 0; prevX = x; settling = false; return; }
-                heldTarget = 1; settling = true;
-            }
-
-            function layout() {
-                dpr = Math.min(devicePixelRatio || 1, dprCap);
-                PW = tabs[0].offsetWidth;
-                PR = row.offsetWidth;
-                cv.width = Math.max(1, Math.round(innerWidth * dpr));
-                cv.height = Math.max(1, Math.round(innerHeight * dpr));
-                gl.viewport(0, 0, cv.width, cv.height);
-                navR = nav.getBoundingClientRect();
-                rowR = row.getBoundingClientRect();
-                drawBar(bn, TH.fg, 0.78, 500);
-                drawBar(bp, TH.acc, 1, 600);
-                up(0, bn);
-                up(1, bp);
-                gl.uniform3f(U('uTint'), TH.tint[0] / 255, TH.tint[1] / 255, TH.tint[2] / 255);
-                gl.uniform1f(U('uTintA'), TH.ta);
-                gl.uniform3f(U('uPillCol'), TH.pill[0] / 255, TH.pill[1] / 255, TH.pill[2] / 255);
-                gl.uniform2f(U('uRes'), cv.width, cv.height);
-                gl.uniform1f(U('uDpr'), cv.width / innerWidth);
-                gl.uniform4f(U('uNav'), navR.left, navR.top, navR.width, navR.height);
-                select(cur, false);
-            }
-
-            /* ---------- Vòng lặp vẽ ---------- */
-            function frame(now) {
-                const dt = Math.min((now - last) / 1000, 0.05) || 0.0167;
-                last = now;
-
-                const kk = heldTarget ? 520 : 300;
-                const cc = reduce ? 60 : (heldTarget ? 30 : 26);
-                const hs = dt / 2;
-                for (let i = 0; i < 2; i++) { hv += (kk * (heldTarget - held) - cc * hv) * hs; held += hv * hs; }
-                if (held < 0) { held = 0; hv = 0; }
-                if (!heldTarget && held < 0.002 && Math.abs(hv) < 0.05) { held = 0; hv = 0; }
-
-                if (!dragging) {
-                    const cx = reduce ? 70 : 34;
-                    for (let i = 0; i < 2; i++) { xv += (420 * (xt - x) - cx * xv) * hs; x += xv * hs; }
-                    if (settling && Math.abs(xt - x) < 0.4 && Math.abs(xv) < 8) {
-                        x = xt; xv = 0; settling = false;
-                        if (!start) heldTarget = 0;
-                    }
-                }
-
-                tv += ((heldTarget ? 1 : 0) - tv) * (1 - Math.exp(-dt * (heldTarget ? 40 : 14)));
-                pv += ((ptrT ? 1 : 0) - pv) * (1 - Math.exp(-dt * (ptrT ? 14 : 5)));
-                if (ptrT && pv < 0.03) { sx = px; sy = py; }
-                else { const kp = 1 - Math.exp(-dt * 28); sx += (px - sx) * kp; sy += (py - sy) * kp; }
-
-                vel += ((x - prevX) / dt - vel) * Math.min(1, dt * 12);
-                prevX = x;
-
-                if (!document.hidden) {
-                    avg += (dt - avg) * 0.05;
-                    if (avg > 0.024 && now - lastAdj > 2500 && dprCap > 1) {
-                        dprCap = dprCap > 2 ? 2 : dprCap > 1.5 ? 1.5 : 1;
-                        lastAdj = now; avg = 0.0167;
-                        layout();
-                    }
-                }
-
-                const w = PW, h = rowR.height, fr = x / Math.max(maxX(), 1);
-                const a = lightA + (fr - 0.5) * 1.3 + (reduce ? 0 : Math.sin(now / 1100) * 0.12);
-
-                gl.uniform4f(U('uPill'), rowR.left + x + w / 2, rowR.top + h / 2, w / 2, h / 2);
-
-                const vc = Math.max(-1, Math.min(1, vel / 700)) * (reduce ? 0.3 : 1);
-                const gw = 8 * held;
-                gl.uniform4f(U('uMask'),
-                    rowR.left + x + w / 2 + vc * 4,
-                    rowR.top + h / 2,
-                    w / 2 + gw + Math.abs(vc) * 6,
-                    h / 2 + gw - Math.abs(vc) * 2);
-
-                gl.uniform1f(U('uHeld'), held);
-                gl.uniform1f(U('uTouch'), tv);
-                gl.uniform1f(U('uGrow'), 8 * held);
-                gl.uniform1f(U('uVel'), vc);
-                gl.uniform1f(U('uDisp'), reduce ? 0.5 : 1);
-                gl.uniform1f(U('uDark'), TH.dark);
-                gl.uniform3f(U('uPtr'), sx, sy, pv);
-                gl.uniform2f(U('uLight'), Math.cos(a), Math.sin(a));
-
-                gl.clear(gl.COLOR_BUFFER_BIT);
-                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-                requestAnimationFrame(frame);
-            }
-
-            /* ---------- Logic tab: kéo / chọn ---------- */
-            tabs.forEach((t, i) => t.addEventListener('click', () => {
-                if (justDragged) { justDragged = false; return; }
-                if (i !== cur) select(i);
-            }));
-
-            nav.addEventListener('pointerdown', e => {
-                const rx = e.clientX - rowR.left;
-                if (rx >= x && rx <= x + PW) {
-                    xv = 0; settling = false; heldTarget = 1;
-                    start = { id: e.pointerId, off: rx - x, sx: e.clientX };
-                }
-            });
-
-            nav.addEventListener('pointermove', e => {
-                if (!start || e.pointerId !== start.id) return;
-                if (!dragging) {
-                    if (Math.abs(e.clientX - start.sx) < 4) return;
-                    dragging = true;
-                    nav.setPointerCapture(e.pointerId);
-                }
-                x = Math.min(Math.max(e.clientX - rowR.left - start.off, 0), maxX());
-            });
-
-            function end(e) {
-                if (!start || e.pointerId !== start.id) return;
-                heldTarget = 0;
-                if (dragging) {
-                    justDragged = true;
-                    setTimeout(() => justDragged = false, 0);
-                    const c = x + PW / 2;
-                    let best = 0, d = 1e9;
-                    tabs.forEach((t, i) => {
-                        const dd = Math.abs(t.offsetLeft + PW / 2 - c);
-                        if (dd < d) { d = dd; best = i; }
-                    });
-                    select(best);
-                }
-                dragging = false;
-                start = null;
-            }
-            nav.addEventListener('contextmenu', e => e.preventDefault());
-            nav.addEventListener('pointerup', end);
-            nav.addEventListener('pointercancel', end);
-
-            /* ---------- Theo dõi con trỏ để tạo quầng sáng ---------- */
-            const pset = e => { px = e.clientX; py = e.clientY; ptrT = 1; };
-            addEventListener('pointermove', pset, { passive: true });
-            addEventListener('pointerdown', pset, { passive: true });
-            addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') ptrT = 0; });
-            addEventListener('pointercancel', () => ptrT = 0);
-            document.documentElement.addEventListener('pointerleave', () => ptrT = 0);
-
-            addEventListener('resize', layout);
-            addEventListener('orientationchange', () => setTimeout(layout, 200));
-            if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
-
-            layout();
-            select(0, false);
-            requestAnimationFrame(frame);
-        }
-    })();
+        /* =================== KHỞI TẠO TAB =================== */
+        applyTheme();
+        window.liquidGlass.setTab(currentTab, false);
+        if (currentTab === 'settings' || currentTab === 'profile') renderCurrent();
     </script>
 </body>
 </html>
