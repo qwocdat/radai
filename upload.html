@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AdDigital - Bảng Quản Trị Phim</title>
+    <title>AdDigital - Bảng Quản Trị Video & Audio MP3</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -112,6 +112,8 @@
             gap: 8px;
         }
         .submit-btn:hover { background: var(--accent-hover); }
+        .submit-btn.audio-btn { background: #a855f7; }
+        .submit-btn.audio-btn:hover { background: #9333ea; }
 
         .movie-entry-row {
             background: rgba(255, 255, 255, 0.02);
@@ -208,7 +210,8 @@
 
     <div class="top-navbar">
         <div class="dash-title"><i class="fa-solid fa-sliders"></i> AdDigital Control Panel</div>
-        <a href="tube.html" target="_blank" class="client-preview-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> Xem Trang Client</a>
+        <!-- [ĐÃ SỬA] Đổi tube.html -> index.html -->
+        <a href="index.html" target="_blank" class="client-preview-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> Xem Trang Client</a>
     </div>
 
     <div class="main-wrapper">
@@ -221,8 +224,12 @@
                     <div id="connStateBadge" class="status-pill pill-error">Đang kiểm tra...</div>
                 </div>
                 <div class="status-tile">
-                    <div class="tile-label">Tổng Số Phim</div>
+                    <div class="tile-label">Tổng Số Phim Video</div>
                     <div id="statTotalMovies" class="tile-value">0</div>
+                </div>
+                <div class="status-tile">
+                    <div class="tile-label">Tổng Số Album Audio</div>
+                    <div id="statTotalAudios" class="tile-value">0</div>
                 </div>
                 <div class="status-tile">
                     <div class="tile-label">Độ Trễ Phản Hồi (Ping)</div>
@@ -231,10 +238,11 @@
             </div>
         </div>
 
+        <!-- ================= PHẦN 1: QUẢN LÝ VIDEO ================= -->
         <div class="forms-two-col">
             <!-- Form 1: Tạo Phim Mới -->
             <div class="glass-card">
-                <div class="card-header-title"><i class="fa-solid fa-film"></i> 1. Thêm Phim Mới</div>
+                <div class="card-header-title"><i class="fa-solid fa-film"></i> 1. Thêm Phim Mới (Video)</div>
                 <form id="formNewMovie">
                     <div class="input-group">
                         <label>Tên Bộ Phim</label>
@@ -252,7 +260,7 @@
                 </form>
             </div>
 
-            <!-- Form 2: Thêm Tập Phim -->
+            <!-- Form 2: Thêm Tập Phim Video -->
             <div class="glass-card">
                 <div class="card-header-title"><i class="fa-solid fa-circle-play"></i> 2. Thêm Tập Video</div>
                 <form id="formNewEpisode">
@@ -280,11 +288,69 @@
             </div>
         </div>
 
-        <!-- Quản Lý Danh Sách -->
+        <!-- ================= [MỚI] PHẦN 2: QUẢN LÝ AUDIO MP3 ================= -->
+        <div class="forms-two-col">
+            <!-- Form 3: Tạo Playlist/Album Audio MP3 Mới -->
+            <div class="glass-card">
+                <div class="card-header-title"><i class="fa-solid fa-compact-disc" style="color: #a855f7;"></i> 3. Thêm Album Audio MP3 Mới</div>
+                <form id="formNewAudioGroup">
+                    <div class="input-group">
+                        <label>Tên Album / Ca Sĩ / Truyện Audio</label>
+                        <input type="text" id="inputAudioGroupTitle" placeholder="Ví dụ: Nhạc Trẻ Lofi 2026" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Đường Dẫn Ảnh Bìa Album</label>
+                        <input type="text" id="inputAudioGroupThumb" placeholder="https://...">
+                    </div>
+                    <div class="input-group">
+                        <label>Mô Tả Ngắn</label>
+                        <textarea id="inputAudioGroupDesc" rows="3" placeholder="Nhập tóm tắt về album audio..."></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn audio-btn"><i class="fa-solid fa-plus"></i> Tạo Album Audio</button>
+                </form>
+            </div>
+
+            <!-- Form 4: Thêm Bài Nhạc Audio MP3 -->
+            <div class="glass-card">
+                <div class="card-header-title"><i class="fa-solid fa-headphones" style="color: #a855f7;"></i> 4. Thêm Bài Nhạc MP3</div>
+                <form id="formNewAudioItem">
+                    <div class="input-group">
+                        <label>Chọn Album Audio Target</label>
+                        <select id="selectAudioGroupTarget" required>
+                            <option value="">-- Chọn Album Audio --</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Thứ Tự Bài (1, 2, 3...)</label>
+                        <input type="number" id="inputAudioOrder" placeholder="1" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Tên Bài Hát / Tập Audio</label>
+                        <input type="text" id="inputAudioTitle" placeholder="Bài 1: Thẻ Nhạc MP3" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Tên File .mp3 Hoặc Link Đầy Đủ</label>
+                        <input type="text" id="inputAudioUrl" placeholder="nhac1.mp3" required>
+                        <span style="font-size: 11px; color: #a855f7; margin-top: 4px; display: block;">Tự động ghép prefix GitHub nếu chỉ nhập tên file .mp3</span>
+                    </div>
+                    <button type="submit" class="submit-btn audio-btn"><i class="fa-solid fa-music"></i> Đăng Bài MP3</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Quản Lý Danh Sách Video -->
         <div class="glass-card">
-            <div class="card-header-title"><i class="fa-solid fa-database"></i> Dữ Liệu Phim Hiện Có</div>
+            <div class="card-header-title"><i class="fa-solid fa-database"></i> Dữ Liệu Phim Video Hiện Có</div>
             <div id="movieDataContainer">
                 <div style="text-align: center; color: var(--text-sub); padding: 20px;">Đang tải danh sách phim...</div>
+            </div>
+        </div>
+
+        <!-- [MỚI] Quản Lý Danh Sách Audio MP3 -->
+        <div class="glass-card">
+            <div class="card-header-title"><i class="fa-solid fa-radio" style="color: #a855f7;"></i> Dữ Liệu Audio MP3 Hiện Có</div>
+            <div id="audioDataContainer">
+                <div style="text-align: center; color: var(--text-sub); padding: 20px;">Đang tải danh sách audio MP3...</div>
             </div>
         </div>
 
@@ -323,7 +389,7 @@
         import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         /* =========================================================
-           1. LOGGING SYSTEM (phải khai báo trước mọi thứ)
+           1. LOGGING SYSTEM
            ========================================================= */
         const logsConsole = document.getElementById('logsConsole');
         const logsCounter = document.getElementById('logsCounter');
@@ -359,7 +425,6 @@
 
             if (autoScroll) logsConsole.scrollTop = logsConsole.scrollHeight;
 
-            // Đồng thời in ra DevTools Console để tiện copy
             const prefix = `[${time}] [${level}]`;
             if (level === 'ERROR') console.error(prefix, msg, detail || '');
             else if (level === 'WARN') console.warn(prefix, msg, detail || '');
@@ -381,7 +446,6 @@
                 : '<i class="fa-solid fa-arrow-down"></i> Auto-scroll: TẮT';
         });
 
-        // Bắt lỗi toàn cục
         window.addEventListener('error', (e) => {
             addLog('ERROR', 'Lỗi JavaScript toàn cục: ' + e.message,
                 `File: ${e.filename}:${e.lineno}:${e.colno}`);
@@ -426,13 +490,16 @@
         const connStateBadge = document.getElementById('connStateBadge');
         const statPingMs = document.getElementById('statPingMs');
         const statTotalMovies = document.getElementById('statTotalMovies');
+        const statTotalAudios = document.getElementById('statTotalAudios');
         const selectMovieTarget = document.getElementById('selectMovieTarget');
+        const selectAudioGroupTarget = document.getElementById('selectAudioGroupTarget');
         const movieDataContainer = document.getElementById('movieDataContainer');
+        const audioDataContainer = document.getElementById('audioDataContainer');
 
         /* =========================================================
-           4. REST PING - kiểm tra kết nối + Rules
+           4. REST PING DIAGNOSTIC
            ========================================================= */
-        let pingFailedLogged = false; // tránh spam log lỗi liên tục
+        let pingFailedLogged = false;
 
         async function runDiagnosticPing() {
             const t0 = performance.now();
@@ -449,19 +516,13 @@
                         pingFailedLogged = false;
                     }
                 } else {
-                    // Các mã lỗi phổ biến:
-                    // 401 -> Rules yêu cầu auth
-                    // 403 -> Rules cấm truy cập
                     const bodyText = await res.text().catch(() => '');
                     connStateBadge.className = "status-pill pill-error";
                     connStateBadge.innerText = `Lỗi ${res.status}`;
                     if (!pingFailedLogged) {
                         addLog('ERROR',
                             `REST Ping thất bại - HTTP ${res.status} ${res.statusText}`,
-                            `URL: ${DB_URL}/.json?shallow=true\nBody: ${bodyText || '(rỗng)'}\n` +
-                            (res.status === 401 || res.status === 403
-                                ? '➜ Gợi ý: Vào Firebase Console → Realtime Database → Rules. Nếu rules đang là {"rules":{".read":false,".write":false}} thì client sẽ bị chặn. Cần mở quyền đọc/ghi (chỉ dùng cho dev).'
-                                : '')
+                            `URL: ${DB_URL}/.json?shallow=true\nBody: ${bodyText || '(rỗng)'}`
                         );
                         pingFailedLogged = true;
                     }
@@ -472,11 +533,7 @@
                 connStateBadge.innerText = "Lỗi kết nối";
                 statPingMs.innerText = `${Math.round(t1 - t0)} ms`;
                 if (!pingFailedLogged) {
-                    addLog('ERROR',
-                        'REST Ping lỗi network/CORS: ' + e.message,
-                        `URL: ${DB_URL}/.json?shallow=true\nStack: ${e.stack || ''}\n` +
-                        '➜ Gợi ý: Kiểm tra databaseURL có đúng region (asia-southeast1) không, hoặc mở tab Network trong DevTools để xem request có bị CORS chặn không.'
-                    );
+                    addLog('ERROR', 'REST Ping lỗi network: ' + e.message);
                     pingFailedLogged = true;
                 }
             }
@@ -486,7 +543,7 @@
         setInterval(runDiagnosticPing, 10000);
 
         /* =========================================================
-           5. FORM TẠO PHIM
+           5. FORM TẠO PHIM VIDEO
            ========================================================= */
         document.getElementById('formNewMovie').addEventListener('submit', (e) => {
             e.preventDefault();
@@ -508,14 +565,13 @@
                 alert('Tạo bộ phim thành công!');
                 document.getElementById('formNewMovie').reset();
             }).catch((err) => {
-                addLog('ERROR', 'Tạo phim thất bại: ' + err.message,
-                    `Code: ${err.code || 'N/A'}\nStack: ${err.stack || ''}`);
+                addLog('ERROR', 'Tạo phim thất bại: ' + err.message);
                 alert('Lỗi khi tạo phim: ' + err.message);
             });
         });
 
         /* =========================================================
-           6. FORM THÊM TẬP
+           6. FORM THÊM TẬP VIDEO
            ========================================================= */
         document.getElementById('formNewEpisode').addEventListener('submit', (e) => {
             e.preventDefault();
@@ -542,14 +598,74 @@
                 alert('Đăng tập video thành công!');
                 document.getElementById('formNewEpisode').reset();
             }).catch((err) => {
-                addLog('ERROR', 'Đăng tập thất bại: ' + err.message,
-                    `Code: ${err.code || 'N/A'}\nStack: ${err.stack || ''}`);
+                addLog('ERROR', 'Đăng tập thất bại: ' + err.message);
                 alert('Lỗi khi đăng tập: ' + err.message);
             });
         });
 
         /* =========================================================
-           7. TẢI DANH SÁCH PHIM (có error callback)
+           7. [MỚI] FORM TẠO ALBUM AUDIO MP3
+           ========================================================= */
+        document.getElementById('formNewAudioGroup').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!db) { addLog('ERROR', 'Không có kết nối database, không thể tạo album audio.'); return; }
+
+            const title = document.getElementById('inputAudioGroupTitle').value;
+            const thumb = document.getElementById('inputAudioGroupThumb').value;
+            const desc = document.getElementById('inputAudioGroupDesc').value;
+
+            addLog('INFO', `Đang tạo Album Audio MP3 mới: "${title}"...`);
+
+            push(ref(db, 'audios'), {
+                title: title,
+                thumbnail: thumb,
+                description: desc,
+                createdAt: Date.now()
+            }).then(() => {
+                addLog('SUCCESS', `Tạo Album Audio thành công: "${title}"`);
+                alert('Tạo Album Audio thành công!');
+                document.getElementById('formNewAudioGroup').reset();
+            }).catch((err) => {
+                addLog('ERROR', 'Tạo Album Audio thất bại: ' + err.message);
+                alert('Lỗi khi tạo album audio: ' + err.message);
+            });
+        });
+
+        /* =========================================================
+           8. [MỚI] FORM THÊM BÀI NHẠC AUDIO MP3
+           ========================================================= */
+        document.getElementById('formNewAudioItem').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!db) { addLog('ERROR', 'Không có kết nối database, không thể thêm bài nhạc.'); return; }
+
+            const aId = selectAudioGroupTarget.value;
+            const order = parseInt(document.getElementById('inputAudioOrder').value);
+            const title = document.getElementById('inputAudioTitle').value;
+            let rawUrl = document.getElementById('inputAudioUrl').value.trim();
+
+            if (!rawUrl.startsWith('http://') && !rawUrl.startsWith('https://')) {
+                rawUrl = GITHUB_PREFIX + rawUrl;
+                addLog('INFO', 'Đã ghép prefix GitHub vào URL nhạc MP3.', `URL cuối: ${rawUrl}`);
+            }
+
+            addLog('INFO', `Đang thêm bài MP3 #${order} vào audioId=${aId}...`);
+
+            push(ref(db, `audios/${aId}/episodes`), {
+                order: order,
+                title: title,
+                url: rawUrl
+            }).then(() => {
+                addLog('SUCCESS', `Đăng bài MP3 "${title}" thành công.`);
+                alert('Đăng bài nhạc Audio MP3 thành công!');
+                document.getElementById('formNewAudioItem').reset();
+            }).catch((err) => {
+                addLog('ERROR', 'Đăng bài MP3 thất bại: ' + err.message);
+                alert('Lỗi khi đăng bài MP3: ' + err.message);
+            });
+        });
+
+        /* =========================================================
+           9. TẢI DANH SÁCH VIDEO (/movies)
            ========================================================= */
         if (db) {
             addLog('INFO', 'Đang lắng nghe dữ liệu từ /movies ...');
@@ -563,7 +679,7 @@
                     selectMovieTarget.innerHTML = '<option value="">-- Chọn phim --</option>';
                     movieDataContainer.innerHTML = '';
 
-                    addLog('SUCCESS', `Đã nhận dữ liệu từ Firebase: ${keys.length} bộ phim.`);
+                    addLog('SUCCESS', `Đã nhận dữ liệu Video: ${keys.length} bộ phim.`);
 
                     if (keys.length === 0) {
                         movieDataContainer.innerHTML = '<div style="text-align: center; color: var(--text-sub); padding: 20px;">Chưa có phim nào trong Database</div>';
@@ -605,48 +721,116 @@
                         movieDataContainer.appendChild(row);
                     });
                 },
-                // >>>>>> ERROR CALLBACK — cực kỳ quan trọng, đây là chỗ code cũ thiếu <<<<<<
                 (err) => {
-                    addLog('ERROR', 'onValue(/movies) thất bại: ' + err.message,
-                        `Code: ${err.code || 'N/A'}\nStack: ${err.stack || ''}\n` +
-                        '➜ Gợi ý: Nếu code là "PERMISSION_DENIED" thì Firebase Rules đang chặn đọc. ' +
-                        'Vào Realtime Database → Rules và set tạm: {"rules":{".read":true,".write":true}} để test.'
-                    );
-                    movieDataContainer.innerHTML =
-                        '<div style="text-align: center; color: var(--danger); padding: 20px;">' +
-                        'Không thể tải dữ liệu phim. Xem bảng Logs bên dưới để biết chi tiết.</div>';
+                    addLog('ERROR', 'onValue(/movies) thất bại: ' + err.message);
+                    movieDataContainer.innerHTML = '<div style="text-align: center; color: var(--danger); padding: 20px;">Không thể tải dữ liệu phim.</div>';
                 }
             );
-        } else {
-            addLog('ERROR', 'Bỏ qua onValue vì Firebase chưa được khởi tạo.');
+
+            /* =========================================================
+               10. [MỚI] TẢI DANH SÁCH AUDIO MP3 (/audios)
+               ========================================================= */
+            addLog('INFO', 'Đang lắng nghe dữ liệu từ /audios ...');
+
+            onValue(ref(db, 'audios'),
+                (snapshot) => {
+                    const data = snapshot.val() || {};
+                    const keys = Object.keys(data);
+
+                    statTotalAudios.innerText = keys.length;
+                    selectAudioGroupTarget.innerHTML = '<option value="">-- Chọn Album Audio --</option>';
+                    audioDataContainer.innerHTML = '';
+
+                    addLog('SUCCESS', `Đã nhận dữ liệu Audio: ${keys.length} Album.`);
+
+                    if (keys.length === 0) {
+                        audioDataContainer.innerHTML = '<div style="text-align: center; color: var(--text-sub); padding: 20px;">Chưa có Album Audio MP3 nào trong Database</div>';
+                        return;
+                    }
+
+                    keys.forEach(id => {
+                        const audioGroup = data[id];
+
+                        const opt = document.createElement('option');
+                        opt.value = id;
+                        opt.innerText = audioGroup.title;
+                        selectAudioGroupTarget.appendChild(opt);
+
+                        const episodes = audioGroup.episodes
+                            ? Object.keys(audioGroup.episodes).map(k => ({ id: k, ...audioGroup.episodes[k] }))
+                            : [];
+                        episodes.sort((a, b) => (a.order || 0) - (b.order || 0));
+
+                        let epMarkup = '';
+                        episodes.forEach(ep => {
+                            epMarkup += `
+                                <div class="ep-nest-item">
+                                    <span>Bài ${ep.order || 1}: ${ep.title} (${ep.url})</span>
+                                    <button class="delete-btn" onclick="removeAudioItem('${id}', '${ep.id}')">Xóa bài</button>
+                                </div>
+                            `;
+                        });
+
+                        const row = document.createElement('div');
+                        row.className = 'movie-entry-row';
+                        row.style.borderColor = 'rgba(168, 85, 247, 0.3)';
+                        row.innerHTML = `
+                            <div class="movie-row-header">
+                                <span class="movie-name">🎵 ${audioGroup.title} (${episodes.length} bài MP3)</span>
+                                <button class="delete-btn" onclick="removeAudioGroup('${id}')">Xóa Album Audio</button>
+                            </div>
+                            <div class="ep-list-nest">${epMarkup || '<span style="font-size: 12px;">Chưa có bài MP3 nào.</span>'}</div>
+                        `;
+                        audioDataContainer.appendChild(row);
+                    });
+                },
+                (err) => {
+                    addLog('ERROR', 'onValue(/audios) thất bại: ' + err.message);
+                    audioDataContainer.innerHTML = '<div style="text-align: center; color: var(--danger); padding: 20px;">Không thể tải dữ liệu Audio.</div>';
+                }
+            );
         }
 
         /* =========================================================
-           8. HÀM XÓA (có .catch + log)
+           11. HÀM XÓA VIDEO & AUDIO
            ========================================================= */
         window.removeMovie = (mId) => {
-            if (!db) { addLog('ERROR', 'Không có database để xóa phim.'); return; }
+            if (!db) return;
             if (confirm('Xóa bộ phim này cùng toàn bộ các tập phim bên trong?')) {
-                addLog('INFO', `Đang xóa movieId=${mId}...`);
                 remove(ref(db, `movies/${mId}`))
                     .then(() => addLog('SUCCESS', `Đã xóa phim: ${mId}`))
-                    .catch(err => addLog('ERROR', 'Xóa phim thất bại: ' + err.message,
-                        `Code: ${err.code || 'N/A'}`));
+                    .catch(err => addLog('ERROR', 'Xóa phim thất bại: ' + err.message));
             }
         };
 
         window.removeEp = (mId, epId) => {
-            if (!db) { addLog('ERROR', 'Không có database để xóa tập.'); return; }
+            if (!db) return;
             if (confirm('Xóa tập phim này?')) {
-                addLog('INFO', `Đang xóa tập epId=${epId} của movieId=${mId}...`);
                 remove(ref(db, `movies/${mId}/episodes/${epId}`))
                     .then(() => addLog('SUCCESS', `Đã xóa tập: ${epId}`))
-                    .catch(err => addLog('ERROR', 'Xóa tập thất bại: ' + err.message,
-                        `Code: ${err.code || 'N/A'}`));
+                    .catch(err => addLog('ERROR', 'Xóa tập thất bại: ' + err.message));
             }
         };
 
-        addLog('INFO', 'Hệ thống đã sẵn sàng. Nếu có lỗi, nó sẽ hiện ngay trong bảng log này.');
+        window.removeAudioGroup = (aId) => {
+            if (!db) return;
+            if (confirm('Xóa toàn bộ Album Audio này cùng tất cả bài MP3?')) {
+                remove(ref(db, `audios/${aId}`))
+                    .then(() => addLog('SUCCESS', `Đã xóa Album Audio: ${aId}`))
+                    .catch(err => addLog('ERROR', 'Xóa Album Audio thất bại: ' + err.message));
+            }
+        };
+
+        window.removeAudioItem = (aId, epId) => {
+            if (!db) return;
+            if (confirm('Xóa bài MP3 này?')) {
+                remove(ref(db, `audios/${aId}/episodes/${epId}`))
+                    .then(() => addLog('SUCCESS', `Đã xóa bài MP3: ${epId}`))
+                    .catch(err => addLog('ERROR', 'Xóa bài MP3 thất bại: ' + err.message));
+            }
+        };
+
+        addLog('INFO', 'Hệ thống đã sẵn sàng. Bạn có thể bắt đầu đăng tải Video hoặc Audio MP3.');
     </script>
 </body>
 </html>
