@@ -870,7 +870,16 @@
         .modal-btn.secondary:hover { background: rgba(255,255,255,0.05); color: #fff; }
         .modal-btn.danger { background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; }
         .modal-btn.danger:hover { background: rgba(239, 68, 68, 0.4); }
-    </style>
+    
+        /* ===== LIQUID GLASS BACK BUTTON ===== */
+        .lg-back { position: relative; display: block; width: 60px; height: 60px; flex: none; border-radius: 50%;
+            touch-action: none; -webkit-touch-callout: none; cursor: pointer; text-decoration: none; outline: none; will-change: transform; z-index: 5; }
+        .lg-back .lg-shadow { position: absolute; inset: 0; border-radius: 50%; box-shadow: 0 10px 24px rgba(0,0,0,.35); will-change: transform; }
+        .lg-back canvas { position: absolute; left: -100px; top: -100px; width: 260px; height: 260px; pointer-events: none; display: block; }
+        .lg-back svg { position: absolute; left: 50%; top: 50%; width: 24px; height: 24px; margin: -12px 0 0 -12px; pointer-events: none; filter: drop-shadow(0 0 5px rgba(10,132,255,.45)); }
+        .lg-back.lg-nogl { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.18); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .lg-back.lg-nogl canvas { display: none; }
+</style>
 </head>
 <body>
 
@@ -1697,7 +1706,7 @@ void main(){
 
             appContainer.innerHTML = `
                 <div class="back-bar">
-                    <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Quay lại danh sách</a>
+                    <a href="index.html" id="lgBack" class="lg-back" aria-label="Quay lại danh sách" draggable="false"><span class="lg-shadow"></span><canvas></canvas><svg viewBox="0 0 28 28" fill="none"><path d="M17.5 4.5 8 14l9.5 9.5" stroke="#0a84ff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
                     <button class="back-btn" onclick="window.openSleepModal()"><i class="fa-solid fa-moon"></i> Hẹn Giờ Đi Ngủ</button>
                 </div>
                 <div class="player-layout">
@@ -2275,5 +2284,171 @@ void main(){
         window.liquidGlass.setTab(currentTab, false);
         if (currentTab === 'settings' || currentTab === 'profile') renderCurrent();
     </script>
+
+<script>
+/* ===== LIQUID GLASS BACK BUTTON (WebGL) - thay nút "Quay lại danh sách" ===== */
+(function () {
+  'use strict';
+  const R = 30, PAD = 100, HS = R + PAD, CF = 0.5, SF = 0.5, MAXD = 50;   // R: bán kính nút; HS: nửa canvas (chừa chỗ kéo giãn)
+  const VS = `attribute vec2 a; void main(){ gl_Position = vec4(a,0.,1.); }`;
+  const FS = `precision highp float;
+  uniform sampler2D uTex; uniform vec2 uCenter, uView, uMouse, uOff, uTouch; uniform float uR, uDpr, uPress, uHold, uHS;
+  vec3 tex(vec2 px){ return texture2D(uTex, px / uView).rgb; }
+  void main(){
+    // P: toạ độ CSS px so với tâm nút (y hướng lên)
+    vec2 P = gl_FragCoord.xy / uDpr - vec2(uHS);
+    /* --- RUBBER STRETCH: hình dạng kính bị kéo giãn theo uOff (giữ thể tích: dài a, hẹp 1/sqrt(a)) --- */
+    vec2 Qv = P - uOff * ${CF};
+    float m = length(uOff);
+    vec2 u = m > 0.001 ? uOff / m : vec2(1.0, 0.0);
+    vec2 v = vec2(-u.y, u.x);
+    float a = 1.0 + ${SF} * m / uR, b = inversesqrt(a);
+    vec2 p = vec2(dot(Qv, u) / a, dot(Qv, v) / b) / uR;     // p: toạ độ trong "hình tròn đơn vị" đã bị méo
+    float r = length(p), aa = 1.0 / (uR * min(1.0, b));
+    float mask = 1.0 - smoothstep(1.0 - aa, 1.0, r);
+    vec2 dir = p / max(r, 1e-4);
+    float pr = clamp(uPress, 0., 1.2);
+    /* --- VIỀN XÁM MỜ NGOÀI: quầng viền xám feather ra ngoài mép --- */
+    float ho = 0.28 * exp(-(r - 1.0) * 16.0);
+    if (mask <= 0.0) { gl_FragColor = ho < 0.004 ? vec4(0.) : vec4(vec3(0.55, 0.57, 0.60) * ho, ho); return; }
+
+
+    /* --- REFRACTION + DISPLACEMENT + EDGE DISTORTION + MAGNIFICATION (liên tục, mượt) --- */
+    float t = smoothstep(0.45, 1.0, r);
+    float disp = (0.018 * r * r + 0.22 * pow(t, 2.5)) * (1.0 + 0.4 * pr);
+    // Nội dung nền được lấy theo hệ toạ độ chưa méo -> bị kéo giãn cùng hình dạng kính (như hình in trên miếng cao su)
+    vec2 q = p * (1.0 - 0.02 * r * r) + dir * disp + uMouse * 0.035 * pr;
+    vec2 px = uCenter + vec2(q.x, -q.y) * uR;
+
+    /* --- PRESS / HOLD: cả nút nhoè đều và chuyển dần sang xám (kính mờ) --- */
+    float w = clamp(pr, 0.0, 1.0) * 0.5 + smoothstep(0.0, 1.0, uHold) * 0.5;
+    float br = 1.2 + min(m * 0.03, 2.5) + w * 7.0;
+    vec3 col = tex(px) * 0.2;
+    for (int i = 0; i < 8; i++) {
+      float ag = float(i) * 0.7854; vec2 o = vec2(cos(ag), sin(ag));
+      col += (tex(px + o * br) + tex(px + o * br * 0.5)) * 0.05;
+    }
+    /* --- CHROMATIC ABERRATION ~0.4px ở mép --- */
+    vec2 cd = u * dir.x + v * dir.y;
+    vec2 ca = vec2(cd.x, -cd.y) * 0.4 * t;
+    col.r = mix(col.r, tex(px + ca).r, 0.6);
+    col.b = mix(col.b, tex(px - ca).b, 0.6);
+
+    /* --- BACKGROUND RESPONSE (nhẹ hơn để kính trong hơn) --- */
+    float lum = dot(col, vec3(0.299, 0.587, 0.114));
+    col += vec3(0.95, 0.97, 1.0) * 0.012 * (1.0 - smoothstep(0.15, 0.65, lum));
+    col *= mix(1.0, 0.93, smoothstep(0.5, 0.95, lum));
+    /* --- GIỮ: kính mờ đục dần về phía mép (không phủ xám phẳng), vẫn nhìn xuyên được ở giữa.
+           Phía bị kéo căng thì mỏng và trong hơn, hơi sáng như màng cao su bị kéo mỏng --- */
+    float tn = clamp(m / 45.0, 0.0, 1.0);
+    float thin = tn * smoothstep(-0.1, 1.0, p.x);
+    float veil = w * (0.28 + 0.5 * smoothstep(0.15, 1.0, r)) * (1.0 - 0.55 * thin);
+    col = mix(col, vec3(0.40, 0.41, 0.43), veil);
+    col += vec3(0.045) * thin;
+    /* --- VIỀN XÁM MỜ TRONG: dải xám feather sát mép --- */
+    col = mix(col, vec3(0.58, 0.60, 0.63), exp(-pow((r - 0.95) / 0.06, 2.0)) * 0.5);
+
+    gl_FragColor = vec4(clamp(col, 0., 1.) * mask, mask);
+  }`;
+  let cur = null;
+
+  function init(el) {
+    el._lg = 1;
+    if (cur && cur.gl) { const x = cur.gl.getExtension('WEBGL_lose_context'); if (x) x.loseContext(); }
+    cur = null;
+    const cv = el.querySelector('canvas'), shadow = el.querySelector('.lg-shadow'), icon = el.querySelector('svg');
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = cv.height = Math.round(HS * 2 * dpr);
+    const gl = cv.getContext('webgl', { alpha: true, premultipliedAlpha: true, antialias: false });
+    let prog, U = {}, tex;
+    try {
+      if (!gl) throw 0;
+      const sh = (t, s) => { const o = gl.createShader(t); gl.shaderSource(o, s); gl.compileShader(o);
+        if (!gl.getShaderParameter(o, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(o)); return o; };
+      prog = gl.createProgram(); gl.attachShader(prog, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FS));
+      gl.linkProgram(prog); gl.useProgram(prog);
+      gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+      const loc = gl.getAttribLocation(prog, 'a'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+      ['uTex','uCenter','uView','uMouse','uOff','uTouch','uR','uDpr','uPress','uHold','uHS'].forEach(n => U[n] = gl.getUniformLocation(prog, n));
+      tex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, tex);
+      [gl.TEXTURE_WRAP_S, gl.TEXTURE_WRAP_T].forEach(k => gl.texParameteri(gl.TEXTURE_2D, k, gl.CLAMP_TO_EDGE));
+      [gl.TEXTURE_MIN_FILTER, gl.TEXTURE_MAG_FILTER].forEach(k => gl.texParameteri(gl.TEXTURE_2D, k, gl.LINEAR));
+      gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    } catch (err) { console.warn('Liquid glass: WebGL lỗi, dùng fallback CSS', err); el.classList.add('lg-nogl'); return; }
+
+    /* Nền phía sau nút: mô phỏng nền trang (màu nền + các vệt aurora) quanh vị trí nút, vì DOM không thể chụp trực tiếp */
+    const tx = document.createElement('canvas'); tx.width = tx.height = HS * 2;
+    const tc = tx.getContext('2d');
+    function drawTex() {
+      const b = el.getBoundingClientRect(), bx = b.left + b.width / 2, by = b.top + b.height / 2;
+      const base = (getComputedStyle(document.documentElement).getPropertyValue('--bg-base') || '#05060a').trim() || '#05060a';
+      tc.fillStyle = base; tc.fillRect(0, 0, HS * 2, HS * 2);
+      const blob = (x, y, r, rgb, al) => { const g = tc.createRadialGradient(x - bx + HS, y - by + HS, 0, x - bx + HS, y - by + HS, r);
+        g.addColorStop(0, `rgba(${rgb},${al})`); g.addColorStop(.7, `rgba(${rgb},0)`); tc.fillStyle = g; tc.fillRect(0, 0, HS * 2, HS * 2); };
+      blob(140, 80, 300, '99,102,241', .28);                                            // aurora 1 (accent)
+      blob(innerWidth - 80, innerHeight * .4 + 240, 280, '168,85,247', .26);            // aurora 2
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, tx);
+    }
+
+    /* Tương tác: spring, kéo giãn kiểu cao su, nhoè + xám khi giữ */
+    let press = 0, vel = 0, target = 0, raf = 0, last = 0, hold = 0;
+    let mx = 0, my = 0, tmx = 0, tmy = 0, ox = 0, oy = 0, vx = 0, vy = 0, tox = 0, toy = 0;
+    let gx = 0, gy = 0, ccx = 0, ccy = 0, moved = false;
+    function render() {
+      gl.viewport(0, 0, cv.width, cv.height); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.uniform1i(U.uTex, 0); gl.uniform2f(U.uCenter, HS, HS); gl.uniform2f(U.uView, HS * 2, HS * 2);
+      gl.uniform2f(U.uMouse, Math.max(-1, Math.min(1, mx / R)), -Math.max(-1, Math.min(1, my / R)));
+      gl.uniform2f(U.uOff, ox, -oy); gl.uniform2f(U.uTouch, mx, -my);
+      gl.uniform1f(U.uR, R); gl.uniform1f(U.uHS, HS); gl.uniform1f(U.uDpr, cv.width / (HS * 2));
+      gl.uniform1f(U.uPress, press); gl.uniform1f(U.uHold, hold);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      el.style.transform = `scale(${1 - 0.025 * press})`;
+      const m = Math.hypot(ox, oy), a = 1 + SF * m / R, ang = Math.atan2(oy, ox);
+      const shape = `translate(${ox * CF}px,${oy * CF}px) rotate(${ang}rad) scale(${a},${1 / Math.sqrt(a)}) rotate(${-ang}rad)`;
+      shadow.style.transform = shape; icon.style.transform = shape;     // bóng và mũi tên giãn cùng kính
+      shadow.style.opacity = 1 - 0.3 * Math.min(Math.max(press, 0), 1);
+    }
+    function tick(now) {
+      const dt = Math.min((now - last) / 1000 || 0.016, 0.033); last = now;
+      vel += (-300 * (press - target) - 36 * vel) * dt; press += vel * dt;
+      const k = target ? 1100 : 260, c = target ? 60 : 34;               // thả: tới hạn -> co thẳng về, không xoay
+      vx += (-k * (ox - tox) - c * vx) * dt; ox += vx * dt;
+      vy += (-k * (oy - toy) - c * vy) * dt; oy += vy * dt;
+      mx += (tmx - mx) * Math.min(dt * 16, 1); my += (tmy - my) * Math.min(dt * 16, 1);
+      hold = target ? Math.min(hold + dt / 0.5, 1) : Math.max(hold - dt / 0.25, 0);
+      render();
+      const idle = Math.abs(press - target) < 0.0008 && Math.abs(vel) < 0.002 && Math.abs(ox - tox) < 0.02 && Math.abs(oy - toy) < 0.02 &&
+        Math.abs(vx) + Math.abs(vy) < 0.05 && hold === (target ? 1 : 0) && Math.abs(tmx - mx) + Math.abs(tmy - my) < 0.02;
+      raf = idle ? 0 : requestAnimationFrame(tick);
+    }
+    const wake = () => { if (!raf) { last = performance.now(); raf = requestAnimationFrame(tick); } };
+    function setMouse(e, first) {
+      if (first) { gx = e.clientX; gy = e.clientY; moved = false; const b = el.getBoundingClientRect(); ccx = b.left + b.width / 2; ccy = b.top + b.height / 2; }
+      const dx = e.clientX - gx, dy = e.clientY - gy, L = Math.hypot(dx, dy) || 1;
+      if (L > 10) moved = true;
+      tmx = Math.max(-R * 1.6, Math.min(R * 1.6, e.clientX - ccx)); tmy = Math.max(-R * 1.6, Math.min(R * 1.6, e.clientY - ccy));
+      const Lc = MAXD * Math.tanh(0.2 * L / MAXD);                        // cao su: càng kéo xa càng nặng
+      tox = dx / L * Lc; toy = dy / L * Lc;
+    }
+    const release = () => { target = 0; tmx = tmy = 0; tox = toy = 0; wake(); };
+    el.addEventListener('pointerdown', e => { el.setPointerCapture(e.pointerId); target = 1; setMouse(e, true); wake(); });
+    el.addEventListener('pointermove', e => { if (target) { setMouse(e); wake(); } });
+    el.addEventListener('pointerup', release); el.addEventListener('pointercancel', release);
+    el.addEventListener('contextmenu', e => e.preventDefault());
+    el.addEventListener('click', e => { if (moved) { e.preventDefault(); moved = false; } });   // kéo rồi thả thì không điều hướng
+
+    cur = { gl, refresh() { drawTex(); render(); } };
+    cur.refresh();
+  }
+
+  let pend = 0;
+  const refresh = () => { if (pend || !cur) return; pend = requestAnimationFrame(() => { pend = 0; cur && cur.refresh(); }); };
+  addEventListener('resize', refresh); addEventListener('scroll', refresh, { passive: true });
+  const scan = () => { const el = document.getElementById('lgBack'); if (el && !el._lg) init(el); };
+  new MutationObserver(scan).observe(document.body, { childList: true, subtree: true }); scan();
+})();
+</script>
 </body>
 </html>
