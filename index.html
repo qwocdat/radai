@@ -754,6 +754,61 @@
         .sleep-clock { font-size: 40px; font-weight: 800; letter-spacing: 1px; margin-top: 8px; font-variant-numeric: tabular-nums;
             background: linear-gradient(90deg, #a5b4fc, #e9d5ff); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 
+        /* ===== MÀN HÌNH ĐANG PHÁT AUDIO ===== */
+        body.np-open { overflow: hidden; }
+        body.np-open #sleepChip { z-index: 2600; top: calc(64px + env(safe-area-inset-top, 0px)); right: 70px; }
+        #npView { position: fixed; inset: 0; z-index: 2500; background: #000; color: #fff; display: flex; flex-direction: column;
+            padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px); overflow: hidden;
+            transform: translateY(100%); visibility: hidden; transition: transform .42s cubic-bezier(.32,.72,0,1), visibility 0s linear .42s; }
+        #npView.show { transform: none; visibility: visible; transition: transform .42s cubic-bezier(.32,.72,0,1), visibility 0s; }
+        .np-bg { position: absolute; inset: -40px; background-size: cover; background-position: center; filter: blur(70px) saturate(1.3) brightness(.4); opacity: .55; z-index: 0; transform: scale(1.15); }
+        #npView > *:not(.np-bg) { position: relative; z-index: 1; }
+        .np-top { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; flex: none; }
+        .np-ico { width: 44px; height: 44px; border-radius: 50%; border: 0; background: transparent; color: #fff; font-size: 20px; cursor: pointer; display: grid; place-items: center; }
+        .np-ico:active { background: rgba(255,255,255,.12); }
+        .np-pill { display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: rgba(40,40,44,.85); }
+        .np-pill button { width: 54px; height: 40px; border: 0; border-radius: 999px; background: transparent; color: #cfcfd4; font-size: 17px; cursor: pointer; }
+        .np-pill button.on { background: #4a4a50; color: #fff; }
+        .np-art-zone { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 0; }
+        .np-art { width: 100%; aspect-ratio: 16/9; background: #111; overflow: hidden; }
+        .np-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .np-info { padding: 0 24px; flex: none; }
+        .np-title { font-size: 24px; font-weight: 800; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .np-sub { margin-top: 6px; font-size: 17px; color: #a1a1a8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .np-seekbox { padding: 26px 24px 0; flex: none; }
+        .np-seekbox input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 22px; background: transparent; cursor: pointer; margin: 0; --p: 0%; }
+        .np-seekbox input[type=range]::-webkit-slider-runnable-track { height: 5px; border-radius: 5px; background: linear-gradient(to right, #fff var(--p), rgba(255,255,255,.22) var(--p)); }
+        .np-seekbox input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; margin-top: -4.5px; border-radius: 50%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.5); }
+        .np-seekbox input[type=range]::-moz-range-track { height: 5px; border-radius: 5px; background: rgba(255,255,255,.22); }
+        .np-seekbox input[type=range]::-moz-range-progress { height: 5px; border-radius: 5px; background: #fff; }
+        .np-seekbox input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border: 0; border-radius: 50%; background: #fff; }
+        .np-times { display: flex; justify-content: space-between; font-size: 13px; color: #a1a1a8; margin-top: 4px; font-variant-numeric: tabular-nums; }
+        .np-controls { display: flex; align-items: center; justify-content: space-between; padding: 14px 22px 0; flex: none; }
+        .np-btn { width: 48px; height: 48px; border: 0; border-radius: 50%; background: transparent; color: #fff; font-size: 21px; cursor: pointer; position: relative; display: grid; place-items: center; opacity: .9; }
+        .np-btn.big { font-size: 30px; }
+        .np-btn:active { background: rgba(255,255,255,.12); }
+        .np-btn.on { color: #c4b5fd; opacity: 1; }
+        .np-btn b { display: none; position: absolute; font-size: 9px; font-weight: 800; top: 50%; left: 50%; transform: translate(-50%, -50%); margin-top: 0; }
+        .np-btn.one b { display: block; }
+        .np-play { width: 78px; height: 78px; border-radius: 50%; border: 0; background: #fff; color: #000; font-size: 32px; cursor: pointer; display: grid; place-items: center; box-shadow: 0 6px 24px rgba(0,0,0,.45); transition: transform .15s ease; }
+        .np-play:active { transform: scale(.94); }
+        .np-queue-bar { flex: none; margin: 14px 0 0; padding: 10px 24px 18px; border: 0; background: transparent; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+        .np-queue-bar #npQueueTitle { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .np-grip { width: 54px; height: 5px; border-radius: 5px; background: rgba(255,255,255,.35); }
+        .np-sheet { position: absolute !important; left: 0; right: 0; bottom: 0; height: 68%; background: #121214; border-radius: 22px 22px 0 0; z-index: 5 !important;
+            display: flex; flex-direction: column; transform: translateY(105%); transition: transform .38s cubic-bezier(.32,.72,0,1); box-shadow: 0 -10px 40px rgba(0,0,0,.6); }
+        .np-sheet.show { transform: none; }
+        .np-sheet-head { display: flex; align-items: center; justify-content: space-between; padding: 8px 8px 4px 22px; font-weight: 800; font-size: 17px; }
+        .np-sheet-list { overflow-y: auto; padding: 4px 12px calc(16px + env(safe-area-inset-bottom, 0px)); flex: 1; }
+        .np-q-item { display: flex; align-items: center; gap: 12px; padding: 8px; border-radius: 12px; cursor: pointer; }
+        .np-q-item:active, .np-q-item.on { background: rgba(255,255,255,.08); }
+        .np-q-item img { width: 72px; aspect-ratio: 16/9; object-fit: cover; border-radius: 8px; background: #1a1d28; flex-shrink: 0; }
+        .np-q-item .tx { flex: 1; min-width: 0; }
+        .np-q-item .t { font-size: 14px; font-weight: 700; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .np-q-item .s { font-size: 12px; color: #a1a1a8; margin-top: 2px; }
+        .np-q-item > i { color: #a1a1a8; font-size: 14px; }
+        .np-q-item.on > i, .np-q-item.on .t { color: #c4b5fd; }
+
         /* Mini audio player */
         .mini-player {
             position: fixed; left: 14px; right: 14px; max-width: 380px; margin: 0 auto;
@@ -942,6 +997,40 @@
             <button class="mini-btn" id="miniClose" aria-label="Đóng"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <input class="mini-seek" id="miniSeek" type="range" min="0" max="100" step="0.1" value="0">
+    </div>
+
+    <!-- Màn hình đang phát Audio -->
+    <div id="npView" aria-hidden="true">
+        <div class="np-bg" id="npBg"></div>
+        <div class="np-top">
+            <button class="np-ico" id="npClose" aria-label="Thu nhỏ"><i class="fa-solid fa-chevron-down"></i></button>
+            <div class="np-pill">
+                <button class="on" aria-label="Audio"><i class="fa-solid fa-headphones"></i></button>
+                <button id="npVideo" aria-label="Xem video"><i class="fa-solid fa-play"></i></button>
+            </div>
+            <button class="np-ico" id="npSleep" aria-label="Hẹn giờ đi ngủ"><i class="fa-solid fa-moon"></i></button>
+        </div>
+        <div class="np-art-zone"><div class="np-art"><img id="npArt" alt=""></div></div>
+        <div class="np-info">
+            <div class="np-title" id="npTitle">—</div>
+            <div class="np-sub" id="npSub">—</div>
+        </div>
+        <div class="np-seekbox">
+            <input type="range" id="npSeek" min="0" max="1000" step="1" value="0" aria-label="Tua">
+            <div class="np-times"><span id="npCur">0:00</span><span id="npDur">0:00</span></div>
+        </div>
+        <div class="np-controls">
+            <button class="np-btn" id="npShuffle" aria-label="Phát ngẫu nhiên"><i class="fa-solid fa-shuffle"></i></button>
+            <button class="np-btn big" id="npPrev" aria-label="Bài trước"><i class="fa-solid fa-backward-step"></i></button>
+            <button class="np-play" id="npPlay" aria-label="Phát/Dừng"><i class="fa-solid fa-play"></i></button>
+            <button class="np-btn big" id="npNext" aria-label="Bài sau"><i class="fa-solid fa-forward-step"></i></button>
+            <button class="np-btn" id="npRepeat" aria-label="Lặp lại"><i class="fa-solid fa-repeat"></i><b>1</b></button>
+        </div>
+        <button class="np-queue-bar" id="npQueueBar"><span class="np-grip"></span><span id="npQueueTitle">Danh sách phát</span></button>
+        <div class="np-sheet" id="npSheet">
+            <div class="np-sheet-head"><span id="npSheetTitle">Danh sách phát</span><button class="np-ico" id="npSheetClose" aria-label="Đóng"><i class="fa-solid fa-xmark"></i></button></div>
+            <div class="np-sheet-list" id="npSheetList"></div>
+        </div>
     </div>
 
     <canvas id="glGlass"></canvas>
@@ -1923,10 +2012,14 @@ void main(){
         let audioGroups = {};
         let audioQueue = [], audioIdx = -1;
 
+        function audioArt(ep, m) {
+            return ep.thumbnail || ep.thumb || ep.image || ep.cover || ep.poster || ep.img || m.thumbnail || FALLBACK_THUMB;
+        }
+
         function buildAudioQueue(mid, m) {
             return getEpisodes(m).map((ep, n) => ({
                 mid, ep: n, movie: m.title || '', title: ep.title || '', num: ep.order || n + 1,
-                url: ep.url || '', thumb: m.thumbnail || FALLBACK_THUMB
+                url: ep.url || '', thumb: m.thumbnail || FALLBACK_THUMB, art: audioArt(ep, m)
             }));
         }
 
@@ -1944,10 +2037,7 @@ void main(){
 
             mids.forEach(mid => {
                 const m = combinedData[mid];
-                audioGroups[mid] = getEpisodes(m).map((ep, i) => ({
-                    mid, ep: i, movie: m.title || '', title: ep.title || '', num: ep.order || i + 1,
-                    url: ep.url || '', thumb: m.thumbnail || FALLBACK_THUMB
-                }));
+                audioGroups[mid] = buildAudioQueue(mid, m);
             });
 
             const withEps = mids.filter(mid => audioGroups[mid].length);
@@ -1987,6 +2077,7 @@ void main(){
                     window.__pendingAuthCallback = () => {
                         audioQueue = audioGroups[el.dataset.mid];
                         loadAudio(parseInt(el.dataset.i), true);
+                        openNP();
                     };
                     requireUserAuth(window.__pendingAuthCallback);
                 });
@@ -2001,6 +2092,7 @@ void main(){
                 audioQueue = buildAudioQueue(mid, m);
                 window.liquidGlass.setTab('audio', true);
                 loadAudio(i, true);
+                openNP();
             });
         };
 
@@ -2024,7 +2116,7 @@ void main(){
                 const u = new URL(location.href);
                 u.searchParams.set('a', it.mid); u.searchParams.set('ae', i);
                 u.searchParams.delete('v'); u.searchParams.delete('ep');
-                history.replaceState(null, '', u.pathname + u.search + u.hash);
+                history.replaceState(history.state, '', u.pathname + u.search + u.hash);
             } catch (e) {}
 
             audioEl.defaultPlaybackRate = settings.speed;
@@ -2037,7 +2129,7 @@ void main(){
                 }
             }, { once: true });
 
-            mini.thumb.src = it.thumb;
+            mini.thumb.src = it.art || it.thumb;
             mini.title.textContent = it.title || ('Bài MP3 ' + it.num);
             mini.sub.textContent = it.movie;
             mini.seek.value = 0;
@@ -2045,10 +2137,12 @@ void main(){
 
             if (autoplay) audioEl.play().catch(() => {});
             markPlaying();
+            updateNP();
         }
 
         function setPlayIcon() {
             mini.play.innerHTML = `<i class="fa-solid fa-${audioEl.paused ? 'play' : 'pause'}"></i>`;
+            setNpPlay();
         }
 
         audioEl.addEventListener('play', () => {
@@ -2071,10 +2165,22 @@ void main(){
             }
         });
 
+        let npShuffle = false, npRepeat = 0; // repeat: 0 tắt, 1 cả danh sách, 2 một bài
+        function pickNext() {
+            const n = audioQueue.length;
+            if (!n) return -1;
+            if (npShuffle && n > 1) { let r; do { r = Math.floor(Math.random() * n); } while (r === audioIdx); return r; }
+            if (audioIdx + 1 < n) return audioIdx + 1;
+            if (npRepeat === 1) return 0;
+            return -1;
+        }
+
         audioEl.addEventListener('ended', () => {
-            if (audioIdx + 1 < audioQueue.length) {
-                showToast(`🎵 Đang phát tiếp Bài ${audioQueue[audioIdx + 1].num}...`);
-                loadAudio(audioIdx + 1, true);
+            if (npRepeat === 2) { audioEl.currentTime = 0; audioEl.play().catch(() => {}); return; }
+            const nx = pickNext();
+            if (nx >= 0) {
+                showToast(`🎵 Đang phát tiếp Bài ${audioQueue[nx].num}...`);
+                loadAudio(nx, true);
             } else {
                 showToast('🎧 Bạn đã nghe hết playlist audio này!');
             }
@@ -2089,7 +2195,8 @@ void main(){
             if (audioEl.currentTime > 4 || audioIdx <= 0) audioEl.currentTime = 0; else loadAudio(audioIdx - 1, true);
         });
         mini.next.addEventListener('click', () => {
-            if (audioIdx + 1 < audioQueue.length) loadAudio(audioIdx + 1, true);
+            const nx = pickNext();
+            if (nx >= 0) loadAudio(nx, true);
         });
         mini.close.addEventListener('click', () => {
             audioEl.pause(); audioEl.removeAttribute('src'); audioEl.load();
@@ -2098,6 +2205,127 @@ void main(){
         mini.seek.addEventListener('input', () => {
             if (audioEl.duration) audioEl.currentTime = (mini.seek.value / 100) * audioEl.duration;
         });
+
+        /* MÀN HÌNH ĐANG PHÁT AUDIO */
+        const $np = (id) => document.getElementById(id);
+        const np = {
+            box: $np('npView'), bg: $np('npBg'), art: $np('npArt'), title: $np('npTitle'), sub: $np('npSub'),
+            cur: $np('npCur'), dur: $np('npDur'), seek: $np('npSeek'), play: $np('npPlay'), prev: $np('npPrev'),
+            next: $np('npNext'), shuffle: $np('npShuffle'), repeat: $np('npRepeat'), close: $np('npClose'),
+            sleep: $np('npSleep'), video: $np('npVideo'), qbar: $np('npQueueBar'), qtitle: $np('npQueueTitle'),
+            sheet: $np('npSheet'), sheetList: $np('npSheetList'), sheetTitle: $np('npSheetTitle'), sheetClose: $np('npSheetClose')
+        };
+
+        function setNpPlay() {
+            np.play.innerHTML = `<i class="fa-solid fa-${audioEl.paused ? 'play' : 'pause'}"></i>`;
+        }
+
+        function renderNpQueue() {
+            np.sheetList.innerHTML = audioQueue.map((it, i) => `
+                <div class="np-q-item ${i === audioIdx ? 'on' : ''}" data-i="${i}">
+                    <img src="${esc(it.art || it.thumb)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
+                    <div class="tx"><div class="t">${esc(it.title || ('Bài ' + it.num))}</div><div class="s">Bài ${it.num}</div></div>
+                    <i class="fa-solid ${i === audioIdx ? 'fa-volume-high' : 'fa-music'}"></i>
+                </div>`).join('');
+        }
+
+        function updateNP() {
+            const it = audioQueue[audioIdx];
+            if (!it) return;
+            const art = it.art || it.thumb || FALLBACK_THUMB;
+            if (np.art.getAttribute('src') !== art) {
+                np.art.src = art;
+                np.bg.style.backgroundImage = 'url("' + String(art).replace(/"/g, '%22') + '")';
+            }
+            np.title.textContent = it.title || ('Bài ' + it.num);
+            np.sub.textContent = it.movie;
+            np.qtitle.textContent = it.movie ? ('Danh sách: ' + it.movie) : 'Danh sách phát';
+            np.sheetTitle.textContent = it.movie || 'Danh sách phát';
+            np.cur.textContent = fmtTime(0); np.dur.textContent = fmtTime(0); np.seek.value = 0; np.seek.style.setProperty('--p', '0%');
+            setNpPlay();
+            renderNpQueue();
+        }
+
+        function openNP() {
+            if (audioIdx < 0) return;
+            updateNP();
+            if (!np.box.classList.contains('show')) {
+                history.pushState({ np: 1 }, '', location.href);
+            }
+            np.box.classList.add('show');
+            np.box.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('np-open');
+        }
+        function hideNP() {
+            np.box.classList.remove('show');
+            np.box.setAttribute('aria-hidden', 'true');
+            np.sheet.classList.remove('show');
+            document.body.classList.remove('np-open');
+        }
+        function closeNP() {
+            if (history.state && history.state.np) history.back(); else hideNP();
+        }
+        window.addEventListener('popstate', () => { if (np.box.classList.contains('show')) hideNP(); });
+
+        np.art.addEventListener('error', () => { if (np.art.src !== FALLBACK_THUMB) np.art.src = FALLBACK_THUMB; });
+        np.close.addEventListener('click', closeNP);
+        np.sleep.addEventListener('click', () => window.openSleepModal());
+        np.video.addEventListener('click', () => {
+            const it = audioQueue[audioIdx];
+            if (it && moviesDataset[it.mid]) {
+                window.playMovieWithAuth(it.mid);
+            } else {
+                showToast('ℹ️ Nội dung này chưa có bản Video.');
+            }
+        });
+        np.play.addEventListener('click', () => { audioEl.paused ? audioEl.play().catch(() => {}) : audioEl.pause(); });
+        np.prev.addEventListener('click', () => {
+            if (audioEl.currentTime > 4 || audioIdx <= 0) audioEl.currentTime = 0; else loadAudio(audioIdx - 1, true);
+        });
+        np.next.addEventListener('click', () => {
+            const nx = pickNext();
+            if (nx >= 0) loadAudio(nx, true); else showToast('🎧 Đã hết danh sách phát.');
+        });
+        np.shuffle.addEventListener('click', () => {
+            npShuffle = !npShuffle;
+            np.shuffle.classList.toggle('on', npShuffle);
+            showToast(npShuffle ? '🔀 Bật phát ngẫu nhiên.' : '🔀 Tắt phát ngẫu nhiên.');
+        });
+        np.repeat.addEventListener('click', () => {
+            npRepeat = (npRepeat + 1) % 3;
+            np.repeat.classList.toggle('on', npRepeat > 0);
+            np.repeat.classList.toggle('one', npRepeat === 2);
+            showToast(['🔁 Tắt lặp lại.', '🔁 Lặp lại cả danh sách.', '🔂 Lặp lại một bài.'][npRepeat]);
+        });
+        np.seek.addEventListener('input', () => {
+            np.seek.style.setProperty('--p', (np.seek.value / 10) + '%');
+            if (audioEl.duration) {
+                audioEl.currentTime = (np.seek.value / 1000) * audioEl.duration;
+                np.cur.textContent = fmtTime(audioEl.currentTime);
+            }
+        });
+        audioEl.addEventListener('timeupdate', () => {
+            if (!np.box.classList.contains('show') || !audioEl.duration) return;
+            if (document.activeElement !== np.seek) {
+                np.seek.value = (audioEl.currentTime / audioEl.duration) * 1000;
+                np.seek.style.setProperty('--p', (np.seek.value / 10) + '%');
+            }
+            np.cur.textContent = fmtTime(audioEl.currentTime);
+            np.dur.textContent = fmtTime(audioEl.duration);
+        });
+        audioEl.addEventListener('loadedmetadata', () => { np.dur.textContent = fmtTime(audioEl.duration); });
+
+        np.qbar.addEventListener('click', () => { renderNpQueue(); np.sheet.classList.add('show'); });
+        np.sheetClose.addEventListener('click', () => np.sheet.classList.remove('show'));
+        np.sheetList.addEventListener('click', (e) => {
+            const row = e.target.closest('.np-q-item');
+            if (!row) return;
+            loadAudio(parseInt(row.dataset.i), true);
+            np.sheet.classList.remove('show');
+        });
+        mini.thumb.addEventListener('click', openNP);
+        document.querySelector('.mini-info').addEventListener('click', openNP);
+        mini.thumb.style.cursor = 'pointer';
 
         /* SETTINGS TAB */
         function clearHistory() {
