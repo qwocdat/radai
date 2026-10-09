@@ -950,8 +950,298 @@
         .lg-back.lg-nogl { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.18); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
         .lg-back.lg-nogl canvas { display: none; }
 </style>
+    <style id="dt-intro-styles">
+        /* DigitalTube first-visit onboarding: isolated overlay; existing app styles remain untouched. */
+        html.dt-intro-accepted #dtIntro { display: none !important; }
+        #dtIntro {
+            position: fixed; inset: 0; z-index: 100000; display: flex; align-items: center; justify-content: center;
+            overflow: hidden; isolation: isolate; color: #f7f8ff; background: #05060a;
+            padding: max(18px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+            font-family: 'Plus Jakarta Sans', sans-serif; overscroll-behavior: contain;
+        }
+        #dtIntro * { box-sizing: border-box; }
+        #dtIntroShader { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -3; display: block; }
+        #dtIntro::before { content: ''; position: absolute; inset: 0; z-index: -2; pointer-events: none;
+            background: radial-gradient(ellipse at 50% 43%, rgba(8,10,18,.12), rgba(4,5,10,.72) 78%), linear-gradient(180deg, rgba(4,5,10,.32), rgba(4,5,10,.48)); }
+        #dtIntro::after { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+            background: radial-gradient(ellipse at center, transparent 25%, rgba(0,0,0,.34) 100%); }
+        #dtIntro .intro-shell { position: relative; width: min(1120px, 100%); max-height: 100%; display: flex; flex-direction: column; }
+        #dtIntro .intro-topline { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: clamp(18px, 4vh, 34px); }
+        #dtIntro .intro-brand { display: inline-flex; align-items: center; gap: 11px; color: #fff; font-size: 14px; font-weight: 800; letter-spacing: .055em; }
+        #dtIntro .intro-brand-mark { display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid rgba(255,255,255,.28); border-radius: 12px;
+            background: linear-gradient(145deg, rgba(125,120,255,.88), rgba(159,78,241,.72)); color: #fff; box-shadow: 0 8px 28px rgba(110,90,255,.26), inset 0 1px 1px rgba(255,255,255,.5); }
+        #dtIntro .intro-counter { display: flex; align-items: center; gap: 12px; color: rgba(237,238,255,.7); font: 700 11px/1 'Plus Jakarta Sans', sans-serif; letter-spacing: .18em; white-space: nowrap; }
+        #dtIntro .intro-progress { display: flex; gap: 5px; }
+        #dtIntro .intro-progress span { width: 25px; height: 3px; border-radius: 10px; background: rgba(255,255,255,.18); transition: background .35s, width .45s cubic-bezier(.2,.8,.2,1), box-shadow .35s; }
+        #dtIntro .intro-progress span.on { width: 37px; background: #dcd8ff; box-shadow: 0 0 14px rgba(172,154,255,.75); }
+        #dtIntro .intro-stage { position: relative; min-height: min(620px, calc(100dvh - 145px)); display: flex; align-items: center; }
+        #dtIntro .intro-slide { display: none; width: 100%; transform-origin: 50% 55%; }
+        #dtIntro .intro-slide.active { display: block; animation: dtIntroStageIn .7s cubic-bezier(.16,1,.3,1) both; }
+        #dtIntro .intro-slide.leaving { opacity: 0; transform: translate3d(70px,0,0) scale(.965); filter: blur(16px); transition: opacity .42s ease, transform .58s cubic-bezier(.4,0,.2,1), filter .4s ease; pointer-events: none; }
+        #dtIntro .intro-layout { display: grid; grid-template-columns: minmax(0,1.1fr) minmax(280px,.9fr); align-items: center; gap: clamp(30px, 7vw, 95px); }
+        #dtIntro .intro-copy { min-width: 0; }
+        #dtIntro .intro-eyebrow { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 21px; padding: 8px 12px; border-radius: 999px;
+            border: 1px solid rgba(220,218,255,.2); background: rgba(255,255,255,.055); color: #d7d3ff; font-size: 10px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; backdrop-filter: blur(16px) saturate(145%); -webkit-backdrop-filter: blur(16px) saturate(145%); }
+        #dtIntro .intro-eyebrow i { font-size: 10px; filter: drop-shadow(0 0 7px currentColor); }
+        #dtIntro .intro-title { margin: 0; max-width: 780px; color: #f9f9ff; font-size: clamp(38px, 6.5vw, 78px); line-height: 1.02; font-weight: 800; letter-spacing: -.065em; text-wrap: balance; }
+        #dtIntro .intro-title .gradient { color: #c9c2ff; background: linear-gradient(105deg,#fff 5%,#cbc6ff 42%,#d6baff 66%,#91dcff 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        #dtIntro .intro-subtitle { max-width: 570px; margin-top: 22px; color: rgba(235,237,255,.72); font-size: clamp(14px,1.55vw,17px); line-height: 1.8; font-weight: 400; }
+        #dtIntro .intro-split { white-space: normal; }
+        #dtIntro .intro-letter { display: inline-block; white-space: pre; opacity: 0; filter: blur(11px); transform: translate3d(var(--dx,0),var(--dy,18px),0) rotate(var(--rot,0deg)) scale(.82); transform-origin: 50% 80%; }
+        #dtIntro .intro-slide.play .intro-letter { animation: dtIntroGlyph .82s cubic-bezier(.16,1,.3,1) var(--delay,0s) both; }
+        #dtIntro .intro-bullet-row { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 27px; }
+        #dtIntro .intro-chip { display: inline-flex; align-items: center; gap: 8px; padding: 10px 13px; color: rgba(245,245,255,.87); font-size: 12px; font-weight: 650; border-radius: 999px;
+            background: rgba(255,255,255,.055); border: 1px solid rgba(255,255,255,.11); backdrop-filter: blur(18px) saturate(135%); -webkit-backdrop-filter: blur(18px) saturate(135%); box-shadow: inset 0 1px rgba(255,255,255,.08); }
+        #dtIntro .intro-chip i { color: #c8c2ff; }
+        #dtIntro .intro-visual { position: relative; min-height: 350px; display: grid; place-items: center; perspective: 900px; }
+        #dtIntro .intro-orbit { position: absolute; width: min(31vw,370px); aspect-ratio: 1; border: 1px solid rgba(209,203,255,.13); border-radius: 50%; transform: rotateX(64deg) rotate(-22deg); box-shadow: 0 0 70px rgba(110,89,255,.08), inset 0 0 50px rgba(100,122,255,.04); animation: dtIntroOrbit 22s linear infinite; }
+        #dtIntro .intro-orbit::before, #dtIntro .intro-orbit::after { content: ''; position: absolute; border: 1px solid rgba(178,168,255,.13); border-radius: 50%; inset: 13%; }
+        #dtIntro .intro-orbit::after { inset: 29%; border-color: rgba(140,213,255,.13); }
+        #dtIntro .intro-app-tile { position: relative; display: grid; place-items: center; width: clamp(135px,18vw,212px); aspect-ratio: 1; border-radius: 36%; border: 1px solid rgba(255,255,255,.36);
+            background: linear-gradient(145deg,rgba(255,255,255,.20),rgba(255,255,255,.035) 46%,rgba(129,101,255,.16));
+            box-shadow: 0 25px 75px rgba(0,0,0,.35),0 0 80px rgba(108,89,255,.22),inset 0 1px 1px rgba(255,255,255,.42),inset 0 -18px 40px rgba(88,89,255,.10);
+            backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); transform: rotateY(-13deg) rotateX(9deg); animation: dtIntroTileFloat 5.5s ease-in-out infinite; }
+        #dtIntro .intro-app-tile::before { content: ''; position: absolute; inset: 9%; border-radius: 31%; background: linear-gradient(130deg,rgba(139,130,255,.2),transparent 55%,rgba(109,218,255,.10)); border: 1px solid rgba(255,255,255,.1); }
+        #dtIntro .intro-app-tile i { position: relative; font-size: clamp(48px,7vw,76px); color: #fff; text-shadow: 0 0 22px rgba(174,164,255,.85),0 0 55px rgba(118,97,255,.6); transform: translateX(4px); }
+        #dtIntro .intro-float-card { position: absolute; display: flex; align-items: center; gap: 11px; min-width: 156px; padding: 13px 15px; border-radius: 18px; border: 1px solid rgba(255,255,255,.18);
+            background: linear-gradient(145deg,rgba(32,34,52,.72),rgba(15,17,30,.53)); backdrop-filter: blur(22px) saturate(145%); -webkit-backdrop-filter: blur(22px) saturate(145%);
+            box-shadow: 0 18px 44px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.15); animation: dtIntroFloat 6s ease-in-out infinite; }
+        #dtIntro .intro-float-card i { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 11px; background: rgba(142,131,255,.18); color: #d8d3ff; }
+        #dtIntro .intro-float-card b { display: block; font-size: 12px; font-weight: 750; }
+        #dtIntro .intro-float-card small { display: block; margin-top: 3px; color: rgba(228,230,250,.55); font-size: 10px; }
+        #dtIntro .intro-float-card.one { top: 13%; right: -4%; transform: rotate(5deg); }
+        #dtIntro .intro-float-card.two { bottom: 12%; left: -5%; animation-delay: -2.1s; transform: rotate(-5deg); }
+        #dtIntro .intro-feature-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; margin-top: 30px; }
+        #dtIntro .intro-feature { position: relative; min-height: 148px; padding: 18px 17px; overflow: hidden; border-radius: 20px; border: 1px solid rgba(255,255,255,.12);
+            background: linear-gradient(145deg,rgba(255,255,255,.085),rgba(255,255,255,.025)); box-shadow: inset 0 1px rgba(255,255,255,.08),0 14px 35px rgba(0,0,0,.12);
+            backdrop-filter: blur(20px) saturate(135%); -webkit-backdrop-filter: blur(20px) saturate(135%); opacity: 0; transform: translateY(18px) scale(.97); }
+        #dtIntro .intro-slide.play .intro-feature { animation: dtIntroCardIn .65s cubic-bezier(.16,1,.3,1) calc(.18s + var(--i,0)*.075s) both; }
+        #dtIntro .intro-feature::after { content: ''; position: absolute; width: 90px; height: 90px; top: -40px; right: -30px; border-radius: 50%; background: rgba(137,119,255,.16); filter: blur(23px); pointer-events: none; }
+        #dtIntro .intro-feature-icon { display: grid; place-items: center; width: 38px; height: 38px; margin-bottom: 17px; border-radius: 13px; color: #d9d3ff; background: rgba(150,136,255,.15); border: 1px solid rgba(198,189,255,.12); font-size: 15px; }
+        #dtIntro .intro-feature h3 { margin: 0 0 7px; font-size: 14px; font-weight: 750; color: #fafaff; }
+        #dtIntro .intro-feature p { margin: 0; font-size: 11px; line-height: 1.65; color: rgba(228,230,249,.62); }
+        #dtIntro .intro-bottom { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-top: clamp(18px,4vh,32px); }
+        #dtIntro .intro-footnote { color: rgba(224,225,245,.45); font-size: 11px; line-height: 1.6; }
+        #dtIntro .intro-next-wrap { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+        #dtIntro .intro-next-label { color: rgba(235,235,255,.72); font-size: 12px; font-weight: 650; }
+        #dtIntro .intro-next { position: relative; isolation: isolate; display: inline-grid; place-items: center; width: 62px; height: 62px; flex-shrink: 0; border-radius: 50%; border: 1px solid rgba(255,255,255,.62); color: #151320;
+            background: linear-gradient(145deg,#fff,#dcd9ff 70%,#b2c7ff); cursor: pointer; box-shadow: 0 9px 28px rgba(155,143,255,.26),inset 0 1px 1px #fff; transition: transform .24s, box-shadow .24s, opacity .24s, filter .24s; }
+        #dtIntro .intro-next::before { content: ''; position: absolute; inset: -8px; border-radius: inherit; border: 1px solid rgba(219,214,255,.24); opacity: .65; transform: scale(.82); transition: transform .35s, opacity .35s; z-index: -1; }
+        #dtIntro .intro-next:hover { transform: translateY(-2px) scale(1.04); box-shadow: 0 14px 38px rgba(155,143,255,.4),inset 0 1px 1px #fff; }
+        #dtIntro .intro-next:hover::before { transform: scale(1.12); opacity: .95; }
+        #dtIntro .intro-next svg { width: 25px; height: 25px; overflow: visible; transform-origin: 50% 50%; animation: dtArrowIdle 3.2s ease-in-out infinite; }
+        #dtIntro .intro-next.flyout { animation: dtArrowLaunch .66s cubic-bezier(.18,.72,.15,1) forwards; pointer-events: none; }
+        #dtIntro .intro-next.flyout svg { animation: dtArrowSpin .66s cubic-bezier(.18,.72,.15,1) forwards; }
+        #dtIntro .intro-next:disabled { opacity: .28; cursor: not-allowed; filter: grayscale(.55); box-shadow: none; }
+        #dtIntro .intro-next:disabled:hover { transform: none; }
+        #dtIntro .intro-next:disabled::before { opacity: .15; }
+        #dtIntro .intro-privacy-layout { display: grid; grid-template-columns: minmax(0,1fr) minmax(300px,.88fr); align-items: center; gap: clamp(28px,6vw,78px); }
+        #dtIntro .intro-shield-wrap { position: relative; width: min(100%,360px); aspect-ratio: 1; display: grid; place-items: center; margin: auto; }
+        #dtIntro .intro-shield-ring { position: absolute; inset: 9%; border-radius: 50%; border: 1px solid rgba(176,166,255,.18); box-shadow: 0 0 65px rgba(117,101,255,.1),inset 0 0 45px rgba(117,101,255,.06); animation: dtIntroOrbit 28s linear infinite reverse; }
+        #dtIntro .intro-shield-ring::before,#dtIntro .intro-shield-ring::after { content: ''; position: absolute; inset: 14%; border: 1px dashed rgba(187,185,255,.15); border-radius: 50%; }
+        #dtIntro .intro-shield-ring::after { inset: 28%; border-style: solid; border-color: rgba(137,212,255,.18); }
+        #dtIntro .intro-shield { position: relative; display: grid; place-items: center; width: 38%; aspect-ratio: .9; clip-path: polygon(50% 0%,90% 16%,86% 60%,70% 82%,50% 100%,30% 82%,14% 60%,10% 16%);
+            background: linear-gradient(145deg,rgba(205,201,255,.9),rgba(113,105,255,.48) 48%,rgba(76,190,255,.42)); filter: drop-shadow(0 0 35px rgba(143,123,255,.52)); }
+        #dtIntro .intro-shield::before { content: ''; position: absolute; inset: 2px; clip-path: inherit; background: linear-gradient(150deg,rgba(30,32,56,.82),rgba(10,12,25,.92)); }
+        #dtIntro .intro-shield i { z-index: 1; font-size: clamp(28px,4vw,43px); color: #e5e2ff; text-shadow: 0 0 20px rgba(172,162,255,.7); }
+        #dtIntro .intro-privacy-points { display: grid; gap: 10px; margin: 23px 0 0; padding: 0; list-style: none; }
+        #dtIntro .intro-privacy-points li { display: flex; gap: 11px; align-items: flex-start; color: rgba(232,234,251,.7); font-size: 12px; line-height: 1.65; }
+        #dtIntro .intro-privacy-points i { color: #b7e5c5; margin-top: 3px; }
+        #dtIntro .intro-legal-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+        #dtIntro .intro-legal-link { border: 0; padding: 7px 0; background: transparent; color: #c9c1ff; text-decoration: underline; text-underline-offset: 4px; font: 650 12px 'Plus Jakarta Sans',sans-serif; cursor: pointer; }
+        #dtIntro .intro-consent { display: flex; align-items: flex-start; gap: 12px; margin-top: 24px; padding: 15px 16px; border: 1px solid rgba(255,255,255,.15); border-radius: 16px; background: rgba(255,255,255,.05); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); cursor: pointer; }
+        #dtIntro .intro-consent input { appearance: none; -webkit-appearance: none; flex: 0 0 20px; width: 20px; height: 20px; margin: 1px 0 0; border: 1px solid rgba(255,255,255,.38); border-radius: 6px; background: rgba(0,0,0,.18); cursor: pointer; position: relative; }
+        #dtIntro .intro-consent input:checked { background: #bdb5ff; border-color: #dcd7ff; }
+        #dtIntro .intro-consent input:checked::after { content: ''; position: absolute; left: 5px; top: 2px; width: 6px; height: 10px; border: solid #17142a; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+        #dtIntro .intro-consent span { color: rgba(247,247,255,.86); font-size: 12px; line-height: 1.7; font-weight: 550; }
+        #dtIntro .intro-consent strong { color: #fff; }
+        #dtIntro .intro-decline { border: 0; color: rgba(237,238,255,.49); background: transparent; font: 600 11px 'Plus Jakarta Sans',sans-serif; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+        #dtIntro .intro-status { min-height: 17px; margin-top: 9px; color: #ffcfbc; font-size: 11px; line-height: 1.5; }
+        #dtIntroLegal { position: fixed; inset: 0; z-index: 100010; display: none; place-items: center; padding: 20px; background: rgba(2,3,8,.78); backdrop-filter: blur(22px) saturate(125%); -webkit-backdrop-filter: blur(22px) saturate(125%); }
+        #dtIntroLegal.show { display: grid; animation: dtIntroFade .2s ease both; }
+        #dtIntroLegal .intro-legal-card { width: min(720px,100%); max-height: min(78dvh,760px); display: flex; flex-direction: column; border: 1px solid rgba(255,255,255,.18); border-radius: 25px; overflow: hidden; background: linear-gradient(145deg,rgba(24,25,43,.94),rgba(9,10,19,.96)); box-shadow: 0 30px 100px rgba(0,0,0,.58),inset 0 1px rgba(255,255,255,.08); }
+        #dtIntroLegal .intro-legal-head { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 21px 23px; border-bottom: 1px solid rgba(255,255,255,.1); }
+        #dtIntroLegal .intro-legal-head h2 { font-size: 18px; margin: 0; font-weight: 800; }
+        #dtIntroLegal .intro-legal-close { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; color: #fff; border: 1px solid rgba(255,255,255,.15); background: rgba(255,255,255,.07); cursor: pointer; }
+        #dtIntroLegal .intro-legal-body { padding: 23px; overflow: auto; color: rgba(235,237,251,.75); font-size: 13px; line-height: 1.85; overscroll-behavior: contain; }
+        #dtIntroLegal .intro-legal-body h3 { margin: 18px 0 6px; color: #fff; font-size: 14px; }
+        #dtIntroLegal .intro-legal-body h3:first-child { margin-top: 0; }
+        #dtIntroLegal .intro-legal-body p { margin: 0 0 12px; }
+        #dtIntroLegal .intro-legal-body strong { color: #fff; }
+        #dtIntro .intro-pulse { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+        @keyframes dtIntroFade { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes dtIntroStageIn { from { opacity: 0; transform: translate3d(0,24px,0) scale(.985); filter: blur(8px); } to { opacity: 1; transform: none; filter: blur(0); } }
+        @keyframes dtIntroGlyph { 0% { opacity: 0; filter: blur(12px); transform: translate3d(var(--dx),var(--dy),0) rotate(var(--rot)) scale(.78); } 65% { opacity: 1; filter: blur(0); } 100% { opacity: 1; filter: blur(0); transform: translate3d(0,0,0) rotate(0) scale(1); } }
+        @keyframes dtIntroCardIn { to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes dtIntroOrbit { from { rotate: 0deg; } to { rotate: 360deg; } }
+        @keyframes dtIntroTileFloat { 0%,100% { transform: translate3d(0,0,0) rotateY(-13deg) rotateX(9deg); } 50% { transform: translate3d(0,-10px,0) rotateY(-8deg) rotateX(5deg); } }
+        @keyframes dtIntroFloat { 0%,100% { translate: 0 0; } 50% { translate: 0 -9px; } }
+        @keyframes dtArrowIdle { 0%,100% { transform: translateX(0) rotate(0deg); } 50% { transform: translateX(2px) rotate(7deg); } }
+        @keyframes dtArrowLaunch { 0% { transform: translate3d(0,0,0) scale(1); filter: blur(0); } 12% { transform: translate3d(-3px,0,0) scale(.91); } 100% { transform: translate3d(130vw,0,0) scale(.62); filter: blur(5px); opacity: 0; } }
+        @keyframes dtArrowSpin { 0% { transform: rotate(0) scale(1); } 20% { transform: rotate(-30deg) scale(1.2); } 100% { transform: rotate(720deg) scale(.75); } }
+        @media (max-width: 760px) {
+            #dtIntro { align-items: stretch; padding-top: max(15px,env(safe-area-inset-top)); padding-bottom: max(16px,env(safe-area-inset-bottom)); }
+            #dtIntro .intro-shell { max-width: 560px; justify-content: flex-start; }
+            #dtIntro .intro-topline { margin-bottom: 15px; }
+            #dtIntro .intro-stage { min-height: 0; flex: 1; align-items: center; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+            #dtIntro .intro-stage::-webkit-scrollbar { display: none; }
+            #dtIntro .intro-layout, #dtIntro .intro-privacy-layout { grid-template-columns: 1fr; gap: 16px; }
+            #dtIntro .intro-layout:first-child { grid-template-columns: 1fr; }
+            #dtIntro .intro-visual { min-height: 220px; margin-top: -4px; }
+            #dtIntro .intro-orbit { width: min(54vw,260px); }
+            #dtIntro .intro-app-tile { width: 122px; }
+            #dtIntro .intro-app-tile i { font-size: 48px; }
+            #dtIntro .intro-float-card { min-width: 136px; padding: 10px 11px; border-radius: 14px; }
+            #dtIntro .intro-float-card.one { top: 8%; right: 0; }
+            #dtIntro .intro-float-card.two { bottom: 5%; left: 0; }
+            #dtIntro .intro-eyebrow { margin-bottom: 15px; font-size: 9px; }
+            #dtIntro .intro-title { font-size: clamp(35px,10vw,53px); }
+            #dtIntro .intro-subtitle { margin-top: 15px; font-size: 13px; line-height: 1.7; }
+            #dtIntro .intro-bullet-row { gap: 7px; margin-top: 18px; }
+            #dtIntro .intro-chip { padding: 8px 10px; font-size: 10px; }
+            #dtIntro .intro-feature-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin-top: 17px; }
+            #dtIntro .intro-feature { min-height: 119px; padding: 12px; border-radius: 15px; }
+            #dtIntro .intro-feature-icon { width: 30px; height: 30px; margin-bottom: 10px; border-radius: 10px; }
+            #dtIntro .intro-feature h3 { font-size: 12px; margin-bottom: 5px; }
+            #dtIntro .intro-feature p { font-size: 10px; }
+            #dtIntro .intro-shield-wrap { width: 118px; aspect-ratio: 1; margin: 0 auto 3px; }
+            #dtIntro .intro-privacy-layout { gap: 3px; }
+            #dtIntro .intro-privacy-layout .intro-eyebrow { margin-bottom: 12px; }
+            #dtIntro .intro-privacy-layout .intro-title { font-size: clamp(32px,8.6vw,45px); }
+            #dtIntro .intro-privacy-points { gap: 6px; margin-top: 14px; }
+            #dtIntro .intro-privacy-points li { font-size: 10px; line-height: 1.5; }
+            #dtIntro .intro-consent { margin-top: 14px; padding: 12px; gap: 9px; }
+            #dtIntro .intro-consent span { font-size: 10px; }
+            #dtIntro .intro-legal-actions { margin-top: 10px; }
+            #dtIntro .intro-bottom { margin-top: 12px; }
+            #dtIntro .intro-footnote { max-width: 45%; font-size: 9px; }
+            #dtIntro .intro-next { width: 54px; height: 54px; }
+            #dtIntro .intro-next-label { font-size: 10px; }
+            #dtIntro .intro-next-wrap { gap: 9px; }
+        }
+        @media (max-height: 760px) and (min-width: 761px) {
+            #dtIntro .intro-stage { min-height: 0; }
+            #dtIntro .intro-title { font-size: clamp(38px,5vw,62px); }
+            #dtIntro .intro-visual { min-height: 280px; }
+            #dtIntro .intro-feature { min-height: 122px; padding: 14px; }
+            #dtIntro .intro-shield-wrap { width: 270px; }
+            #dtIntro .intro-bottom { margin-top: 15px; }
+        }
+        @media (max-width: 380px) {
+            #dtIntro .intro-topline { margin-bottom: 8px; }
+            #dtIntro .intro-title { font-size: 32px; }
+            #dtIntro .intro-visual { min-height: 180px; }
+            #dtIntro .intro-feature { min-height: 112px; }
+            #dtIntro .intro-footnote { display: none; }
+            #dtIntro .intro-bottom { justify-content: flex-end; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            #dtIntro .intro-orbit, #dtIntro .intro-app-tile, #dtIntro .intro-float-card, #dtIntro .intro-next svg, #dtIntro .intro-shield-ring { animation-duration: 20s; }
+            #dtIntro .intro-slide.active { animation-duration: .01ms; }
+            #dtIntro .intro-slide.play .intro-letter, #dtIntro .intro-slide.play .intro-feature { animation-duration: .01ms; animation-delay: 0s; }
+        }
+    </style>
+    <script>
+        try {
+            if ((localStorage.getItem('dt_intro_consent_v1') || '').startsWith('accepted|')) {
+                document.documentElement.classList.add('dt-intro-accepted');
+            }
+        } catch (_) {}
+    </script>
+
 </head>
 <body>
+
+<div id="dtIntro" role="dialog" aria-modal="true" aria-label="Giới thiệu DigitalTube lần đầu" aria-describedby="introSubtitle1">
+    <canvas id="dtIntroShader" aria-hidden="true"></canvas>
+    <div class="intro-shell">
+        <div class="intro-topline">
+            <div class="intro-brand"><span class="intro-brand-mark"><i class="fa-solid fa-play"></i></span><span>DIGITALTUBE</span></div>
+            <div class="intro-counter" aria-label="Tiến trình giới thiệu"><span id="dtIntroCounter">01 / 03</span><span class="intro-progress"><span class="on"></span><span></span><span></span></span></div>
+        </div>
+        <div class="intro-stage">
+            <section class="intro-slide active" data-slide="0" aria-labelledby="introTitle1">
+                <div class="intro-layout">
+                    <div class="intro-copy">
+                        <div class="intro-eyebrow"><i class="fa-solid fa-sparkles"></i> YOUR MEDIA, YOUR SPACE</div>
+                        <h1 class="intro-title intro-split" id="introTitle1">DigitalTube. Thế giới video và audio của bạn.</h1>
+                        <p class="intro-subtitle" id="introSubtitle1">Một không gian giải trí gọn gàng, nơi bạn tìm nội dung, xem theo tập và tiếp tục thưởng thức từ đúng vị trí đã dừng.</p>
+                        <div class="intro-bullet-row">
+                            <span class="intro-chip"><i class="fa-solid fa-film"></i> Video theo tập</span>
+                            <span class="intro-chip"><i class="fa-solid fa-headphones"></i> Audio MP3</span>
+                            <span class="intro-chip"><i class="fa-solid fa-clock-rotate-left"></i> Xem tiếp dễ dàng</span>
+                        </div>
+                    </div>
+                    <div class="intro-visual" aria-hidden="true">
+                        <div class="intro-orbit"></div>
+                        <div class="intro-app-tile"><i class="fa-solid fa-play"></i></div>
+                        <div class="intro-float-card one"><i class="fa-solid fa-wave-square"></i><span><b>Audio Player</b><small>Play your way</small></span></div>
+                        <div class="intro-float-card two"><i class="fa-solid fa-film"></i><span><b>Video Library</b><small>Pick up where you left</small></span></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="intro-slide" data-slide="1" aria-labelledby="introTitle2">
+                <div class="intro-copy">
+                    <div class="intro-eyebrow"><i class="fa-solid fa-layer-group"></i> BUILT FOR THE WAY YOU WATCH</div>
+                    <h2 class="intro-title intro-split" id="introTitle2">Mọi tính năng. Một trải nghiệm liền mạch.</h2>
+                    <p class="intro-subtitle">Từ thư viện nội dung đến trình phát và hồ sơ cá nhân, các công cụ chính nằm ngay trong giao diện DigitalTube.</p>
+                    <div class="intro-feature-grid">
+                        <article class="intro-feature" style="--i:0"><span class="intro-feature-icon"><i class="fa-solid fa-clapperboard"></i></span><h3>Thư viện video</h3><p>Duyệt phim, xem danh sách tập và mở nội dung cần xem.</p></article>
+                        <article class="intro-feature" style="--i:1"><span class="intro-feature-icon"><i class="fa-solid fa-headphones-simple"></i></span><h3>Trình phát audio</h3><p>Mini-player, hàng đợi, tua bài, lặp và phát ngẫu nhiên.</p></article>
+                        <article class="intro-feature" style="--i:2"><span class="intro-feature-icon"><i class="fa-solid fa-magnifying-glass"></i></span><h3>Tìm kiếm nhanh</h3><p>Tìm nội dung video hoặc audio từ thanh tìm kiếm.</p></article>
+                        <article class="intro-feature" style="--i:3"><span class="intro-feature-icon"><i class="fa-solid fa-clock-rotate-left"></i></span><h3>Lịch sử & xem tiếp</h3><p>Lưu tiến độ trên thiết bị và tiếp tục gần vị trí đã dừng.</p></article>
+                        <article class="intro-feature" style="--i:4"><span class="intro-feature-icon"><i class="fa-solid fa-sliders"></i></span><h3>Cá nhân hoá</h3><p>Chọn màu nhấn, tốc độ phát, tự chuyển tập và giảm chuyển động.</p></article>
+                        <article class="intro-feature" style="--i:5"><span class="intro-feature-icon"><i class="fa-solid fa-moon"></i></span><h3>Hẹn giờ ngủ</h3><p>Đặt thời gian để trình phát tự dừng khi bạn nghỉ ngơi.</p></article>
+                    </div>
+                </div>
+            </section>
+
+            <section class="intro-slide" data-slide="2" aria-labelledby="introTitle3">
+                <div class="intro-privacy-layout">
+                    <div class="intro-copy">
+                        <div class="intro-eyebrow"><i class="fa-solid fa-shield-halved"></i> PRIVACY & YOUR CHOICE</div>
+                        <h2 class="intro-title intro-split" id="introTitle3">Quyền riêng tư bắt đầu từ sự minh bạch.</h2>
+                        <p class="intro-subtitle">Bạn cần đọc và đồng ý với chính sách quyền riêng tư cùng điều khoản sử dụng trước khi mở website. Không đồng ý nghĩa là chưa thể vào DigitalTube.</p>
+                        <ul class="intro-privacy-points">
+                            <li><i class="fa-solid fa-circle-check"></i><span>Cài đặt, tên hiển thị và tiến độ phát hiện được lưu trong bộ nhớ trình duyệt trên thiết bị này.</span></li>
+                            <li><i class="fa-solid fa-circle-check"></i><span>Danh mục video/audio được tải từ Firebase; việc phát nội dung có thể kết nối tới máy chủ lưu nội dung và dịch vụ cung cấp ảnh.</span></li>
+                            <li><i class="fa-solid fa-circle-info"></i><span>Màn hình tên tài khoản hiện tại chỉ lưu tên trên trình duyệt, chưa phải hệ thống xác thực tài khoản an toàn. Đừng nhập mật khẩu thật hoặc dữ liệu nhạy cảm.</span></li>
+                        </ul>
+                        <div class="intro-legal-actions">
+                            <button class="intro-legal-link" type="button" data-legal="privacy">Đọc chính sách quyền riêng tư</button>
+                            <button class="intro-legal-link" type="button" data-legal="terms">Đọc điều khoản sử dụng</button>
+                        </div>
+                        <label class="intro-consent" for="dtIntroConsent">
+                            <input id="dtIntroConsent" type="checkbox">
+                            <span>Tôi xác nhận đã đọc, hiểu và <strong>đồng ý với Chính sách quyền riêng tư và Điều khoản sử dụng</strong> của DigitalTube.</span>
+                        </label>
+                        <div class="intro-status" id="dtIntroStatus" role="status" aria-live="polite"></div>
+                    </div>
+                    <div class="intro-shield-wrap" aria-hidden="true">
+                        <div class="intro-shield-ring"></div>
+                        <div class="intro-shield"><i class="fa-solid fa-lock"></i></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <div class="intro-bottom">
+            <div class="intro-footnote" id="dtIntroFootnote">Giới thiệu nhanh · Chỉ xuất hiện lần đầu trên trình duyệt này</div>
+            <div class="intro-next-wrap">
+                <button class="intro-decline" id="dtIntroDecline" type="button" hidden>Không đồng ý</button>
+                <span class="intro-next-label" id="dtIntroNextLabel">Khám phá DigitalTube</span>
+                <button class="intro-next" id="dtIntroNext" type="button" aria-label="Chuyển sang trang tiếp theo"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4.5 12h14M12.5 5.5 19 12l-6.5 6.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            </div>
+        </div>
+    </div>
+    <div id="dtIntroLegal" role="dialog" aria-modal="true" aria-labelledby="dtIntroLegalTitle">
+        <div class="intro-legal-card">
+            <div class="intro-legal-head"><h2 id="dtIntroLegalTitle">Chính sách</h2><button class="intro-legal-close" id="dtIntroLegalClose" type="button" aria-label="Đóng chính sách"><i class="fa-solid fa-xmark"></i></button></div>
+            <div class="intro-legal-body" id="dtIntroLegalBody"></div>
+        </div>
+    </div>
+</div>
+
 
     <!-- Aurora background -->
     <div class="aurora-bg">
@@ -2754,5 +3044,282 @@ void main(){
   new MutationObserver(scan).observe(document.body, { childList: true, subtree: true }); scan();
 })();
 </script>
+<script id="dt-intro-controller">
+(function () {
+    'use strict';
+    const root = document.getElementById('dtIntro');
+    if (!root || document.documentElement.classList.contains('dt-intro-accepted')) return;
+
+    const slides = Array.from(root.querySelectorAll('.intro-slide'));
+    const next = document.getElementById('dtIntroNext');
+    const counter = document.getElementById('dtIntroCounter');
+    const progress = Array.from(root.querySelectorAll('.intro-progress span'));
+    const nextLabel = document.getElementById('dtIntroNextLabel');
+    const footnote = document.getElementById('dtIntroFootnote');
+    const consent = document.getElementById('dtIntroConsent');
+    const status = document.getElementById('dtIntroStatus');
+    const decline = document.getElementById('dtIntroDecline');
+    const legal = document.getElementById('dtIntroLegal');
+    const legalTitle = document.getElementById('dtIntroLegalTitle');
+    const legalBody = document.getElementById('dtIntroLegalBody');
+    const canvas = document.getElementById('dtIntroShader');
+    let current = 0, busy = false, sweep = -1, raf = 0, gl = null, program = null;
+    let previousFocus = null, lockSnapshot = [];
+
+    // Keep keyboard focus and pointer interaction inside the blocking first-visit dialog.
+    function lockPage() {
+        document.body.style.overflow = 'hidden';
+        lockSnapshot = Array.from(document.body.children).filter(n => n !== root).map(n => [n, !!n.inert]);
+        lockSnapshot.forEach(([n]) => { try { n.inert = true; } catch (_) {} });
+        previousFocus = document.activeElement;
+    }
+    function unlockPage() {
+        lockSnapshot.forEach(([n, wasInert]) => { try { n.inert = wasInert; } catch (_) {} });
+        document.body.style.overflow = '';
+        try { previousFocus && previousFocus.focus && previousFocus.focus({ preventScroll: true }); } catch (_) {}
+    }
+    lockPage();
+
+    // Split headings into individually animated glyphs; text remains real selectable DOM text.
+    slides.forEach(slide => {
+        slide.querySelectorAll('.intro-split').forEach(el => {
+            const text = el.textContent;
+            el.textContent = '';
+            Array.from(text).forEach((ch, i) => {
+                const span = document.createElement('span');
+                span.className = 'intro-letter';
+                span.textContent = ch;
+                span.style.setProperty('--delay', (Math.min(i, 42) * .014 + (i % 4) * .004) + 's');
+                span.style.setProperty('--dx', (((i * 17) % 47) - 23) + 'px');
+                span.style.setProperty('--dy', ((((i * 13) % 43) - 21)) + 'px');
+                span.style.setProperty('--rot', ((((i * 19) % 31) - 15)) + 'deg');
+                el.appendChild(span);
+            });
+        });
+    });
+
+    function playSlide(index) {
+        slides.forEach((slide, i) => {
+            slide.classList.toggle('active', i === index);
+            slide.classList.remove('leaving', 'play');
+        });
+        // Force a new animation timeline after switching slides.
+        void slides[index].offsetWidth;
+        slides[index].classList.add('play');
+        counter.textContent = String(index + 1).padStart(2, '0') + ' / 03';
+        progress.forEach((bar, i) => bar.classList.toggle('on', i <= index));
+        next.classList.remove('flyout');
+        if (index === 0) {
+            next.disabled = false;
+            next.setAttribute('aria-label', 'Sang trang giới thiệu tính năng');
+            nextLabel.textContent = 'Khám phá DigitalTube';
+            footnote.textContent = 'Giới thiệu nhanh · Chỉ xuất hiện lần đầu trên trình duyệt này';
+            decline.hidden = true;
+        } else if (index === 1) {
+            next.disabled = false;
+            next.setAttribute('aria-label', 'Sang trang bảo mật và điều khoản');
+            nextLabel.textContent = 'Tiếp tục';
+            footnote.textContent = '02 · Các tính năng hiện có trong phiên bản này';
+            decline.hidden = true;
+        } else {
+            next.disabled = !consent.checked;
+            next.setAttribute('aria-label', 'Đồng ý và bắt đầu sử dụng DigitalTube');
+            nextLabel.textContent = 'Đồng ý & bắt đầu';
+            footnote.textContent = '03 · Cần đồng ý để mở nội dung website';
+            decline.hidden = false;
+        }
+    }
+
+    // Real WebGL fragment shader: animated warped aurora, refractive noise, orbital energy and launch streak.
+    function initShader() {
+        if (!canvas) return;
+        const vertex = 'attribute vec2 aPosition; void main(){ gl_Position = vec4(aPosition, 0.0, 1.0); }';
+        const fragment = `
+        precision highp float;
+        uniform vec2 uResolution;
+        uniform float uTime;
+        uniform float uSweep;
+        uniform float uEnergy;
+        float hash21(vec2 p){ p=fract(p*vec2(123.34,456.21)); p+=dot(p,p+45.32); return fract(p.x*p.y); }
+        float noise2(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f); return mix(mix(hash21(i),hash21(i+vec2(1.,0.)),f.x),mix(hash21(i+vec2(0.,1.)),hash21(i+vec2(1.,1.)),f.x),f.y); }
+        float fbm(vec2 p){ float v=0.0, a=.5; for(int i=0;i<5;i++){ v+=noise2(p)*a; p=p*2.02+vec2(11.7,3.2); a*=.5; } return v; }
+        float glow(vec2 p, vec2 c, float r){ return exp(-dot(p-c,p-c)/max(r*r,.0001)); }
+        void main(){
+          vec2 uv=gl_FragCoord.xy/uResolution;
+          vec2 p=(uv-.5)*vec2(uResolution.x/uResolution.y,1.0);
+          float tm=uTime*.12;
+          float n=fbm(p*2.6+vec2(tm,-tm*.55));
+          vec2 warp=p+vec2(n-.5,noise2(p*3.8+tm)-.5)*.18;
+          vec3 col=vec3(.012,.015,.028);
+          col+=vec3(.10,.09,.38)*glow(warp,vec2(-.45+sin(tm)*.14,.23),.58)*.78;
+          col+=vec3(.25,.055,.38)*glow(warp,vec2(.55+cos(tm*.8)*.12,.04),.51)*.63;
+          col+=vec3(.025,.25,.42)*glow(warp,vec2(.04+sin(tm*1.2)*.12,-.44),.48)*.54;
+          float bands=sin((warp.y*3.8+fbm(warp*2.0+tm)*.7)*6.0+tm*4.0);
+          float ribbon=exp(-pow((warp.y-.18*sin(warp.x*1.7+tm)-.06*cos(warp.x*3.0-tm))/.15,2.0));
+          col+=vec3(.10,.13,.43)*ribbon*(.12+.13*bands+.16*fbm(warp*3.0+tm));
+          float lensR=length(p-vec2(.12*sin(tm),.08*cos(tm*.8)));
+          float ring=exp(-pow((lensR-.25-.016*sin(atan(p.y,p.x)*4.0+tm*3.0))/.009,2.0));
+          col+=vec3(.20,.24,.60)*ring*.16;
+          col+=vec3(.12,.18,.31)*(1.0-smoothstep(.18,.85,lensR))*.12;
+          for(int i=0;i<14;i++){
+            float fi=float(i); vec2 seed=vec2(fi*2.71,fi*8.13);
+            vec2 pt=vec2(hash21(seed),hash21(seed+3.7));
+            pt.x=fract(pt.x+uTime*(.006+hash21(seed+5.1)*.015));
+            pt.y=.12+pt.y*.76;
+            float d=length((uv-pt)*vec2(uResolution.x/uResolution.y,1.0));
+            float sparkle=exp(-d*d*9000.0)*(.15+.85*hash21(seed+8.4));
+            col+=vec3(.46,.48,.94)*sparkle*.52;
+          }
+          float edge=min(min(uv.x,1.0-uv.x),min(uv.y,1.0-uv.y));
+          col*=.74+.26*smoothstep(0.0,.35,edge);
+          float active=step(0.0,uSweep);
+          float head=mix(-.12,1.12,clamp(uSweep,0.0,1.0));
+          float line=exp(-abs(uv.x-head)*145.0)*exp(-pow((uv.y-.5)*2.7,2.0));
+          float trail=exp(-max(head-uv.x,0.0)*5.4)*step(uv.x,head)*exp(-pow((uv.y-.5)*2.2,2.0));
+          float chroma=sin(uv.y*95.0+uTime*14.0)*.5+.5;
+          col+=active*(vec3(.60,.75,1.0)*line*.95+vec3(.20,.14,.68)*trail*.27+vec3(.12,.48,.8)*trail*chroma*.18)*uEnergy;
+          col+=vec3(.12,.10,.26)*n*.08;
+          col=pow(max(col,0.0),vec3(.88));
+          gl_FragColor=vec4(col,1.0);
+        }`;
+        try {
+            gl = canvas.getContext('webgl', { alpha: false, antialias: false, powerPreference: 'low-power' });
+            if (!gl) throw new Error('WebGL unavailable');
+            function compile(type, source) {
+                const sh = gl.createShader(type); gl.shaderSource(sh, source); gl.compileShader(sh);
+                if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) { const msg = gl.getShaderInfoLog(sh); gl.deleteShader(sh); throw new Error(msg); }
+                return sh;
+            }
+            program = gl.createProgram();
+            gl.attachShader(program, compile(gl.VERTEX_SHADER, vertex));
+            gl.attachShader(program, compile(gl.FRAGMENT_SHADER, fragment));
+            gl.linkProgram(program);
+            if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program));
+            gl.useProgram(program);
+            const buffer = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+            const pos = gl.getAttribLocation(program, 'aPosition'); gl.enableVertexAttribArray(pos); gl.vertexAttribPointer(pos,2,gl.FLOAT,false,0,0);
+            program.uResolution = gl.getUniformLocation(program, 'uResolution');
+            program.uTime = gl.getUniformLocation(program, 'uTime');
+            program.uSweep = gl.getUniformLocation(program, 'uSweep');
+            program.uEnergy = gl.getUniformLocation(program, 'uEnergy');
+            resizeShader();
+            return true;
+        } catch (error) {
+            console.warn('DigitalTube intro WebGL fallback:', error);
+            canvas.style.display = 'none';
+            return false;
+        }
+    }
+    function resizeShader() {
+        if (!gl || !canvas) return;
+        const dpr = Math.min(window.devicePixelRatio || 1, 1.7);
+        const w = Math.max(1, Math.floor(canvas.clientWidth * dpr));
+        const h = Math.max(1, Math.floor(canvas.clientHeight * dpr));
+        if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; gl.viewport(0,0,w,h); }
+    }
+    function renderShader(now) {
+        if (!gl || !program || !root.isConnected) return;
+        resizeShader();
+        gl.useProgram(program);
+        gl.uniform2f(program.uResolution, canvas.width, canvas.height);
+        gl.uniform1f(program.uTime, now * .001);
+        gl.uniform1f(program.uSweep, sweep);
+        gl.uniform1f(program.uEnergy, sweep < 0 ? 0 : 1.0);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        raf = requestAnimationFrame(renderShader);
+    }
+    const shaderReady = initShader();
+    if (shaderReady) raf = requestAnimationFrame(renderShader);
+    window.addEventListener('resize', resizeShader, { passive: true });
+
+    function runSweep() {
+        if (!gl) return;
+        const start = performance.now(), duration = 690;
+        sweep = 0;
+        function step(now) {
+            const p = Math.min(1, (now - start) / duration);
+            // Smooth acceleration then coast, synchronized with the arrow's flight.
+            sweep = 1 - Math.pow(1 - p, 1.65);
+            if (p < 1) requestAnimationFrame(step);
+            else sweep = -1;
+        }
+        requestAnimationFrame(step);
+    }
+
+    function advance() {
+        if (busy) return;
+        if (current < 2) {
+            busy = true;
+            const oldIndex = current;
+            slides[oldIndex].classList.add('leaving');
+            next.classList.add('flyout');
+            runSweep();
+            setTimeout(() => {
+                current = oldIndex + 1;
+                playSlide(current);
+                busy = false;
+            }, 610);
+        } else {
+            if (!consent.checked) {
+                status.textContent = 'Bạn cần đánh dấu đồng ý với cả hai văn bản trước khi tiếp tục.';
+                consent.focus();
+                return;
+            }
+            busy = true;
+            next.classList.add('flyout');
+            runSweep();
+            try {
+                localStorage.setItem('dt_intro_consent_v1', 'accepted|v1|' + new Date().toISOString());
+                } catch (_) {
+                status.textContent = 'Trình duyệt đang chặn bộ nhớ cục bộ; bước giới thiệu có thể xuất hiện lại ở lần truy cập sau.';
+            }
+            setTimeout(() => {
+                root.style.transition = 'opacity .38s ease, filter .45s ease, transform .55s cubic-bezier(.2,.8,.2,1)';
+                root.style.opacity = '0'; root.style.filter = 'blur(14px)'; root.style.transform = 'scale(1.025)';
+                setTimeout(() => { root.style.display = 'none'; document.documentElement.classList.add('dt-intro-accepted'); unlockPage(); if (raf) cancelAnimationFrame(raf); }, 390);
+            }, 410);
+        }
+    }
+
+    next.addEventListener('click', advance);
+    consent.addEventListener('change', () => {
+        if (current === 2) next.disabled = !consent.checked;
+        status.textContent = consent.checked ? 'Đã ghi nhận lựa chọn của bạn. Nhấn mũi tên để vào website.' : '';
+    });
+    decline.addEventListener('click', () => {
+        status.textContent = 'Bạn chưa đồng ý nên DigitalTube vẫn đang khóa. Bạn có thể xem lại hai văn bản phía trên; không có nội dung website nào được mở.';
+    });
+
+    const legalText = {
+        privacy: `<h3>1. Dữ liệu được lưu trên thiết bị</h3><p>DigitalTube hiện lưu cài đặt trình phát, màu giao diện, tên hiển thị, tiến độ phát video/audio và trạng thái đã xem phần giới thiệu trong bộ nhớ cục bộ (localStorage) của trình duyệt. Dữ liệu này thường ở lại trên trình duyệt cho tới khi bạn xoá dữ liệu website hoặc trình duyệt tự dọn dữ liệu.</p><h3>2. Dữ liệu tải từ dịch vụ bên ngoài</h3><p>Danh mục video và audio được đọc từ Firebase Realtime Database. Khi tải ảnh thu nhỏ hoặc phát media, trình duyệt có thể gửi yêu cầu tới máy chủ lưu trữ media, nhà cung cấp ảnh và dịch vụ mạng liên quan. Các dịch vụ đó có thể xử lý dữ liệu kết nối theo chính sách riêng của họ.</p><h3>3. Tên hiển thị và màn hình tài khoản</h3><p>Trong phiên bản hiện tại, thao tác “đăng nhập” chỉ ghi tên đã nhập vào trình duyệt; trường mật khẩu không được dùng để xác thực với máy chủ. Đây không phải hệ thống tài khoản bảo mật. Không nhập mật khẩu đang dùng ở dịch vụ khác, thông tin thanh toán hoặc dữ liệu nhạy cảm.</p><h3>4. Xoá và kiểm soát dữ liệu</h3><p>Bạn có thể xoá lịch sử xem trong mục Cài đặt/Hồ sơ, khôi phục cài đặt hoặc xoá dữ liệu website trong cài đặt trình duyệt. Việc xoá dữ liệu trình duyệt cũng có thể khiến màn hình giới thiệu xuất hiện lại.</p><h3>5. Giới hạn bảo mật</h3><p>DigitalTube không tuyên bố bảo mật tuyệt đối, không khẳng định dữ liệu được mã hoá đầu-cuối và không thể bảo đảm an toàn cho dịch vụ bên thứ ba. Hãy chỉ dùng dữ liệu bạn thấy phù hợp để cung cấp cho website.</p><h3>6. Cập nhật chính sách</h3><p>Nội dung này mô tả hành vi của phiên bản website đang được cung cấp. Nếu cách thu thập hoặc xử lý dữ liệu thay đổi đáng kể, chính sách cần được cập nhật tương ứng.</p>`,
+        terms: `<h3>1. Phạm vi sử dụng</h3><p>DigitalTube cung cấp giao diện để duyệt và phát nội dung video/audio có sẵn trong hệ thống. Bạn đồng ý sử dụng website hợp pháp, tôn trọng quyền của chủ sở hữu nội dung và không làm gián đoạn hoạt động của dịch vụ.</p><h3>2. Quyền với nội dung</h3><p>Chỉ truy cập, phát, chia sẻ hoặc tải nội dung khi bạn có quyền và được phép theo luật áp dụng cùng điều kiện của nguồn nội dung. Giao diện này không trao cho bạn quyền sở hữu đối với video, âm thanh, hình ảnh hoặc thương hiệu của bên thứ ba.</p><h3>3. Tính sẵn sàng</h3><p>Nội dung có thể thay đổi, bị gỡ, tạm thời không khả dụng hoặc phát sinh lỗi do mạng, máy chủ hay dịch vụ ngoài. Website được cung cấp theo trạng thái hiện có; không bảo đảm hoạt động liên tục trên mọi thiết bị.</p><h3>4. Tài khoản và thông tin</h3><p>Trường tên trong phiên bản hiện tại chỉ là tên hiển thị lưu cục bộ, không phải xác thực an toàn. Không dùng tính năng này để lưu bí mật hoặc thông tin đăng nhập thật.</p><h3>5. Giới hạn trách nhiệm</h3><p>Bạn chịu trách nhiệm về cách sử dụng website và việc bạn có quyền truy cập nội dung. Trong phạm vi pháp luật cho phép, nhà vận hành không bảo đảm rằng mọi nội dung ngoài hệ thống luôn chính xác, hợp pháp hoặc khả dụng.</p><h3>6. Chấp thuận điều khoản</h3><p>Bạn chỉ có thể mở website sau khi xác nhận đã đọc và đồng ý với Điều khoản sử dụng cùng Chính sách quyền riêng tư. Nếu không đồng ý, vui lòng không tiếp tục sử dụng DigitalTube.</p>`
+    };
+    root.querySelectorAll('[data-legal]').forEach(button => {
+        button.addEventListener('click', () => {
+            const kind = button.getAttribute('data-legal');
+            legalTitle.textContent = kind === 'privacy' ? 'Chính sách quyền riêng tư' : 'Điều khoản sử dụng';
+            legalBody.innerHTML = legalText[kind] || '';
+            legal.classList.add('show');
+            document.getElementById('dtIntroLegalClose').focus();
+        });
+    });
+    function closeLegal() { legal.classList.remove('show'); }
+    document.getElementById('dtIntroLegalClose').addEventListener('click', closeLegal);
+    legal.addEventListener('click', e => { if (e.target === legal) closeLegal(); });
+    document.addEventListener('keydown', e => {
+        if (root.style.display === 'none') return;
+        if (e.key === 'Escape' && legal.classList.contains('show')) { closeLegal(); e.stopPropagation(); return; }
+        if (legal.classList.contains('show')) return;
+        if (e.key === 'ArrowRight' && current < 2) { e.preventDefault(); advance(); }
+        if (e.key === 'Enter' && current < 2 && !['BUTTON','INPUT'].includes(document.activeElement.tagName)) { e.preventDefault(); advance(); }
+        // Deliberately no Escape dismissal: the mandatory consent page cannot be bypassed.
+    });
+
+    playSlide(0);
+    // If WebGL is unavailable the full onboarding remains usable with its carefully styled CSS fallback.
+})();
+</script>
+
 </body>
 </html>
