@@ -29,6 +29,24 @@
     @media(max-width:760px){.topbar{height:64px;padding:0 16px}.navlinks{display:none}.topbar .btn{padding:9px 11px;font-size:11px}.brand{font-size:16px}.hero{display:flex;flex-direction:column;align-items:stretch;padding:60px 20px 48px;gap:16px;min-height:auto}.hero h1{font-size:clamp(42px,11vw,60px);letter-spacing:-2.8px;margin-top:17px}.hero p{font-size:14px}.hero-art{min-height:410px;transform:none;margin-top:4px}.art-orbit{width:350px;height:350px;max-width:95vw}.demo-profile{width:min(310px,80vw)}.chip-a{right:0;top:8%}.chip-b{left:0;bottom:7%}.section{padding:44px 20px}.feature-grid{grid-template-columns:1fr}.feature-card{padding:19px}.template-row{grid-template-columns:repeat(2,1fr)}.template-card{height:150px}.cta-band{margin:22px 16px 55px;padding:24px;flex-direction:column;align-items:flex-start}.cta-band h2{font-size:23px}footer{flex-direction:column;gap:10px;padding:23px 20px}.auth-wrap{min-height:calc(100vh - 64px)}.auth-card{padding:25px 21px}.dashboard-shell{display:block;min-height:calc(100vh - 64px)}.sidebar{display:none}.dash-main{padding:21px 14px 46px}.dash-top{align-items:flex-start;flex-direction:column;margin-bottom:20px}.dash-title h1{font-size:23px}.dash-top-actions{width:100%}.dash-top-actions .btn{flex:1}.mobile-nav{display:flex;gap:5px;overflow-x:auto;padding:8px 12px;border-bottom:1px solid var(--line);background:rgba(13,14,22,.8);position:sticky;top:64px;z-index:20;scrollbar-width:none}.mobile-nav::-webkit-scrollbar{display:none}.mobile-nav button{display:flex;align-items:center;gap:6px;white-space:nowrap;flex:none;padding:9px 11px;border:1px solid transparent;border-radius:11px;background:transparent;color:#a6a8b9;font-size:10px;font-weight:650}.mobile-nav button.active{color:#e5deff;border-color:rgba(180,162,255,.18);background:rgba(173,155,255,.1)}.mobile-nav svg{width:15px;height:15px}.panel{padding:16px;border-radius:17px}.stats-grid{gap:9px}.stat-card{padding:13px}.stat-value{font-size:22px}.setup-row{align-items:flex-start;flex-wrap:wrap}.setup-row .btn{margin-left:36px}.editor-grid{grid-template-columns:1fr}.preview-shell{position:static}.preview-frame{max-width:400px}.preview-screen{min-height:520px}.bio-page{min-height:520px}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.preset-grid{grid-template-columns:repeat(2,1fr)}.public-wrap{padding:20px 10px 40px}.public-device .bio-page{padding:30px 18px 22px}.public-device .bio-name{font-size:24px}.public-device .bio-link{font-size:12px}.link-item{align-items:flex-start;flex-wrap:wrap}.link-actions{margin-left:auto}.link-item-main{max-width:calc(100% - 70px)}.link-state{margin-left:35px}.hide-mobile{display:none!important}.mobile-only{display:initial!important}.chart-wrap{gap:5px}.chart-bar{width:22px}}
     @media(max-width:390px){.topbar .top-actions .btn-quiet{display:none}.hero h1{font-size:40px}.hero-art{min-height:370px}.art-orbit{width:300px;height:300px}.float-chip{padding:8px 10px}.chip-a{right:-2px}.chip-b{left:-2px}.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.stat-value{font-size:20px}.url-line{align-items:flex-start}.url-line code{white-space:normal;overflow-wrap:anywhere}.dash-top-actions .btn{font-size:10px;padding:9px}.public-device .bio-page{padding:26px 13px 20px}}
     @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+  
+    /* Landing interaction layer: kept separate from the app's Firebase and dashboard logic. */
+    .landing-particles-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.9;contain:strict}
+    body.landing-mode #app>.hero,body.landing-mode #app>.section,body.landing-mode #app>.cta-band,body.landing-mode #app>footer{position:relative;z-index:1}
+    body.landing-mode .hero h1[data-title-interactive]{cursor:pointer;transform-style:preserve-3d;transform:perspective(950px) rotateX(var(--title-tilt-y,0deg)) rotateY(var(--title-tilt-x,0deg)) translateZ(0);transition:transform .22s cubic-bezier(.2,.75,.25,1),filter .25s;will-change:transform;outline:none}
+    body.landing-mode .hero h1[data-title-interactive]:focus-visible{outline:1px solid rgba(199,185,255,.72);outline-offset:8px;border-radius:8px}
+    body.landing-mode .hero h1[data-title-interactive] em{transition:filter .25s,text-shadow .25s}
+    body.landing-mode .hero h1[data-title-interactive]:hover em{filter:drop-shadow(0 0 20px rgba(164,143,255,.2))}
+    body.landing-mode .hero h1[data-title-interactive].title-tap{animation:title-impact .62s cubic-bezier(.2,.8,.2,1)}
+    body.landing-mode .hero h1[data-title-interactive].title-tap em{text-shadow:0 0 26px rgba(171,151,255,.28);filter:drop-shadow(0 0 15px rgba(171,151,255,.34))}
+    @keyframes title-impact{0%{transform:perspective(950px) rotateX(var(--title-tilt-y,0deg)) rotateY(var(--title-tilt-x,0deg)) scale(1)}28%{transform:perspective(950px) rotateX(calc(var(--title-tilt-y,0deg) - 4deg)) rotateY(calc(var(--title-tilt-x,0deg) + 7deg)) translateZ(10px) scale(1.025)}53%{transform:perspective(950px) rotateX(calc(var(--title-tilt-y,0deg) + 2deg)) rotateY(calc(var(--title-tilt-x,0deg) - 3deg)) translateZ(3px) scale(.995)}100%{transform:perspective(950px) rotateX(var(--title-tilt-y,0deg)) rotateY(var(--title-tilt-x,0deg)) translateZ(0) scale(1)}}
+    body.landing-mode .scroll-fly{opacity:0;filter:blur(5px);transform:translate3d(var(--fly-x,0px),var(--fly-y,26px),0) scale(.985);transition:opacity .72s cubic-bezier(.2,.7,.2,1),transform .78s cubic-bezier(.2,.75,.22,1),filter .7s ease;transition-delay:var(--fly-delay,0ms);will-change:opacity,transform,filter}
+    body.landing-mode .scroll-fly.in-view{opacity:1;filter:none;transform:translate3d(0,0,0) scale(1)}
+    body.landing-mode .feature-card,body.landing-mode .template-card{transition:transform .35s cubic-bezier(.2,.75,.22,1),border-color .3s,box-shadow .3s}
+    body.landing-mode .feature-card:hover,body.landing-mode .template-card:hover{transform:translateY(-4px);border-color:rgba(193,178,255,.24);box-shadow:0 18px 42px rgba(0,0,0,.19),0 0 25px rgba(133,112,235,.055)}
+    @media(max-width:760px){.landing-particles-canvas{opacity:.68}body.landing-mode .hero h1[data-title-interactive]{transform:perspective(950px) rotateX(var(--title-tilt-y,0deg)) rotateY(var(--title-tilt-x,0deg))}body.landing-mode .feature-card:hover,body.landing-mode .template-card:hover{transform:none}}
+    @media(prefers-reduced-motion:reduce){.landing-particles-canvas{opacity:.28}body.landing-mode .scroll-fly{opacity:1!important;filter:none!important;transform:none!important;transition:none!important}body.landing-mode .hero h1[data-title-interactive]{transform:none!important;animation:none!important;transition:none!important}body.landing-mode .feature-card:hover,body.landing-mode .template-card:hover{transform:none!important}}
+
   </style>
 </head>
 <body>
@@ -167,7 +185,7 @@
       $('#brand-mark').innerHTML=icon('sparkle',19);
     }
     function renderHome(){
-      return `<section class="hero"><div><div class="eyebrow">YOUR SPACE ON THE INTERNET</div><h1>Một liên kết.<br><em>Cả thế giới</em> của bạn.</h1><p>Tạo một trang Bio mang đúng chất riêng. Gom mạng xã hội, dự án, nội dung và những điều bạn muốn chia sẻ vào một địa chỉ duy nhất.</p><div class="hero-buttons"><button class="btn btn-primary" data-action="auth-register">Bắt đầu miễn phí ${icon('arrow',16)}</button><button class="btn" data-action="auth-login">Tôi đã có tài khoản</button></div><div class="hero-note"><span>${icon('check',14)} Không cần biết lập trình</span><span>${icon('check',14)} Tuỳ chỉnh trực quan</span><span>${icon('check',14)} Chia sẻ bằng username</span></div></div><div class="hero-art"><div class="art-orbit"></div><div class="float-chip chip-a"><b>Liquid Glass</b><span>Chất liệu có chiều sâu</span></div><div class="float-chip chip-b"><b>01 link</b><span>Mọi nơi bạn hiện diện</span></div><div class="demo-profile"><div class="demo-topline"><span>BIOSPACE / PROFILE</span><span class="demo-dot"></span></div><div class="demo-avatar">Q</div><h3>Quoc Dat</h3><div class="demo-bio">Digital creator · Vietnam</div><div class="demo-link">${icon('link',17)}<b>My website</b><small>↗</small></div><div class="demo-link">${icon('globe',17)}<b>Social profiles</b><small>↗</small></div><div class="demo-link">${icon('music',17)}<b>My latest project</b><small>↗</small></div></div></div></section>
+      return `<section class="hero"><div><div class="eyebrow">YOUR SPACE ON THE INTERNET</div><h1 data-title-interactive tabindex="0" aria-label="Nhấn để kích hoạt hiệu ứng chuyển động">Một liên kết.<br><em>Cả thế giới</em> của bạn.</h1><p>Tạo một trang Bio mang đúng chất riêng. Gom mạng xã hội, dự án, nội dung và những điều bạn muốn chia sẻ vào một địa chỉ duy nhất.</p><div class="hero-buttons"><button class="btn btn-primary" data-action="auth-register">Bắt đầu miễn phí ${icon('arrow',16)}</button><button class="btn" data-action="auth-login">Tôi đã có tài khoản</button></div><div class="hero-note"><span>${icon('check',14)} Không cần biết lập trình</span><span>${icon('check',14)} Tuỳ chỉnh trực quan</span><span>${icon('check',14)} Chia sẻ bằng username</span></div></div><div class="hero-art"><div class="art-orbit"></div><div class="float-chip chip-a"><b>Liquid Glass</b><span>Chất liệu có chiều sâu</span></div><div class="float-chip chip-b"><b>01 link</b><span>Mọi nơi bạn hiện diện</span></div><div class="demo-profile"><div class="demo-topline"><span>BIOSPACE / PROFILE</span><span class="demo-dot"></span></div><div class="demo-avatar">Q</div><h3>Quoc Dat</h3><div class="demo-bio">Digital creator · Vietnam</div><div class="demo-link">${icon('link',17)}<b>My website</b><small>↗</small></div><div class="demo-link">${icon('globe',17)}<b>Social profiles</b><small>↗</small></div><div class="demo-link">${icon('music',17)}<b>My latest project</b><small>↗</small></div></div></div></section>
         <section class="section" id="features"><div class="section-head"><div class="eyebrow">BUILT AROUND YOU</div><h2>Không chỉ là một danh sách liên kết.</h2><p>Từ nội dung đến diện mạo, bạn kiểm soát trang Bio của mình. Công cụ phải làm việc cho bạn, không bắt bạn học thêm một nghề chỉ để đổi màu nút.</p></div><div class="feature-grid"><article class="feature-card"><div class="feature-icon">${icon('palette',20)}</div><h3>Thiết kế theo gu của bạn</h3><p>Điều chỉnh màu sắc, avatar, ảnh bìa, bố cục và phong cách nút với bản xem trước trực tiếp.</p></article><article class="feature-card"><div class="feature-icon">${icon('link',20)}</div><h3>Quản lý liên kết gọn gàng</h3><p>Thêm, sửa, nhân bản, bật tắt và sắp xếp thứ tự. Mỗi thay đổi được lưu vào Firebase.</p></article><article class="feature-card"><div class="feature-icon">${icon('chart',20)}</div><h3>Thống kê từ sự kiện thật</h3><p>Theo dõi lượt xem và lượt nhấp mà hệ thống ghi nhận. Không tự bịa số đẹp để trang trí dashboard.</p></article></div></section>
         <section class="section" id="templates"><div class="section-head"><div class="eyebrow">START WITH A STYLE</div><h2>Một điểm bắt đầu, vô số cách thể hiện.</h2><p>Chọn phong cách gần với bạn rồi tinh chỉnh tiếp. Đổi giao diện không làm mất nội dung hoặc liên kết đã tạo.</p></div><div class="template-row"><div class="template-card"><div class="template-orb"></div><div class="template-line"></div><div class="template-line short"></div><div class="template-button"></div><div class="template-button"></div><span class="template-name">Dark Premium</span></div><div class="template-card"><div class="template-orb"></div><div class="template-line"></div><div class="template-line short"></div><div class="template-button"></div><div class="template-button"></div><span class="template-name">Minimal Light</span></div><div class="template-card"><div class="template-orb"></div><div class="template-line"></div><div class="template-line short"></div><div class="template-button"></div><div class="template-button"></div><span class="template-name">Cyber Blue</span></div><div class="template-card"><div class="template-orb"></div><div class="template-line"></div><div class="template-line short"></div><div class="template-button"></div><div class="template-button"></div><span class="template-name">Purple Glow</span></div></div></section>
         <section class="section" id="security"><div class="section-head"><div class="eyebrow">YOUR DATA, YOUR CONTROL</div><h2>Quyền riêng tư không phải nút trang trí.</h2><p>Bản nháp được lưu trong hồ sơ riêng của tài khoản. Trang công khai chỉ đọc dữ liệu đã xuất bản ở một nhánh riêng của Realtime Database. Quyền truy cập vẫn phụ thuộc vào Security Rules bạn triển khai trong Firebase.</p></div><div class="feature-grid"><article class="feature-card"><div class="feature-icon">${icon('lock',20)}</div><h3>Bản nháp riêng tư</h3><p>Khách truy cập không đọc được nội dung nháp chỉ bằng cách biết username.</p></article><article class="feature-card"><div class="feature-icon">${icon('shield',20)}</div><h3>Kiểm tra quyền sở hữu</h3><p>Hồ sơ chỉnh sửa gắn với UID đã đăng nhập. Username được giữ bằng giao dịch trong Realtime Database.</p></article><article class="feature-card"><div class="feature-icon">${icon('globe',20)}</div><h3>URL dễ chia sẻ</h3><p>Mỗi Bio dùng định dạng nhất quán: tên miền của bạn theo sau bởi dấu # và username.</p></article></div></section>
@@ -243,6 +261,100 @@
       else{m.innerHTML='';if(state.route==='public')app.innerHTML=renderPublic();else if(state.route==='login'||state.route==='register'||state.route==='reset')app.innerHTML=renderAuth();else app.innerHTML=renderHome();}
       if(state.route==='public'){$('#top-actions').innerHTML=state.user?`<button class="btn btn-quiet" data-action="go-dashboard">Dashboard</button>`:`<button class="btn btn-quiet" data-action="auth-login">Đăng nhập</button><button class="btn btn-primary" data-action="auth-register">Tạo Bio</button>`;}
       if(state.route==='dashboard'&&state.tab==='editor') updateSaveLabel();
+      syncLandingEffects();
+    }
+    let landingParticleRuntime = null;
+    let scrollFlyObserver = null;
+    let activeLandingTitle = null;
+
+    function startLandingParticles(){
+      const canvas=document.createElement('canvas');
+      canvas.className='landing-particles-canvas';
+      canvas.setAttribute('aria-hidden','true');
+      canvas.dataset.landingFx='1';
+      document.body.append(canvas);
+      const ctx=canvas.getContext('2d',{alpha:true,desynchronized:true});
+      if(!ctx){canvas.remove();return null;}
+      const reduceMotion=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches||false;
+      const runtime={canvas,ctx,width:window.innerWidth,height:window.innerHeight,dpr:1,particles:[],bursts:[],mouseX:0,mouseY:0,scrollY:window.scrollY||0,raf:0,lastFrame:0,reduced:reduceMotion};
+      const random=(min,max)=>min+Math.random()*(max-min);
+      function seedParticle(){return {x:random(-runtime.width*.68,runtime.width*.68),y:random(-runtime.height*.68,runtime.height*.68),z:random(60,1250),r:random(.6,1.8),speed:random(.32,.95),phase:random(0,Math.PI*2),hue:Math.random()};}
+      function resize(){
+        runtime.width=Math.max(1,window.innerWidth);runtime.height=Math.max(1,window.innerHeight);runtime.dpr=Math.min(window.devicePixelRatio||1,1.35);
+        canvas.width=Math.round(runtime.width*runtime.dpr);canvas.height=Math.round(runtime.height*runtime.dpr);canvas.style.width=runtime.width+'px';canvas.style.height=runtime.height+'px';
+        ctx.setTransform(runtime.dpr,0,0,runtime.dpr,0,0);
+        const count=runtime.width<540?42:runtime.width<900?62:86;
+        runtime.particles=Array.from({length:count},seedParticle);
+        draw(performance.now(),true);
+        if(!runtime.reduced)schedule();
+      }
+      function draw(time=0,staticFrame=false){
+        ctx.clearRect(0,0,runtime.width,runtime.height);
+        const points=[];
+        for(const p of runtime.particles){
+          if(!staticFrame&&!runtime.reduced){p.z-=p.speed;if(p.z<45){Object.assign(p,seedParticle(),{z:1250});}}
+          const perspective=900/(p.z+520);
+          const wave=runtime.reduced?0:Math.sin(time*.00045+p.phase)*7;
+          const x=runtime.width*.5+p.x*perspective-runtime.mouseX*19*perspective;
+          const y=runtime.height*.5+(p.y+wave)*perspective+runtime.mouseY*15*perspective-Math.min(runtime.scrollY,6000)*.012;
+          if(x < -45||x>runtime.width+45||y < -45||y>runtime.height+45)continue;
+          const depth=Math.max(.12,1-p.z/1400);
+          points.push({x,y,r:Math.max(.55,p.r*depth*1.7),depth,hue:p.hue});
+        }
+        for(let i=0;i<points.length;i++){
+          const a=points[i];
+          for(let j=i+1;j<points.length;j++){
+            const b=points[j],dx=a.x-b.x,dy=a.y-b.y,d2=dx*dx+dy*dy;
+            if(d2<112*112){const distance=Math.sqrt(d2);const alpha=(1-distance/112)*Math.min(a.depth,b.depth)*.19;ctx.strokeStyle=a.hue>.72?`rgba(112,190,255,${alpha})`:`rgba(183,164,255,${alpha})`;ctx.lineWidth=.65;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}
+          }
+        }
+        for(const p of points){const alpha=.16+p.depth*.49;ctx.beginPath();ctx.fillStyle=p.hue>.72?`rgba(133,205,255,${alpha})`:`rgba(201,188,255,${alpha})`;ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();}
+        if(runtime.bursts.length&&!runtime.reduced){
+          const alive=[];
+          for(const b of runtime.bursts){b.x+=b.vx;b.y+=b.vy;b.vx*=.985;b.vy=b.vy*.985+.012;b.life-=.022;if(b.life<=0)continue;ctx.beginPath();ctx.fillStyle=`rgba(${b.blue?'137,202,255':'204,188,255'},${Math.max(0,b.life*.85)})`;ctx.arc(b.x,b.y,b.size*(.5+b.life),0,Math.PI*2);ctx.fill();alive.push(b);}
+          runtime.bursts=alive;
+        }
+      }
+      function animate(time){
+        if(landingParticleRuntime!==runtime||document.hidden)return;
+        if(time-runtime.lastFrame<27){runtime.raf=requestAnimationFrame(animate);return;}
+        runtime.lastFrame=time;draw(time);runtime.raf=requestAnimationFrame(animate);
+      }
+      function schedule(){if(!runtime.raf&&!document.hidden&&!runtime.reduced)runtime.raf=requestAnimationFrame(animate);}
+      function onPointerMove(event){runtime.mouseX=(event.clientX/runtime.width-.5)*2;runtime.mouseY=(event.clientY/runtime.height-.5)*2;if(runtime.reduced)draw(performance.now(),true);}
+      function onScroll(){runtime.scrollY=window.scrollY||0;if(runtime.reduced)draw(performance.now(),true);}
+      function onVisibility(){if(document.hidden){if(runtime.raf)cancelAnimationFrame(runtime.raf);runtime.raf=0;}else schedule();}
+      runtime.spawnBurst=(x,y)=>{if(runtime.reduced)return;for(let i=0;i<30;i++){const angle=Math.random()*Math.PI*2;const speed=random(1.1,4.4);runtime.bursts.push({x,y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,size:random(1,2.7),life:1,blue:Math.random()>.68});}schedule();};
+      runtime.destroy=()=>{if(runtime.raf)cancelAnimationFrame(runtime.raf);window.removeEventListener('resize',resize);window.removeEventListener('pointermove',onPointerMove);window.removeEventListener('scroll',onScroll);document.removeEventListener('visibilitychange',onVisibility);canvas.remove();};
+      window.addEventListener('resize',resize,{passive:true});window.addEventListener('pointermove',onPointerMove,{passive:true});window.addEventListener('scroll',onScroll,{passive:true});document.addEventListener('visibilitychange',onVisibility);
+      landingParticleRuntime=runtime;resize();return runtime;
+    }
+    function setupScrollFly(){
+      if(scrollFlyObserver){scrollFlyObserver.disconnect();scrollFlyObserver=null;}
+      const reduceMotion=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches||false;
+      const selectors=['.hero .eyebrow','.hero p','.hero-buttons','.hero-note','.section-head .eyebrow','.section-head h2','.section-head p','.feature-card','.template-card','.cta-band > div','.cta-band > button','footer > span'];
+      const targets=[...new Set(selectors.flatMap(selector=>[...document.querySelectorAll('#app '+selector)]))];
+      if(reduceMotion||!('IntersectionObserver' in window)){targets.forEach(el=>el.classList.remove('scroll-fly','in-view'));return;}
+      scrollFlyObserver=new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting){entry.target.classList.add('in-view');scrollFlyObserver?.unobserve(entry.target);}}},{threshold:.12,rootMargin:'0px 0px -32px 0px'});
+      targets.forEach((el,index)=>{
+        el.classList.remove('in-view');el.classList.add('scroll-fly');
+        const horizontal=el.matches('.feature-card,.template-card');
+        const from=horizontal?(index%3===0?'left':index%3===1?'up':'right'):(el.matches('.section-head p,.hero p')?'left':'up');
+        el.style.setProperty('--fly-x',from==='left'?'-28px':from==='right'?'28px':'0px');
+        el.style.setProperty('--fly-y',from==='up'?'28px':'0px');
+        el.style.setProperty('--fly-delay',`${Math.min(index%4,3)*65}ms`);
+        scrollFlyObserver.observe(el);
+      });
+    }
+    function syncLandingEffects(){
+      const isLanding=state.route==='home'&&!location.hash&&!!$('#app .hero');
+      if(isLanding){document.body.classList.add('landing-mode');if(!landingParticleRuntime)startLandingParticles();setupScrollFly();}
+      else{document.body.classList.remove('landing-mode');if(scrollFlyObserver){scrollFlyObserver.disconnect();scrollFlyObserver=null;}if(landingParticleRuntime){landingParticleRuntime.destroy();landingParticleRuntime=null;}activeLandingTitle=null;}
+    }
+    function triggerTitleMotion(title,x,y){
+      if(!title)return;title.classList.remove('title-tap');void title.offsetWidth;title.classList.add('title-tap');
+      const rect=title.getBoundingClientRect();if(typeof x!=='number'||typeof y!=='number'){x=rect.left+rect.width*.5;y=rect.top+rect.height*.5;}
+      landingParticleRuntime?.spawnBurst(x,y);window.setTimeout(()=>title.classList.remove('title-tap'),720);
     }
     function updateSaveLabel(){const nodes=[$('#save-state'),$('#editor-save-state')].filter(Boolean);nodes.forEach(n=>{n.className=`save-line ${state.saving?'saving':state.dirty?'':'saved'}`;n.textContent=state.saving?'Đang lưu…':state.dirty?'Chưa đồng bộ':'Đã đồng bộ';});}
     async function loadUserData(user){
@@ -441,6 +553,21 @@
       if(!state.profile)return;const payload={exportedAt:new Date().toISOString(),profile:{...state.profile,draft:state.draft},analytics:state.events};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`biospace-${state.profile.username||'profile'}-export.json`;a.click();URL.revokeObjectURL(url);toast('Đã tạo bản xuất dữ liệu JSON.');
     }
     function applyPreset(id){const preset=PRESETS.find(p=>p.id===id);if(!preset)return;state.draft.theme={...state.draft.theme,...preset.theme,preset:id};queueAutoSave();render();toast(`Đã áp dụng mẫu ${preset.name}.`);}
+
+    document.addEventListener('pointermove',event=>{
+      const title=event.target.closest?.('[data-title-interactive]');
+      if(!title||event.pointerType==='touch'){if(activeLandingTitle){activeLandingTitle.style.setProperty('--title-tilt-x','0deg');activeLandingTitle.style.setProperty('--title-tilt-y','0deg');activeLandingTitle=null;}return;}
+      activeLandingTitle=title;const rect=title.getBoundingClientRect();
+      const nx=Math.max(-1,Math.min(1,((event.clientX-rect.left)/rect.width-.5)*2));
+      const ny=Math.max(-1,Math.min(1,((event.clientY-rect.top)/rect.height-.5)*2));
+      title.style.setProperty('--title-tilt-x',`${(nx*5).toFixed(2)}deg`);title.style.setProperty('--title-tilt-y',`${(-ny*3.5).toFixed(2)}deg`);
+    },{passive:true});
+    document.addEventListener('pointerout',event=>{
+      const title=event.target.closest?.('[data-title-interactive]');if(!title||title.contains(event.relatedTarget))return;
+      title.style.setProperty('--title-tilt-x','0deg');title.style.setProperty('--title-tilt-y','0deg');if(activeLandingTitle===title)activeLandingTitle=null;
+    });
+    document.addEventListener('click',event=>{const title=event.target.closest?.('[data-title-interactive]');if(title)triggerTitleMotion(title,event.clientX,event.clientY);});
+    document.addEventListener('keydown',event=>{const title=event.target.closest?.('[data-title-interactive]');if(!title||!['Enter',' '].includes(event.key))return;event.preventDefault();triggerTitleMotion(title);});
 
     document.addEventListener('click',async event=>{
       const btn=event.target.closest('[data-action]');if(!btn)return;const action=btn.dataset.action;
