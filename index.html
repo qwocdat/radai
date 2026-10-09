@@ -743,6 +743,17 @@
         .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); }
         body.has-mini .toast { bottom: calc(170px + env(safe-area-inset-bottom, 0px)); }
 
+        /* Đồng hồ đếm ngược hẹn giờ */
+        #sleepChip { position: fixed; right: 14px; top: calc(76px + env(safe-area-inset-top, 0px)); z-index: 950; display: none; align-items: center; gap: 7px;
+            padding: 7px 13px; border-radius: 999px; border: 1px solid rgba(var(--accent2-rgb), .45); background: var(--glass-bg); color: #fff;
+            backdrop-filter: blur(14px) saturate(160%); -webkit-backdrop-filter: blur(14px) saturate(160%);
+            font: 700 13px/1 Roboto, "Segoe UI", system-ui, sans-serif; font-variant-numeric: tabular-nums; cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0,0,0,.45), 0 0 18px rgba(var(--accent2-rgb), .25); }
+        #sleepChip.show { display: inline-flex; }
+        #sleepChip i { color: #c4b5fd; font-size: 12px; }
+        .sleep-clock { font-size: 40px; font-weight: 800; letter-spacing: 1px; margin-top: 8px; font-variant-numeric: tabular-nums;
+            background: linear-gradient(90deg, #a5b4fc, #e9d5ff); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
         /* Mini audio player */
         .mini-player {
             position: fixed; left: 14px; right: 14px; max-width: 380px; margin: 0 auto;
@@ -824,6 +835,10 @@
         .hist-item .s { font-size: 12px; color: var(--text-sub); margin-top: 3px; }
         .hist-bar { height: 4px; background: rgba(255,255,255,.1); border-radius: 4px; margin-top: 8px; overflow: hidden; }
         .hist-bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+        .kind-tag { display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: .5px; padding: 2px 7px; margin-right: 8px; border-radius: 6px; vertical-align: 1px; }
+        .kind-tag.video { color: #93c5fd; background: rgba(59,130,246,.18); border: 1px solid rgba(59,130,246,.4); }
+        .kind-tag.audio { color: #f9a8d4; background: rgba(236,72,153,.18); border: 1px solid rgba(236,72,153,.4); }
+        .audio-item .fa-music { color: #f472b6; }
         .section-sub { font-size: 17px; font-weight: 700; margin: 8px 0 14px; }
 
         @media (max-width: 700px) {
@@ -1496,45 +1511,75 @@ void main(){
             }
         };
 
-        /* HẸN GIỜ ĐI NGỦ (SLEEP TIMER) */
-        let sleepTimerTimeout = null;
+        /* HẸN GIỜ ĐI NGỦ (SLEEP TIMER) - có đồng hồ đếm ngược */
         let sleepEndTime = null;
+        let sleepTick = null;
+
+        const sleepChip = document.createElement('button');
+        sleepChip.id = 'sleepChip';
+        sleepChip.type = 'button';
+        sleepChip.innerHTML = '<i class="fa-solid fa-moon"></i><span id="sleepChipTime">00:00</span>';
+        sleepChip.onclick = () => window.openSleepModal();
+        document.body.appendChild(sleepChip);
+
+        const fmtCountdown = (ms) => {
+            const t = Math.max(0, Math.ceil(ms / 1000));
+            const h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), s = t % 60;
+            const mm = String(m).padStart(2, '0'), ss = String(s).padStart(2, '0');
+            return h > 0 ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
+        };
+
+        function renderSleepClock() {
+            const statusEl = document.getElementById('sleepStatusText');
+            if (!sleepEndTime) {
+                sleepChip.classList.remove('show');
+                statusEl.textContent = 'Chọn thời gian để tự động tắt phát Media khi bạn đi ngủ:';
+                return;
+            }
+            const left = sleepEndTime - Date.now();
+            if (left <= 0) { fireSleepTimer(); return; }
+            sleepChip.classList.add('show');
+            document.getElementById('sleepChipTime').textContent = fmtCountdown(left);
+            statusEl.innerHTML = `Hẹn giờ đang bật — sẽ tự động tắt Media sau<div class="sleep-clock">${fmtCountdown(left)}</div>`;
+        }
+
+        function stopSleepTick() { if (sleepTick) { clearInterval(sleepTick); sleepTick = null; } }
+
+        function fireSleepTimer() {
+            stopSleepTick();
+            sleepEndTime = null;
+            const videoEl = document.getElementById('streamPlayer');
+            if (videoEl) videoEl.pause();
+            if (audioEl) audioEl.pause();
+            renderSleepClock();
+            document.getElementById('sleepModal').classList.remove('show');
+            showToast('🌙 Đã đến giờ hẹn — Media đã tự động tắt.');
+            customAlert('Hẹn Giờ Đi Ngủ', 'Đã đến giờ hẹn! Trình phát Media đã tự động tắt. Chúc bạn ngủ ngon 🌙');
+        }
 
         window.openSleepModal = () => {
-            const statusEl = document.getElementById('sleepStatusText');
-            if (sleepEndTime && Date.now() < sleepEndTime) {
-                const leftMins = Math.ceil((sleepEndTime - Date.now()) / 60000);
-                statusEl.textContent = `Hẹn giờ đang bật: Còn khoảng ${leftMins} phút nữa sẽ tự động tắt Media.`;
-            } else {
-                statusEl.textContent = 'Chọn thời gian để tự động tắt phát Media khi bạn đi ngủ:';
-            }
+            renderSleepClock();
             document.getElementById('sleepModal').classList.add('show');
         };
 
         window.setSleepTimer = (minutes) => {
-            if (sleepTimerTimeout) {
-                clearTimeout(sleepTimerTimeout);
-                sleepTimerTimeout = null;
-                sleepEndTime = null;
-            }
+            stopSleepTick();
+            sleepEndTime = null;
 
             if (minutes > 0) {
                 sleepEndTime = Date.now() + minutes * 60 * 1000;
-                sleepTimerTimeout = setTimeout(() => {
-                    const videoEl = document.getElementById('streamPlayer');
-                    if (videoEl) videoEl.pause();
-                    if (audioEl) audioEl.pause();
-                    customAlert('Hẹn Giờ Đi Ngủ', 'Đã đến giờ hẹn! Trình phát Media đã tự động tắt.');
-                    sleepEndTime = null;
-                    sleepTimerTimeout = null;
-                }, minutes * 60 * 1000);
-
+                // Tính theo mốc thời gian thực nên vẫn chính xác khi tab bị trình duyệt làm chậm
+                sleepTick = setInterval(renderSleepClock, 1000);
+                renderSleepClock();
                 showToast(`🌙 Đã hẹn giờ tự động tắt sau ${minutes} phút.`);
             } else {
                 showToast('🌙 Đã tắt hẹn giờ đi ngủ.');
             }
+            renderSleepClock();
             document.getElementById('sleepModal').classList.remove('show');
         };
+
+        document.addEventListener('visibilitychange', () => { if (!document.hidden && sleepEndTime) renderSleepClock(); });
 
         document.getElementById('miniSleep').onclick = window.openSleepModal;
 
@@ -1596,6 +1641,9 @@ void main(){
 
         const urlParams = new URLSearchParams(window.location.search);
         const movieId = urlParams.get('v');
+        const audioParamId = urlParams.get('a');                 // id định danh audio (riêng với video ?v=)
+        const audioParamEp = parseInt(urlParams.get('ae') || '0');
+        let audioRestored = false;
         const currentEpIdx = parseInt(urlParams.get('ep') || '0');
 
         let moviesDataset = {};
@@ -1614,6 +1662,11 @@ void main(){
         // Lắng nghe dữ liệu MP3 Audio riêng từ node /audios
         onValue(ref(db, 'audios'), (snapshot) => {
             audiosDataset = snapshot.val() || {};
+            if (!audioRestored && audioParamId && audiosDataset[audioParamId] && currentUser) {
+                audioRestored = true;
+                audioQueue = buildAudioQueue(audioParamId, audiosDataset[audioParamId]);
+                loadAudio(Math.min(Math.max(audioParamEp, 0), audioQueue.length - 1), false);
+            }
             if (currentTab === 'audio') renderCurrent();
         }, (err) => {
             console.log('Chưa có node /audios hoặc lỗi:', err?.message);
@@ -1788,7 +1841,7 @@ void main(){
 
         /* ROUTING TAB */
         const TAB_IDS = ['video', 'audio', 'settings', 'profile'];
-        let currentTab = TAB_IDS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'video';
+        let currentTab = TAB_IDS.includes(location.hash.slice(1)) ? location.hash.slice(1) : (audioParamId && !movieId ? 'audio' : 'video');
 
         function renderCurrent() {
             const needsData = currentTab === 'video' || currentTab === 'audio';
@@ -1844,7 +1897,7 @@ void main(){
                 if (!player.duration || isNaN(player.duration)) return;
                 lastSave = now;
                 progress[key] = {
-                    mid: mId, ep: epIdx, t: player.currentTime, d: player.duration, u: now,
+                    k: 'video', mid: mId, ep: epIdx, t: player.currentTime, d: player.duration, u: now,
                     mt: movie.title || '', et: epData.title || '', th: movie.thumbnail || ''
                 };
                 store.set('dt_progress', progress);
@@ -1870,6 +1923,13 @@ void main(){
         let audioGroups = {};
         let audioQueue = [], audioIdx = -1;
 
+        function buildAudioQueue(mid, m) {
+            return getEpisodes(m).map((ep, n) => ({
+                mid, ep: n, movie: m.title || '', title: ep.title || '', num: ep.order || n + 1,
+                url: ep.url || '', thumb: m.thumbnail || FALLBACK_THUMB
+            }));
+        }
+
         function getEpisodes(m) {
             return m.episodes ? Object.values(m.episodes).sort((a, b) => (a.order || 0) - (b.order || 0)) : [];
         }
@@ -1878,8 +1938,8 @@ void main(){
             const q = (filterQuery || '').toLowerCase();
             audioGroups = {};
 
-            // Đọc dữ liệu node MP3 Audio riêng (/audios) cùng node /movies
-            const combinedData = { ...audiosDataset, ...moviesDataset };
+            // Audio chỉ đọc node /audios riêng — không lấy video từ /movies
+            const combinedData = audiosDataset;
             const mids = Object.keys(combinedData).filter(mid => (combinedData[mid].title || '').toLowerCase().includes(q));
 
             mids.forEach(mid => {
@@ -1913,9 +1973,9 @@ void main(){
                         <div class="list">
                             ${items.map((it, i) => `
                                 <div class="ep-card-item audio-item" data-mid="${esc(mid)}" data-i="${i}">
-                                    <span class="ep-card-num">Tập ${it.num}</span>
+                                    <span class="ep-card-num">Bài ${it.num}</span>
                                     <span class="ep-card-title">${esc(it.title)}</span>
-                                    <i class="fa-solid fa-circle-play"></i>
+                                    <i class="fa-solid fa-music"></i>
                                 </div>`).join('')}
                         </div>
                     </div>`;
@@ -1934,6 +1994,16 @@ void main(){
             markPlaying();
         }
 
+        window.playAudioFromHistory = (mid, i) => {
+            requireUserAuth(() => {
+                const m = audiosDataset[mid];
+                if (!m) { showToast('⚠️ Không tìm thấy audio này.'); return; }
+                audioQueue = buildAudioQueue(mid, m);
+                window.liquidGlass.setTab('audio', true);
+                loadAudio(i, true);
+            });
+        };
+
         function markPlaying() {
             const cur = audioQueue[audioIdx];
             document.querySelectorAll('.audio-item').forEach(el => {
@@ -1950,6 +2020,12 @@ void main(){
 
             const key = 'audio_' + it.mid + '_' + i;
             const saved = progress[key];
+            try {
+                const u = new URL(location.href);
+                u.searchParams.set('a', it.mid); u.searchParams.set('ae', i);
+                u.searchParams.delete('v'); u.searchParams.delete('ep');
+                history.replaceState(null, '', u.pathname + u.search + u.hash);
+            } catch (e) {}
 
             audioEl.defaultPlaybackRate = settings.speed;
             audioEl.src = normalizeVideoUrl(it.url);
@@ -1990,7 +2066,7 @@ void main(){
             if (audioQueue[audioIdx] && audioEl.duration) {
                 const it = audioQueue[audioIdx];
                 const key = 'audio_' + it.mid + '_' + audioIdx;
-                progress[key] = { mid: it.mid, ep: audioIdx, t: audioEl.currentTime, d: audioEl.duration, u: Date.now(), mt: it.movie, et: it.title, th: it.thumb };
+                progress[key] = { k: 'audio', mid: it.mid, ep: audioIdx, t: audioEl.currentTime, d: audioEl.duration, u: Date.now(), mt: it.movie, et: it.title, th: it.thumb };
                 store.set('dt_progress', progress);
             }
         });
@@ -2192,9 +2268,9 @@ void main(){
 
         /* PROFILE TAB */
         function renderProfileScreen() {
-            const entries = Object.values(progress);
+            const entries = Object.entries(progress).map(([k, e]) => ({ ...e, k: e.k || (k.startsWith('audio_') ? 'audio' : 'video') }));
             const byMovie = {};
-            entries.forEach(e => { if (!byMovie[e.mid] || e.u > byMovie[e.mid].u) byMovie[e.mid] = e; });
+            entries.forEach(e => { const g = e.k + '|' + e.mid; if (!byMovie[g] || e.u > byMovie[g].u) byMovie[g] = e; });
             const hist = Object.values(byMovie).sort((a, b) => b.u - a.u);
             const hours = entries.reduce((s, e) => s + (e.t || 0), 0) / 3600;
             const initial = (profile.name || 'K').trim().charAt(0).toUpperCase() || 'K';
@@ -2218,14 +2294,14 @@ void main(){
                 ${hist.length ? `<div class="hist-list">${hist.map(e => {
                     const pct = e.d ? Math.min(100, Math.round(e.t / e.d * 100)) : 0;
                     return `
-                    <div class="hist-item" onclick="window.playMovieEpWithAuth('${esc(e.mid)}', ${e.ep})">
+                    <div class="hist-item" onclick="${e.k === 'audio' ? `window.playAudioFromHistory('${esc(e.mid)}', ${e.ep})` : `window.playMovieEpWithAuth('${esc(e.mid)}', ${e.ep})`}">
                         <img src="${esc(e.th || FALLBACK_THUMB)}" alt="" loading="lazy" onerror="this.src='${FALLBACK_THUMB}'">
                         <div style="flex:1;min-width:0;">
-                            <div class="t">${esc(e.mt)}</div>
-                            <div class="s">Tập ${e.ep + 1}${e.et ? ' — ' + esc(e.et) : ''} · ${fmtTime(e.t)} / ${fmtTime(e.d)}</div>
+                            <div class="t"><span class="kind-tag ${e.k}">${e.k === 'audio' ? 'AUDIO' : 'VIDEO'}</span>${esc(e.mt)}</div>
+                            <div class="s">${e.k === 'audio' ? 'Bài' : 'Tập'} ${e.ep + 1}${e.et ? ' — ' + esc(e.et) : ''} · ${fmtTime(e.t)} / ${fmtTime(e.d)}</div>
                             <div class="hist-bar"><i style="width:${pct}%"></i></div>
                         </div>
-                        <i class="fa-solid fa-circle-play" style="color:var(--accent);font-size:20px;"></i>
+                        <i class="fa-solid ${e.k === 'audio' ? 'fa-music' : 'fa-circle-play'}" style="color:var(--accent);font-size:20px;"></i>
                     </div>`;
                 }).join('')}</div>
                 <div style="margin-top:16px;"><button class="dt-btn danger" id="btnClearHist2">Xoá lịch sử xem</button></div>`
