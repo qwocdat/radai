@@ -1,0 +1,45 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "auth !== null && auth.uid === $uid",
+        ".write": "auth !== null && auth.uid === $uid",
+        ".validate": "!newData.child('role').exists() || newData.child('role').val() === 'user'"
+      }
+    },
+    "profiles": {
+      "$uid": {
+        ".read": "auth !== null && auth.uid === $uid",
+        ".write": "auth !== null && auth.uid === $uid"
+      }
+    },
+    "usernames": {
+      "$username": {
+        ".read": "auth !== null",
+        ".write": "auth !== null && (!data.exists() || data.val() === auth.uid) && ((newData.exists() && newData.val() === auth.uid && $username !== 'admin' && $username !== 'login' && $username !== 'register' && $username !== 'settings' && $username !== 'dashboard' && $username !== 'api' && $username !== 'help' && $username !== 'support' && $username !== 'about' && $username !== 'privacy' && $username !== 'terms' && $username !== 'account' && $username !== 'auth' && $username !== 'null' && $username !== 'undefined' && $username !== 'firebase' && $username !== 'root' && $username !== 'www' && $username !== 'mail' && $username !== 'profile' && $username !== 'profiles' && $username !== 'explore' && $username !== 'discover' && $username !== 'assets' && $username !== 'static' && $username !== 'public' && $username !== 'editor' && $username !== 'analytics') || (!newData.exists() && data.val() === auth.uid))",
+        ".validate": "$username.matches(/^[a-z0-9_-]{3,24}$/) && (!newData.exists() || (newData.isString() && newData.val() === auth.uid))"
+      }
+    },
+    "publicProfiles": {
+      "$username": {
+        ".read": true,
+        ".write": "auth !== null && root.child('usernames').child($username).val() === auth.uid",
+        ".validate": "!newData.exists() || (newData.child('uid').val() === auth.uid && newData.child('username').val() === $username && newData.child('status').val() === 'published')"
+      }
+    },
+    "analytics": {
+      "$uid": {
+        "events": {
+          ".read": "auth !== null && auth.uid === $uid",
+          "$eventId": {
+            ".write": "!data.exists() && root.child('profiles').child($uid).child('status').val() === 'published' && (newData.child('type').val() === 'view' || newData.child('type').val() === 'click') && newData.child('timestamp').isNumber()",
+            ".validate": "newData.hasChildren(['type', 'timestamp']) && newData.child('timestamp').isNumber() && (newData.child('type').val() === 'view' || newData.child('type').val() === 'click')"
+          },
+          ".indexOn": [
+            "timestamp"
+          ]
+        }
+      }
+    }
+  }
+}
