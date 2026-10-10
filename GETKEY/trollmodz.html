@@ -246,13 +246,16 @@ body.modal-open { overflow:hidden; overscroll-behavior:none; }
 const LINK4M_API_KEY = '6992df868b3d1e423d1ab833';
 const LENTOP_API_KEY = 'VtWpbloYUY926b0POtWWmIrt';
 
-// Tự động lấy URL trang hiện tại để làm Callback nhận key chính xác trên mọi tên miền (GitHub Pages/Custom Domain)
-const getCurrentBaseUrl = () => window.location.protocol + '//' + window.location.host + window.location.pathname;
+// Tự động lấy URL trang hiện tại để làm Callback nhận key chính xác trên mọi tên miền
+const getCurrentBaseUrl = () => {
+  const u = new URL(window.location.href);
+  return u.protocol + '//' + u.host + u.pathname;
+};
 
 function localStorageSafeGet(key) { try { return localStorage.getItem(key); } catch { return null; } }
 function localStorageSafeSet(key, value) { try { localStorage.setItem(key, value); } catch {} }
 
-// Mã định danh thiết bị (Khai báo ở ngoài phạm vi global để buildKeyReturnUrl sử dụng được)
+// Mã định danh thiết bị (Global Scope)
 function getDeviceId() {
   let id = localStorageSafeGet('tm_device_id');
   if (!id || !/^DEV-[A-F0-9]{8,16}-[A-Z0-9]+$/i.test(id)) {
@@ -282,7 +285,8 @@ function readTrustedFlowToken(payload, names) {
   return '';
 }
 
-function buildKeyReturnUrl(payload) {
+// Tạo địa chỉ URL callback quay về trang kèm Task ID, Device ID và Bước hiện tại
+function buildKeyReturnUrl(payload, targetStep = '1_done') {
   const session = readTrustedFlowToken(payload, ['session', 'sessionId', 'session_id', 'taskId']);
   const device = readTrustedFlowToken(payload, ['device', 'deviceId', 'device_id']) || getDeviceId();
   const time = payload?.time || payload?.timestamp || Date.now();
@@ -292,32 +296,34 @@ function buildKeyReturnUrl(payload) {
   callback.searchParams.set('session', session);
   callback.searchParams.set('device', device);
   callback.searchParams.set('time', time.toString());
-  callback.searchParams.set('step', '2');
+  callback.searchParams.set('step', targetStep);
   return callback.href;
 }
 
-function buildLentopUrl(returnUrl) {
-  const url = new URL('https://lentop.one/st');
-  url.searchParams.set('api', LENTOP_API_KEY);
-  url.searchParams.set('url', returnUrl);
-  url.searchParams.set('sub_link', getCurrentBaseUrl());
-  return url.href;
-}
-
-function buildChainedLink4mUrl(payload) {
-  const callbackUrl = buildKeyReturnUrl(payload);
+// Tạo URL Link 1 (Link4M) chuyển hướng về trang sau khi hoàn thành bước 1
+function buildLink4mUrl(payload) {
+  const callbackUrl = buildKeyReturnUrl(payload, '1_done');
   if (!callbackUrl) return null;
   const url = new URL('https://link4m.co/st');
   url.searchParams.set('api', LINK4M_API_KEY);
-  url.searchParams.set('url', buildLentopUrl(callbackUrl));
+  url.searchParams.set('url', callbackUrl);
+  return url.href;
+}
+
+// Tạo URL Link 2 (Lentop) chuyển hướng về trang sau khi hoàn thành bước 2
+function buildLentopUrl(payload) {
+  const callbackUrl = buildKeyReturnUrl(payload, '2_done');
+  if (!callbackUrl) return null;
+  const url = new URL('https://lentop.one/st');
+  url.searchParams.set('api', LENTOP_API_KEY);
+  url.searchParams.set('url', callbackUrl);
+  url.searchParams.set('sub_link', getCurrentBaseUrl());
   return url.href;
 }
 
 function buildCurrentStepUrl(payload) {
   const step = Number(payload?.step ?? payload?.currentStep ?? payload?.current_step ?? 1);
-  const callbackUrl = buildKeyReturnUrl(payload);
-  if (!callbackUrl) return null;
-  return step >= 2 ? buildLentopUrl(callbackUrl) : buildChainedLink4mUrl(payload);
+  return step >= 2 ? buildLentopUrl(payload) : buildLink4mUrl(payload);
 }
 
 (() => {
@@ -474,12 +480,12 @@ function buildCurrentStepUrl(payload) {
   }
 
   // =========================================================================
-  // BỘ XỬ LÝ API CỤC BỘ
+  // BỘ XỬ LÝ API CỤC BỘ (XỬ LÝ 2 BƯỚC ĐỘC LẬP)
   // =========================================================================
   async function api(path, options = {}) {
     const deviceId = getDeviceId();
     const now = Date.now();
-    const TASK_TIMEOUT_MS = 15 * 60 * 1000;
+    const TASK_TIMEOUT_MS = 15 * 60 * 1000; // Nhiệm vụ hết hạn sau 15 phút
 
     await new Promise(res => setTimeout(res, 120));
 
@@ -488,18 +494,20 @@ function buildCurrentStepUrl(payload) {
     }
 
     if (path === '/api/session') {
+      // Khởi tạo nhiệm vụ mới cho Bước 1
       const taskId = 'TASK-' + Math.random().toString(36).substring(2, 10).toUpperCase() + '-' + now.toString(36).toUpperCase();
       const taskData = {
         session: taskId,
         device: deviceId,
         time: now,
         step: 1,
-        validated: false,
+        step1Done: false,
+        step2Done: false,
         claimed: false
       };
 
       localStorageSafeSet('tm_active_task', JSON.stringify(taskData));
-      const redirectUrl = buildChainedLink4mUrl(taskData);
+      const redirectUrl = buildLink4mUrl(taskData);
 
       return {
         status: 'redirect',
@@ -517,7 +525,7 @@ function buildCurrentStepUrl(payload) {
         throw err;
       }
       const task = JSON.parse(raw);
-      const redirectUrl = buildChainedLink4mUrl(task);
+      const redirectUrl = task.step >= 2 ? buildLentopUrl(task) : buildLink4mUrl(task);
       return {
         status: 'redirect',
         step: task.step || 1,
@@ -529,6 +537,12 @@ function buildCurrentStepUrl(payload) {
       const returnParams = getReturnParams();
       let task = null;
 
+      const raw = localStorageSafeGet('tm_active_task');
+      if (raw) {
+        try { task = JSON.parse(raw); } catch {}
+      }
+
+      // Nếu người dùng quay lại trang sau khi vượt link (có tham số session & device trên URL)
       if (returnParams.session && returnParams.device) {
         if (returnParams.device !== deviceId) {
           const err = new Error(t('returnInvalid'));
@@ -543,23 +557,28 @@ function buildCurrentStepUrl(payload) {
           throw err;
         }
 
-        if (returnParams.step === '2') {
+        if (!task || task.session !== returnParams.session) {
           task = {
             session: returnParams.session,
             device: returnParams.device,
             time: taskTime,
-            step: 2,
-            validated: true,
+            step: 1,
+            step1Done: false,
+            step2Done: false,
             claimed: false
           };
-          localStorageSafeSet('tm_active_task', JSON.stringify(task));
         }
-      }
 
-      if (!task) {
-        const raw = localStorageSafeGet('tm_active_task');
-        if (raw) {
-          try { task = JSON.parse(raw); } catch {}
+        // Đánh dấu hoàn thành từng bước
+        if (returnParams.step === '1_done' || returnParams.step === '1') {
+          task.step1Done = true;
+          task.step = 2; // Chuyển sang chuẩn bị Bước 2
+          localStorageSafeSet('tm_active_task', JSON.stringify(task));
+        } else if (returnParams.step === '2_done' || returnParams.step === '2') {
+          if (task.step1Done) {
+            task.step2Done = true;
+          }
+          localStorageSafeSet('tm_active_task', JSON.stringify(task));
         }
       }
 
@@ -576,7 +595,8 @@ function buildCurrentStepUrl(payload) {
         return { status: 'expired', currentStep: 2, serverNow: now };
       }
 
-      if (task.validated || task.step === 2) {
+      // Đã hoàn thành cả 2 bước -> Cấp key
+      if (task.step1Done && task.step2Done) {
         return {
           status: 'ready_to_claim',
           canClaim: true,
@@ -585,9 +605,19 @@ function buildCurrentStepUrl(payload) {
         };
       }
 
+      // Hoàn thành Bước 1 -> Hiển thị chờ làm tiếp Bước 2 (Link 2/2)
+      if (task.step1Done) {
+        return {
+          status: 'pending',
+          currentStep: 2,
+          serverNow: now
+        };
+      }
+
+      // Chưa xong Bước 1
       return {
         status: 'pending',
-        currentStep: task.step || 1,
+        currentStep: 1,
         serverNow: now
       };
     }
@@ -613,10 +643,17 @@ function buildCurrentStepUrl(payload) {
         throw err;
       }
 
+      if (!task.step1Done || !task.step2Done) {
+        const err = new Error(t('returnInvalid'));
+        err.code = 'steps_incomplete';
+        throw err;
+      }
+
       if (task.claimed) {
         return { status: 'expired', serverNow: now };
       }
 
+      // Sinh Key độc bản dựa trên Task + Device Signature
       const seed = task.session + deviceId;
       let hash = 0;
       for (let i = 0; i < seed.length; i++) hash = ((hash << 5) - hash) + seed.charCodeAt(i);
