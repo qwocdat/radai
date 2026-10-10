@@ -218,7 +218,7 @@ body.modal-open { overflow:hidden; overscroll-behavior:none; }
         <h2 data-i18n="onboardHow">TWO LINKS. ONE KEY.</h2>
         <div class="steps-list">
           <div class="onboard-step"><span class="step-number">01</span><span class="step-icon">↗</span><div><strong data-i18n="stepOneTitle">COMPLETE LINK 1</strong><p data-i18n="stepOneText">Finish the Link4M step, then continue to step two.</p></div><span class="step-line"></span></div>
-          <div class="onboard-step"><span class="step-number">02</span><span class="step-icon">↗</span><div><strong data-i18n="stepTwoTitle">COMPLETE LINK 2</strong><p data-i18n="stepTwoText">Finish the Lentop step and return to DIGITALSMOD.</p></div><span class="step-line"></span></div>
+          <div class="onboard-step"><span class="step-number">02</span><span class="step-icon">↗</span><div><strong data-i18n="stepTwoTitle">COMPLETE LINK 2</strong><p data-i18n="stepTwoText">Finish the TrafficTop step and return to DIGITALSMOD.</p></div><span class="step-line"></span></div>
           <div class="onboard-step"><span class="step-number">03</span><span class="step-icon">⌁</span><div><strong data-i18n="stepThreeTitle">CLAIM YOUR KEY</strong><p data-i18n="stepThreeText">The system verifies device signature and task ID before issuing a key.</p></div></div>
         </div>
         <label class="privacy-check"><input id="privacyConsent" type="checkbox"><span class="custom-check" aria-hidden="true"></span><span data-i18n="privacyConsent">I understand that a hardware fingerprint ID, task timestamp and session parameters are used for abuse prevention.</span></label>
@@ -228,7 +228,7 @@ body.modal-open { overflow:hidden; overscroll-behavior:none; }
         <div class="ready-emblem"><span class="ready-ring ring-one"></span><span class="ready-ring ring-two"></span><span class="ready-core">TM</span></div>
         <p class="onboard-index">03 / READY CHECK</p>
         <h2 data-i18n="onboardReady">SYSTEM READY?</h2>
-        <p class="onboard-description" data-i18n="onboardReadyText">Your flow will open Link4M first, then Lentop. The key appears only if the return flow is accepted and device signature matches.</p>
+        <p class="onboard-description" data-i18n="onboardReadyText">Your flow will open Link4M first, then TrafficTop. The key appears only if the return flow is accepted and device signature matches.</p>
         <div class="ready-checklist"><span><i></i><span data-i18n="readyPrivacy">PRIVACY NOTICE ACKNOWLEDGED</span></span><span><i></i><span data-i18n="readySession">DEVICE-BOUND TASK ID</span></span><span><i></i><span data-i18n="readyNoFake">TASK & FINGERPRINT VALIDATION</span></span></div>
         <button class="onboard-action" type="button" id="startFromOnboarding"><span data-i18n="startSession">START KEY SESSION</span><span>↗</span></button>
         <button class="text-button onboard-cancel" type="button" data-onboard-back data-i18n="back">BACK</button>
@@ -242,11 +242,11 @@ body.modal-open { overflow:hidden; overscroll-behavior:none; }
   </div>
 
 <script>
-// Cấu hình chìa khóa các trang rút gọn link
+// Cấu hình API rút gọn link
 const LINK4M_API_KEY = '6992df868b3d1e423d1ab833';
-const LENTOP_API_KEY = 'VtWpbloYUY926b0POtWWmIrt';
+const TRAFFICTOP_API_KEY = 'tXk7A1HwG4QSXwGN6TU7yLOz';
 
-// Tự động lấy URL trang hiện tại để làm Callback nhận key chính xác trên mọi tên miền
+// Tự động lấy URL trang hiện tại
 const getCurrentBaseUrl = () => {
   const u = new URL(window.location.href);
   return u.protocol + '//' + u.host + u.pathname;
@@ -255,7 +255,7 @@ const getCurrentBaseUrl = () => {
 function localStorageSafeGet(key) { try { return localStorage.getItem(key); } catch { return null; } }
 function localStorageSafeSet(key, value) { try { localStorage.setItem(key, value); } catch {} }
 
-// Mã định danh thiết bị (Global Scope)
+// Mã định danh thiết bị
 function getDeviceId() {
   let id = localStorageSafeGet('tm_device_id');
   if (!id || !/^DEV-[A-F0-9]{8,16}-[A-Z0-9]+$/i.test(id)) {
@@ -285,7 +285,7 @@ function readTrustedFlowToken(payload, names) {
   return '';
 }
 
-// Tạo địa chỉ URL callback quay về trang kèm Task ID, Device ID và Bước hiện tại
+// Tạo URL callback
 function buildKeyReturnUrl(payload, targetStep = '1_done') {
   const session = readTrustedFlowToken(payload, ['session', 'sessionId', 'session_id', 'taskId']);
   const device = readTrustedFlowToken(payload, ['device', 'deviceId', 'device_id']) || getDeviceId();
@@ -300,7 +300,7 @@ function buildKeyReturnUrl(payload, targetStep = '1_done') {
   return callback.href;
 }
 
-// Tạo URL Link 1 (Link4M) chuyển hướng về trang sau khi hoàn thành bước 1
+// URL Link 1 (Link4M)
 function buildLink4mUrl(payload) {
   const callbackUrl = buildKeyReturnUrl(payload, '1_done');
   if (!callbackUrl) return null;
@@ -310,12 +310,12 @@ function buildLink4mUrl(payload) {
   return url.href;
 }
 
-// Tạo URL Link 2 (Lentop) chuyển hướng về trang sau khi hoàn thành bước 2
-function buildLentopUrl(payload) {
+// URL Link 2 (TrafficTop API)
+function buildTrafficTopUrl(payload) {
   const callbackUrl = buildKeyReturnUrl(payload, '2_done');
   if (!callbackUrl) return null;
-  const url = new URL('https://lentop.one/st');
-  url.searchParams.set('api', LENTOP_API_KEY);
+  const url = new URL('https://traffictop.net/st');
+  url.searchParams.set('api', TRAFFICTOP_API_KEY);
   url.searchParams.set('url', callbackUrl);
   url.searchParams.set('sub_link', getCurrentBaseUrl());
   return url.href;
@@ -323,7 +323,7 @@ function buildLentopUrl(payload) {
 
 function buildCurrentStepUrl(payload) {
   const step = Number(payload?.step ?? payload?.currentStep ?? payload?.current_step ?? 1);
-  return step >= 2 ? buildLentopUrl(payload) : buildLink4mUrl(payload);
+  return step >= 2 ? buildTrafficTopUrl(payload) : buildLink4mUrl(payload);
 }
 
 (() => {
@@ -355,10 +355,10 @@ function buildCurrentStepUrl(payload) {
 
   const COPY = {
     en: {
-      maintenance: "WE'RE DOING MAINTENANCE. EVERYTHING IS PAUSED UNTIL WE'RE BACK.", systemOnline: 'KEY SYSTEM // READY', tagline: 'NO ACCOUNT. NO PASSWORD. JUST YOUR KEY.', heroSubline: 'TWO-STAGE ACCESS AUTHORIZATION', accessKey: 'ACCESS KEY', paste: 'PASTE', fieldHint: 'Your issued key appears here after both steps are complete.', unlock: 'UNLOCK', getKey: 'GET KEY', resumeLink1: 'RESUME LINK 1', continueLink2: 'CONTINUE LINK 2', keyReady: 'KEY ISSUED', readyTitle: 'READY WHEN YOU ARE', readyMessage: 'Start the key session to begin the two-link sequence.', expiresIn: 'KEY DISPLAY EXPIRES IN', oneTime: 'ONE-TIME DISPLAY WINDOW', copyKey: 'COPY KEY', primaryNote: 'Two consecutive steps are required. Returning to this page alone does not verify completion.', noKey: 'NO KEY? CONTACT YOUR SELLER.', timeNote: 'YOUR DISPLAY WINDOW STARTS WHEN THE KEY IS ISSUED.', secureSession: 'DEVICE-BOUND FLOW', onboardWelcome: 'WELCOME TO TROLLMODZ', onboardWelcomeText: 'A two-stage access flow built for your TrollModz key. Follow each step and return here to claim your key.', getStarted: 'GET STARTED', onboardHow: 'TWO LINKS. ONE KEY.', stepOneTitle: 'COMPLETE LINK 1', stepOneText: 'Finish the Link4M step, then continue to step two.', stepTwoTitle: 'COMPLETE LINK 2', stepTwoText: 'Finish the Lentop step and return to DIGITALSMOD.', stepThreeTitle: 'CLAIM YOUR KEY', stepThreeText: 'The system verifies device signature and task ID before issuing a key.', privacyConsent: 'I understand that a hardware fingerprint ID, task timestamp and session parameters are used for abuse prevention.', back: 'BACK', continue: 'CONTINUE', onboardReady: 'SYSTEM READY?', onboardReadyText: 'Your flow will open Link4M first, then Lentop. The key appears only if the return flow is accepted and device signature matches.', readyPrivacy: 'PRIVACY NOTICE ACKNOWLEDGED', readySession: 'DEVICE-BOUND TASK ID', readyNoFake: 'TASK & FINGERPRINT VALIDATION', startSession: 'START KEY SESSION', onboardBottom: 'DIGITALSMOD SECURITY FLOW', statusStandby: 'STANDBY', statusActive: 'IN PROGRESS', statusReady: 'VERIFIED RETURN', statusIssued: 'KEY ISSUED', statusExpired: 'EXPIRED', statusError: 'ACTION REQUIRED', statusChecking: 'CHECKING TASK & DEVICE', loadingTitle: 'INITIALIZING SESSION', loadingMessage: 'Creating a task ID and preparing the next step.', link1Title: 'LINK 1 REQUIRED', link1Message: 'Continue to Link4M. Return to this page to proceed to step two.', link2Title: 'LINK 2 REQUIRED', link2Message: 'The first return was accepted. Complete Lentop to continue.', verifyingTitle: 'VERIFYING RETURN', verifyingMessage: 'Checking task ID and device signature before issuing a key.', readyClaimTitle: 'BOTH STEPS RETURNED', readyClaimMessage: 'Verification successful! Generating your key...', issuedTitle: 'YOUR KEY IS READY', issuedMessage: 'Copy the key before the 10-second display window ends.', expiredTitle: 'DISPLAY WINDOW EXPIRED', expiredMessage: 'This session key will not be shown again. Start a new two-link session to request another key.', errorTitle: 'SESSION NEEDS ATTENTION', errorMessage: 'The request could not be completed. Check the message and try again.', copied: 'KEY COPIED TO CLIPBOARD', pasteSuccess: 'Clipboard text pasted.', pasteFailed: 'Clipboard access was denied. Paste manually into the field.', clipboardDenied: 'Clipboard access is unavailable. Your key remains visible until the timer ends.', sessionFailed: 'Unable to start the session. No key was issued.', noKeyStock: 'The key pool is empty. No key was issued; contact the administrator.', maintenanceText: 'The key system is under maintenance. New sessions and key claims are paused.', consentRequired: 'Review the privacy notice and confirm it before starting.', linkConfig: 'A short-link provider is not configured. No key was issued.', returnInvalid: 'This return could not be validated or device mismatch detected. Restart the flow on this device.', sessionMissing: 'This session/task was not found or has expired. Start a fresh key session.', networkError: 'Could not reach the server. Check your connection and try again.', rateLimited: 'Too many attempts. Wait a minute before trying again.', startButtonBusy: 'WORKING…', continuePrompt: 'Continue from the current step.', startNew: 'START NEW SESSION', sessionExpired: 'The session expired. Start a new session and complete both links.', copyOnlyButton: 'COPY KEY', link2Config: 'Lentop is not configured. Step one was not accepted.', onboardingRequired: 'Complete onboarding and acknowledge the privacy notice before continuing.', privacyNeeded: 'Privacy acknowledgement is required.', settingsLabel: 'HOW IT WORKS', sessionCode: 'SYS/01', idleCode: 'SYS/00', expiredCode: 'SYS/EX', readyCode: 'SYS/OK', activeCode: 'SYS/…', keyTimeNote: 'The 10-second countdown is enforced locally. Hiding text cannot revoke a key already seen.'
+      maintenance: "WE'RE DOING MAINTENANCE. EVERYTHING IS PAUSED UNTIL WE'RE BACK.", systemOnline: 'KEY SYSTEM // READY', tagline: 'NO ACCOUNT. NO PASSWORD. JUST YOUR KEY.', heroSubline: 'TWO-STAGE ACCESS AUTHORIZATION', accessKey: 'ACCESS KEY', paste: 'PASTE', fieldHint: 'Your issued key appears here after both steps are complete.', unlock: 'UNLOCK', getKey: 'GET KEY', resumeLink1: 'RESUME LINK 1', continueLink2: 'CONTINUE LINK 2', keyReady: 'KEY ISSUED', readyTitle: 'READY WHEN YOU ARE', readyMessage: 'Start the key session to begin the two-link sequence.', expiresIn: 'KEY DISPLAY EXPIRES IN', oneTime: 'ONE-TIME DISPLAY WINDOW', copyKey: 'COPY KEY', primaryNote: 'Two consecutive steps are required. Returning to this page alone does not verify completion.', noKey: 'NO KEY? CONTACT YOUR SELLER.', timeNote: 'YOUR DISPLAY WINDOW STARTS WHEN THE KEY IS ISSUED.', secureSession: 'DEVICE-BOUND FLOW', onboardWelcome: 'WELCOME TO TROLLMODZ', onboardWelcomeText: 'A two-stage access flow built for your TrollModz key. Follow each step and return here to claim your key.', getStarted: 'GET STARTED', onboardHow: 'TWO LINKS. ONE KEY.', stepOneTitle: 'COMPLETE LINK 1', stepOneText: 'Finish the Link4M step, then continue to step two.', stepTwoTitle: 'COMPLETE LINK 2', stepTwoText: 'Finish the TrafficTop step and return to DIGITALSMOD.', stepThreeTitle: 'CLAIM YOUR KEY', stepThreeText: 'The system verifies device signature and task ID before issuing a key.', privacyConsent: 'I understand that a hardware fingerprint ID, task timestamp and session parameters are used for abuse prevention.', back: 'BACK', continue: 'CONTINUE', onboardReady: 'SYSTEM READY?', onboardReadyText: 'Your flow will open Link4M first, then TrafficTop. The key appears only if the return flow is accepted and device signature matches.', readyPrivacy: 'PRIVACY NOTICE ACKNOWLEDGED', readySession: 'DEVICE-BOUND TASK ID', readyNoFake: 'TASK & FINGERPRINT VALIDATION', startSession: 'START KEY SESSION', onboardBottom: 'DIGITALSMOD SECURITY FLOW', statusStandby: 'STANDBY', statusActive: 'IN PROGRESS', statusReady: 'VERIFIED RETURN', statusIssued: 'KEY ISSUED', statusExpired: 'EXPIRED', statusError: 'ACTION REQUIRED', statusChecking: 'CHECKING TASK & DEVICE', loadingTitle: 'INITIALIZING SESSION', loadingMessage: 'Creating a task ID and preparing the next step.', link1Title: 'LINK 1 REQUIRED', link1Message: 'Continue to Link4M. Return to this page to proceed to step two.', link2Title: 'LINK 2 REQUIRED', link2Message: 'The first return was accepted. Complete TrafficTop to continue.', verifyingTitle: 'VERIFYING RETURN', verifyingMessage: 'Checking task ID and device signature before issuing a key.', readyClaimTitle: 'BOTH STEPS RETURNED', readyClaimMessage: 'Verification successful! Generating your key...', issuedTitle: 'YOUR KEY IS READY', issuedMessage: 'Copy the key before the 10-second display window ends.', expiredTitle: 'DISPLAY WINDOW EXPIRED', expiredMessage: 'This session key will not be shown again. Start a new two-link session to request another key.', errorTitle: 'SESSION NEEDS ATTENTION', errorMessage: 'The request could not be completed. Check the message and try again.', copied: 'KEY COPIED TO CLIPBOARD', pasteSuccess: 'Clipboard text pasted.', pasteFailed: 'Clipboard access was denied. Paste manually into the field.', clipboardDenied: 'Clipboard access is unavailable. Your key remains visible until the timer ends.', sessionFailed: 'Unable to start the session. No key was issued.', noKeyStock: 'The key pool is empty. No key was issued; contact the administrator.', maintenanceText: 'The key system is under maintenance. New sessions and key claims are paused.', consentRequired: 'Review the privacy notice and confirm it before starting.', linkConfig: 'A short-link provider is not configured. No key was issued.', returnInvalid: 'This return could not be validated or device mismatch detected. Restart the flow on this device.', sessionMissing: 'This session/task was not found or has expired. Start a fresh key session.', networkError: 'Could not reach the server. Check your connection and try again.', rateLimited: 'Too many attempts. Wait a minute before trying again.', startButtonBusy: 'WORKING…', continuePrompt: 'Continue from the current step.', startNew: 'START NEW SESSION', sessionExpired: 'The session expired. Start a new session and complete both links.', copyOnlyButton: 'COPY KEY', link2Config: 'TrafficTop is not configured. Step one was not accepted.', onboardingRequired: 'Complete onboarding and acknowledge the privacy notice before continuing.', privacyNeeded: 'Privacy acknowledgement is required.', settingsLabel: 'HOW IT WORKS', sessionCode: 'SYS/01', idleCode: 'SYS/00', expiredCode: 'SYS/EX', readyCode: 'SYS/OK', activeCode: 'SYS/…', keyTimeNote: 'The 10-second countdown is enforced locally. Hiding text cannot revoke a key already seen.'
     },
     vi: {
-      maintenance: 'HỆ THỐNG ĐANG BẢO TRÌ. MỌI HOẠT ĐỘNG TẠM DỪNG CHO ĐẾN KHI HOẠT ĐỘNG TRỞ LẠI.', systemOnline: 'HỆ THỐNG KEY // SẴN SÀNG', tagline: 'KHÔNG TÀI KHOẢN. KHÔNG MẬT KHẨU. CHỈ CÓ KEY.', heroSubline: 'XÁC THỰC TRUY CẬP HAI BƯỚC', accessKey: 'ACCESS KEY', paste: 'DÁN', fieldHint: 'Key sẽ xuất hiện tại đây sau khi hoàn thành cả hai bước.', unlock: 'LẤY KEY', getKey: 'LẤY KEY', resumeLink1: 'TIẾP TỤC LINK 1', continueLink2: 'TIẾP TỤC LINK 2', keyReady: 'ĐÃ CẤP KEY', readyTitle: 'HỆ THỐNG ĐÃ SẴN SÀNG', readyMessage: 'Bắt đầu phiên để thực hiện chuỗi hai liên kết.', expiresIn: 'KEY SẼ ẨN SAU', oneTime: 'CỬA SỔ HIỂN THỊ MỘT LẦN', copyKey: 'SAO CHÉP KEY', primaryNote: 'Bạn phải hoàn thành các bước xác minh, sau đó hệ thống sẽ tạo chìa khóa bản quyền cho bạn!.', noKey: 'CHƯA CÓ KEY? LIÊN HỆ NGƯỜI BÁN.', timeNote: 'THỜI GIAN HIỂN THỊ BẮT ĐẦU KHI KEY ĐƯỢC CẤP.', secureSession: 'XÁC THỰC THEO MÃ MÁY', onboardWelcome: 'CHÀO MỪNG ĐẾN TROLLMODZ', onboardWelcomeText: 'Quy trình hai bước để nhận key TrollModz. Hoàn thành từng bước rồi quay lại đây để nhận key.', getStarted: 'BẮT ĐẦU', onboardHow: 'HAI LINK. MỘT KEY.', stepOneTitle: 'HOÀN THÀNH LINK 1', stepOneText: 'Hoàn thành bước Link4M, sau đó tiếp tục bước hai.', stepTwoTitle: 'HOÀN THÀNH LINK 2', stepTwoText: 'Hoàn thành Lentop rồi quay lại DIGITALSMOD.', stepThreeTitle: 'NHẬN KEY', stepThreeText: 'Hệ thống đối chiếu mã định danh máy và ID nhiệm vụ trước khi cấp key.', privacyConsent: 'Tôi hiểu rằng mã phần cứng máy, mốc thời gian nhiệm vụ được sử dụng để chống bypass.', back: 'QUAY LẠI', continue: 'TIẾP TỤC', onboardReady: 'SẴN SÀNG CHƯA?', onboardReadyText: 'Quy trình mở Link4M trước rồi đến Lentop. Key chỉ xuất hiện nếu mã máy trùng khớp và nhiệm vụ hợp lệ.', readyPrivacy: 'ĐÃ ĐỌC THÔNG BÁO QUYỀN RIÊNG TƯ', readySession: 'ID NHIỆM VỤ GẮN VỚI MÁY', readyNoFake: 'XÁC THỰC PHẦN CỨNG & TASK ID', startSession: 'BẮT ĐẦU PHIÊN LẤY KEY', onboardBottom: 'QUY TRÌNH BẢO MẬT DIGITALSMOD', statusStandby: 'CHỜ', statusActive: 'ĐANG THỰC HIỆN', statusReady: 'ĐÃ QUAY VỀ', statusIssued: 'ĐÃ CẤP KEY', statusExpired: 'HẾT HẠN', statusError: 'CẦN XỬ LÝ', statusChecking: 'ĐANG XÁC THỰC MÁY & TASK', loadingTitle: 'ĐANG KHỞI TẠO PHIÊN', loadingMessage: 'Tạo mã nhiệm vụ và chuẩn bị bước tiếp theo.', link1Title: 'CẦN HOÀN THÀNH LINK 1', link1Message: 'Tiếp tục tới Link4M. Quay lại đây để chuyển sang bước hai.', link2Title: 'CẦN HOÀN THÀNH LINK 2', link2Message: 'Bước một đã được ghi nhận. Hoàn thành Lentop để tiếp tục.', verifyingTitle: 'ĐANG XÁC MINH LẦN QUAY VỀ', verifyingMessage: 'Kiểm tra ID nhiệm vụ và mã định danh máy trước khi cấp key.', readyClaimTitle: 'ĐÃ QUAY VỀ TỪ CẢ HAI BƯỚC', readyClaimMessage: 'Mã máy hợp lệ! Đang khởi tạo và cấp key...', issuedTitle: 'KEY ĐÃ SẴN SÀNG', issuedMessage: 'Sao chép key trước khi hết cửa sổ hiển thị 10 giây.', expiredTitle: 'CỬA SỔ HIỂN THỊ ĐÃ HẾT', expiredMessage: 'Phiên này sẽ không hiển thị lại key. Bắt đầu phiên hai link mới để yêu cầu key khác.', errorTitle: 'PHIÊN CẦN ĐƯỢC XỬ LÝ', errorMessage: 'Yêu cầu chưa hoàn tất. Mã nhiệm vụ không hợp lệ hoặc bị đổi máy.', copied: 'ĐÃ SAO CHÉP KEY', pasteSuccess: 'Đã dán nội dung clipboard.', pasteFailed: 'Trình duyệt từ chối clipboard. Hãy dán thủ công vào ô.', clipboardDenied: 'Không thể truy cập clipboard. Key vẫn hiển thị đến khi hết giờ.', sessionFailed: 'Không thể bắt đầu phiên. Chưa có key nào được cấp.', noKeyStock: 'Kho key đã hết. Không có key nào được cấp; hãy liên hệ quản trị viên.', maintenanceText: 'Hệ thống key đang bảo trì. Tạm dừng tạo phiên và nhận key mới.', consentRequired: 'Hãy đọc thông báo quyền riêng tư và xác nhận trước khi bắt đầu.', linkConfig: 'Chưa cấu hình dịch vụ link rút gọn. Không có key nào được cấp.', returnInvalid: 'Không thể xác minh lần quay về hoặc bị đổi thiết bị. Hãy bắt đầu lại trên máy này.', sessionMissing: 'Không tìm thấy hoặc đã hết hạn nhiệm vụ này. Hãy bắt đầu phiên lấy key mới.', networkError: 'Không thể xử lý yêu cầu. Thử lại sau.', rateLimited: 'Bạn thử quá nhiều lần. Chờ một phút rồi thử lại.', startButtonBusy: 'ĐANG XỬ LÝ…', continuePrompt: 'Tiếp tục từ bước đã được ghi nhận.', startNew: 'BẮT ĐẦU PHIÊN MỚI', sessionExpired: 'Phiên đã hết hạn. Hãy bắt đầu phiên mới và hoàn thành cả hai link.', copyOnlyButton: 'SAO CHÉP KEY', link2Config: 'Chưa cấu hình Lentop. Bước một chưa được chấp nhận.', onboardingRequired: 'Hãy hoàn thành hướng dẫn và xác nhận thông báo quyền riêng tư trước khi tiếp tục.', privacyNeeded: 'Cần xác nhận quyền riêng tư.', settingsLabel: 'HƯỚNG DẪN', sessionCode: 'SYS/01', idleCode: 'SYS/00', expiredCode: 'SYS/EX', readyCode: 'SYS/OK', activeCode: 'SYS/…', keyTimeNote: 'Bộ đếm 10 giây chạy trực tiếp. Hãy sao chép key ngay.'
+      maintenance: 'HỆ THỐNG ĐANG BẢO TRÌ. MỌI HOẠT ĐỘNG TẠM DỪNG CHO ĐẾN KHI HOẠT ĐỘNG TRỞ LẠI.', systemOnline: 'HỆ THỐNG KEY // SẴN SÀNG', tagline: 'KHÔNG TÀI KHOẢN. KHÔNG MẬT KHẨU. CHỈ CÓ KEY.', heroSubline: 'XÁC THỰC TRUY CẬP HAI BƯỚC', accessKey: 'ACCESS KEY', paste: 'DÁN', fieldHint: 'Key sẽ xuất hiện tại đây sau khi hoàn thành cả hai bước.', unlock: 'LẤY KEY', getKey: 'LẤY KEY', resumeLink1: 'TIẾP TỤC LINK 1', continueLink2: 'TIẾP TỤC LINK 2', keyReady: 'ĐÃ CẤP KEY', readyTitle: 'HỆ THỐNG ĐÃ SẴN SÀNG', readyMessage: 'Bắt đầu phiên để thực hiện chuỗi hai liên kết.', expiresIn: 'KEY SẼ ẨN SAU', oneTime: 'CỬA SỔ HIỂN THỊ MỘT LẦN', copyKey: 'SAO CHÉP KEY', primaryNote: 'Bạn phải hoàn thành các bước xác minh, sau đó hệ thống sẽ tạo chìa khóa bản quyền cho bạn!.', noKey: 'CHƯA CÓ KEY? LIÊN HỆ NGƯỜI BÁN.', timeNote: 'THỜI GIAN HIỂN THỊ BẮT ĐẦU KHI KEY ĐƯỢC CẤP.', secureSession: 'XÁC THỰC THEO MÃ MÁY', onboardWelcome: 'CHÀO MỪNG ĐẾN TROLLMODZ', onboardWelcomeText: 'Quy trình hai bước để nhận key TrollModz. Hoàn thành từng bước rồi quay lại đây để nhận key.', getStarted: 'BẮT ĐẦU', onboardHow: 'HAI LINK. MỘT KEY.', stepOneTitle: 'HOÀN THÀNH LINK 1', stepOneText: 'Hoàn thành bước Link4M, sau đó tiếp tục bước hai.', stepTwoTitle: 'HOÀN THÀNH LINK 2', stepTwoText: 'Hoàn thành TrafficTop rồi quay lại DIGITALSMOD.', stepThreeTitle: 'NHẬN KEY', stepThreeText: 'Hệ thống đối chiếu mã định danh máy và ID nhiệm vụ trước khi cấp key.', privacyConsent: 'Tôi hiểu rằng mã phần cứng máy, mốc thời gian nhiệm vụ được sử dụng để chống bypass.', back: 'QUAY LẠI', continue: 'TIẾP TỤC', onboardReady: 'SẴN SÀNG CHƯA?', onboardReadyText: 'Quy trình mở Link4M trước rồi đến TrafficTop. Key chỉ xuất hiện nếu mã máy trùng khớp và nhiệm vụ hợp lệ.', readyPrivacy: 'ĐÃ ĐỌC THÔNG BÁO QUYỀN RIÊNG TƯ', readySession: 'ID NHIỆM VỤ GẮN VỚI MÁY', readyNoFake: 'XÁC THỰC PHẦN CỨNG & TASK ID', startSession: 'BẮT ĐẦU PHIÊN LẤY KEY', onboardBottom: 'QUY TRÌNH BẢO MẬT DIGITALSMOD', statusStandby: 'CHỜ', statusActive: 'ĐANG THỰC HIỆN', statusReady: 'ĐÃ QUAY VỀ', statusIssued: 'ĐÃ CẤP KEY', statusExpired: 'HẾT HẠN', statusError: 'CẦN XỬ LÝ', statusChecking: 'ĐANG XÁC THỰC MÁY & TASK', loadingTitle: 'ĐANG KHỞI TẠO PHIÊN', loadingMessage: 'Tạo mã nhiệm vụ và chuẩn bị bước tiếp theo.', link1Title: 'CẦN HOÀN THÀNH LINK 1', link1Message: 'Tiếp tục tới Link4M. Quay lại đây để chuyển sang bước hai.', link2Title: 'CẦN HOÀN THÀNH LINK 2', link2Message: 'Bước một đã được ghi nhận. Hoàn thành TrafficTop để tiếp tục.', verifyingTitle: 'ĐANG XÁC MINH LẦN QUAY VỀ', verifyingMessage: 'Kiểm tra ID nhiệm vụ và mã định danh máy trước khi cấp key.', readyClaimTitle: 'ĐÃ QUAY VỀ TỪ CẢ HAI BƯỚC', readyClaimMessage: 'Mã máy hợp lệ! Đang khởi tạo và cấp key...', issuedTitle: 'KEY ĐÃ SẴN SÀNG', issuedMessage: 'Sao chép key trước khi hết cửa sổ hiển thị 10 giây.', expiredTitle: 'CỬA SỔ HIỂN THỊ ĐÃ HẾT', expiredMessage: 'Phiên này sẽ không hiển thị lại key. Bắt đầu phiên hai link mới để yêu cầu key khác.', errorTitle: 'PHIÊN CẦN ĐƯỢC XỬ LÝ', errorMessage: 'Yêu cầu chưa hoàn tất. Mã nhiệm vụ không hợp lệ hoặc bị đổi máy.', copied: 'ĐÃ SAO CHÉP KEY', pasteSuccess: 'Đã dán nội dung clipboard.', pasteFailed: 'Trình duyệt từ chối clipboard. Hãy dán thủ công vào ô.', clipboardDenied: 'Không thể truy cập clipboard. Key vẫn hiển thị đến khi hết giờ.', sessionFailed: 'Không thể bắt đầu phiên. Chưa có key nào được cấp.', noKeyStock: 'Kho key đã hết. Không có key nào được cấp; hãy liên hệ quản trị viên.', maintenanceText: 'Hệ thống key đang bảo trì. Tạm dừng tạo phiên và nhận key mới.', consentRequired: 'Hãy đọc thông báo quyền riêng tư và xác nhận trước khi bắt đầu.', linkConfig: 'Chưa cấu hình dịch vụ link rút gọn. Không có key nào được cấp.', returnInvalid: 'Không thể xác minh lần quay về hoặc bị đổi thiết bị. Hãy bắt đầu lại trên máy này.', sessionMissing: 'Không tìm thấy hoặc đã hết hạn nhiệm vụ này. Hãy bắt đầu phiên lấy key mới.', networkError: 'Không thể xử lý yêu cầu. Thử lại sau.', rateLimited: 'Bạn thử quá nhiều lần. Chờ một phút rồi thử lại.', startButtonBusy: 'ĐANG XỬ LÝ…', continuePrompt: 'Tiếp tục từ bước đã được ghi nhận.', startNew: 'BẮT ĐẦU PHIÊN MỚI', sessionExpired: 'Phiên đã hết hạn. Hãy bắt đầu phiên mới và hoàn thành cả hai link.', copyOnlyButton: 'SAO CHÉP KEY', link2Config: 'Chưa cấu hình TrafficTop. Bước một chưa được chấp nhận.', onboardingRequired: 'Hãy hoàn thành hướng dẫn và xác nhận thông báo quyền riêng tư trước khi tiếp tục.', privacyNeeded: 'Cần xác nhận quyền riêng tư.', settingsLabel: 'HƯỚNG DẪN', sessionCode: 'SYS/01', idleCode: 'SYS/00', expiredCode: 'SYS/EX', readyCode: 'SYS/OK', activeCode: 'SYS/…', keyTimeNote: 'Bộ đếm 10 giây chạy trực tiếp. Hãy sao chép key ngay.'
     }
   };
 
@@ -479,13 +479,10 @@ function buildCurrentStepUrl(payload) {
     return out;
   }
 
-  // =========================================================================
-  // BỘ XỬ LÝ API CỤC BỘ (XỬ LÝ 2 BƯỚC ĐỘC LẬP)
-  // =========================================================================
   async function api(path, options = {}) {
     const deviceId = getDeviceId();
     const now = Date.now();
-    const TASK_TIMEOUT_MS = 15 * 60 * 1000; // Nhiệm vụ hết hạn sau 15 phút
+    const TASK_TIMEOUT_MS = 15 * 60 * 1000;
 
     await new Promise(res => setTimeout(res, 120));
 
@@ -494,7 +491,6 @@ function buildCurrentStepUrl(payload) {
     }
 
     if (path === '/api/session') {
-      // Khởi tạo nhiệm vụ mới cho Bước 1
       const taskId = 'TASK-' + Math.random().toString(36).substring(2, 10).toUpperCase() + '-' + now.toString(36).toUpperCase();
       const taskData = {
         session: taskId,
@@ -525,7 +521,7 @@ function buildCurrentStepUrl(payload) {
         throw err;
       }
       const task = JSON.parse(raw);
-      const redirectUrl = task.step >= 2 ? buildLentopUrl(task) : buildLink4mUrl(task);
+      const redirectUrl = task.step >= 2 ? buildTrafficTopUrl(task) : buildLink4mUrl(task);
       return {
         status: 'redirect',
         step: task.step || 1,
@@ -542,7 +538,6 @@ function buildCurrentStepUrl(payload) {
         try { task = JSON.parse(raw); } catch {}
       }
 
-      // Nếu người dùng quay lại trang sau khi vượt link (có tham số session & device trên URL)
       if (returnParams.session && returnParams.device) {
         if (returnParams.device !== deviceId) {
           const err = new Error(t('returnInvalid'));
@@ -569,10 +564,9 @@ function buildCurrentStepUrl(payload) {
           };
         }
 
-        // Đánh dấu hoàn thành từng bước
         if (returnParams.step === '1_done' || returnParams.step === '1') {
           task.step1Done = true;
-          task.step = 2; // Chuyển sang chuẩn bị Bước 2
+          task.step = 2;
           localStorageSafeSet('tm_active_task', JSON.stringify(task));
         } else if (returnParams.step === '2_done' || returnParams.step === '2') {
           if (task.step1Done) {
@@ -595,7 +589,6 @@ function buildCurrentStepUrl(payload) {
         return { status: 'expired', currentStep: 2, serverNow: now };
       }
 
-      // Đã hoàn thành cả 2 bước -> Cấp key
       if (task.step1Done && task.step2Done) {
         return {
           status: 'ready_to_claim',
@@ -605,7 +598,6 @@ function buildCurrentStepUrl(payload) {
         };
       }
 
-      // Hoàn thành Bước 1 -> Hiển thị chờ làm tiếp Bước 2 (Link 2/2)
       if (task.step1Done) {
         return {
           status: 'pending',
@@ -614,7 +606,6 @@ function buildCurrentStepUrl(payload) {
         };
       }
 
-      // Chưa xong Bước 1
       return {
         status: 'pending',
         currentStep: 1,
@@ -653,7 +644,6 @@ function buildCurrentStepUrl(payload) {
         return { status: 'expired', serverNow: now };
       }
 
-      // Sinh Key độc bản dựa trên Task + Device Signature
       const seed = task.session + deviceId;
       let hash = 0;
       for (let i = 0; i < seed.length; i++) hash = ((hash << 5) - hash) + seed.charCodeAt(i);
@@ -724,13 +714,21 @@ function buildCurrentStepUrl(payload) {
   }
 
   function openOnboarding(step = 0) {
-    $('#onboarding').hidden = false;
+    const el = $('#onboarding');
+    if (el) {
+      el.removeAttribute('hidden');
+      el.hidden = false;
+    }
     onboardingPage(step);
     document.body.classList.add('modal-open');
   }
 
   function closeOnboarding() {
-    $('#onboarding').hidden = true;
+    const el = $('#onboarding');
+    if (el) {
+      el.setAttribute('hidden', '');
+      el.hidden = true;
+    }
     document.body.classList.remove('modal-open');
   }
 
@@ -990,8 +988,8 @@ function buildCurrentStepUrl(payload) {
       if (state.status === 'key_issued') return;
       if (state.status === 'ready_to_claim') return claimKey();
       if (state.status === 'pending') return continueCurrentStep();
-      if (!state.onboardingDone) { openOnboarding(0); return; }
-      return beginFlow();
+      // Bật lại Onboarding khi bấm LẤY KEY ở trạng thái chờ
+      openOnboarding(state.privacyAccepted ? 2 : 0);
     });
     $('#pasteButton').addEventListener('click', pasteFromClipboard);
     $('#copyKeyButton').addEventListener('click', copyKey);
