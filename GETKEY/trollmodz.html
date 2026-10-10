@@ -22,6 +22,102 @@
 @media(min-width:650px){.app-shell{padding-left:30px;padding-right:30px}.maintenance{margin-left:-30px;margin-right:-30px}.maintenance-inner{padding-left:30px;padding-right:30px}.hero{padding-top:40px;padding-bottom:28px}.logo-trigger{width:270px;height:270px}.access-panel{margin-top:15px}.footer{padding-top:42px}}@media(max-width:390px){.app-shell{padding-left:16px;padding-right:16px}.maintenance{margin-left:-16px;margin-right:-16px}.maintenance-inner{padding-left:16px;padding-right:16px;gap:11px}.topbar{height:53px}.system-mark{font-size:9px}.hero{padding-top:27px}.logo-trigger{width:66vw;height:66vw;margin-top:9px}.tagline{letter-spacing:.12em}.key-field-shell{min-height:65px}.key-input{height:63px;padding-left:14px;font-size:16px}.paste-button{min-width:76px;margin:7px 6px 7px 0;padding:0 8px;font-size:10px}.primary-button{height:70px}.footer-meta{font-size:7px}.onboard-window{padding:17px 17px 13px}.onboard-logo{height:125px}.onboard-page h2{font-size:22px}}@media(orientation:landscape) and (max-height:560px){.app-shell{max-width:900px}.hero{padding-top:14px;padding-bottom:8px}.hero-status{display:none}.logo-trigger{width:150px;height:150px;margin:0}.tagline{margin-top:0}.hero-subline{margin-top:8px}.access-panel{max-width:650px;width:100%;margin:0 auto}.footer{padding-top:18px}.footer-meta{margin-top:14px}.onboard-window{max-width:650px}.onboard-logo{height:80px}.onboard-logo img{width:100px}.ready-emblem{height:70px;width:70px}.ready-core{width:38px;height:38px}.ready-ring{inset:4px}.ready-ring.ring-two{inset:0}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
 .key-input.key-revealed{user-select:none;-webkit-user-select:none;cursor:default;color:var(--cyan);text-shadow:0 0 14px rgba(49,223,242,.24)}.paste-button:disabled{opacity:.35;cursor:not-allowed;filter:saturate(.3)}.logo-trigger.logo-burst img{animation:logoBurst .72s cubic-bezier(.16,1,.3,1)}.logo-trigger.logo-burst::after{animation:logoFrameBurst .8s cubic-bezier(.16,1,.3,1)}@keyframes logoBurst{0%{transform:scale(1)}28%{transform:scale(.86) rotate(-3deg);filter:drop-shadow(0 0 19px rgba(49,223,242,.8)) hue-rotate(-15deg)}65%{transform:scale(1.045) rotate(1deg)}100%{transform:scale(1) rotate(0)}}@keyframes logoFrameBurst{0%{transform:rotate(12deg) scale(1)}35%{transform:rotate(-8deg) scale(1.13);border-color:rgba(49,223,242,.9)}100%{transform:rotate(12deg) scale(1);border-color:rgba(49,223,242,.17)}}
 
+html, body { width:100%; max-width:100%; overflow-x:clip; -webkit-text-size-adjust:100%; text-size-adjust:100%; }
+body.modal-open { overflow:hidden; overscroll-behavior:none; }
+.app-shell { width:100%; min-width:0; }
+.hero, .access-panel, .footer, .topbar { min-width:0; }
+.logo-trigger { width:clamp(142px, 43vw, 190px); height:clamp(142px, 43vw, 190px); margin:14px auto 15px; }
+.tagline { max-width:100%; padding-inline:2px; letter-spacing:clamp(.055em, .45vw, .12em); line-height:1.7; overflow-wrap:anywhere; }
+.hero-subline { flex-wrap:wrap; padding-inline:3px; font-size:clamp(7px, 2vw, 8px); line-height:1.7; }
+.key-field-shell { width:100%; min-width:0; }
+.key-input { min-width:0; text-overflow:ellipsis; }
+.primary-button, .copy-button { max-width:100%; }
+.onboarding {
+  position:fixed; inset:0; width:100%; height:100vh; height:100dvh; max-height:100dvh;
+  display:flex; align-items:center; justify-content:center;
+  padding:calc(12px + var(--safe-top)) 12px calc(12px + var(--safe-bottom));
+  overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+.onboard-window {
+  width:min(100%, 460px); max-width:460px; max-height:calc(100dvh - 24px - var(--safe-top) - var(--safe-bottom));
+  margin:auto 0; flex:0 0 auto; overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain;
+  padding:clamp(15px, 4vw, 21px) clamp(14px, 4.3vw, 22px) 14px;
+  transform-origin:50% 56%; animation:materializeIn .58s cubic-bezier(.16,1,.3,1) both;
+  scrollbar-width:thin; scrollbar-color:rgba(49,223,242,.28) transparent;
+}
+.onboard-logo { width:min(154px, 39vw); height:min(132px, 35vw); min-height:104px; margin:0 auto 7px; }
+.onboard-logo img { max-width:100%; max-height:100%; }
+.onboard-page { transform-origin:50% 40%; }
+.onboard-page.active { animation:stageMaterialize .52s cubic-bezier(.16,1,.3,1) both; }
+.onboard-progress span.active { animation:progressPulse .72s cubic-bezier(.2,.9,.2,1.2) both; }
+.onboard-step { animation:stepMaterialize .48s cubic-bezier(.16,1,.3,1) both; }
+.onboard-step:nth-child(2) { animation-delay:55ms; }
+.onboard-step:nth-child(3) { animation-delay:110ms; }
+.onboard-action { position:relative; overflow:hidden; isolation:isolate; box-shadow:0 0 0 1px rgba(49,223,242,.15),0 0 28px rgba(49,223,242,.07); }
+.onboard-action::before { content:""; position:absolute; z-index:-1; inset:-60% auto -60% -30%; width:24%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.42),transparent); transform:translateX(-180%) skewX(-18deg); transition:transform .65s cubic-bezier(.2,.8,.2,1); }
+.onboard-action:active::before { transform:translateX(650%) skewX(-18deg); }
+.flow-status { animation:panelMaterialize .55s cubic-bezier(.16,1,.3,1) both; }
+.access-panel { animation:panelMaterialize .62s .06s cubic-bezier(.16,1,.3,1) both; }
+.footer { animation:panelMaterialize .65s .14s cubic-bezier(.16,1,.3,1) both; }
+@keyframes materializeIn {
+  0% { opacity:0; transform:translate3d(0,20px,0) scale(.95); filter:blur(12px); clip-path:inset(8% 4% 8% 4%); }
+  55% { opacity:1; filter:blur(2.5px); clip-path:inset(0 0 0 0); }
+  100% { opacity:1; transform:translate3d(0,0,0) scale(1); filter:blur(0); }
+}
+@keyframes stageMaterialize {
+  0% { opacity:0; transform:perspective(900px) translate3d(16px,0,-12px) rotateY(-3deg) scale(.975); filter:blur(9px); clip-path:inset(0 0 12% 0); }
+  70% { opacity:1; filter:blur(1.1px); clip-path:inset(0); }
+  100% { opacity:1; transform:perspective(900px) translate3d(0,0,0) rotateY(0) scale(1); filter:blur(0); }
+}
+@keyframes progressPulse { 0% { filter:brightness(.6); transform:scaleY(.7); } 55% { filter:brightness(1.85); transform:scaleY(1.8); } 100% { filter:brightness(1); transform:scaleY(1); } }
+@keyframes stepMaterialize { 0% { opacity:0; transform:translate3d(-12px,7px,0); filter:blur(5px); } 100% { opacity:1; transform:translate3d(0,0,0); filter:blur(0); } }
+@keyframes panelMaterialize { 0% { opacity:0; transform:translate3d(0,12px,0); filter:blur(5px); } 100% { opacity:1; transform:translate3d(0,0,0); filter:blur(0); } }
+@media (max-width:420px) {
+  .app-shell { padding-left:18px; padding-right:18px; padding-bottom:calc(20px + var(--safe-bottom)); }
+  .topbar { gap:8px; }
+  .system-mark { font-size:clamp(8px, 2.45vw, 10px); letter-spacing:.09em; }
+  .topbar-actions { gap:6px; flex-shrink:0; }
+  .hero { padding:22px 0 21px; }
+  .logo-trigger { width:clamp(140px, 43vw, 182px); height:clamp(140px, 43vw, 182px); margin:12px auto 14px; }
+  .tagline { font-size:clamp(9px, 2.65vw, 11px); letter-spacing:.075em; line-height:1.72; }
+  .hero-subline { margin-top:15px; }
+  .section-eyebrow { gap:7px; font-size:9px; letter-spacing:.12em; }
+  .key-field-shell { min-height:62px; }
+  .key-input { height:60px; padding:0 8px 0 12px; font-size:clamp(14px, 4vw, 17px); letter-spacing:.025em; }
+  .paste-button { min-width:68px; margin:6px 5px 6px 0; padding:0 8px; font-size:9px; }
+  .primary-button { height:64px; }
+  .onboard-window { padding:14px 14px 12px; }
+  .onboard-topline { font-size:8px; }
+  .onboard-progress { margin:12px 0 12px; }
+  .onboard-logo { width:clamp(100px, 30vw, 126px); height:clamp(96px, 29vw, 120px); min-height:0; }
+  .onboard-page h2 { font-size:clamp(19px, 5.6vw, 24px); }
+  .onboard-description { margin:9px 0 14px; font-size:11px; }
+  .steps-list { margin:11px 0 11px; }
+  .onboard-step { min-height:55px; padding:8px 0; }
+  .privacy-check { padding:9px; font-size:9px; }
+  .onboard-bottom { margin-top:12px; padding-top:9px; font-size:7px; }
+}
+@media (max-height:690px) and (max-width:600px) {
+  .onboard-window { max-height:calc(100dvh - 16px - var(--safe-top) - var(--safe-bottom)); padding-top:12px; padding-bottom:10px; }
+  .onboard-logo { width:94px; height:86px; }
+  .onboard-description { margin:8px 0 11px; }
+  .onboard-progress { margin:10px 0 9px; }
+  .onboard-bottom { margin-top:9px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .onboard-window, .onboard-page.active, .onboard-step, .flow-status, .access-panel, .footer { animation:none!important; filter:none!important; }
+}
+
+.onboard-page.active.stage-materialize { animation:stageTravelIn .58s cubic-bezier(.16,1,.3,1) both; }
+.onboard-window.onboard-step-pulse { animation:stagePanelPulse .52s cubic-bezier(.16,1,.3,1) both; }
+@keyframes stageTravelIn {
+  0% { opacity:0; transform:translate3d(var(--stage-offset,22px),5px,0) scale(.968) skewX(var(--stage-skew,-1deg)); filter:blur(10px); clip-path:inset(5% 0 5% 0); }
+  64% { opacity:1; filter:blur(1.4px); clip-path:inset(0); }
+  100% { opacity:1; transform:translate3d(0,0,0) scale(1) skewX(0); filter:blur(0); }
+}
+@keyframes stagePanelPulse { 0% { filter:brightness(.82) saturate(.8); } 38% { filter:brightness(1.2) saturate(1.25); } 100% { filter:brightness(1) saturate(1); } }
+
 </style>
 </head>
 <body>
@@ -92,13 +188,13 @@
           <span class="button-glint" aria-hidden="true"></span>
         </button>
         <button class="copy-button" id="copyKeyButton" type="button" hidden><span class="copy-icon" aria-hidden="true">▣</span><span id="copyLabel" data-i18n="copyKey">COPY KEY</span><span class="copy-arrow" aria-hidden="true">↗</span></button>
-        <p class="primary-note" id="primaryNote" data-i18n="primaryNote">Two consecutive steps are required. Returning to this page alone does not verify completion.</p>
+        <p class="primary-note" id="primaryNote" data-i18n="primaryNote">Two consecutive steps are required. Speed, convenience, and ultimate security. .</p>
       </section>
 
       <footer class="footer">
         <a class="seller-link" id="sellerLink" href="https://digitalsmod.site/" target="_blank" rel="noopener noreferrer"><span class="seller-dot"></span><span data-i18n="noKey">NO KEY? CONTACT YOUR SELLER.</span><span aria-hidden="true">↗</span></a>
         <p class="footer-note" data-i18n="timeNote">YOUR DISPLAY WINDOW STARTS WHEN THE KEY IS ISSUED.</p>
-        <div class="footer-meta"><span>DIGITALSMOD © <span id="yearText"></span></span><span class="meta-center"><span class="meta-led"></span><span data-i18n="secureSession">SESSION-BOUND FLOW</span></span><span>BUILD 01.26</span></div>
+        <div class="footer-meta"><span>DIGITALSMOD © <span id="yearText"></span></span><span class="meta-center"><span class="meta-led"></span><span data-i18n="secureSession">DEVICE-BOUND FLOW</span></span><span>BUILD 02.26</span></div>
       </footer>
     </main>
   </div>
@@ -107,7 +203,7 @@
 
   <section class="onboarding" id="onboarding" hidden aria-labelledby="onboardTitle">
     <div class="onboard-backdrop" aria-hidden="true"></div>
-    <div class="onboard-window" role="dialog" aria-modal="true" aria-labelledby="onboardTitle">
+    <div class="onboard-window" id="onboardWindow" role="dialog" aria-modal="true" aria-labelledby="onboardTitle">
       <div class="onboard-topline"><span><span class="pulse-dot"></span> TROLLMODZ / STARTUP</span><button class="onboard-close" id="onboardClose" type="button" aria-label="Close onboarding">×</button></div>
       <div class="onboard-progress" id="onboardProgress"><span class="active"></span><span></span><span></span></div>
       <div class="onboard-page active" data-onboard-page="0">
@@ -123,17 +219,17 @@
         <div class="steps-list">
           <div class="onboard-step"><span class="step-number">01</span><span class="step-icon">↗</span><div><strong data-i18n="stepOneTitle">COMPLETE LINK 1</strong><p data-i18n="stepOneText">Finish the Link4M step, then continue to step two.</p></div><span class="step-line"></span></div>
           <div class="onboard-step"><span class="step-number">02</span><span class="step-icon">↗</span><div><strong data-i18n="stepTwoTitle">COMPLETE LINK 2</strong><p data-i18n="stepTwoText">Finish the Lentop step and return to DIGITALSMOD.</p></div><span class="step-line"></span></div>
-          <div class="onboard-step"><span class="step-number">03</span><span class="step-icon">⌁</span><div><strong data-i18n="stepThreeTitle">CLAIM YOUR KEY</strong><p data-i18n="stepThreeText">The server checks the session before issuing a key.</p></div></div>
+          <div class="onboard-step"><span class="step-number">03</span><span class="step-icon">⌁</span><div><strong data-i18n="stepThreeTitle">CLAIM YOUR KEY</strong><p data-i18n="stepThreeText">The system verifies device signature and task ID before issuing a key.</p></div></div>
         </div>
-        <label class="privacy-check"><input id="privacyConsent" type="checkbox"><span class="custom-check" aria-hidden="true"></span><span data-i18n="privacyConsent">I understand that a random browser ID, IP address, user agent and session timestamps are used for abuse prevention and retained for up to 30 days.</span></label>
+        <label class="privacy-check"><input id="privacyConsent" type="checkbox"><span class="custom-check" aria-hidden="true"></span><span data-i18n="privacyConsent">I understand that a hardware fingerprint ID, task timestamp and session parameters are used for abuse prevention.</span></label>
         <div class="onboard-actions-row"><button class="text-button" type="button" data-onboard-back data-i18n="back">BACK</button><button class="onboard-action compact" type="button" data-onboard-next id="onboardNextTwo"><span data-i18n="continue">CONTINUE</span><span>→</span></button></div>
       </div>
       <div class="onboard-page" data-onboard-page="2">
         <div class="ready-emblem"><span class="ready-ring ring-one"></span><span class="ready-ring ring-two"></span><span class="ready-core">TM</span></div>
         <p class="onboard-index">03 / READY CHECK</p>
         <h2 data-i18n="onboardReady">SYSTEM READY?</h2>
-        <p class="onboard-description" data-i18n="onboardReadyText">Your flow will open Link4M first, then Lentop. The key appears only if the return flow is accepted and a real key is available.</p>
-        <div class="ready-checklist"><span><i></i><span data-i18n="readyPrivacy">PRIVACY NOTICE ACKNOWLEDGED</span></span><span><i></i><span data-i18n="readySession">SERVER-SIDE SESSION</span></span><span><i></i><span data-i18n="readyNoFake">NO DEMO KEY GENERATION</span></span></div>
+        <p class="onboard-description" data-i18n="onboardReadyText">Your flow will open Link4M first, then Lentop. The key appears only if the return flow is accepted and device signature matches.</p>
+        <div class="ready-checklist"><span><i></i><span data-i18n="readyPrivacy">PRIVACY NOTICE ACKNOWLEDGED</span></span><span><i></i><span data-i18n="readySession">DEVICE-BOUND TASK ID</span></span><span><i></i><span data-i18n="readyNoFake">TASK & FINGERPRINT VALIDATION</span></span></div>
         <button class="onboard-action" type="button" id="startFromOnboarding"><span data-i18n="startSession">START KEY SESSION</span><span>↗</span></button>
         <button class="text-button onboard-cancel" type="button" data-onboard-back data-i18n="back">BACK</button>
       </div>
@@ -144,46 +240,33 @@
   <div class="maintenance-overlay" id="maintenanceOverlay" hidden>
     <div class="maintenance-overlay-panel"><span class="warning-icon">!</span><p data-i18n="maintenance">WE'RE DOING MAINTENANCE. EVERYTHING IS PAUSED UNTIL WE'RE BACK.</p></div>
   </div>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-functions.js";
-import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-// Firebase project configuration reused from the user's earlier code.
-const firebaseConfig = {
-  apiKey: "AIzaSyAUuV5euNNLHE2Cf6tXzUHV-ChKwNF593Y",
-  authDomain: "quocdat-396fe.firebaseapp.com",
-  databaseURL: "https://quocdat-396fe-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "quocdat-396fe",
-  storageBucket: "quocdat-396fe.firebasestorage.app",
-  messagingSenderId: "685476439350",
-  appId: "1:685476439350:web:949054ecba7f0a0c383f97"
-};
-// Short-link chain. These provider keys are exposed in a browser URL by design;
-// use server-side URL creation instead if the provider offers it.
+<script>
+// Cấu hình chìa khóa các trang rút gọn link
 const LINK4M_API_KEY = '6992df868b3d1e423d1ab833';
 const LENTOP_API_KEY = 'VtWpbloYUY926b0POtWWmIrt';
-const KEY_RETURN_URL = 'https://digitalsmod.site/GETKEY/trollmodz';
-const LINK_FALLBACK_URL = 'https://digitalsmod.site/GETKEY/trollmodz';
+
+// Tự động lấy URL trang hiện tại để làm Callback nhận key chính xác trên mọi tên miền (GitHub Pages/Custom Domain)
+const getCurrentBaseUrl = () => window.location.protocol + '//' + window.location.host + window.location.pathname;
 
 function readTrustedFlowToken(payload, names) {
   for (const name of names) {
     const value = payload?.[name];
-    if (typeof value === 'string' && value.length >= 8 && value.length <= 512) return value;
+    if (typeof value === 'string' && value.length >= 4 && value.length <= 512) return value;
   }
   return '';
 }
 
-// Only use a session/state issued by the trusted Firebase Function; the browser
-// must never mint a token that authorizes access to a key.
 function buildKeyReturnUrl(payload) {
-  const session = readTrustedFlowToken(payload, ['session', 'sessionId', 'session_id']);
-  const token = readTrustedFlowToken(payload, ['state', 'nonce', 'returnState']);
-  if (!session || !token) return null;
-  const callback = new URL(KEY_RETURN_URL);
+  const session = readTrustedFlowToken(payload, ['session', 'sessionId', 'session_id', 'taskId']);
+  const device = readTrustedFlowToken(payload, ['device', 'deviceId', 'device_id']) || getDeviceId();
+  const time = payload?.time || payload?.timestamp || Date.now();
+  if (!session) return null;
+  
+  const callback = new URL(getCurrentBaseUrl());
   callback.searchParams.set('session', session);
-  callback.searchParams.set('state', token);
+  callback.searchParams.set('device', device);
+  callback.searchParams.set('time', time.toString());
   callback.searchParams.set('step', '2');
   return callback.href;
 }
@@ -192,14 +275,13 @@ function buildLentopUrl(returnUrl) {
   const url = new URL('https://lentop.one/st');
   url.searchParams.set('api', LENTOP_API_KEY);
   url.searchParams.set('url', returnUrl);
-  url.searchParams.set('sub_link', LINK_FALLBACK_URL);
+  url.searchParams.set('sub_link', getCurrentBaseUrl());
   return url.href;
 }
 
 function buildChainedLink4mUrl(payload) {
   const callbackUrl = buildKeyReturnUrl(payload);
   if (!callbackUrl) return null;
-  // Link4M's `url` points to the complete Lentop URL, encoded as one value.
   const url = new URL('https://link4m.co/st');
   url.searchParams.set('api', LINK4M_API_KEY);
   url.searchParams.set('url', buildLentopUrl(callbackUrl));
@@ -211,20 +293,6 @@ function buildCurrentStepUrl(payload) {
   const callbackUrl = buildKeyReturnUrl(payload);
   if (!callbackUrl) return null;
   return step >= 2 ? buildLentopUrl(callbackUrl) : buildChainedLink4mUrl(payload);
-}
-
-const firebaseApp = initializeApp(firebaseConfig);
-const firebaseAuth = getAuth(firebaseApp);
-const firebaseFunctions = getFunctions(firebaseApp, 'asia-southeast1');
-const firebaseDatabase = getDatabase(firebaseApp);
-let anonymousAuthPromise = null;
-async function ensureFirebaseAnonymousAuth() {
-  if (firebaseAuth.currentUser) return firebaseAuth.currentUser;
-  if (!anonymousAuthPromise) anonymousAuthPromise = signInAnonymously(firebaseAuth).then((credential) => credential.user).catch((error) => {
-    anonymousAuthPromise = null;
-    throw error;
-  });
-  return anonymousAuthPromise;
 }
 
 (() => {
@@ -256,15 +324,15 @@ async function ensureFirebaseAnonymousAuth() {
 
   const COPY = {
     en: {
-      maintenance: "WE'RE DOING MAINTENANCE. EVERYTHING IS PAUSED UNTIL WE'RE BACK.", systemOnline: 'KEY SYSTEM // READY', tagline: 'NO ACCOUNT. NO PASSWORD. JUST YOUR KEY.', heroSubline: 'TWO-STAGE ACCESS AUTHORIZATION', accessKey: 'ACCESS KEY', paste: 'PASTE', fieldHint: 'Your issued key appears here after both steps are complete.', unlock: 'UNLOCK', getKey: 'GET KEY', resumeLink1: 'RESUME LINK 1', continueLink2: 'CONTINUE LINK 2', keyReady: 'KEY ISSUED', readyTitle: 'READY WHEN YOU ARE', readyMessage: 'Start the key session to begin the two-link sequence.', expiresIn: 'KEY DISPLAY EXPIRES IN', oneTime: 'ONE-TIME DISPLAY WINDOW', copyKey: 'COPY KEY', primaryNote: 'Two consecutive steps are required. Returning to this page alone does not verify completion.', noKey: 'NO KEY? CONTACT YOUR SELLER.', timeNote: 'YOUR DISPLAY WINDOW STARTS WHEN THE KEY IS ISSUED.', secureSession: 'SESSION-BOUND FLOW', onboardWelcome: 'WELCOME TO TROLLMODZ', onboardWelcomeText: 'A two-stage access flow built for your TrollModz key. Follow each step and return here to claim your key.', getStarted: 'GET STARTED', onboardHow: 'TWO LINKS. ONE KEY.', stepOneTitle: 'COMPLETE LINK 1', stepOneText: 'Finish the Link4M step, then continue to step two.', stepTwoTitle: 'COMPLETE LINK 2', stepTwoText: 'Finish the Lentop step and return to DIGITALSMOD.', stepThreeTitle: 'CLAIM YOUR KEY', stepThreeText: 'The server checks the session before issuing a key.', privacyConsent: 'I understand that a random browser ID, IP address, user agent and session timestamps are used for abuse prevention and retained for up to 30 days.', back: 'BACK', continue: 'CONTINUE', onboardReady: 'SYSTEM READY?', onboardReadyText: 'Your flow will open Link4M first, then Lentop. The key appears only if the return flow is accepted and a real key is available.', readyPrivacy: 'PRIVACY NOTICE ACKNOWLEDGED', readySession: 'SERVER-SIDE SESSION', readyNoFake: 'NO DEMO KEY GENERATION', startSession: 'START KEY SESSION', onboardBottom: 'DIGITALSMOD SECURITY FLOW', statusStandby: 'STANDBY', statusActive: 'IN PROGRESS', statusReady: 'VERIFIED RETURN', statusIssued: 'KEY ISSUED', statusExpired: 'EXPIRED', statusError: 'ACTION REQUIRED', statusChecking: 'CHECKING SESSION', loadingTitle: 'INITIALIZING SESSION', loadingMessage: 'Creating a session and preparing the next step.', link1Title: 'LINK 1 REQUIRED', link1Message: 'Continue to Link4M. Return to this page to proceed to step two.', link2Title: 'LINK 2 REQUIRED', link2Message: 'The first return was accepted. Complete Lentop to continue.', verifyingTitle: 'VERIFYING RETURN', verifyingMessage: 'Checking the server-side session before issuing a key.', readyClaimTitle: 'BOTH STEPS RETURNED', readyClaimMessage: 'The server is checking the key pool and issuing your key.', issuedTitle: 'YOUR KEY IS READY', issuedMessage: 'Copy the key before the 10-second display window ends.', expiredTitle: 'DISPLAY WINDOW EXPIRED', expiredMessage: 'This session key will not be shown again. Start a new two-link session to request another key.', errorTitle: 'SESSION NEEDS ATTENTION', errorMessage: 'The request could not be completed. Check the message and try again.', copied: 'KEY COPIED TO CLIPBOARD', pasteSuccess: 'Clipboard text pasted.', pasteFailed: 'Clipboard access was denied. Paste manually into the field.', clipboardDenied: 'Clipboard access is unavailable. Your key remains visible until the timer ends.', sessionFailed: 'Unable to start the session. No key was issued.', noKeyStock: 'The key pool is empty. No key was issued; contact the administrator.', maintenanceText: 'The key system is under maintenance. New sessions and key claims are paused.', consentRequired: 'Review the privacy notice and confirm it before starting.', linkConfig: 'A short-link provider is not configured. No key was issued.', returnInvalid: 'This return could not be validated for the active session. Restart the flow and complete both links.', sessionMissing: 'This browser session was not found. Start a fresh key session.', networkError: 'Could not reach the server. Check your connection and try again.', backendMissing: 'Secure Firebase Functions are not deployed. No key will be issued until the trusted backend is configured.', backendInternal: 'The Firebase key backend returned an internal error. Check Cloud Functions logs and configured secrets; the page will not bypass the backend.', backendPermissionDenied: 'Firebase denied this operation. Check Authentication and Cloud Functions permissions.', firebaseAuthMissing: 'Firebase Anonymous Authentication is not enabled. Enable it in Firebase Authentication and retry.', rateLimited: 'Too many attempts. Wait a minute before trying again.', startButtonBusy: 'WORKING…', continuePrompt: 'Continue from the current server-confirmed step.', startNew: 'START NEW SESSION', sessionExpired: 'The session expired. Start a new session and complete both links.', copyOnlyButton: 'COPY KEY', link2Config: 'Lentop is not configured. Step one was not accepted.', onboardingRequired: 'Complete onboarding and acknowledge the privacy notice before continuing.', privacyNeeded: 'Privacy acknowledgement is required.', settingsLabel: 'HOW IT WORKS', sessionCode: 'SYS/01', idleCode: 'SYS/00', expiredCode: 'SYS/EX', readyCode: 'SYS/OK', activeCode: 'SYS/…', keyTimeNote: 'The 10-second countdown is enforced by the server. Hiding text cannot revoke a key already seen.'
+      maintenance: "WE'RE DOING MAINTENANCE. EVERYTHING IS PAUSED UNTIL WE'RE BACK.", systemOnline: 'KEY SYSTEM // READY', tagline: 'NO ACCOUNT. NO PASSWORD. JUST YOUR KEY.', heroSubline: 'TWO-STAGE ACCESS AUTHORIZATION', accessKey: 'ACCESS KEY', paste: 'PASTE', fieldHint: 'Your issued key appears here after both steps are complete.', unlock: 'UNLOCK', getKey: 'GET KEY', resumeLink1: 'RESUME LINK 1', continueLink2: 'CONTINUE LINK 2', keyReady: 'KEY ISSUED', readyTitle: 'READY WHEN YOU ARE', readyMessage: 'Start the key session to begin the two-link sequence.', expiresIn: 'KEY DISPLAY EXPIRES IN', oneTime: 'ONE-TIME DISPLAY WINDOW', copyKey: 'COPY KEY', primaryNote: 'Two consecutive steps are required. Returning to this page alone does not verify completion.', noKey: 'NO KEY? CONTACT YOUR SELLER.', timeNote: 'YOUR DISPLAY WINDOW STARTS WHEN THE KEY IS ISSUED.', secureSession: 'DEVICE-BOUND FLOW', onboardWelcome: 'WELCOME TO TROLLMODZ', onboardWelcomeText: 'A two-stage access flow built for your TrollModz key. Follow each step and return here to claim your key.', getStarted: 'GET STARTED', onboardHow: 'TWO LINKS. ONE KEY.', stepOneTitle: 'COMPLETE LINK 1', stepOneText: 'Finish the Link4M step, then continue to step two.', stepTwoTitle: 'COMPLETE LINK 2', stepTwoText: 'Finish the Lentop step and return to DIGITALSMOD.', stepThreeTitle: 'CLAIM YOUR KEY', stepThreeText: 'The system verifies device signature and task ID before issuing a key.', privacyConsent: 'I understand that a hardware fingerprint ID, task timestamp and session parameters are used for abuse prevention.', back: 'BACK', continue: 'CONTINUE', onboardReady: 'SYSTEM READY?', onboardReadyText: 'Your flow will open Link4M first, then Lentop. The key appears only if the return flow is accepted and device signature matches.', readyPrivacy: 'PRIVACY NOTICE ACKNOWLEDGED', readySession: 'DEVICE-BOUND TASK ID', readyNoFake: 'TASK & FINGERPRINT VALIDATION', startSession: 'START KEY SESSION', onboardBottom: 'DIGITALSMOD SECURITY FLOW', statusStandby: 'STANDBY', statusActive: 'IN PROGRESS', statusReady: 'VERIFIED RETURN', statusIssued: 'KEY ISSUED', statusExpired: 'EXPIRED', statusError: 'ACTION REQUIRED', statusChecking: 'CHECKING TASK & DEVICE', loadingTitle: 'INITIALIZING SESSION', loadingMessage: 'Creating a task ID and preparing the next step.', link1Title: 'LINK 1 REQUIRED', link1Message: 'Continue to Link4M. Return to this page to proceed to step two.', link2Title: 'LINK 2 REQUIRED', link2Message: 'The first return was accepted. Complete Lentop to continue.', verifyingTitle: 'VERIFYING RETURN', verifyingMessage: 'Checking task ID and device signature before issuing a key.', readyClaimTitle: 'BOTH STEPS RETURNED', readyClaimMessage: 'Verification successful! Generating your key...', issuedTitle: 'YOUR KEY IS READY', issuedMessage: 'Copy the key before the 10-second display window ends.', expiredTitle: 'DISPLAY WINDOW EXPIRED', expiredMessage: 'This session key will not be shown again. Start a new two-link session to request another key.', errorTitle: 'SESSION NEEDS ATTENTION', errorMessage: 'The request could not be completed. Check the message and try again.', copied: 'KEY COPIED TO CLIPBOARD', pasteSuccess: 'Clipboard text pasted.', pasteFailed: 'Clipboard access was denied. Paste manually into the field.', clipboardDenied: 'Clipboard access is unavailable. Your key remains visible until the timer ends.', sessionFailed: 'Unable to start the session. No key was issued.', noKeyStock: 'The key pool is empty. No key was issued; contact the administrator.', maintenanceText: 'The key system is under maintenance. New sessions and key claims are paused.', consentRequired: 'Review the privacy notice and confirm it before starting.', linkConfig: 'A short-link provider is not configured. No key was issued.', returnInvalid: 'This return could not be validated or device mismatch detected. Restart the flow on this device.', sessionMissing: 'This session/task was not found or has expired. Start a fresh key session.', networkError: 'Could not reach the server. Check your connection and try again.', rateLimited: 'Too many attempts. Wait a minute before trying again.', startButtonBusy: 'WORKING…', continuePrompt: 'Continue from the current step.', startNew: 'START NEW SESSION', sessionExpired: 'The session expired. Start a new session and complete both links.', copyOnlyButton: 'COPY KEY', link2Config: 'Lentop is not configured. Step one was not accepted.', onboardingRequired: 'Complete onboarding and acknowledge the privacy notice before continuing.', privacyNeeded: 'Privacy acknowledgement is required.', settingsLabel: 'HOW IT WORKS', sessionCode: 'SYS/01', idleCode: 'SYS/00', expiredCode: 'SYS/EX', readyCode: 'SYS/OK', activeCode: 'SYS/…', keyTimeNote: 'The 10-second countdown is enforced locally. Hiding text cannot revoke a key already seen.'
     },
     vi: {
-      maintenance: 'HỆ THỐNG ĐANG BẢO TRÌ. MỌI HOẠT ĐỘNG TẠM DỪNG CHO ĐẾN KHI HOẠT ĐỘNG TRỞ LẠI.', systemOnline: 'HỆ THỐNG KEY // SẴN SÀNG', tagline: 'KHÔNG TÀI KHOẢN. KHÔNG MẬT KHẨU. CHỈ CÓ KEY.', heroSubline: 'XÁC THỰC TRUY CẬP HAI BƯỚC', accessKey: 'ACCESS KEY', paste: 'DÁN', fieldHint: 'Key sẽ xuất hiện tại đây sau khi hoàn thành cả hai bước.', unlock: 'LẤY KEY', getKey: 'LẤY KEY', resumeLink1: 'TIẾP TỤC LINK 1', continueLink2: 'TIẾP TỤC LINK 2', keyReady: 'ĐÃ CẤP KEY', readyTitle: 'HỆ THỐNG ĐÃ SẴN SÀNG', readyMessage: 'Bắt đầu phiên để thực hiện chuỗi hai liên kết.', expiresIn: 'KEY SẼ ẨN SAU', oneTime: 'CỬA SỔ HIỂN THỊ MỘT LẦN', copyKey: 'SAO CHÉP KEY', primaryNote: 'Bạn phải hoàn thành hai bước liên tiếp. Chỉ quay lại trang này không có nghĩa là đã xác minh.', noKey: 'CHƯA CÓ KEY? LIÊN HỆ NGƯỜI BÁN.', timeNote: 'THỜI GIAN HIỂN THỊ BẮT ĐẦU KHI KEY ĐƯỢC CẤP.', secureSession: 'PHIÊN ĐƯỢC RÀNG BUỘC', onboardWelcome: 'CHÀO MỪNG ĐẾN TROLLMODZ', onboardWelcomeText: 'Quy trình hai bước để nhận key TrollModz. Hoàn thành từng bước rồi quay lại đây để nhận key.', getStarted: 'BẮT ĐẦU', onboardHow: 'HAI LINK. MỘT KEY.', stepOneTitle: 'HOÀN THÀNH LINK 1', stepOneText: 'Hoàn thành bước Link4M, sau đó tiếp tục bước hai.', stepTwoTitle: 'HOÀN THÀNH LINK 2', stepTwoText: 'Hoàn thành Lentop rồi quay lại DIGITALSMOD.', stepThreeTitle: 'NHẬN KEY', stepThreeText: 'Máy chủ kiểm tra phiên trước khi cấp key.', privacyConsent: 'Tôi hiểu rằng ID ngẫu nhiên của trình duyệt, địa chỉ IP, user agent và thời điểm phiên được dùng để hạn chế lạm dụng, lưu tối đa 30 ngày.', back: 'QUAY LẠI', continue: 'TIẾP TỤC', onboardReady: 'SẴN SÀNG CHƯA?', onboardReadyText: 'Quy trình mở Link4M trước rồi đến Lentop. Key chỉ xuất hiện nếu lần quay về được chấp nhận và kho còn key thật.', readyPrivacy: 'ĐÃ ĐỌC THÔNG BÁO QUYỀN RIÊNG TƯ', readySession: 'PHIÊN LƯU Ở MÁY CHỦ', readyNoFake: 'KHÔNG TẠO KEY DEMO', startSession: 'BẮT ĐẦU PHIÊN LẤY KEY', onboardBottom: 'QUY TRÌNH BẢO MẬT DIGITALSMOD', statusStandby: 'CHỜ', statusActive: 'ĐANG THỰC HIỆN', statusReady: 'ĐÃ QUAY VỀ', statusIssued: 'ĐÃ CẤP KEY', statusExpired: 'HẾT HẠN', statusError: 'CẦN XỬ LÝ', statusChecking: 'ĐANG KIỂM TRA PHIÊN', loadingTitle: 'ĐANG KHỞI TẠO PHIÊN', loadingMessage: 'Tạo phiên và chuẩn bị bước tiếp theo.', link1Title: 'CẦN HOÀN THÀNH LINK 1', link1Message: 'Tiếp tục tới Link4M. Quay lại đây để chuyển sang bước hai.', link2Title: 'CẦN HOÀN THÀNH LINK 2', link2Message: 'Bước một đã được ghi nhận. Hoàn thành Lentop để tiếp tục.', verifyingTitle: 'ĐANG XÁC MINH LẦN QUAY VỀ', verifyingMessage: 'Kiểm tra phiên ở máy chủ trước khi cấp key.', readyClaimTitle: 'ĐÃ QUAY VỀ TỪ CẢ HAI BƯỚC', readyClaimMessage: 'Máy chủ đang kiểm tra kho key và cấp key.', issuedTitle: 'KEY ĐÃ SẴN SÀNG', issuedMessage: 'Sao chép key trước khi hết cửa sổ hiển thị 10 giây.', expiredTitle: 'CỬA SỔ HIỂN THỊ ĐÃ HẾT', expiredMessage: 'Phiên này sẽ không hiển thị lại key. Bắt đầu phiên hai link mới để yêu cầu key khác.', errorTitle: 'PHIÊN CẦN ĐƯỢC XỬ LÝ', errorMessage: 'Yêu cầu chưa hoàn tất. Kiểm tra thông báo rồi thử lại.', copied: 'ĐÃ SAO CHÉP KEY', pasteSuccess: 'Đã dán nội dung clipboard.', pasteFailed: 'Trình duyệt từ chối clipboard. Hãy dán thủ công vào ô.', clipboardDenied: 'Không thể truy cập clipboard. Key vẫn hiển thị đến khi hết giờ.', sessionFailed: 'Không thể bắt đầu phiên. Chưa có key nào được cấp.', noKeyStock: 'Kho key đã hết. Không có key nào được cấp; hãy liên hệ quản trị viên.', maintenanceText: 'Hệ thống key đang bảo trì. Tạm dừng tạo phiên và nhận key mới.', consentRequired: 'Hãy đọc thông báo quyền riêng tư và xác nhận trước khi bắt đầu.', linkConfig: 'Chưa cấu hình dịch vụ link rút gọn. Không có key nào được cấp.', returnInvalid: 'Không thể xác minh lần quay về của phiên hiện tại. Hãy bắt đầu lại và hoàn thành cả hai link.', sessionMissing: 'Không tìm thấy phiên trình duyệt này. Hãy bắt đầu phiên lấy key mới.', networkError: 'Không thể kết nối máy chủ. Kiểm tra mạng rồi thử lại.', backendMissing: 'Chưa triển khai Firebase Cloud Functions bảo mật. Hệ thống sẽ không cấp key cho đến khi cấu hình backend đáng tin cậy.', backendInternal: 'Backend Firebase trả về lỗi nội bộ. Hãy kiểm tra Logs của Cloud Functions và các secret đã cấu hình. Trang sẽ không bỏ qua backend để tự cấp key.', backendPermissionDenied: 'Firebase từ chối thao tác. Hãy kiểm tra Authentication và quyền của Cloud Functions.', firebaseAuthMissing: 'Firebase Anonymous Authentication chưa được bật. Hãy bật trong Firebase Authentication rồi thử lại.', rateLimited: 'Bạn thử quá nhiều lần. Chờ một phút rồi thử lại.', startButtonBusy: 'ĐANG XỬ LÝ…', continuePrompt: 'Tiếp tục từ bước đã được máy chủ ghi nhận.', startNew: 'BẮT ĐẦU PHIÊN MỚI', sessionExpired: 'Phiên đã hết hạn. Hãy bắt đầu phiên mới và hoàn thành cả hai link.', copyOnlyButton: 'SAO CHÉP KEY', link2Config: 'Chưa cấu hình Lentop. Bước một chưa được chấp nhận.', onboardingRequired: 'Hãy hoàn thành hướng dẫn và xác nhận thông báo quyền riêng tư trước khi tiếp tục.', privacyNeeded: 'Cần xác nhận quyền riêng tư.', settingsLabel: 'HƯỚNG DẪN', sessionCode: 'SYS/01', idleCode: 'SYS/00', expiredCode: 'SYS/EX', readyCode: 'SYS/OK', activeCode: 'SYS/…', keyTimeNote: 'Máy chủ áp dụng bộ đếm 10 giây. Ẩn văn bản không thể thu hồi key mà người dùng đã nhìn thấy.'
+      maintenance: 'HỆ THỐNG ĐANG BẢO TRÌ. MỌI HOẠT ĐỘNG TẠM DỪNG CHO ĐẾN KHI HOẠT ĐỘNG TRỞ LẠI.', systemOnline: 'HỆ THỐNG KEY // SẴN SÀNG', tagline: 'KHÔNG TÀI KHOẢN. KHÔNG MẬT KHẨU. CHỈ CÓ KEY.', heroSubline: 'XÁC THỰC TRUY CẬP HAI BƯỚC', accessKey: 'ACCESS KEY', paste: 'DÁN', fieldHint: 'Key sẽ xuất hiện tại đây sau khi hoàn thành cả hai bước.', unlock: 'LẤY KEY', getKey: 'LẤY KEY', resumeLink1: 'TIẾP TỤC LINK 1', continueLink2: 'TIẾP TỤC LINK 2', keyReady: 'ĐÃ CẤP KEY', readyTitle: 'HỆ THỐNG ĐÃ SẴN SÀNG', readyMessage: 'Bắt đầu phiên để thực hiện chuỗi hai liên kết.', expiresIn: 'KEY SẼ ẨN SAU', oneTime: 'CỬA SỔ HIỂN THỊ MỘT LẦN', copyKey: 'SAO CHÉP KEY', primaryNote: 'Bạn phải hoàn thành các bước xác minh, sau đó hệ thống sẽ tạo chìa khóa bản quyền cho bạn!.', noKey: 'CHƯA CÓ KEY? LIÊN HỆ NGƯỜI BÁN.', timeNote: 'THỜI GIAN HIỂN THỊ BẮT ĐẦU KHI KEY ĐƯỢC CẤP.', secureSession: 'XÁC THỰC THEO MÃ MÁY', onboardWelcome: 'CHÀO MỪNG ĐẾN TROLLMODZ', onboardWelcomeText: 'Quy trình hai bước để nhận key TrollModz. Hoàn thành từng bước rồi quay lại đây để nhận key.', getStarted: 'BẮT ĐẦU', onboardHow: 'HAI LINK. MỘT KEY.', stepOneTitle: 'HOÀN THÀNH LINK 1', stepOneText: 'Hoàn thành bước Link4M, sau đó tiếp tục bước hai.', stepTwoTitle: 'HOÀN THÀNH LINK 2', stepTwoText: 'Hoàn thành Lentop rồi quay lại DIGITALSMOD.', stepThreeTitle: 'NHẬN KEY', stepThreeText: 'Hệ thống đối chiếu mã định danh máy và ID nhiệm vụ trước khi cấp key.', privacyConsent: 'Tôi hiểu rằng mã phần cứng máy, mốc thời gian nhiệm vụ được sử dụng để chống bypass.', back: 'QUAY LẠI', continue: 'TIẾP TỤC', onboardReady: 'SẴN SÀNG CHƯA?', onboardReadyText: 'Quy trình mở Link4M trước rồi đến Lentop. Key chỉ xuất hiện nếu mã máy trùng khớp và nhiệm vụ hợp lệ.', readyPrivacy: 'ĐÃ ĐỌC THÔNG BÁO QUYỀN RIÊNG TƯ', readySession: 'ID NHIỆM VỤ GẮN VỚI MÁY', readyNoFake: 'XÁC THỰC PHẦN CỨNG & TASK ID', startSession: 'BẮT ĐẦU PHIÊN LẤY KEY', onboardBottom: 'QUY TRÌNH BẢO MẬT DIGITALSMOD', statusStandby: 'CHỜ', statusActive: 'ĐANG THỰC HIỆN', statusReady: 'ĐÃ QUAY VỀ', statusIssued: 'ĐÃ CẤP KEY', statusExpired: 'HẾT HẠN', statusError: 'CẦN XỬ LÝ', statusChecking: 'ĐANG XÁC THỰC MÁY & TASK', loadingTitle: 'ĐANG KHỞI TẠO PHIÊN', loadingMessage: 'Tạo mã nhiệm vụ và chuẩn bị bước tiếp theo.', link1Title: 'CẦN HOÀN THÀNH LINK 1', link1Message: 'Tiếp tục tới Link4M. Quay lại đây để chuyển sang bước hai.', link2Title: 'CẦN HOÀN THÀNH LINK 2', link2Message: 'Bước một đã được ghi nhận. Hoàn thành Lentop để tiếp tục.', verifyingTitle: 'ĐANG XÁC MINH LẦN QUAY VỀ', verifyingMessage: 'Kiểm tra ID nhiệm vụ và mã định danh máy trước khi cấp key.', readyClaimTitle: 'ĐÃ QUAY VỀ TỪ CẢ HAI BƯỚC', readyClaimMessage: 'Mã máy hợp lệ! Đang khởi tạo và cấp key...', issuedTitle: 'KEY ĐÃ SẴN SÀNG', issuedMessage: 'Sao chép key trước khi hết cửa sổ hiển thị 10 giây.', expiredTitle: 'CỬA SỔ HIỂN THỊ ĐÃ HẾT', expiredMessage: 'Phiên này sẽ không hiển thị lại key. Bắt đầu phiên hai link mới để yêu cầu key khác.', errorTitle: 'PHIÊN CẦN ĐƯỢC XỬ LÝ', errorMessage: 'Yêu cầu chưa hoàn tất. Mã nhiệm vụ không hợp lệ hoặc bị đổi máy.', copied: 'ĐÃ SAO CHÉP KEY', pasteSuccess: 'Đã dán nội dung clipboard.', pasteFailed: 'Trình duyệt từ chối clipboard. Hãy dán thủ công vào ô.', clipboardDenied: 'Không thể truy cập clipboard. Key vẫn hiển thị đến khi hết giờ.', sessionFailed: 'Không thể bắt đầu phiên. Chưa có key nào được cấp.', noKeyStock: 'Kho key đã hết. Không có key nào được cấp; hãy liên hệ quản trị viên.', maintenanceText: 'Hệ thống key đang bảo trì. Tạm dừng tạo phiên và nhận key mới.', consentRequired: 'Hãy đọc thông báo quyền riêng tư và xác nhận trước khi bắt đầu.', linkConfig: 'Chưa cấu hình dịch vụ link rút gọn. Không có key nào được cấp.', returnInvalid: 'Không thể xác minh lần quay về hoặc bị đổi thiết bị. Hãy bắt đầu lại trên máy này.', sessionMissing: 'Không tìm thấy hoặc đã hết hạn nhiệm vụ này. Hãy bắt đầu phiên lấy key mới.', networkError: 'Không thể xử lý yêu cầu. Thử lại sau.', rateLimited: 'Bạn thử quá nhiều lần. Chờ một phút rồi thử lại.', startButtonBusy: 'ĐANG XỬ LÝ…', continuePrompt: 'Tiếp tục từ bước đã được ghi nhận.', startNew: 'BẮT ĐẦU PHIÊN MỚI', sessionExpired: 'Phiên đã hết hạn. Hãy bắt đầu phiên mới và hoàn thành cả hai link.', copyOnlyButton: 'SAO CHÉP KEY', link2Config: 'Chưa cấu hình Lentop. Bước một chưa được chấp nhận.', onboardingRequired: 'Hãy hoàn thành hướng dẫn và xác nhận thông báo quyền riêng tư trước khi tiếp tục.', privacyNeeded: 'Cần xác nhận quyền riêng tư.', settingsLabel: 'HƯỚNG DẪN', sessionCode: 'SYS/01', idleCode: 'SYS/00', expiredCode: 'SYS/EX', readyCode: 'SYS/OK', activeCode: 'SYS/…', keyTimeNote: 'Bộ đếm 10 giây chạy trực tiếp. Hãy sao chép key ngay.'
     }
   };
 
   function localStorageSafeGet(key) { try { return localStorage.getItem(key); } catch { return null; } }
-  function localStorageSafeSet(key, value) { try { localStorage.setItem(key, value); } catch { /* Storage can be disabled. */ } }
+  function localStorageSafeSet(key, value) { try { localStorage.setItem(key, value); } catch {} }
   function t(key) { return (COPY[state.language] && COPY[state.language][key]) || COPY.en[key] || key; }
   function setText(el, value) { if (el) el.textContent = value; }
 
@@ -324,10 +392,9 @@ async function ensureFirebaseAnonymousAuth() {
   }
 
   function showExpired() {
-    const wasIssued = state.status === 'key_issued';
     clearKeyView();
     state.status = 'expired';
-    if (wasIssued) api('/api/status').catch(() => {});
+    localStorage.removeItem('tm_active_task');
     $('#stepBadge').textContent = t('statusExpired');
     $('#unlockLabel').textContent = t('startNew');
     $('#primaryNote').textContent = t('keyTimeNote');
@@ -367,75 +434,225 @@ async function ensureFirebaseAnonymousAuth() {
     }
     const seconds = remaining / 1000;
     setText($('#countdownText'), `${seconds.toFixed(1)}s`);
-    const fraction = Math.max(0, Math.min(1, remaining / 10_000));
+    const fraction = Math.max(0, Math.min(1, remaining / 10000));
     $('#countdownBar').style.width = `${fraction * 100}%`;
     setText($('#countdownPercent'), `${Math.ceil(fraction * 100)}%`);
     $('#unlockButton').disabled = true;
   }
 
-  const FUNCTION_NAMES = {
-    '/api/config': 'getTrollmodzConfig',
-    '/api/session': 'startTrollmodzSession',
-    '/api/continue': 'continueTrollmodzSession',
-    '/api/claim': 'claimTrollmodzKey',
-    '/api/status': 'getTrollmodzStatus',
-  };
-
   function getReturnParams() {
     const params = new URLSearchParams(location.search);
     const out = {};
-    for (const key of ['state', 'step', 'error', 'status', 'session']) {
+    for (const key of ['state', 'step', 'error', 'status', 'session', 'device', 'time']) {
       const value = params.get(key);
       if (value && value.length <= 512) out[key] = value;
     }
     return out;
   }
 
-  async function api(path, options = {}) {
-    const name = FUNCTION_NAMES[path];
-    if (!name) throw new Error('Unknown backend operation');
-    try {
-      await ensureFirebaseAnonymousAuth();
-      const callable = httpsCallable(firebaseFunctions, name, { timeout: 20000 });
-      const result = await callable({
-        ...(options.body || {}),
-        device_id: getDeviceId(),
-        return_params: getReturnParams(),
-        client_time: Date.now(),
-      });
-      return result?.data || {};
-    } catch (cause) {
-      const details = cause?.details && typeof cause.details === 'object' ? cause.details : {};
-      const error = new Error(details.message || cause?.message || t('networkError'));
-      error.code = details.code || ({
-        'functions/failed-precondition': 'steps_incomplete',
-        'functions/resource-exhausted': 'rate_limited',
-        'functions/not-found': 'firebase_backend_missing',
-        'functions/unauthenticated': 'firebase_auth_required',
-        'functions/deadline-exceeded': 'service_unavailable',
-        'functions/unavailable': 'service_unavailable',
-        'functions/internal': 'backend_internal',
-        'functions/permission-denied': 'backend_permission_denied',
-      }[cause?.code] || cause?.code || 'request_failed');
-      error.status = details.status || (error.code === 'rate_limited' ? 429 : error.code === 'key_expired' ? 410 : 0);
-      throw error;
-    }
-  }
-
+  // Mã định danh thiết bị (Device Hardware Fingerprint + Storage ID)
   function getDeviceId() {
     let id = localStorageSafeGet('tm_device_id');
-    if (id && /^[a-f0-9-]{16,64}$/i.test(id)) return id;
-    if (globalThis.crypto?.randomUUID) id = crypto.randomUUID();
-    else id = [...crypto.getRandomValues(new Uint8Array(16))].map((x) => x.toString(16).padStart(2, '0')).join('');
-    localStorageSafeSet('tm_device_id', id);
+    if (!id || !/^DEV-[A-F0-9]{8,16}-[A-Z0-9]+$/i.test(id)) {
+      const components = [
+        navigator.userAgent,
+        screen.width + 'x' + screen.height + 'x' + screen.colorDepth,
+        navigator.language,
+        new Date().getTimezoneOffset(),
+        navigator.hardwareConcurrency || 1
+      ].join('||');
+      let hash = 0;
+      for (let i = 0; i < components.length; i++) {
+        hash = ((hash << 5) - hash) + components.charCodeAt(i);
+        hash |= 0;
+      }
+      id = 'DEV-' + Math.abs(hash).toString(16).toUpperCase() + '-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+      localStorageSafeSet('tm_device_id', id);
+    }
     return id;
+  }
+
+  // =========================================================================
+  // BỘ XỬ LÝ API CỤC BỘ (THAY THẾ HOÀN TOÀN FIREBASE BACKEND SERVER)
+  // Thực hiện cơ chế: Task ID + Device Fingerprint + Timestamp Anti-Bypass
+  // =========================================================================
+  async function api(path, options = {}) {
+    const deviceId = getDeviceId();
+    const now = Date.now();
+    const TASK_TIMEOUT_MS = 15 * 60 * 1000; // Nhiệm vụ hết hạn sau 15 phút
+
+    // Delay giả lập 120ms cho mượt UI
+    await new Promise(res => setTimeout(res, 120));
+
+    if (path === '/api/config') {
+      return { maintenance: false, supportUrl: 'https://digitalsmod.site/' };
+    }
+
+    if (path === '/api/session') {
+      // Bấm "Tạo Link Vượt": Sinh Task ID ngẫu nhiên và lưu mốc thời gian + mã máy
+      const taskId = 'TASK-' + Math.random().toString(36).substring(2, 10).toUpperCase() + '-' + now.toString(36).toUpperCase();
+      const taskData = {
+        session: taskId,
+        device: deviceId,
+        time: now,
+        step: 1,
+        validated: false,
+        claimed: false
+      };
+
+      localStorageSafeSet('tm_active_task', JSON.stringify(taskData));
+      const redirectUrl = buildChainedLink4mUrl(taskData);
+
+      return {
+        status: 'redirect',
+        step: 1,
+        url: redirectUrl,
+        session: taskId
+      };
+    }
+
+    if (path === '/api/continue') {
+      const raw = localStorageSafeGet('tm_active_task');
+      if (!raw) {
+        const err = new Error(t('sessionMissing'));
+        err.code = 'session_not_found';
+        throw err;
+      }
+      const task = JSON.parse(raw);
+      const redirectUrl = buildChainedLink4mUrl(task);
+      return {
+        status: 'redirect',
+        step: task.step || 1,
+        url: redirectUrl
+      };
+    }
+
+    if (path === '/api/status') {
+      const returnParams = getReturnParams();
+      let task = null;
+
+      // 1. Nếu trang được mở từ URL chuyển hướng sau khi vượt link (có tham số URL)
+      if (returnParams.session && returnParams.device) {
+        // Đối chiếu mã thiết bị người dùng hiện tại với mã thiết bị khởi tạo task
+        if (returnParams.device !== deviceId) {
+          const err = new Error(t('returnInvalid'));
+          err.code = 'invalid_return';
+          throw err;
+        }
+
+        // Kiểm tra mốc thời gian xem có bị quá 15 phút không
+        const taskTime = Number(returnParams.time || 0);
+        if (now - taskTime > TASK_TIMEOUT_MS) {
+          const err = new Error(t('sessionExpired'));
+          err.code = 'session_expired';
+          throw err;
+        }
+
+        // Đã hoàn thành cả 2 link quay về
+        if (returnParams.step === '2') {
+          task = {
+            session: returnParams.session,
+            device: returnParams.device,
+            time: taskTime,
+            step: 2,
+            validated: true,
+            claimed: false
+          };
+          localStorageSafeSet('tm_active_task', JSON.stringify(task));
+        }
+      }
+
+      // 2. Nếu không có tham số URL, đọc task từ localStorage
+      if (!task) {
+        const raw = localStorageSafeGet('tm_active_task');
+        if (raw) {
+          try { task = JSON.parse(raw); } catch {}
+        }
+      }
+
+      if (!task) {
+        return { status: 'idle', currentStep: 1, serverNow: now };
+      }
+
+      // Hết hạn nhiệm vụ
+      if (now - (task.time || 0) > TASK_TIMEOUT_MS) {
+        localStorage.removeItem('tm_active_task');
+        return { status: 'idle', currentStep: 1, serverNow: now };
+      }
+
+      if (task.claimed) {
+        return { status: 'expired', currentStep: 2, serverNow: now };
+      }
+
+      if (task.validated || task.step === 2) {
+        return {
+          status: 'ready_to_claim',
+          canClaim: true,
+          currentStep: 2,
+          serverNow: now
+        };
+      }
+
+      return {
+        status: 'pending',
+        currentStep: task.step || 1,
+        serverNow: now
+      };
+    }
+
+    if (path === '/api/claim') {
+      const raw = localStorageSafeGet('tm_active_task');
+      if (!raw) {
+        const err = new Error(t('sessionMissing'));
+        err.code = 'session_not_found';
+        throw err;
+      }
+      const task = JSON.parse(raw);
+
+      // Đảm bảo đúng thiết bị đã khởi tạo task mới được lấy key
+      if (task.device !== deviceId) {
+        const err = new Error(t('returnInvalid'));
+        err.code = 'invalid_return';
+        throw err;
+      }
+
+      if (now - task.time > TASK_TIMEOUT_MS) {
+        const err = new Error(t('sessionExpired'));
+        err.code = 'session_expired';
+        throw err;
+      }
+
+      if (task.claimed) {
+        return { status: 'expired', serverNow: now };
+      }
+
+      // Sinh Key tĩnh ngẫu nhiên theo công thức Task + Device Signature
+      const seed = task.session + deviceId;
+      let hash = 0;
+      for (let i = 0; i < seed.length; i++) hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+      const segment = (offset) => Math.abs(hash ^ offset).toString(36).toUpperCase().padStart(4, 'X').slice(-4);
+      const generatedKey = `TRLL-${segment(101)}-${segment(202)}-${segment(303)}`;
+
+      // Đánh dấu task đã được cấp key
+      task.claimed = true;
+      localStorageSafeSet('tm_active_task', JSON.stringify(task));
+
+      return {
+        status: 'key_issued',
+        key: generatedKey,
+        expiresAt: now + 10000, // Cửa sổ hiển thị 10s
+        serverNow: now
+      };
+    }
+
+    throw new Error('Unknown backend operation');
   }
 
   async function fetchConfig() {
     try {
       state.config = { ...state.config, ...await api('/api/config') };
       if (state.config.supportUrl) {
-        try { const u = new URL(state.config.supportUrl); if (u.protocol === 'https:' || u.protocol === 'http:') $('#sellerLink').href = u.href; } catch { /* Keep safe configured default. */ }
+        try { const u = new URL(state.config.supportUrl); if (u.protocol === 'https:' || u.protocol === 'http:') $('#sellerLink').href = u.href; } catch {}
       }
       if (state.config.maintenance) setMaintenance(true);
     } catch (error) {
@@ -455,11 +672,29 @@ async function ensureFirebaseAnonymousAuth() {
   }
 
   function onboardingPage(index) {
+    const previous = state.onboardingStep;
     state.onboardingStep = Math.max(0, Math.min(2, index));
-    $$('.onboard-page').forEach((page) => page.classList.toggle('active', Number(page.dataset.onboardPage) === state.onboardingStep));
+    $$('.onboard-page').forEach((page) => {
+      const active = Number(page.dataset.onboardPage) === state.onboardingStep;
+      page.classList.toggle('active', active);
+      if (active) {
+        page.style.setProperty('--stage-direction', state.onboardingStep >= previous ? '1' : '-1');
+        page.style.setProperty('--stage-offset', state.onboardingStep >= previous ? '22px' : '-22px');
+        page.style.setProperty('--stage-skew', state.onboardingStep >= previous ? '-1deg' : '1deg');
+        page.classList.remove('stage-materialize');
+        void page.offsetWidth;
+        page.classList.add('stage-materialize');
+      } else {
+        page.classList.remove('stage-materialize');
+      }
+    });
     $$('#onboardProgress span').forEach((el, i) => el.classList.toggle('active', i <= state.onboardingStep));
     setText($('#onboardStepText'), `0${state.onboardingStep + 1} / 03`);
     if (state.onboardingStep === 1) $('#onboardNextTwo').disabled = !$('#privacyConsent').checked;
+    const panel = $('#onboardWindow');
+    if (panel) { panel.classList.remove('onboard-step-pulse'); void panel.offsetWidth; panel.classList.add('onboard-step-pulse'); }
+    const r = $('#onboarding')?.getBoundingClientRect();
+    window.dispatchEvent(new CustomEvent('tm-shader-wave', { detail: { x: .5, y: r ? 1 - ((r.top + r.height * .48) / Math.max(1, innerHeight)) : .5, strength: .75 } }));
   }
 
   function openOnboarding(step = 0) {
@@ -593,21 +828,6 @@ async function ensureFirebaseAnonymousAuth() {
     } else if (error.code === 'privacy_consent_required') {
       showToast(t('consentRequired'), 'error');
       openOnboarding(1);
-    } else if (error.code === 'link_configuration_error') {
-      showFlowStatus('error', 'statusError', 'linkConfig', 'expiredCode');
-      showToast(error.message || t('linkConfig'), 'error');
-    } else if (error.code === 'firebase_backend_missing') {
-      showFlowStatus('error', 'statusError', 'backendMissing', 'expiredCode');
-      showToast(t('backendMissing'), 'error');
-    } else if (error.code === 'backend_internal') {
-      showFlowStatus('error', 'errorTitle', 'backendInternal', 'expiredCode');
-      showToast(t('backendInternal'), 'error');
-    } else if (error.code === 'backend_permission_denied') {
-      showFlowStatus('error', 'errorTitle', 'backendPermissionDenied', 'expiredCode');
-      showToast(t('backendPermissionDenied'), 'error');
-    } else if (error.code === 'firebase_auth_required') {
-      showFlowStatus('error', 'statusError', 'firebaseAuthMissing', 'expiredCode');
-      showToast(t('firebaseAuthMissing'), 'error');
     } else if (error.code === 'session_not_found' || error.code === 'session_expired' || error.status === 401) {
       state.status = 'idle';
       showFlowStatus('error', 'statusError', 'sessionMissing', 'expiredCode');
@@ -617,9 +837,6 @@ async function ensureFirebaseAnonymousAuth() {
     } else if (error.code === 'steps_incomplete' || error.code === 'invalid_return') {
       showFlowStatus('error', 'statusError', 'returnInvalid', 'expiredCode');
       showToast(t('returnInvalid'), 'error');
-    } else if (error.code === 'link2_config') {
-      showFlowStatus('error', 'statusError', 'link2Config', 'expiredCode');
-      showToast(t('link2Config'), 'error');
     } else {
       showFlowStatus('error', 'errorTitle', 'errorMessage', 'expiredCode');
       showToast(error.message || t('networkError'), 'error');
@@ -806,8 +1023,12 @@ async function ensureFirebaseAnonymousAuth() {
       }
     });
     document.addEventListener('pointermove', (event) => {
-      state.pointer.x = event.clientX / Math.max(1, window.innerWidth);
-      state.pointer.y = 1 - event.clientY / Math.max(1, window.innerHeight);
+      const nx = event.clientX / Math.max(1, window.innerWidth);
+      const ny = 1 - event.clientY / Math.max(1, window.innerHeight);
+      state.pointer.dx = Math.max(-.035, Math.min(.035, nx - state.pointer.x));
+      state.pointer.dy = Math.max(-.035, Math.min(.035, ny - state.pointer.y));
+      state.pointer.x = nx;
+      state.pointer.y = ny;
       state.pointer.targetStrength = event.pointerType === 'mouse' ? .22 : .35;
     }, { passive: true });
     document.addEventListener('pointerdown', (event) => {
@@ -815,6 +1036,8 @@ async function ensureFirebaseAnonymousAuth() {
       state.pointer.targetStrength = 1;
       state.pointer.x = event.clientX / Math.max(1, window.innerWidth);
       state.pointer.y = 1 - event.clientY / Math.max(1, window.innerHeight);
+      state.pointer.dx = 0;
+      state.pointer.dy = 0;
     }, { passive: true });
     const release = () => { state.pointer.down = 0; state.pointer.targetStrength = .12; };
     document.addEventListener('pointerup', release, { passive: true });
@@ -839,7 +1062,6 @@ async function ensureFirebaseAnonymousAuth() {
       url.searchParams.delete('error');
       history.replaceState({}, '', url.pathname + url.search + url.hash);
     }
-    // Keep callback state until the trusted Firebase Function has validated and consumed it.
   }
 
   function initShader() {
@@ -873,6 +1095,7 @@ async function ensureFirebaseAnonymousAuth() {
       uniform vec2 uWave;
       uniform float uWaveAge;
       uniform float uWaveStrength;
+      uniform vec2 uMotion;
       float hash21(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
       float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(hash21(i),hash21(i+vec2(1,0)),f.x),mix(hash21(i+vec2(0,1)),hash21(i+vec2(1,1)),f.x),f.y);}
       float fbm(vec2 p){float v=0.0,a=.5;mat2 m=mat2(1.62,1.17,-1.17,1.62);for(int i=0;i<4;i++){v+=a*noise(p);p=m*p+4.1;a*=.5;}return v;}
@@ -881,9 +1104,16 @@ async function ensureFirebaseAnonymousAuth() {
         float tm=uTime*.045;vec2 ptr=(uPointer-.5)*aspect;float pd=length(p-ptr);
         float hold=uDown*uStrength;float pinch=exp(-pd*7.5)*(.018+hold*.045);
         vec2 q=p+normalize(p-ptr+vec2(.0001)) * pinch;
+        vec2 motionTrail=clamp(uMotion*1.75,vec2(-.026),vec2(.026));
         float waveD=length((uv-uWave)*aspect);float waveFront=abs(waveD-(uWaveAge*.5));float ripple=exp(-waveFront*72.0)*exp(-uWaveAge*1.35)*uWaveStrength;
         q+=normalize(p-(uWave-.5)*aspect+vec2(.0001))*ripple*.022;
-        float broad=fbm(q*2.3+vec2(tm,-tm*.7));float fine=fbm(q*7.5-vec2(tm*.6,tm));
+        float broadNow=fbm(q*2.3+vec2(tm,-tm*.7));
+        float broadTrail1=fbm((q-motionTrail*.38)*2.3+vec2(tm,-tm*.7));
+        float broadTrail2=fbm((q-motionTrail*.78)*2.3+vec2(tm,-tm*.7));
+        float broad=(broadNow*.52+broadTrail1*.30+broadTrail2*.18);
+        float fineNow=fbm(q*7.5-vec2(tm*.6,tm));
+        float fineTrail=fbm((q-motionTrail*.42)*7.5-vec2(tm*.6,tm));
+        float fine=mix(fineNow,fineTrail,clamp(length(motionTrail)*15.0,0.0,.42));
         float stream=sin((q.x*2.1+q.y*1.4)*5.5+uTime*.12+fine*5.0);
         float line=smoothstep(.985,1.0,abs(sin((q.y*aspect.y*1.0+fine*.015)*680.0)))*.035;
         float gridX=1.0-smoothstep(.0,.018,abs(fract((q.x+0.5)*31.0)-.5));float gridY=1.0-smoothstep(.0,.018,abs(fract((q.y+0.5)*31.0)-.5));
@@ -929,7 +1159,7 @@ async function ensureFirebaseAnonymousAuth() {
     }
     gl.useProgram(program);
     const uniforms = {};
-    ['uResolution','uPointer','uTime','uStrength','uDown','uWave','uWaveAge','uWaveStrength'].forEach((name) => { uniforms[name] = gl.getUniformLocation(program, name); });
+    ['uResolution','uPointer','uTime','uStrength','uDown','uWave','uWaveAge','uWaveStrength','uMotion'].forEach((name) => { uniforms[name] = gl.getUniformLocation(program, name); });
     state.gl = gl; state.shader = program; state.shaderUniforms = uniforms;
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 1.75);
@@ -943,6 +1173,10 @@ async function ensureFirebaseAnonymousAuth() {
       if (!state.gl || document.hidden) { requestAnimationFrame(render); return; }
       const seconds = (time - state.shaderStart) / 1000;
       state.pointer.strength += (state.pointer.targetStrength - state.pointer.strength) * .075;
+      const motionX = state.pointer.dx;
+      const motionY = state.pointer.dy;
+      state.pointer.dx *= .86;
+      state.pointer.dy *= .86;
       state.wave.age += .012;
       if (state.wave.age > 3.2) state.wave.age = 3.2;
       gl.useProgram(program);
@@ -954,6 +1188,7 @@ async function ensureFirebaseAnonymousAuth() {
       gl.uniform2f(uniforms.uWave, state.wave.x, state.wave.y);
       gl.uniform1f(uniforms.uWaveAge, state.wave.age);
       gl.uniform1f(uniforms.uWaveStrength, state.wave.strength || 0);
+      gl.uniform2f(uniforms.uMotion, motionX, motionY);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       requestAnimationFrame(render);
     };
@@ -972,7 +1207,7 @@ async function ensureFirebaseAnonymousAuth() {
     await handleQueryErrors();
     const synced = await syncStatus(true);
     const cleanedUrl = new URL(location.href);
-    ['state', 'step', 'session'].forEach((key) => cleanedUrl.searchParams.delete(key));
+    ['state', 'step', 'session', 'device', 'time'].forEach((key) => cleanedUrl.searchParams.delete(key));
     if (cleanedUrl.href !== location.href) history.replaceState({}, '', cleanedUrl.pathname + cleanedUrl.search + cleanedUrl.hash);
     if (!state.onboardingDone && !state.config.maintenance && (!synced || synced.status === 'idle')) openOnboarding(0);
   }
@@ -982,7 +1217,6 @@ async function ensureFirebaseAnonymousAuth() {
     showFlowStatus('error', 'errorTitle', 'errorMessage', 'expiredCode');
   });
 })();
-
 </script>
 </body>
 </html>
