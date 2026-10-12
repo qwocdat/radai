@@ -18,6 +18,13 @@
     .eyebrow { color: #bca5ff; font-size: 11px; text-transform: uppercase; font-weight: 800; letter-spacing: .18em; }
     h1 { font-size: clamp(27px, 7vw, 34px); line-height: 1.08; letter-spacing: -.04em; margin: 10px 0 12px; }
     .desc { font-size: 14px; color: #aaa7b4; line-height: 1.6; margin: 0 0 22px; }
+    .plans { display:grid; gap:10px; margin:20px 0 16px; }
+    .plan { display:flex; gap:12px; align-items:flex-start; padding:15px; border:1px solid #ffffff20; border-radius:18px; background:#00000024; cursor:pointer; transition:border-color .18s, background .18s, transform .18s; }
+    .plan:has(input:checked) { border-color:#a78bfa; background:#8b68ff19; box-shadow:inset 0 0 0 1px #a78bfa22; }
+    .plan input { accent-color:#9b7bff; width:18px; height:18px; margin:2px 0 0; flex:0 0 auto; }
+    .plan strong { display:block; font-size:14px; }
+    .plan small { display:block; margin-top:4px; color:#a9a4b5; font-size:12px; line-height:1.5; }
+    .plan .tag { display:inline-block; margin-top:7px; padding:4px 7px; border-radius:7px; background:#ffffff0c; color:#c9baff; font-size:10px; font-weight:800; }
     .steps { display: grid; gap: 10px; margin: 20px 0; }
     .step { display: flex; align-items: center; gap: 12px; padding: 13px; border: 1px solid #ffffff12; background: #00000021; border-radius: 17px; }
     .number { flex: 0 0 30px; height: 30px; display: grid; place-items: center; border-radius: 10px; color: #cabaff; background: #9670ff1c; font-weight: 800; font-size: 12px; }
@@ -43,9 +50,13 @@
       <div class="eyebrow">Access verification</div>
       <h1 id="title">Lấy key DigitalLiquid</h1>
       <p class="desc" id="description">Hoàn thành hai bước liên kết theo thứ tự để nhận key dùng cho ứng dụng DigitalLiquid.</p>
+      <div class="plans" role="radiogroup" aria-label="Chọn loại key">
+        <label class="plan"><input type="radio" name="keyPlan" value="hour" checked><span><strong>Vượt 1 lần · Key 1 giờ</strong><small>Hoàn thành một liên kết để nhận key trải nghiệm có thời hạn 1 giờ.</small><span class="tag">TRẢI NGHIỆM</span></span></label>
+        <label class="plan"><input type="radio" name="keyPlan" value="permanent"><span><strong>Vượt 2 lần · Key vĩnh viễn</strong><small>Hoàn thành hai liên kết theo thứ tự để nhận key không hết hạn.</small><span class="tag">VĨNH VIỄN</span></span></label>
+      </div>
       <div class="steps">
         <div class="step"><div class="number" id="step1-num">01</div><div><strong id="step1-title">Liên kết thứ nhất</strong><small id="step1-sub">Mở liên kết, hoàn tất rồi quay lại trang này</small></div></div>
-        <div class="step"><div class="number" id="step2-num">02</div><div><strong id="step2-title">Liên kết thứ hai</strong><small id="step2-sub">Chỉ thực hiện sau bước đầu</small></div></div>
+        <div class="step" id="step2-row"><div class="number" id="step2-num">02</div><div><strong id="step2-title">Liên kết thứ hai</strong><small id="step2-sub">Chỉ thực hiện sau bước đầu</small></div></div>
       </div>
       <button id="action" disabled>Bắt đầu bước 1</button>
       <button id="refresh" class="secondary" type="button">Kiểm tra trạng thái</button>
@@ -77,7 +88,8 @@
   const LINK4M_API_KEY = '6992df868b3d1e423d1ab833';
   const LINK4M_ENDPOINT = 'https://link4m.co/st';
   const SESSION_TTL_MS = 30 * 60 * 1000;
-  const KEY_TTL_MS = 24 * 60 * 60 * 1000;
+  const TRIAL_KEY_TTL_MS = 60 * 60 * 1000;
+  const PERMANENT_KEY_TTL_MS = 0; // 0 means no expiry
   const MIN_STEP_MS = 8000;
 
   const app = initializeApp(firebaseConfig);
@@ -96,9 +108,13 @@
     localStorage.setItem('dl_install_id', installId);
   }
   let stage = 0, session = null, busy = false;
+  let keyPlan = params.get('plan') === 'permanent' ? 'permanent' : 'hour';
+  const requiredPasses = () => keyPlan === 'permanent' ? 2 : 1;
+  const selectedKeyTtl = () => keyPlan === 'permanent' ? PERMANENT_KEY_TTL_MS : TRIAL_KEY_TTL_MS;
+  document.querySelectorAll('input[name="keyPlan"]').forEach(r => { r.checked = r.value === keyPlan; r.addEventListener('change', async () => { keyPlan = r.value; const u = new URL(location.href); u.searchParams.set('plan', keyPlan); history.replaceState({}, '', u); if (session && stage === 0 && sid) { try { await update(ref(db, `keySystem/sessions/${sid}`), { plan: keyPlan, requiredPasses: requiredPasses(), state: 'waiting_link_1' }); session.plan = keyPlan; session.requiredPasses = requiredPasses(); } catch (e) { setStatus('Không thể lưu lựa chọn. Hãy tải lại trang và thử lại.'); } } else if (session && stage > 0) { keyPlan = session.plan === 'permanent' ? 'permanent' : 'hour'; document.querySelectorAll('input[name="keyPlan"]').forEach(x => x.checked = x.value === keyPlan); setStatus('Không thể đổi loại key sau khi đã bắt đầu vượt liên kết.'); } paint(); }); });
 
   function setStatus(message) { statusEl.textContent = message; }
-  function setBusy(on) { busy = on; action.disabled = on || stage >= 2; refresh.disabled = on; }
+  function setBusy(on) { busy = on; action.disabled = on || stage >= requiredPasses(); refresh.disabled = on; }
   function makeKey() {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     const group = () => Array.from({length: 6}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
@@ -114,10 +130,12 @@
     $('step2-num').textContent = stage >= 2 ? '✓' : '02';
     $('step1-title').textContent = stage >= 1 ? 'Liên kết thứ nhất · Hoàn tất' : 'Liên kết thứ nhất';
     $('step2-title').textContent = stage >= 2 ? 'Liên kết thứ hai · Hoàn tất' : 'Liên kết thứ hai';
-    action.textContent = stage === 0 ? 'Vượt liên kết 1' : stage === 1 ? 'Vượt liên kết 2' : 'Đã cấp key';
-    action.disabled = busy || stage >= 2;
-    if (stage >= 1 && stage < 2) $('description').textContent = 'Bước đầu đã hoàn tất. Tiếp tục liên kết thứ hai để cấp key.';
-    if (stage >= 2) {
+    const needed = requiredPasses();
+    $('step2-row').style.display = needed === 1 ? 'none' : 'flex';
+    action.textContent = stage >= needed ? 'Đã cấp key' : stage === 0 ? 'Vượt liên kết 1' : 'Vượt liên kết 2';
+    action.disabled = busy || stage >= needed;
+    if (stage >= 1 && stage < needed) $('description').textContent = 'Bước đầu đã hoàn tất. Tiếp tục liên kết thứ hai để nhận key vĩnh viễn.';
+    if (stage >= needed) {
       $('title').textContent = 'Đã hoàn thành';
       $('description').textContent = 'Bạn đã hoàn thành các bước xác thực.';
       action.style.display = 'none';
@@ -127,7 +145,7 @@
     const sessionRef = push(ref(db, 'keySystem/sessions'));
     sid = sessionRef.key;
     const now = Date.now();
-    session = { installId, createdAt: now, expiresAt: now + SESSION_TTL_MS, stage: 0, state: 'waiting_link_1', pending: null };
+    session = { installId, plan: keyPlan, requiredPasses: requiredPasses(), createdAt: now, expiresAt: now + SESSION_TTL_MS, stage: 0, state: 'waiting_link_1', pending: null };
     await set(sessionRef, session);
     const u = new URL(location.href);
     u.searchParams.set('sid', sid);
@@ -155,6 +173,8 @@
         }
         // Client-only limitation: the browser can modify this association.
         if (session.installId !== installId) throw new Error('Mã cài đặt không khớp với phiên lấy key. Hãy mở Get Key từ trong ứng dụng.');
+        keyPlan = session.plan === 'permanent' ? 'permanent' : (params.get('plan') === 'permanent' ? 'permanent' : 'hour');
+        document.querySelectorAll('input[name="keyPlan"]').forEach(r => r.checked = r.value === keyPlan);
         stage = Number(session.stage || 0);
         return;
       }
@@ -172,6 +192,8 @@
     if (!snap.exists()) throw new Error('Không tìm thấy phiên lấy key.');
     session = snap.val();
     if (session.expiresAt < Date.now()) throw new Error('Phiên lấy key đã hết hạn.');
+    keyPlan = session.plan === 'permanent' ? 'permanent' : (params.get('plan') === 'permanent' ? 'permanent' : 'hour');
+    document.querySelectorAll('input[name="keyPlan"]').forEach(r => r.checked = r.value === keyPlan);
     stage = Number(session.stage || 0);
   }
   function findShortUrl(value) {
@@ -207,16 +229,19 @@
     if (completedStep === 2 && stage < 1) throw new Error('Bạn cần hoàn thành liên kết thứ nhất trước.');
     if (stage < completedStep) {
       const newStage = completedStep;
-      const sessionUpdates = { stage: newStage, state: newStage === 2 ? 'complete' : 'waiting_link_2', pending: null, updatedAt: Date.now() };
+      const needed = Number(session.requiredPasses || (session.plan === 'permanent' ? 2 : 1));
+      const sessionUpdates = { stage: newStage, state: newStage >= needed ? 'complete' : 'waiting_link_2', pending: null, updatedAt: Date.now() };
       await update(ref(db, `keySystem/sessions/${sid}`), sessionUpdates);
       stage = newStage;
-      if (stage === 2 && !session.issuedKeyHash) {
+      if (stage >= needed && !session.issuedKeyHash) {
         const key = makeKey();
         const keyHash = await sha256(key.toUpperCase());
         const now = Date.now();
+        const ttl = session.plan === 'permanent' ? PERMANENT_KEY_TTL_MS : TRIAL_KEY_TTL_MS;
+        const expiresAt = ttl === 0 ? null : now + ttl;
         await set(ref(db, `keySystem/keys/${keyHash}`), {
-          status: 'active', installId, deviceHash: await sha256(installId.trim()), createdAt: now,
-          expiresAt: now + KEY_TTL_MS, sessionId: sid, issuedBy: 'client-html'
+          status: 'active', plan: session.plan || 'hour', installId, deviceHash: await sha256(installId.trim()), createdAt: now,
+          expiresAt, permanent: ttl === 0, sessionId: sid, issuedBy: 'client-html'
         });
         await update(ref(db, `keySystem/sessions/${sid}`), { issuedKeyHash: keyHash, displayKey: key, displayKeyExpiresAt: now + 5 * 60 * 1000 });
         session.issuedKeyHash = keyHash;
@@ -229,7 +254,7 @@
     await getSessionFresh();
   }
   async function showKeyIfReady() {
-    if (stage < 2) return;
+    if (stage < requiredPasses()) return;
     // The key is only revealed to this browser session; it is cleared after its short display window.
     const sref = ref(db, `keySystem/sessions/${sid}`);
     const snap = await get(sref);
@@ -237,6 +262,8 @@
     if (value.displayKey && value.displayKeyExpiresAt > Date.now()) {
       keyvalue.textContent = value.displayKey;
       keybox.style.display = 'block';
+      const permanent = value.plan === 'permanent';
+      keybox.querySelector('.status').textContent = permanent ? 'Key vĩnh viễn. Hãy nhập key vào ứng dụng DigitalLiquid.' : 'Key trải nghiệm có hạn 1 giờ. Hãy nhập key vào ứng dụng DigitalLiquid.';
       setStatus('Đã tạo key. Sao chép và nhập vào DigitalLiquid.');
       return;
     }
@@ -249,12 +276,12 @@
   async function refreshStatus() {
     await getSessionFresh();
     paint();
-    if (stage >= 2) await showKeyIfReady();
-    else setStatus(stage === 0 ? 'Hoàn thành liên kết thứ nhất để mở bước kế tiếp.' : 'Bước 1 đã hoàn tất. Tiếp tục bước 2.');
+    if (stage >= requiredPasses()) await showKeyIfReady();
+    else setStatus(stage === 0 ? 'Hoàn thành liên kết đầu tiên để nhận key.' : 'Bước 1 đã hoàn tất. Tiếp tục bước 2 để nhận key vĩnh viễn.');
   }
 
   action.addEventListener('click', async () => {
-    if (busy || stage >= 2) return;
+    if (busy || stage >= requiredPasses()) return;
     setBusy(true);
     try {
       await getSessionFresh();
@@ -265,6 +292,7 @@
       const destination = new URL(location.href);
       destination.searchParams.set('sid', sid);
       destination.searchParams.set('installId', installId);
+      destination.searchParams.set('plan', keyPlan);
       destination.searchParams.set('done', String(step));
       destination.searchParams.set('nonce', nonce);
       const issuedAt = Date.now();
