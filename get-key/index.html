@@ -126,20 +126,7 @@
       action.style.display = 'none';
     }
   }
-  async function ensureSession() {
-    if (!auth.currentUser) await signInAnonymously(auth);
-    if (sid) {
-      const snap = await get(ref(db, `keySystem/sessions/${sid}`));
-      if (snap.exists()) {
-        session = snap.val();
-        if (session.expiresAt < Date.now()) throw new Error('Phiên đã hết hạn. Hãy quay lại app và nhấn Get Key để tạo phiên mới.');
-        // Client-only limitation: the browser can modify this association.
-        if (session.installId !== installId) throw new Error('Mã cài đặt không khớp với phiên lấy key. Hãy mở Get Key từ trong ứng dụng.');
-        stage = Number(session.stage || 0);
-        return;
-      }
-      throw new Error('Không tìm thấy phiên lấy key. Hãy quay lại ứng dụng và mở Get Key lần nữa.');
-    }
+  async function createFreshSession() {
     const sessionRef = push(ref(db, 'keySystem/sessions'));
     sid = sessionRef.key;
     const now = Date.now();
@@ -148,7 +135,40 @@
     const u = new URL(location.href);
     u.searchParams.set('sid', sid);
     u.searchParams.set('installId', installId);
+    u.searchParams.delete('done');
+    u.searchParams.delete('nonce');
     history.replaceState({}, '', u);
+  }
+
+  async function ensureSession() {
+    if (!auth.currentUser) await signInAnonymously(auth);
+    if (sid) {
+      const snap = await get(ref(db, `keySystem/sessions/${sid}`));
+      if (snap.exists()) {
+        session = snap.val();
+        if (Number(session.expiresAt || 0) < Date.now()) {
+          // A normal app launch can recover from an expired/missing session by creating a new one.
+          // A Link4m callback must not silently restart, or a stale callback could count as a step.
+          if (params.has('done') || params.has('nonce')) {
+            throw new Error('Phiên đã hết hạn. Hãy quay lại ứng dụng và nhấn Get Key để tạo phiên mới.');
+          }
+          sid = '';
+          await createFreshSession();
+          return;
+        }
+        // Client-only limitation: the browser can modify this association.
+        if (session.installId !== installId) throw new Error('Mã cài đặt không khớp với phiên lấy key. Hãy mở Get Key từ trong ứng dụng.');
+        stage = Number(session.stage || 0);
+        return;
+      }
+      // If the app opens Get Key with a stale session id, create a new session on a normal visit.
+      // Do not recreate sessions on Link4m callback URLs, because that would lose callback context.
+      if (params.has('done') || params.has('nonce')) {
+        throw new Error('Không tìm thấy phiên lấy key sau khi quay về liên kết. Hãy quay lại ứng dụng, nhấn Get Key và thực hiện lại bước này.');
+      }
+      sid = '';
+    }
+    await createFreshSession();
   }
   async function getSessionFresh() {
     const snap = await get(ref(db, `keySystem/sessions/${sid}`));
