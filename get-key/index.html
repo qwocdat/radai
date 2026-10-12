@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#09090d">
+  <title>DigitalLiquid · Get Key</title>
+  <style>
+    :root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100svh; display: grid; place-items: center; padding: 24px 16px; color: #f6f4fb; background: radial-gradient(90% 55% at 50% 0%, #3c205f 0, transparent 65%), radial-gradient(55% 45% at 100% 100%, #15113b 0, transparent 70%), #09090d; }
+    .wrap { width: min(100%, 430px); }
+    .brand { display: flex; align-items: center; gap: 12px; margin: 0 0 20px 4px; }
+    .logo { width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center; background: linear-gradient(145deg, #b69aff, #5f34c7 58%, #171329); box-shadow: 0 8px 28px #6b42cb55; font-weight: 900; }
+    .brand strong { display: block; font-size: 15px; letter-spacing: .04em; }
+    .brand span { color: #aaa3ba; font-size: 12px; }
+    .card { border: 1px solid #ffffff19; border-radius: 28px; padding: 25px; background: linear-gradient(145deg, #ffffff0d, #ffffff05); box-shadow: 0 26px 90px #0008, inset 0 1px #ffffff12; backdrop-filter: blur(24px); }
+    .eyebrow { color: #bca5ff; font-size: 11px; text-transform: uppercase; font-weight: 800; letter-spacing: .18em; }
+    h1 { font-size: clamp(27px, 7vw, 34px); line-height: 1.08; letter-spacing: -.04em; margin: 10px 0 12px; }
+    .desc { font-size: 14px; color: #aaa7b4; line-height: 1.6; margin: 0 0 22px; }
+    .steps { display: grid; gap: 10px; margin: 20px 0; }
+    .step { display: flex; align-items: center; gap: 12px; padding: 13px; border: 1px solid #ffffff12; background: #00000021; border-radius: 17px; }
+    .number { flex: 0 0 30px; height: 30px; display: grid; place-items: center; border-radius: 10px; color: #cabaff; background: #9670ff1c; font-weight: 800; font-size: 12px; }
+    .step strong { display: block; font-size: 13px; }
+    .step small { display: block; margin-top: 3px; color: #85818f; font-size: 11px; }
+    button { width: 100%; border: 0; border-radius: 15px; padding: 15px 18px; color: white; background: linear-gradient(100deg, #8658f5, #6741d5); font: inherit; font-weight: 800; cursor: pointer; box-shadow: 0 10px 24px #6a42d044; transition: transform .2s ease, opacity .2s ease; }
+    button:active { transform: scale(.985); }
+    button:disabled { opacity: .45; cursor: wait; }
+    .secondary { margin-top: 9px; color: #c4bdd3; background: #ffffff0b; border: 1px solid #ffffff17; box-shadow: none; }
+    .status { min-height: 42px; margin: 14px 0 0; font-size: 12px; color: #a9a4b5; line-height: 1.55; overflow-wrap: anywhere; }
+    .keybox { display: none; padding: 14px; margin-top: 15px; border-radius: 16px; border: 1px solid #8c70ff66; background: #8b68ff12; }
+    .keybox strong { display: block; margin-bottom: 8px; font-size: 12px; color: #c5b7ff; }
+    .keyvalue { overflow-wrap: anywhere; letter-spacing: .06em; font: 700 14px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; user-select: all; }
+    .privacy { margin: 18px 5px 0; color: #777281; font-size: 10px; line-height: 1.55; text-align: center; }
+    .footer { text-align: center; font-size: 10px; color: #5e5968; margin-top: 18px; letter-spacing: .08em; }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="brand"><div class="logo">DL</div><div><strong>DIGITALSMOD</strong><span>DigitalLiquid access service</span></div></div>
+    <section class="card">
+      <div class="eyebrow">Access verification</div>
+      <h1 id="title">Lấy key DigitalLiquid</h1>
+      <p class="desc" id="description">Hoàn thành hai bước liên kết theo thứ tự. Key sẽ được lưu vào Firebase và gắn với mã cài đặt gửi từ ứng dụng.</p>
+      <div class="steps">
+        <div class="step"><div class="number" id="step1-num">01</div><div><strong id="step1-title">Liên kết thứ nhất</strong><small id="step1-sub">Mở liên kết, hoàn tất rồi quay lại trang này</small></div></div>
+        <div class="step"><div class="number" id="step2-num">02</div><div><strong id="step2-title">Liên kết thứ hai</strong><small id="step2-sub">Chỉ thực hiện sau bước đầu</small></div></div>
+      </div>
+      <button id="action" disabled>Bắt đầu bước 1</button>
+      <button id="refresh" class="secondary" type="button">Kiểm tra trạng thái</button>
+      <p class="status" id="status" role="status" aria-live="polite">Đang kết nối Firebase…</p>
+      <div class="keybox" id="keybox"><strong>KEY CỦA BẠN</strong><div class="keyvalue" id="keyvalue"></div><button id="copy" class="secondary" type="button">Sao chép key</button><p class="status">Key có hạn 24 giờ. Hãy nhập key vào ứng dụng DigitalLiquid.</p></div>
+    </section>
+    <p class="privacy">Bản chạy hoàn toàn phía trình duyệt: Firebase SDK và luồng lấy key nằm trong file HTML. Đây là cơ chế hạn chế cơ bản, không chống được người cố ý sửa mã phía client.</p>
+    <div class="footer">DIGITALSMOD · KEY SERVICE</div>
+  </main>
+<script type="module">
+  // DigitalLiquid single-file edition. All web logic is in this index.html.
+  // WARNING: This client-only model deliberately trades security for phone-only deployment.
+  // Enable Firebase Authentication > Anonymous and use the Realtime Database rules included in the response.
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+  import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import { getDatabase, ref, get, set, update, push } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+  import { getAnalytics, isSupported } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js';
+
+  const firebaseConfig = {
+    apiKey: 'AIzaSyAVuB8m14zkMPs-JTLAKB0Bp18QBKAMBt4',
+    authDomain: 'ideo-dd376.firebaseapp.com',
+    databaseURL: 'https://ideo-dd376-default-rtdb.asia-southeast1.firebasedatabase.app',
+    projectId: 'ideo-dd376',
+    storageBucket: 'ideo-dd376.firebasestorage.app',
+    messagingSenderId: '689163185',
+    appId: '1:689163185:web:af4091213001180f364b90',
+    measurementId: 'G-QP54CZ2BJT'
+  };
+
+  // The Link4m API key must be considered public in a client-only file.
+  // If Link4m blocks cross-origin browser calls (CORS), link creation cannot work from HTML alone.
+  const LINK4M_API_KEY = '6992df868b3d1e423d1ab833';
+  const LINK4M_ENDPOINT = 'https://link4m.co/st';
+  const SESSION_TTL_MS = 30 * 60 * 1000;
+  const KEY_TTL_MS = 24 * 60 * 60 * 1000;
+  const MIN_STEP_MS = 8000;
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getDatabase(app);
+  isSupported().then(ok => { if (ok) getAnalytics(app); }).catch(() => {});
+
+  const $ = id => document.getElementById(id);
+  const action = $('action'), refresh = $('refresh'), statusEl = $('status');
+  const keybox = $('keybox'), keyvalue = $('keyvalue');
+  const params = new URLSearchParams(location.search);
+  let sid = params.get('sid') || '';
+  let installId = params.get('installId') || localStorage.getItem('dl_install_id') || '';
+  if (!installId) {
+    installId = (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}-${Math.random().toString(16).slice(2)}`);
+    localStorage.setItem('dl_install_id', installId);
+  }
+  let stage = 0, session = null, busy = false;
+
+  function setStatus(message) { statusEl.textContent = message; }
+  function setBusy(on) { busy = on; action.disabled = on || stage >= 2; refresh.disabled = on; }
+  function makeKey() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const group = () => Array.from({length: 6}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    return `DL-${group()}-${group()}-${group()}-${group()}`;
+  }
+  async function sha256(text) {
+    const bytes = new TextEncoder().encode(text);
+    const digest = await crypto.subtle.digest('SHA-256', bytes);
+    return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+  function paint() {
+    $('step1-num').textContent = stage >= 1 ? '✓' : '01';
+    $('step2-num').textContent = stage >= 2 ? '✓' : '02';
+    $('step1-title').textContent = stage >= 1 ? 'Liên kết thứ nhất · Hoàn tất' : 'Liên kết thứ nhất';
+    $('step2-title').textContent = stage >= 2 ? 'Liên kết thứ hai · Hoàn tất' : 'Liên kết thứ hai';
+    action.textContent = stage === 0 ? 'Vượt liên kết 1' : stage === 1 ? 'Vượt liên kết 2' : 'Đã cấp key';
+    action.disabled = busy || stage >= 2;
+    if (stage >= 1 && stage < 2) $('description').textContent = 'Bước đầu đã hoàn tất. Tiếp tục liên kết thứ hai để cấp key.';
+    if (stage >= 2) {
+      $('title').textContent = 'Đã hoàn thành';
+      $('description').textContent = 'Key đã được lưu vào Firebase và gắn với mã cài đặt của bạn.';
+      action.style.display = 'none';
+    }
+  }
+  async function ensureSession() {
+    if (!auth.currentUser) await signInAnonymously(auth);
+    if (sid) {
+      const snap = await get(ref(db, `keySystem/sessions/${sid}`));
+      if (snap.exists()) {
+        session = snap.val();
+        if (session.expiresAt < Date.now()) throw new Error('Phiên đã hết hạn. Hãy quay lại app và nhấn Get Key để tạo phiên mới.');
+        // Client-only limitation: the browser can modify this association.
+        if (session.installId !== installId) throw new Error('Mã cài đặt không khớp với phiên lấy key. Hãy mở Get Key từ trong ứng dụng.');
+        stage = Number(session.stage || 0);
+        return;
+      }
+      throw new Error('Không tìm thấy phiên lấy key. Hãy quay lại ứng dụng và mở Get Key lần nữa.');
+    }
+    const sessionRef = push(ref(db, 'keySystem/sessions'));
+    sid = sessionRef.key;
+    const now = Date.now();
+    session = { installId, createdAt: now, expiresAt: now + SESSION_TTL_MS, stage: 0, state: 'waiting_link_1', pending: null };
+    await set(sessionRef, session);
+    const u = new URL(location.href);
+    u.searchParams.set('sid', sid);
+    u.searchParams.set('installId', installId);
+    history.replaceState({}, '', u);
+  }
+  async function getSessionFresh() {
+    const snap = await get(ref(db, `keySystem/sessions/${sid}`));
+    if (!snap.exists()) throw new Error('Không tìm thấy phiên lấy key.');
+    session = snap.val();
+    if (session.expiresAt < Date.now()) throw new Error('Phiên lấy key đã hết hạn.');
+    stage = Number(session.stage || 0);
+  }
+  function findShortUrl(value) {
+    if (typeof value === 'string') {
+      const match = value.match(/https?:\/\/[^\s"'<>]+/g) || [];
+      return match.map(s => s.replace(/[),.]+$/, '')).find(s => {
+        try { const u = new URL(s); return u.protocol === 'https:' && u.hostname !== location.hostname; } catch { return false; }
+      }) || null;
+    }
+    if (Array.isArray(value)) { for (const item of value) { const found = findShortUrl(item); if (found) return found; } }
+    if (value && typeof value === 'object') { for (const [key, item] of Object.entries(value)) { if (/url|link|short/i.test(key)) { const found = findShortUrl(item); if (found) return found; } } for (const item of Object.values(value)) { const found = findShortUrl(item); if (found) return found; } }
+    return null;
+  }
+  async function createShortUrl(destination) {
+    const endpoint = new URL(LINK4M_ENDPOINT);
+    endpoint.searchParams.set('api', LINK4M_API_KEY);
+    endpoint.searchParams.set('url', destination);
+    let response;
+    try {
+      response = await fetch(endpoint.toString(), { method: 'GET', mode: 'cors', cache: 'no-store' });
+    } catch (e) {
+      throw new Error('Trình duyệt không đọc được phản hồi API Link4m (có thể do CORS). Với một file HTML thuần, không thể tự vượt giới hạn này; hãy kiểm tra Link4m có hỗ trợ CORS hoặc dùng link đã rút gọn sẵn.');
+    }
+    const text = await response.text();
+    if (!response.ok) throw new Error(`Link4m trả về HTTP ${response.status}.`);
+    let payload = text;
+    try { payload = JSON.parse(text); } catch {}
+    const shortUrl = findShortUrl(payload);
+    if (!shortUrl) throw new Error('API Link4m không trả về URL rút gọn có thể nhận diện.');
+    return shortUrl;
+  }
+  async function handleReturnFromLink() {
+    const completedStep = Number(params.get('done') || 0);
+    const nonce = params.get('nonce') || '';
+    if (![1, 2].includes(completedStep) || !sid) return;
+    await getSessionFresh();
+    const pending = session.pending;
+    if (!pending || pending.step !== completedStep || pending.nonce !== nonce) {
+      setStatus('Không xác nhận được lượt quay về. Nếu vừa hoàn thành liên kết, hãy kiểm tra lại trạng thái.');
+      return;
+    }
+    if (Date.now() - Number(pending.issuedAt || 0) < MIN_STEP_MS) {
+      setStatus('Bạn quay lại quá nhanh. Chờ vài giây rồi nhấn Kiểm tra trạng thái.');
+      return;
+    }
+    if (completedStep === 2 && stage < 1) throw new Error('Bạn cần hoàn thành liên kết thứ nhất trước.');
+    if (stage < completedStep) {
+      const newStage = completedStep;
+      const sessionUpdates = { stage: newStage, state: newStage === 2 ? 'complete' : 'waiting_link_2', pending: null, updatedAt: Date.now() };
+      await update(ref(db, `keySystem/sessions/${sid}`), sessionUpdates);
+      stage = newStage;
+      if (stage === 2 && !session.issuedKeyHash) {
+        const key = makeKey();
+        const keyHash = await sha256(key.toUpperCase());
+        const now = Date.now();
+        await set(ref(db, `keySystem/keys/${keyHash}`), {
+          status: 'active', installId, deviceHash: await sha256(installId.trim()), createdAt: now,
+          expiresAt: now + KEY_TTL_MS, sessionId: sid, issuedBy: 'client-html'
+        });
+        await update(ref(db, `keySystem/sessions/${sid}`), { issuedKeyHash: keyHash, displayKey: key, displayKeyExpiresAt: now + 5 * 60 * 1000 });
+        session.issuedKeyHash = keyHash;
+        session.displayKey = key;
+      }
+    }
+    const cleaned = new URL(location.href);
+    cleaned.searchParams.delete('done'); cleaned.searchParams.delete('nonce');
+    history.replaceState({}, '', cleaned);
+    await getSessionFresh();
+  }
+  async function showKeyIfReady() {
+    if (stage < 2) return;
+    // The key is only revealed to this browser session; it is cleared after its short display window.
+    const sref = ref(db, `keySystem/sessions/${sid}`);
+    const snap = await get(sref);
+    const value = snap.val() || {};
+    if (value.displayKey && value.displayKeyExpiresAt > Date.now()) {
+      keyvalue.textContent = value.displayKey;
+      keybox.style.display = 'block';
+      setStatus('Đã tạo key. Sao chép và nhập vào DigitalLiquid.');
+      return;
+    }
+    if (value.issuedKeyHash) {
+      setStatus('Key đã được tạo nhưng không còn hiển thị. Nếu chưa sao chép, hãy tạo phiên mới từ app.');
+    } else {
+      setStatus('Chưa thể hiển thị key. Nhấn Kiểm tra trạng thái để thử lại.');
+    }
+  }
+  async function refreshStatus() {
+    await getSessionFresh();
+    paint();
+    if (stage >= 2) await showKeyIfReady();
+    else setStatus(stage === 0 ? 'Hoàn thành liên kết thứ nhất để mở bước kế tiếp.' : 'Bước 1 đã hoàn tất. Tiếp tục bước 2.');
+  }
+
+  action.addEventListener('click', async () => {
+    if (busy || stage >= 2) return;
+    setBusy(true);
+    try {
+      await getSessionFresh();
+      const step = stage + 1;
+      if (![1, 2].includes(step)) return;
+      if (step === 2 && stage < 1) throw new Error('Bạn cần hoàn thành liên kết thứ nhất trước.');
+      const nonce = crypto.randomUUID ? crypto.randomUUID().replaceAll('-', '') : `${Date.now()}${Math.random().toString(16).slice(2)}`;
+      const destination = new URL(location.href);
+      destination.searchParams.set('sid', sid);
+      destination.searchParams.set('installId', installId);
+      destination.searchParams.set('done', String(step));
+      destination.searchParams.set('nonce', nonce);
+      const issuedAt = Date.now();
+      await update(ref(db, `keySystem/sessions/${sid}`), { pending: { step, nonce, issuedAt }, updatedAt: issuedAt });
+      setStatus(`Đang tạo link Link4m cho bước ${step}…`);
+      const shortUrl = await createShortUrl(destination.toString());
+      location.href = shortUrl;
+    } catch (e) {
+      setStatus(e?.message || 'Không thực hiện được thao tác.');
+      setBusy(false);
+      paint();
+    }
+  });
+  refresh.addEventListener('click', async () => {
+    setBusy(true);
+    try { await refreshStatus(); }
+    catch (e) { setStatus(e?.message || 'Không thể đọc trạng thái.'); }
+    finally { setBusy(false); paint(); }
+  });
+  $('copy').addEventListener('click', async () => {
+    const value = keyvalue.textContent.trim();
+    try { await navigator.clipboard.writeText(value); setStatus('Đã sao chép key. Quay lại ứng dụng để xác nhận.'); }
+    catch { setStatus('Hãy nhấn giữ vào key để sao chép.'); }
+  });
+
+  (async () => {
+    setBusy(true);
+    try {
+      await signInAnonymously(auth);
+      await ensureSession();
+      await handleReturnFromLink();
+      await refreshStatus();
+    } catch (e) {
+      setStatus((e?.message || 'Không thể khởi tạo Firebase.') + ' Nếu đây là lần đầu, hãy bật Anonymous trong Firebase Authentication và áp dụng Database Rules.');
+    } finally { setBusy(false); paint(); }
+  })();
+</script>
+</body>
+</html>
