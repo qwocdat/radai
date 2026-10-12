@@ -42,23 +42,21 @@
     <section class="card">
       <div class="eyebrow">Access verification</div>
       <h1 id="title">Lấy key DigitalLiquid</h1>
-      <p class="desc" id="description">Hoàn thành hai bước liên kết theo thứ tự. Key sẽ được lưu vào Firebase và gắn với mã cài đặt gửi từ ứng dụng.</p>
+      <p class="desc" id="description">Hoàn thành hai bước liên kết theo thứ tự để nhận key dùng cho ứng dụng DigitalLiquid.</p>
       <div class="steps">
         <div class="step"><div class="number" id="step1-num">01</div><div><strong id="step1-title">Liên kết thứ nhất</strong><small id="step1-sub">Mở liên kết, hoàn tất rồi quay lại trang này</small></div></div>
         <div class="step"><div class="number" id="step2-num">02</div><div><strong id="step2-title">Liên kết thứ hai</strong><small id="step2-sub">Chỉ thực hiện sau bước đầu</small></div></div>
       </div>
       <button id="action" disabled>Bắt đầu bước 1</button>
       <button id="refresh" class="secondary" type="button">Kiểm tra trạng thái</button>
-      <p class="status" id="status" role="status" aria-live="polite">Đang kết nối Firebase…</p>
+      <p class="status" id="status" role="status" aria-live="polite">Đang khởi tạo phiên lấy key…</p>
       <div class="keybox" id="keybox"><strong>KEY CỦA BẠN</strong><div class="keyvalue" id="keyvalue"></div><button id="copy" class="secondary" type="button">Sao chép key</button><p class="status">Key có hạn 24 giờ. Hãy nhập key vào ứng dụng DigitalLiquid.</p></div>
     </section>
-    <p class="privacy">Bản chạy hoàn toàn phía trình duyệt: Firebase SDK và luồng lấy key nằm trong file HTML. Đây là cơ chế hạn chế cơ bản, không chống được người cố ý sửa mã phía client.</p>
+    <p class="privacy">DIGITALSMOD · Hoàn thành đủ hai bước liên kết để nhận key. Không chia sẻ key với người khác.</p>
     <div class="footer">DIGITALSMOD · KEY SERVICE</div>
   </main>
 <script type="module">
-  // DigitalLiquid single-file edition. All web logic is in this index.html.
-  // WARNING: This client-only model deliberately trades security for phone-only deployment.
-  // Enable Firebase Authentication > Anonymous and use the Realtime Database rules included in the response.
+  // DigitalLiquid single-file edition. Website logic is contained in this file.
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
   import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
   import { getDatabase, ref, get, set, update, push } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
@@ -75,8 +73,7 @@
     measurementId: 'G-QP54CZ2BJT'
   };
 
-  // The Link4m API key must be considered public in a client-only file.
-  // If Link4m blocks cross-origin browser calls (CORS), link creation cannot work from HTML alone.
+  // Link4m Quick Link configuration. This key is visible to visitors in a public HTML file.
   const LINK4M_API_KEY = '6992df868b3d1e423d1ab833';
   const LINK4M_ENDPOINT = 'https://link4m.co/st';
   const SESSION_TTL_MS = 30 * 60 * 1000;
@@ -122,7 +119,7 @@
     if (stage >= 1 && stage < 2) $('description').textContent = 'Bước đầu đã hoàn tất. Tiếp tục liên kết thứ hai để cấp key.';
     if (stage >= 2) {
       $('title').textContent = 'Đã hoàn thành';
-      $('description').textContent = 'Key đã được lưu vào Firebase và gắn với mã cài đặt của bạn.';
+      $('description').textContent = 'Bạn đã hoàn thành các bước xác thực.';
       action.style.display = 'none';
     }
   }
@@ -188,23 +185,10 @@
     if (value && typeof value === 'object') { for (const [key, item] of Object.entries(value)) { if (/url|link|short/i.test(key)) { const found = findShortUrl(item); if (found) return found; } } for (const item of Object.values(value)) { const found = findShortUrl(item); if (found) return found; } }
     return null;
   }
-  async function createShortUrl(destination) {
-    const endpoint = new URL(LINK4M_ENDPOINT);
-    endpoint.searchParams.set('api', LINK4M_API_KEY);
-    endpoint.searchParams.set('url', destination);
-    let response;
-    try {
-      response = await fetch(endpoint.toString(), { method: 'GET', mode: 'cors', cache: 'no-store' });
-    } catch (e) {
-      throw new Error('Trình duyệt không đọc được phản hồi API Link4m (có thể do CORS). Với một file HTML thuần, không thể tự vượt giới hạn này; hãy kiểm tra Link4m có hỗ trợ CORS hoặc dùng link đã rút gọn sẵn.');
-    }
-    const text = await response.text();
-    if (!response.ok) throw new Error(`Link4m trả về HTTP ${response.status}.`);
-    let payload = text;
-    try { payload = JSON.parse(text); } catch {}
-    const shortUrl = findShortUrl(payload);
-    if (!shortUrl) throw new Error('API Link4m không trả về URL rút gọn có thể nhận diện.');
-    return shortUrl;
+  function createQuickLink(destination) {
+    // Exact Quick Link format: https://link4m.co/st?api=KEY&url=DESTINATION
+    // Open it as a navigation instead of fetch(), so browser CORS does not block redirects.
+    return `${LINK4M_ENDPOINT}?api=${encodeURIComponent(LINK4M_API_KEY)}&url=${encodeURIComponent(destination)}`;
   }
   async function handleReturnFromLink() {
     const completedStep = Number(params.get('done') || 0);
@@ -285,9 +269,9 @@
       destination.searchParams.set('nonce', nonce);
       const issuedAt = Date.now();
       await update(ref(db, `keySystem/sessions/${sid}`), { pending: { step, nonce, issuedAt }, updatedAt: issuedAt });
-      setStatus(`Đang tạo link Link4m cho bước ${step}…`);
-      const shortUrl = await createShortUrl(destination.toString());
-      location.href = shortUrl;
+      setStatus(`Đang mở liên kết bước ${step}…`);
+      const quickLink = createQuickLink(destination.toString());
+      location.href = quickLink;
     } catch (e) {
       setStatus(e?.message || 'Không thực hiện được thao tác.');
       setBusy(false);
@@ -314,7 +298,8 @@
       await handleReturnFromLink();
       await refreshStatus();
     } catch (e) {
-      setStatus((e?.message || 'Không thể khởi tạo Firebase.') + ' Nếu đây là lần đầu, hãy bật Anonymous trong Firebase Authentication và áp dụng Database Rules.');
+      const message = e?.message || 'Không thể khởi tạo phiên lấy key.';
+      setStatus(message.includes('auth/admin-restricted-operation') ? 'Không thể khởi tạo phiên. Vui lòng thử lại sau.' : message);
     } finally { setBusy(false); paint(); }
   })();
 </script>
