@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#09090d">
+  <title>DigitalLiquid · Get Key</title>
+  <style>
+    :root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100svh; display: grid; place-items: center; padding: 24px 16px; color: #f6f4fb; background: radial-gradient(90% 55% at 50% 0%, #3c205f 0, transparent 65%), radial-gradient(55% 45% at 100% 100%, #15113b 0, transparent 70%), #09090d; }
+    .wrap { width: min(100%, 430px); }
+    .brand { display: flex; align-items: center; gap: 12px; margin: 0 0 20px 4px; }
+    .logo { width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center; background: linear-gradient(145deg, #b69aff, #5f34c7 58%, #171329); box-shadow: 0 8px 28px #6b42cb55; font-weight: 900; }
+    .brand strong { display: block; font-size: 15px; letter-spacing: .04em; }
+    .brand span { color: #aaa3ba; font-size: 12px; }
+    .card { border: 1px solid #ffffff19; border-radius: 28px; padding: 25px; background: linear-gradient(145deg, #ffffff0d, #ffffff05); box-shadow: 0 26px 90px #0008, inset 0 1px #ffffff12; backdrop-filter: blur(24px); }
+    .eyebrow { color: #bca5ff; font-size: 11px; text-transform: uppercase; font-weight: 800; letter-spacing: .18em; }
+    h1 { font-size: clamp(27px, 7vw, 34px); line-height: 1.08; letter-spacing: -.04em; margin: 10px 0 12px; }
+    .desc { font-size: 14px; color: #aaa7b4; line-height: 1.6; margin: 0 0 22px; }
+    .steps { display: grid; gap: 10px; margin: 20px 0; }
+    .step { display: flex; align-items: center; gap: 12px; padding: 13px; border: 1px solid #ffffff12; background: #00000021; border-radius: 17px; }
+    .number { flex: 0 0 30px; height: 30px; display: grid; place-items: center; border-radius: 10px; color: #cabaff; background: #9670ff1c; font-weight: 800; font-size: 12px; }
+    .step strong { display: block; font-size: 13px; }
+    .step small { display: block; margin-top: 3px; color: #85818f; font-size: 11px; }
+    button { width: 100%; border: 0; border-radius: 15px; padding: 15px 18px; color: white; background: linear-gradient(100deg, #8658f5, #6741d5); font: inherit; font-weight: 800; cursor: pointer; box-shadow: 0 10px 24px #6a42d044; transition: transform .2s ease, opacity .2s ease; }
+    button:active { transform: scale(.985); }
+    button:disabled { opacity: .45; cursor: wait; }
+    .secondary { margin-top: 9px; color: #c4bdd3; background: #ffffff0b; border: 1px solid #ffffff17; box-shadow: none; }
+    .status { min-height: 42px; margin: 14px 0 0; font-size: 12px; color: #a9a4b5; line-height: 1.55; }
+    .keybox { display: none; padding: 14px; margin-top: 15px; border-radius: 16px; border: 1px solid #8c70ff66; background: #8b68ff12; }
+    .keybox strong { display: block; margin-bottom: 8px; font-size: 12px; color: #c5b7ff; }
+    .keyvalue { overflow-wrap: anywhere; letter-spacing: .06em; font: 700 14px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .privacy { margin: 18px 5px 0; color: #777281; font-size: 10px; line-height: 1.55; text-align: center; }
+    .footer { text-align: center; font-size: 10px; color: #5e5968; margin-top: 18px; letter-spacing: .08em; }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="brand"><div class="logo">DL</div><div><strong>DIGITALSMOD</strong><span>DigitalLiquid access service</span></div></div>
+    <section class="card">
+      <div class="eyebrow">Access verification</div>
+      <h1 id="title">Lấy key DigitalLiquid</h1>
+      <p class="desc" id="description">Hoàn thành hai bước liên kết theo thứ tự. Sau khi hoàn tất, key sẽ được cấp cho thiết bị đã mở trang này từ ứng dụng.</p>
+      <div class="steps">
+        <div class="step"><div class="number" id="step1-num">01</div><div><strong id="step1-title">Liên kết thứ nhất</strong><small id="step1-sub">Mở liên kết và quay lại trang này sau khi hoàn tất</small></div></div>
+        <div class="step"><div class="number" id="step2-num">02</div><div><strong id="step2-title">Liên kết thứ hai</strong><small id="step2-sub">Chỉ mở sau khi bước đầu hoàn tất</small></div></div>
+      </div>
+      <button id="action">Bắt đầu bước 1</button>
+      <button id="refresh" class="secondary" type="button">Kiểm tra trạng thái</button>
+      <p class="status" id="status" role="status" aria-live="polite">Đang kiểm tra phiên lấy key…</p>
+      <div class="keybox" id="keybox"><strong>KEY CỦA BẠN · HIỂN THỊ MỘT LẦN</strong><div class="keyvalue" id="keyvalue"></div><button id="copy" class="secondary" type="button">Sao chép key</button><p class="status">Key có hạn 24 giờ và được gắn với thiết bị đã yêu cầu key. Hãy dán key vào ứng dụng DigitalLiquid.</p></div>
+    </section>
+    <p class="privacy">Hệ thống lưu mã cài đặt đã băm, địa chỉ IP do máy chủ quan sát được và trạng thái phiên để giới hạn chia sẻ key. Không gửi IMEI hoặc số điện thoại.</p>
+    <div class="footer">DIGITALSMOD · KEY SERVICE</div>
+  </main>
+<script>
+(() => {
+  // If hosting on a different domain, update API_BASE to the deployed keyApi URL.
+  const API_BASE = 'https://asia-southeast1-quocdat-396fe.cloudfunctions.net/keyApi';
+  const params = new URLSearchParams(location.search);
+  const sid = params.get('sid') || '';
+  const action = document.getElementById('action');
+  const refresh = document.getElementById('refresh');
+  const statusEl = document.getElementById('status');
+  const title = document.getElementById('title');
+  const description = document.getElementById('description');
+  const keybox = document.getElementById('keybox');
+  const keyvalue = document.getElementById('keyvalue');
+  let stage = 0;
+  let busy = false;
+
+  async function request(path, options = {}) {
+    const response = await fetch(`${API_BASE}${path}`, {
+      ...options,
+      headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || data.ok === false) throw new Error(data.error || `Yêu cầu thất bại (${response.status}).`);
+    return data;
+  }
+
+  function setBusy(value) {
+    busy = value;
+    action.disabled = value;
+    refresh.disabled = value;
+  }
+
+  function paint() {
+    document.getElementById('step1-num').textContent = stage >= 1 ? '✓' : '01';
+    document.getElementById('step2-num').textContent = stage >= 2 ? '✓' : '02';
+    document.getElementById('step1-title').textContent = stage >= 1 ? 'Liên kết thứ nhất · Hoàn tất' : 'Liên kết thứ nhất';
+    document.getElementById('step2-title').textContent = stage >= 2 ? 'Liên kết thứ hai · Hoàn tất' : 'Liên kết thứ hai';
+    action.textContent = stage === 0 ? 'Vượt liên kết 1' : stage === 1 ? 'Vượt liên kết 2' : 'Đã hoàn thành';
+    action.disabled = busy || stage >= 2;
+    if (stage === 1) description.textContent = 'Bước đầu đã hoàn tất. Tiếp tục bước thứ hai để cấp key.';
+    if (stage >= 2) {
+      title.textContent = 'Đã hoàn thành';
+      description.textContent = 'Phiên của bạn đã vượt qua hai bước. Hệ thống đang lấy key được gắn với thiết bị.';
+      action.textContent = 'Đã cấp key';
+      action.disabled = true;
+    }
+  }
+
+  async function getStatus() {
+    if (!sid) throw new Error('Không tìm thấy mã phiên. Hãy quay lại ứng dụng và nhấn Get Key để mở trang này.');
+    const data = await request(`/session-status?sid=${encodeURIComponent(sid)}`);
+    stage = data.stage;
+    paint();
+    if (stage >= 2) await consumeKey();
+    else statusEl.textContent = stage === 0 ? 'Hoàn thành bước 1 để mở khóa bước tiếp theo.' : 'Bước 1 đã hoàn thành. Tiếp tục bước 2.';
+  }
+
+  async function consumeKey() {
+    if (keyvalue.textContent) return;
+    const data = await request('/consume-key', { method: 'POST', body: JSON.stringify({ sid }) });
+    keyvalue.textContent = data.key;
+    keybox.style.display = 'block';
+    statusEl.textContent = 'Key đã được cấp. Sao chép và nhập vào ứng dụng DigitalLiquid.';
+    action.style.display = 'none';
+  }
+
+  action.addEventListener('click', async () => {
+    if (busy || !sid || stage >= 2) return;
+    setBusy(true);
+    statusEl.textContent = 'Đang tạo liên kết an toàn…';
+    try {
+      const nextStep = stage === 0 ? 1 : 2;
+      const data = await request(`/get-link?sid=${encodeURIComponent(sid)}&step=${nextStep}`);
+      if (data.completed) {
+        await getStatus();
+        return;
+      }
+      location.href = data.shortUrl;
+    } catch (error) {
+      statusEl.textContent = error.message;
+      setBusy(false);
+      action.textContent = 'Thử lại';
+    }
+  });
+
+  refresh.addEventListener('click', async () => {
+    setBusy(true);
+    try { await getStatus(); }
+    catch (error) { statusEl.textContent = error.message; }
+    finally { setBusy(false); paint(); }
+  });
+
+  document.getElementById('copy').addEventListener('click', async () => {
+    const value = keyvalue.textContent.trim();
+    try {
+      await navigator.clipboard.writeText(value);
+      statusEl.textContent = 'Đã sao chép key. Quay lại ứng dụng để xác nhận.';
+    } catch (_) {
+      statusEl.textContent = 'Không thể tự sao chép trên trình duyệt này. Hãy nhấn giữ key để sao chép.';
+    }
+  });
+
+  (async () => {
+    setBusy(true);
+    try { await getStatus(); }
+    catch (error) { statusEl.textContent = error.message; action.disabled = true; }
+    finally { setBusy(false); paint(); if (stage >= 2) action.style.display = 'none'; }
+  })();
+})();
+</script>
+</body>
+</html>
