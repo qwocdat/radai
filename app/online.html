@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#090a10">
+  <title>DigitalLiquid · Admin</title>
+  <style>
+    :root{color-scheme:dark;--bg:#090a10;--panel:rgba(25,27,40,.78);--line:rgba(255,255,255,.1);--text:#f7f7fb;--muted:#a4a7b8;--purple:#a79aff;--red:#ff747d;--green:#81ebbd}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(900px 600px at 0% 0%,#242044 0,transparent 62%),radial-gradient(700px 500px at 100% 100%,#18273a 0,transparent 60%),var(--bg);color:var(--text);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+    .wrap{width:min(980px,100%);margin:auto;padding:30px 18px 50px}.top{display:flex;align-items:center;gap:14px;margin-bottom:24px}.logo{width:52px;height:52px;border-radius:17px;display:grid;place-items:center;background:linear-gradient(145deg,#252139,#0b0c12);border:1px solid var(--line);box-shadow:0 12px 36px #0006;font-size:19px;font-weight:800}.eyebrow{color:var(--purple);font-size:10px;font-weight:800;letter-spacing:.18em}.top h1{font-size:25px;line-height:1.2;margin:2px 0 0}.muted{color:var(--muted)}.panel{border:1px solid var(--line);background:var(--panel);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:25px;padding:20px;margin:14px 0;box-shadow:0 18px 60px #0002}.panel h2{font-size:15px;margin:0 0 16px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}label{font-size:12px;color:#d5d5e2}input,textarea{width:100%;border:1px solid #ffffff1a;background:#0c0d14;color:var(--text);border-radius:13px;padding:12px 13px;font:inherit;outline:none}input:focus,textarea:focus{border-color:#a79affaa;box-shadow:0 0 0 3px #a79aff17}textarea{min-height:95px;resize:vertical}.check{display:flex;align-items:center;gap:10px;padding:10px 0;color:#ededf6}.check input{width:18px;height:18px;accent-color:#a79aff}.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}button{border:1px solid var(--line);border-radius:13px;padding:12px 16px;background:#ffffff0d;color:#fff;font-weight:700;cursor:pointer}button.primary{background:linear-gradient(135deg,#9989ff,#6351b8);border-color:#ffffff20}button:disabled{opacity:.45;cursor:wait}.status{min-height:24px;margin-top:12px;font-size:12px;color:var(--muted);overflow-wrap:anywhere}.status.error{color:var(--red)}.status.ok{color:var(--green)}.identity{font-size:12px;overflow-wrap:anywhere}.hidden{display:none!important}.pill{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:4px 9px;color:var(--purple);font-size:10px;letter-spacing:.08em}.warn{border-left:3px solid #ffbd70;padding:10px 12px;background:#ffbd7010;color:#e5d8c9;border-radius:0 10px 10px 0;font-size:12px;margin-top:12px}
+    @media(max-width:620px){.grid{grid-template-columns:1fr}.panel{padding:16px;border-radius:20px}.wrap{padding:22px 13px 34px}.top h1{font-size:22px}}
+  </style>
+</head>
+<body>
+<main class="wrap">
+  <header class="top"><div class="logo">DL</div><div><div class="eyebrow">DIGITALSMOD · CONTROL PLANE</div><h1>DigitalLiquid Admin</h1><div class="muted" style="font-size:12px">Quản lý thông báo, bảo trì, phiên bản và xác minh chữ ký.</div></div></header>
+
+  <section class="panel" id="loginPanel">
+    <h2>Đăng nhập quản trị</h2>
+    <div class="grid">
+      <div class="field"><label for="email">Email Firebase Admin</label><input id="email" type="email" autocomplete="username" placeholder="admin@example.com"></div>
+      <div class="field"><label for="password">Mật khẩu</label><input id="password" type="password" autocomplete="current-password" placeholder="Mật khẩu Firebase Auth"></div>
+    </div>
+    <div class="actions"><button class="primary" id="loginBtn">Đăng nhập</button></div>
+    <div class="status" id="loginStatus"></div>
+    <div class="warn">Tài khoản quản trị phải được tạo trong Firebase Authentication và UID phải được cho phép ghi tại Database Rules. Không đặt mật khẩu hoặc private key trong mã HTML.</div>
+  </section>
+
+  <section class="panel hidden" id="editorPanel">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2 style="margin:0">Trạng thái quản trị</h2><span class="pill">FIREBASE REALTIME DATABASE</span></div>
+    <p id="identity" class="identity muted"></p>
+    <div class="actions"><button id="loadBtn">Tải cấu hình hiện tại</button><button id="logoutBtn">Đăng xuất</button></div>
+
+    <section class="panel" style="margin:18px 0 0;background:#0c0d14a8">
+      <h2>Điều khiển ứng dụng</h2>
+      <label class="check"><input id="appEnabled" type="checkbox" checked> Cho phép chạy ứng dụng</label>
+      <label class="check"><input id="maintenanceEnabled" type="checkbox"> Bật chế độ bảo trì, chặn bản đang chạy</label>
+      <div class="grid">
+        <div class="field full"><label for="maintenanceMessage">Thông báo bảo trì / lý do vô hiệu hóa</label><textarea id="maintenanceMessage">DigitalLiquid đang được bảo trì. Vui lòng thử lại sau.</textarea></div>
+      </div>
+    </section>
+
+    <section class="panel" style="margin:14px 0 0;background:#0c0d14a8">
+      <h2>Phiên bản và tải xuống</h2>
+      <div class="grid">
+        <div class="field"><label for="latestVersionName">Tên phiên bản mới</label><input id="latestVersionName" placeholder="1.3"></div>
+        <div class="field"><label for="latestVersionCode">Version code mới</label><input id="latestVersionCode" type="number" min="0" value="3"></div>
+        <div class="field"><label for="minVersionCode">Version code tối thiểu được phép chạy</label><input id="minVersionCode" type="number" min="0" value="0"></div>
+        <div class="field"><label for="downloadUrl">URL tải APK (HTTPS)</label><input id="downloadUrl" type="url" placeholder="https://.../DigitalLiquid.apk"></div>
+      </div>
+      <p class="muted" style="font-size:12px;margin-bottom:0">Đặt min version cao hơn bản cũ và cung cấp URL tải để bắt buộc cập nhật. Version code của ứng dụng hiện tại nằm trong app/build.gradle.kts.</p>
+    </section>
+
+    <section class="panel" style="margin:14px 0 0;background:#0c0d14a8">
+      <h2>Thông báo tự do</h2>
+      <label class="check"><input id="announcementEnabled" type="checkbox"> Gửi thông báo tới ứng dụng</label>
+      <div class="grid">
+        <div class="field full"><label for="announcementTitle">Tiêu đề</label><input id="announcementTitle" placeholder="Thông báo từ DigitalLiquid"></div>
+        <div class="field full"><label for="announcementMessage">Nội dung</label><textarea id="announcementMessage" placeholder="Nội dung sẽ xuất hiện trong ứng dụng..."></textarea></div>
+        <div class="field full"><label for="announcementUrl">Liên kết nút bấm (không bắt buộc)</label><input id="announcementUrl" type="url" placeholder="https://..."></div>
+      </div>
+    </section>
+
+    <section class="panel" style="margin:14px 0 0;background:#0c0d14a8">
+      <h2>Chống sửa đổi APK</h2>
+      <div class="field"><label for="expectedSignerSha256">SHA-256 chứng thư ký APK được cho phép (để trống khi chưa dùng khóa ký ổn định)</label><input id="expectedSignerSha256" placeholder="64 ký tự hex, không bắt buộc có dấu :"></div>
+      <p class="muted" style="font-size:12px;margin-bottom:0">Ứng dụng từ chối bản ký bằng chứng thư khác khi trường này được đặt. Phải dùng cùng một khóa phát hành cho mọi bản hợp lệ. Đừng điền fingerprint của debug APK vì chữ ký debug có thể đổi giữa các lần GitHub Actions chạy.</p>
+    </section>
+
+    <div class="actions"><button class="primary" id="saveBtn">Lưu cấu hình trực tuyến</button><button id="reloadBtn">Tải lại</button></div>
+    <div class="status" id="editorStatus"></div>
+    <div class="warn">Nếu nhận PERMISSION_DENIED, hãy cấu hình mục appControl trong Realtime Database Rules. Không bật quyền ghi toàn bộ database cho mọi người dùng.</div>
+  </section>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+  // The Firebase API key is a public client identifier. Authorization is enforced by Firebase Auth + Database Rules.
+  const firebaseConfig = {
+    apiKey: "AIzaSyAVuB8m14zkMPs-JTLAKB0Bp18QBKAMBt4",
+    authDomain: "ideo-dd376.firebaseapp.com",
+    databaseURL: "https://ideo-dd376-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "ideo-dd376"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.database();
+  const $ = id => document.getElementById(id);
+  const setStatus = (id, message, type='') => { $(id).textContent = message; $(id).className = 'status ' + type; };
+  const asBool = v => v === true;
+  const cleanUrl = value => { const v = String(value || '').trim(); if (!v) return ''; const u = new URL(v); if (!['https:','http:'].includes(u.protocol)) throw new Error('Liên kết chỉ được dùng HTTP/HTTPS.'); return u.href; };
+
+  function showEditor(user) {
+    $('loginPanel').classList.add('hidden'); $('editorPanel').classList.remove('hidden');
+    $('identity').textContent = `Đã đăng nhập: ${user.email || '(không có email)'} · UID: ${user.uid}`;
+    loadConfig();
+  }
+  auth.onAuthStateChanged(user => { if (user && user.email) showEditor(user); else { $('loginPanel').classList.remove('hidden'); $('editorPanel').classList.add('hidden'); } });
+
+  $('loginBtn').addEventListener('click', async () => {
+    $('loginBtn').disabled = true; setStatus('loginStatus', 'Đang đăng nhập…');
+    try { await auth.signInWithEmailAndPassword($('email').value.trim(), $('password').value); setStatus('loginStatus','Đăng nhập thành công.','ok'); }
+    catch(e) { setStatus('loginStatus', `${e.code || 'ERROR'}: ${e.message}`, 'error'); }
+    finally { $('loginBtn').disabled = false; }
+  });
+  $('logoutBtn').addEventListener('click', () => auth.signOut());
+  $('loadBtn').addEventListener('click', loadConfig); $('reloadBtn').addEventListener('click', loadConfig);
+
+  async function loadConfig() {
+    if (!auth.currentUser) return;
+    setStatus('editorStatus', 'Đang đọc appControl…'); $('loadBtn').disabled = true;
+    try {
+      const snap = await db.ref('appControl').get(); const data = snap.val() || {};
+      const maintenance = data.maintenance || {}; const announcement = data.announcement || {};
+      $('appEnabled').checked = data.appEnabled !== false;
+      $('maintenanceEnabled').checked = asBool(maintenance.enabled ?? data.maintenanceEnabled);
+      $('maintenanceMessage').value = maintenance.message || data.maintenanceMessage || 'DigitalLiquid đang được bảo trì. Vui lòng thử lại sau.';
+      $('latestVersionName').value = data.latestVersionName || data.versionName || '';
+      $('latestVersionCode').value = Number(data.latestVersionCode ?? data.versionCode ?? 3);
+      $('minVersionCode').value = Number(data.minVersionCode || 0);
+      $('downloadUrl').value = data.downloadUrl || '';
+      $('announcementEnabled').checked = asBool(announcement.enabled ?? data.announcementEnabled);
+      $('announcementTitle').value = announcement.title || data.announcementTitle || '';
+      $('announcementMessage').value = announcement.message || data.announcementMessage || '';
+      $('announcementUrl').value = announcement.url || data.announcementUrl || '';
+      $('expectedSignerSha256').value = (data.expectedSignerSha256 || '').replaceAll(':','').toUpperCase();
+      setStatus('editorStatus', snap.exists() ? 'Đã tải cấu hình từ Firebase.' : 'Node appControl chưa tồn tại. Lưu để tạo node mới.', 'ok');
+    } catch(e) { setStatus('editorStatus', `${e.code || 'ERROR'}: ${e.message}`, 'error'); }
+    finally { $('loadBtn').disabled = false; }
+  }
+
+  $('saveBtn').addEventListener('click', async () => {
+    if (!auth.currentUser) { setStatus('editorStatus','Bạn chưa đăng nhập.','error'); return; }
+    $('saveBtn').disabled = true; setStatus('editorStatus','Đang lưu cấu hình…');
+    try {
+      const latestVersionCode = Math.max(0, Number.parseInt($('latestVersionCode').value,10) || 0);
+      const minVersionCode = Math.max(0, Number.parseInt($('minVersionCode').value,10) || 0);
+      const downloadUrl = cleanUrl($('downloadUrl').value);
+      const announcementUrl = cleanUrl($('announcementUrl').value);
+      const expectedSignerSha256 = $('expectedSignerSha256').value.trim().replaceAll(':','').toUpperCase();
+      if (expectedSignerSha256 && !/^[A-F0-9]{64}$/.test(expectedSignerSha256)) throw new Error('SHA-256 chứng thư phải có đúng 64 ký tự hex.');
+      const now = Date.now();
+      const payload = {
+        appEnabled: $('appEnabled').checked,
+        maintenance: { enabled: $('maintenanceEnabled').checked, message: $('maintenanceMessage').value.trim() || 'DigitalLiquid đang được bảo trì. Vui lòng thử lại sau.', updatedAt: now },
+        latestVersionName: $('latestVersionName').value.trim(), latestVersionCode, minVersionCode, downloadUrl,
+        expectedSignerSha256,
+        announcement: { enabled: $('announcementEnabled').checked, id: String(now), updatedAt: now,
+          title: $('announcementTitle').value.trim() || 'Thông báo DigitalLiquid',
+          message: $('announcementMessage').value.trim(), url: announcementUrl }
+      };
+      await db.ref('appControl').update(payload);
+      setStatus('editorStatus','Đã lưu. Ứng dụng sẽ nhận chính sách ở lần kiểm tra kế tiếp; dịch vụ nền kiểm tra lại khoảng 90 giây một lần.','ok');
+    } catch(e) { setStatus('editorStatus', `${e.code || 'ERROR'}: ${e.message}`, 'error'); }
+    finally { $('saveBtn').disabled = false; }
+  });
+</script>
+</body>
+</html>
