@@ -19,12 +19,12 @@
   <section class="panel" id="loginPanel">
     <h2>Đăng nhập quản trị</h2>
     <div class="grid">
-      <div class="field"><label for="email">Email Firebase Admin</label><input id="email" type="email" autocomplete="username" placeholder="admin@example.com"></div>
-      <div class="field"><label for="password">Mật khẩu</label><input id="password" type="password" autocomplete="current-password" placeholder="Mật khẩu Firebase Auth"></div>
+      <div class="field"><label for="adminUser">Tài khoản</label><input id="adminUser" autocomplete="username" placeholder="Tài khoản quản trị"></div>
+      <div class="field"><label for="adminPass">Mật khẩu</label><input id="adminPass" type="password" autocomplete="current-password" placeholder="Mật khẩu quản trị"></div>
     </div>
     <div class="actions"><button class="primary" id="loginBtn">Đăng nhập</button></div>
     <div class="status" id="loginStatus"></div>
-    <div class="warn">Tài khoản quản trị phải được tạo trong Firebase Authentication và UID phải được cho phép ghi tại Database Rules. Không đặt mật khẩu hoặc private key trong mã HTML.</div>
+    <div class="warn">Lưu ý bảo mật: thông tin đăng nhập dạng hard-code trong HTML có thể bị xem bằng cách đọc mã nguồn. Đây chỉ là lớp khóa giao diện, không thay thế xác thực phía máy chủ. Firebase vẫn phải từ chối ghi trái phép bằng Database Rules.</div>
   </section>
 
   <section class="panel hidden" id="editorPanel">
@@ -97,19 +97,29 @@
     $('identity').textContent = `Đã đăng nhập: ${user.email || '(không có email)'} · UID: ${user.uid}`;
     loadConfig();
   }
-  auth.onAuthStateChanged(user => { if (user && user.email) showEditor(user); else { $('loginPanel').classList.remove('hidden'); $('editorPanel').classList.add('hidden'); } });
+  // No Firebase Authentication account is requested by this page. Local gate only.
 
+  // Convenience-only gate. Credentials in a client HTML file are extractable; never treat this as server-side security.
+  const ADMIN_USERNAME = 'digitalsmod';
+  const ADMIN_PASSWORD = 'ame1610@';
+  let localAdminUnlocked = false;
   $('loginBtn').addEventListener('click', async () => {
-    $('loginBtn').disabled = true; setStatus('loginStatus', 'Đang đăng nhập…');
-    try { await auth.signInWithEmailAndPassword($('email').value.trim(), $('password').value); setStatus('loginStatus','Đăng nhập thành công.','ok'); }
-    catch(e) { setStatus('loginStatus', `${e.code || 'ERROR'}: ${e.message}`, 'error'); }
-    finally { $('loginBtn').disabled = false; }
+    const username = $('adminUser').value.trim();
+    const password = $('adminPass').value;
+    if (username !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
+      setStatus('loginStatus', 'Sai tài khoản hoặc mật khẩu.', 'error'); return;
+    }
+    localAdminUnlocked = true;
+    $('loginPanel').classList.add('hidden'); $('editorPanel').classList.remove('hidden');
+    $('identity').textContent = 'Đã mở giao diện quản trị cục bộ. Quyền ghi Firebase vẫn phụ thuộc Database Rules.';
+    setStatus('loginStatus', 'Đăng nhập thành công.', 'ok');
+    await loadConfig();
   });
-  $('logoutBtn').addEventListener('click', () => auth.signOut());
+  $('logoutBtn').addEventListener('click', () => { localAdminUnlocked = false; $('editorPanel').classList.add('hidden'); $('loginPanel').classList.remove('hidden'); $('adminPass').value = ''; });
   $('loadBtn').addEventListener('click', loadConfig); $('reloadBtn').addEventListener('click', loadConfig);
 
   async function loadConfig() {
-    if (!auth.currentUser) return;
+    if (!localAdminUnlocked) return;
     setStatus('editorStatus', 'Đang đọc appControl…'); $('loadBtn').disabled = true;
     try {
       const snap = await db.ref('appControl').get(); const data = snap.val() || {};
@@ -132,7 +142,7 @@
   }
 
   $('saveBtn').addEventListener('click', async () => {
-    if (!auth.currentUser) { setStatus('editorStatus','Bạn chưa đăng nhập.','error'); return; }
+    if (!localAdminUnlocked) { setStatus('editorStatus','Bạn chưa đăng nhập.','error'); return; }
     $('saveBtn').disabled = true; setStatus('editorStatus','Đang lưu cấu hình…');
     try {
       const latestVersionCode = Math.max(0, Number.parseInt($('latestVersionCode').value,10) || 0);
