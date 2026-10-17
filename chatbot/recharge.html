@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>AETHERIA // Nạp Token & Nhiệm Vụ Vượt Link</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <style>
+    :root {
+      --bg-dark: #040509;
+      --bg-panel: rgba(12, 15, 26, 0.88);
+      --border-glass: rgba(255, 255, 255, 0.12);
+      --accent-cyan: #00f0ff;
+      --accent-violet: #7a00ff;
+      --accent-magenta: #ff007f;
+      --accent-emerald: #00ff9d;
+      --accent-amber: #ffb800;
+      --text-main: #f1f5f9;
+      --text-muted: #8b96a8;
+      --font-sans: 'Space Grotesk', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent !important; }
+
+    body {
+      width: 100%; min-height: 100vh;
+      background: radial-gradient(circle at top right, #10162f 0%, var(--bg-dark) 65%);
+      color: var(--text-main); font-family: var(--font-sans); padding: 20px 14px 60px;
+    }
+
+    .container { width: min(880px, 95vw); margin: 0 auto; }
+
+    .top-bar {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;
+    }
+
+    .btn-glass {
+      padding: 9px 16px; border-radius: 999px; background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-glass); color: #fff; font-size: 12.5px; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+
+    .wallet-card {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(122, 0, 255, 0.2));
+      border: 1px solid var(--border-glass); border-radius: 20px; padding: 24px; margin-bottom: 24px;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;
+    }
+
+    .tab-bar {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: rgba(255, 255, 255, 0.04);
+      padding: 5px; border-radius: 14px; margin-bottom: 24px;
+    }
+
+    .tab-btn {
+      padding: 10px; border-radius: 10px; border: none; background: transparent; color: var(--text-muted);
+      font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+
+    .tab-btn.active {
+      background: rgba(0, 240, 255, 0.15); color: var(--accent-cyan);
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .card-box {
+      background: var(--bg-panel); border: 1px solid var(--border-glass); border-radius: 20px; padding: 24px; margin-bottom: 20px;
+    }
+
+    .field-box { margin-bottom: 16px; }
+    .field-box label { display: block; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
+
+    .cyber-input, .cyber-select {
+      width: 100%; padding: 12px 14px; background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 11px; color: #fff;
+      font-family: var(--font-mono); font-size: 13px;
+    }
+
+    .btn-neon {
+      width: 100%; padding: 13px; border-radius: 12px; background: linear-gradient(135deg, var(--accent-cyan), #6ef7ff);
+      color: #040509; font-weight: 700; font-size: 14px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+
+    .quest-card {
+      background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px; padding: 18px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+    }
+
+    #toast-stack { position: fixed; top: 24px; right: 24px; z-index: 20000; display: flex; flex-direction: column; gap: 8px; }
+    .cyber-toast {
+      background: rgba(10, 12, 22, 0.96); border: 1px solid var(--border-glass); border-left: 4px solid var(--accent-cyan);
+      border-radius: 10px; padding: 12px 16px; color: #fff; font-size: 12.5px; display: flex; align-items: center; gap: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="toast-stack"></div>
+
+  <div class="container">
+    <div class="top-bar">
+      <a href="chatbot.html" class="btn-glass"><i class="fa-solid fa-arrow-left"></i> Quay lại Đoạn Chat</a>
+      <a href="index.html" class="btn-glass"><i class="fa-solid fa-house"></i> Trang Chủ</a>
+    </div>
+
+    <!-- VÍ TOKEN HIỆN TẠI -->
+    <div class="wallet-card">
+      <div>
+        <div style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted); margin-bottom:4px;">SỐ DƯ TOKEN KHẢ DỤNG</div>
+        <div style="font-family:var(--font-mono); font-size:32px; font-weight:700; color:var(--accent-cyan);" id="user-tokens-text">-- TOKEN</div>
+        <div style="font-size:12px; color:var(--text-muted);" id="user-email-text">Đang kiểm tra phiên đăng nhập...</div>
+      </div>
+      <div style="text-align:right;">
+        <span style="padding:6px 14px; border-radius:999px; background:rgba(0,255,157,0.12); color:var(--accent-emerald); font-family:var(--font-mono); font-size:11px; border:1px solid rgba(0,255,157,0.3);">
+          TỈ GIÁ: 1.000đ = <span id="rate-display">10.000</span> Tok
+        </span>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="tab-pay2s"><i class="fa-solid fa-qrcode"></i> Nạp Pay2S (QR)</button>
+      <button class="tab-btn" data-tab="tab-card"><i class="fa-solid fa-credit-card"></i> Thẻ Cào</button>
+      <button class="tab-btn" data-tab="tab-quest"><i class="fa-solid fa-link"></i> Vượt Link (+Tok)</button>
+    </div>
+
+    <!-- TAB 1: NẠP TIỀN PAY2S THẬT -->
+    <div class="tab-content active" id="tab-pay2s">
+      <div class="card-box">
+        <h3 style="margin-bottom:14px; font-size:17px;"><i class="fa-solid fa-shield-halved" style="color:var(--accent-cyan);"></i> Thanh Toán Trực Tuyến Pay2S Gateway</h3>
+        
+        <div class="field-box">
+          <label>CHỌN MỆNH GIÁ NẠP (VNĐ)</label>
+          <select class="cyber-select" id="pay-amount">
+            <option value="10000">10.000 VNĐ (+100.000 Token)</option>
+            <option value="20000">20.000 VNĐ (+200.000 Token)</option>
+            <option value="50000" selected>50.000 VNĐ (+500.000 Token)</option>
+            <option value="100000">100.000 VNĐ (+1.000.000 Token)</option>
+            <option value="200000">200.000 VNĐ (+2.000.000 Token)</option>
+          </select>
+        </div>
+
+        <button type="button" class="btn-neon" id="btn-create-pay2s">
+          <i class="fa-solid fa-qrcode"></i> Khởi Tạo Giao Dịch Pay2S
+        </button>
+      </div>
+    </div>
+
+    <!-- TAB 2: THẺ CÀO (ĐANG PHÁT TRIỂN) -->
+    <div class="tab-content" id="tab-card">
+      <div class="card-box" style="text-align:center; padding:44px 20px;">
+        <i class="fa-solid fa-screwdriver-wrench" style="font-size:42px; color:var(--accent-amber); margin-bottom:16px;"></i>
+        <h3 style="font-size:20px; margin-bottom:8px;">Cổng Thẻ Cào Đang Được Phát Triển</h3>
+        <p style="font-size:13px; color:var(--text-muted); max-width:440px; margin:0 auto 20px; line-height:1.6;">
+          Hệ thống tích hợp cổng gạch thẻ Viettel, Vinaphone, Mobifone, Zing tự động đang hoàn tất kiểm duyệt kết nối. Vui lòng sử dụng cổng QR Pay2S hoặc tính năng Vượt link.
+        </p>
+        <span style="padding:6px 16px; border-radius:999px; background:rgba(255,184,0,0.12); color:var(--accent-amber); font-family:var(--font-mono); font-size:11px;">
+          COMING SOON // AUTO TELCO GATE
+        </span>
+      </div>
+    </div>
+
+    <!-- TAB 3: VƯỢT LINK NHẬN TOKEN (TỐI ĐA 2 LẦN / NGÀY) -->
+    <div class="tab-content" id="tab-quest">
+      <div class="card-box">
+        <h3 style="margin-bottom:8px; font-size:17px;"><i class="fa-solid fa-gift" style="color:var(--accent-emerald);"></i> Nhiệm Vụ Vượt Link Kiếm Token Miễn Phí</h3>
+        <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:20px;">
+          Mỗi lượt vượt link thành công sẽ được hệ thống cộng ngay <strong style="color:var(--accent-cyan);"><span id="reward-display">2.500</span> Token</strong> vào tài khoản. Tối đa <strong style="color:#fff;"><span id="limit-display">2</span> lần/ngày/cổng</strong>.
+        </p>
+
+        <!-- LINK4M -->
+        <div class="quest-card">
+          <div>
+            <div style="font-weight:700; font-size:15px; color:#fff;">Cổng Link4M Fast Link</div>
+            <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">
+              Đã hoàn thành hôm nay: <strong style="color:var(--accent-cyan);" id="l4m-used">0</strong>/<span id="l4m-max">2</span> lượt
+            </div>
+          </div>
+          <button type="button" class="btn-glass" id="btn-quest-link4m" style="border-color:var(--accent-cyan); color:var(--accent-cyan);">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Vượt Link4M
+          </button>
+        </div>
+
+        <!-- TRAFFICTOP -->
+        <div class="quest-card">
+          <div>
+            <div style="font-weight:700; font-size:15px; color:#fff;">Cổng TrafficTop Premium</div>
+            <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">
+              Đã hoàn thành hôm nay: <strong style="color:var(--accent-cyan);" id="tt-used">0</strong>/<span id="tt-max">2</span> lượt
+            </div>
+          </div>
+          <button type="button" class="btn-glass" id="btn-quest-traffictop" style="border-color:var(--accent-magenta); color:var(--accent-magenta);">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Vượt TrafficTop
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getDatabase, ref, get, set, update, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAVuB8m14zkMPs-JTLAKB0Bp18QBKAMBt4",
+      authDomain: "ideo-dd376.firebaseapp.com",
+      databaseURL: "https://ideo-dd376-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "ideo-dd376",
+      storageBucket: "ideo-dd376.firebasestorage.app",
+      messagingSenderId: "689163185",
+      appId: "1:689163185:web:af4091213001180f364b90",
+      measurementId: "G-QP54CZ2BJT"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const rtdb = getDatabase(app);
+
+    let currentUser = null;
+    let currentTokens = 0;
+    let pay2sConfig = {};
+    let shortlinkConfig = { rewardTokens: 2500, dailyLimit: 2, link4mApi: "6992df868b3d1e423d1ab833", traffictopApi: "tXk7A1HwG4QSXwGN6TU7yLOz" };
+
+    function notify(msg) {
+      const stack = document.getElementById('toast-stack');
+      const d = document.createElement('div');
+      d.className = 'cyber-toast';
+      d.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--accent-emerald);"></i><span>${msg}</span>`;
+      stack.appendChild(d);
+      setTimeout(() => d.remove(), 3200);
+    }
+
+    // TAB SWITCHER
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.getAttribute('data-tab')).classList.add('active');
+      };
+    });
+
+    // LẮNG NGHE AUTH & SỐ LƯỢNG TOKEN
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "chatbot.html";
+        return;
+      }
+      currentUser = user;
+      document.getElementById('user-email-text').textContent = user.email;
+
+      onValue(ref(rtdb, `aetheria_project/users/${user.uid}/tokens`), (snap) => {
+        currentTokens = snap.exists() ? snap.val() : 0;
+        document.getElementById('user-tokens-text').textContent = `${currentTokens.toLocaleString()} TOKEN`;
+      });
+
+      // Kiểm tra callback vượt link hoàn thành (URL param ?verify_quest=link4m hoặc traffictop)
+      const urlParams = new URLSearchParams(window.location.search);
+      const verifyQuest = urlParams.get('verify_quest');
+      if (verifyQuest) {
+        handleQuestReward(verifyQuest);
+      } else {
+        updateQuestStats();
+      }
+    });
+
+    // ĐỌC CẤU HÌNH TỪ FIREBASE
+    onValue(ref(rtdb, 'aetheria_project/payment_config/pay2s'), (snap) => {
+      if (snap.exists()) {
+        pay2sConfig = snap.val();
+        if (pay2sConfig.tokenRate) document.getElementById('rate-display').textContent = (pay2sConfig.tokenRate * 10).toLocaleString();
+      }
+    });
+
+    onValue(ref(rtdb, 'aetheria_project/shortlink_config'), (snap) => {
+      if (snap.exists()) {
+        shortlinkConfig = snap.val();
+        document.getElementById('reward-display').textContent = (shortlinkConfig.rewardTokens || 2500).toLocaleString();
+        document.getElementById('limit-display').textContent = shortlinkConfig.dailyLimit || 2;
+        document.getElementById('l4m-max').textContent = shortlinkConfig.dailyLimit || 2;
+        document.getElementById('tt-max').textContent = shortlinkConfig.dailyLimit || 2;
+      }
+    });
+
+    // GỌI CỔNG PAY2S THẬT
+    document.getElementById('btn-create-pay2s').onclick = async () => {
+      const amount = parseInt(document.getElementById('pay-amount').value, 10);
+      const partnerCode = pay2sConfig.partnerCode;
+      const accessKey = pay2sConfig.accessKey;
+
+      if (!partnerCode || !accessKey) {
+        alert("Cổng Pay2S chưa được cấu hình Partner code/Access key trên trang Dashboard!");
+        return;
+      }
+
+      const orderId = `AETH_${Date.now()}`;
+      notify("Đang khởi tạo giao dịch tới Pay2S...");
+
+      try {
+        const res = await fetch("https://payment.pay2s.vn/v1/gateway/api/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            partnerCode,
+            accessKey,
+            orderId,
+            amount: String(amount),
+            orderInfo: `Nap token cho ${currentUser.email}`,
+            redirectUrl: window.location.href,
+            ipnUrl: "https://ideo-dd376.firebaseapp.com"
+          })
+        });
+
+        const data = await res.json();
+        if (data.payUrl) {
+          window.location.href = data.payUrl;
+        } else {
+          alert("Lỗi Pay2S: " + (data.message || JSON.stringify(data)));
+        }
+      } catch (err) {
+        alert("Lỗi kết nối Pay2S: " + err.message);
+      }
+    };
+
+    // LOGIC VƯỢT LINK TỐI ĐA 2 LẦN/NGÀY
+    const todayKey = new Date().toISOString().split('T')[0];
+
+    async function updateQuestStats() {
+      if (!currentUser) return;
+      const snap = await get(ref(rtdb, `aetheria_project/users/${currentUser.uid}/quests/${todayKey}`));
+      const stats = snap.exists() ? snap.val() : { link4m: 0, traffictop: 0 };
+      document.getElementById('l4m-used').textContent = stats.link4m || 0;
+      document.getElementById('tt-used').textContent = stats.traffictop || 0;
+    }
+
+    async function handleQuestReward(type) {
+      const snap = await get(ref(rtdb, `aetheria_project/users/${currentUser.uid}/quests/${todayKey}`));
+      const stats = snap.exists() ? snap.val() : { link4m: 0, traffictop: 0 };
+      const maxLimit = shortlinkConfig.dailyLimit || 2;
+
+      if ((stats[type] || 0) < maxLimit) {
+        stats[type] = (stats[type] || 0) + 1;
+        await set(ref(rtdb, `aetheria_project/users/${currentUser.uid}/quests/${todayKey}`), stats);
+
+        const reward = shortlinkConfig.rewardTokens || 2500;
+        await set(ref(rtdb, `aetheria_project/users/${currentUser.uid}/tokens`), currentTokens + reward);
+
+        alert(`Chúc mừng! Bạn đã hoàn thành vượt link ${type} và nhận được +${reward.toLocaleString()} Token!`);
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } else {
+        alert(`Bạn đã đạt giới hạn ${maxLimit} lần/ngày cho cổng này!`);
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+      updateQuestStats();
+    }
+
+    // TẠO LINK RÚT GỌN LINK4M
+    document.getElementById('btn-quest-link4m').onclick = async () => {
+      const snap = await get(ref(rtdb, `aetheria_project/users/${currentUser.uid}/quests/${todayKey}/link4m`));
+      const used = snap.exists() ? snap.val() : 0;
+      const maxLimit = shortlinkConfig.dailyLimit || 2;
+
+      if (used >= maxLimit) {
+        alert(`Bạn đã hết lượt vượt Link4M hôm nay (Tối đa ${maxLimit} lần/ngày)!`);
+        return;
+      }
+
+      const api = shortlinkConfig.link4mApi || "6992df868b3d1e423d1ab833";
+      const targetUrl = encodeURIComponent(`${window.location.origin}${window.location.pathname}?verify_quest=link4m`);
+      window.location.href = `https://link4m.co/st?api=${api}&url=${targetUrl}`;
+    };
+
+    // TẠO LINK RÚT GỌN TRAFFICTOP
+    document.getElementById('btn-quest-traffictop').onclick = async () => {
+      const snap = await get(ref(rtdb, `aetheria_project/users/${currentUser.uid}/quests/${todayKey}/traffictop`));
+      const used = snap.exists() ? snap.val() : 0;
+      const maxLimit = shortlinkConfig.dailyLimit || 2;
+
+      if (used >= maxLimit) {
+        alert(`Bạn đã hết lượt vượt TrafficTop hôm nay (Tối đa ${maxLimit} lần/ngày)!`);
+        return;
+      }
+
+      const api = shortlinkConfig.traffictopApi || "tXk7A1HwG4QSXwGN6TU7yLOz";
+      const targetUrl = encodeURIComponent(`${window.location.origin}${window.location.pathname}?verify_quest=traffictop`);
+      window.location.href = `https://traffictop.net/st?api=${api}&url=${targetUrl}`;
+    };
+  </script>
+</body>
+</html>
