@@ -128,65 +128,8 @@
       gap: 8px;
     }
 
-    .custom-dropdown {
-      position: relative;
-    }
-
-    .dropdown-trigger {
-      padding: 6px 12px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-glass);
-      border-radius: 999px;
-      color: #fff;
-      font-family: var(--font-mono);
-      font-size: 11.5px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-    }
-
-    .dropdown-menu {
-      position: absolute;
-      top: calc(100% + 8px);
-      right: 0;
-      min-width: 220px;
-      background: rgba(10, 12, 22, 0.96);
-      backdrop-filter: blur(24px);
-      border: 1px solid rgba(0, 240, 255, 0.35);
-      border-radius: 14px;
-      padding: 6px;
-      z-index: 2000;
-      opacity: 0;
-      visibility: hidden;
-      transform: translateY(-8px);
-      transition: all 0.2s ease;
-    }
-
-    .custom-dropdown.open .dropdown-menu {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
-    }
-
-    .dropdown-option {
-      padding: 9px 12px;
-      border-radius: 9px;
-      font-size: 12px;
-      color: var(--text-muted);
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .dropdown-option:hover, .dropdown-option.selected {
-      background: rgba(0, 240, 255, 0.14);
-      color: #fff;
-    }
-
     .btn-action-pill {
-      padding: 6px 12px;
+      padding: 7px 14px;
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border-glass);
@@ -198,6 +141,7 @@
       align-items: center;
       gap: 6px;
       text-decoration: none;
+      transition: all 0.2s;
     }
 
     .btn-action-pill:hover {
@@ -286,11 +230,22 @@
     }
 
     .sidebar-footer {
-      padding: 10px 12px;
+      padding: 12px;
       border-top: 1px solid var(--border-glass);
       background: rgba(0, 0, 0, 0.25);
-      font-family: var(--font-mono);
-      font-size: 11px;
+    }
+
+    .sidebar-footer a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sidebar-footer a:hover {
+      color: #fff;
     }
 
     /* CENTER CHAT */
@@ -393,7 +348,7 @@
       white-space: pre-wrap;
     }
 
-    /* CODE BLOCK KHÔNG BAO GIỜ BỊ LỖI CHỮ THẺ SPAN */
+    /* CODE BLOCK SẠCH AN TOÀN */
     .code-block-card {
       margin-top: 10px;
       border-radius: 8px;
@@ -441,23 +396,91 @@
       color: #e2e8f0;
     }
 
-    /* INPUT CONSOLE */
+    /* INPUT CONSOLE (MODEL PICKER ĐƯỢC CHUYỂN XUỐNG ĐÂY) */
     .chat-input-zone {
       padding: 8px 12px 10px;
       border-top: 1px solid var(--border-glass);
-      background: rgba(6, 8, 15, 0.75);
+      background: rgba(6, 8, 15, 0.85);
       flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .input-zone-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* CUSTOM MODEL PICKER IN CHAT ZONE */
+    .custom-dropdown {
+      position: relative;
+    }
+
+    .dropdown-trigger {
+      padding: 5px 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-glass);
+      border-radius: 999px;
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 0;
+      min-width: 200px;
+      background: rgba(10, 12, 22, 0.98);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(0, 240, 255, 0.35);
+      border-radius: 12px;
+      padding: 5px;
+      z-index: 2000;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(6px);
+      transition: all 0.2s ease;
+    }
+
+    .custom-dropdown.open .dropdown-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown-option {
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .dropdown-option:hover, .dropdown-option.selected {
+      background: rgba(0, 240, 255, 0.14);
+      color: #fff;
     }
 
     .quick-prompts-row {
       display: flex;
       gap: 6px;
       overflow-x: auto;
-      padding-bottom: 8px;
+      scrollbar-width: none;
     }
 
     .prompt-chip {
-      padding: 5px 10px;
+      padding: 4px 10px;
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -480,7 +503,6 @@
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      margin-bottom: 6px;
     }
 
     .staged-chip {
@@ -634,7 +656,7 @@
       display: none;
     }
 
-    /* MOBILE BOTTOM TABBAR */
+    /* MOBILE TABBAR (ĐÃ LOẠI BỎ HOÀN TOÀN TAB DASHBOARD) */
     #mobile-tabbar {
       display: none;
       flex-shrink: 0;
@@ -659,7 +681,7 @@
       flex-direction: column;
       align-items: center;
       gap: 2px;
-      padding: 5px 12px;
+      padding: 5px 14px;
       border-radius: 8px;
       cursor: pointer;
     }
@@ -729,30 +751,7 @@
       </a>
 
       <div class="nav-right">
-        <div class="custom-dropdown" id="model-picker">
-          <div class="dropdown-trigger">
-            <i class="fa-solid fa-wand-magic-sparkles" style="color:var(--accent-cyan);"></i>
-            <span id="model-label">Claude 3.5 Sonnet</span>
-            <i class="fa-solid fa-chevron-down" style="font-size:9px;"></i>
-          </div>
-          <div class="dropdown-menu">
-            <div class="dropdown-option selected" data-model="claude-3-5-sonnet-20241022" data-label="Claude 3.5 Sonnet">
-              <span>Claude 3.5 Sonnet</span>
-              <i class="fa-solid fa-check" style="color:var(--accent-cyan);"></i>
-            </div>
-            <div class="dropdown-option" data-model="claude-3-5-haiku-20241022" data-label="Claude 3.5 Haiku">
-              <span>Claude 3.5 Haiku</span>
-              <i class="fa-solid fa-bolt" style="color:var(--accent-amber);"></i>
-            </div>
-          </div>
-        </div>
-
-        <a href="dashboard.html" class="btn-action-pill hide-on-mob">
-          <i class="fa-solid fa-sliders"></i>
-          <span>Dashboard</span>
-        </a>
-
-        <a href="index.html" class="btn-action-pill hide-on-mob">
+        <a href="index.html" class="btn-action-pill">
           <i class="fa-solid fa-house"></i>
           <span>Trang Chủ</span>
         </a>
@@ -782,10 +781,10 @@
         </div>
 
         <div class="sidebar-footer">
-          <div style="display:flex; justify-content:space-between;">
-            <span style="color:var(--text-muted);">API STATUS</span>
-            <span id="user-quota-readout" style="color:var(--accent-emerald);">ĐANG ĐỒNG BỘ</span>
-          </div>
+          <a href="index.html">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Quay về trang chủ</span>
+          </a>
         </div>
       </aside>
 
@@ -805,23 +804,41 @@
         <div class="messages-scroll-box" id="messages-box"></div>
 
         <div class="chat-input-zone">
-          <div class="quick-prompts-row">
-            <button class="prompt-chip" data-prompt="Hãy giải thích chi tiết cấu trúc mã nguồn và thuật toán của đoạn code này.">
-              <i class="fa-solid fa-magnifying-glass-chart" style="color:var(--accent-cyan);"></i>
-              <span>Giải thích mã nguồn</span>
-            </button>
-            <button class="prompt-chip" data-prompt="Hãy kiểm tra các lỗ hổng bảo mật và đề xuất bản vá an toàn cho đoạn code.">
-              <i class="fa-solid fa-shield-halved" style="color:var(--accent-magenta);"></i>
-              <span>Tìm và sửa lỗi bảo mật</span>
-            </button>
-            <button class="prompt-chip" data-prompt="Hãy viết bộ kiểm thử Unit Test đầy đủ cho đoạn code trên.">
-              <i class="fa-solid fa-vial-circle-check" style="color:var(--accent-emerald);"></i>
-              <span>Viết bài kiểm thử Unit Test</span>
-            </button>
-            <button class="prompt-chip" data-prompt="Hãy tối ưu hóa hiệu năng và độ phức tạp thuật toán cho đoạn code.">
-              <i class="fa-solid fa-bolt" style="color:var(--accent-amber);"></i>
-              <span>Tối ưu hóa thuật toán</span>
-            </button>
+          <div class="input-zone-top-row">
+            <!-- MODEL PICKER ĐƯỢC CHUYỂN XUỐNG ĐÂY -->
+            <div class="custom-dropdown" id="model-picker">
+              <div class="dropdown-trigger">
+                <i class="fa-solid fa-wand-magic-sparkles" style="color:var(--accent-cyan);"></i>
+                <span id="model-label">Claude 3.5 Sonnet</span>
+                <i class="fa-solid fa-chevron-up" style="font-size:9px;"></i>
+              </div>
+              <div class="dropdown-menu">
+                <div class="dropdown-option selected" data-model="claude-3-5-sonnet-20241022" data-label="Claude 3.5 Sonnet">
+                  <span>Claude 3.5 Sonnet</span>
+                  <i class="fa-solid fa-check" style="color:var(--accent-cyan);"></i>
+                </div>
+                <div class="dropdown-option" data-model="claude-3-5-haiku-20241022" data-label="Claude 3.5 Haiku">
+                  <span>Claude 3.5 Haiku</span>
+                  <i class="fa-solid fa-bolt" style="color:var(--accent-amber);"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- GỢI Ý PROMPT NHANH -->
+            <div class="quick-prompts-row">
+              <button class="prompt-chip" data-prompt="Hãy giải thích chi tiết cấu trúc mã nguồn và thuật toán của đoạn code này.">
+                <i class="fa-solid fa-magnifying-glass-chart" style="color:var(--accent-cyan);"></i>
+                <span>Giải thích code</span>
+              </button>
+              <button class="prompt-chip" data-prompt="Hãy kiểm tra các lỗ hổng bảo mật và đề xuất bản vá an toàn cho đoạn code.">
+                <i class="fa-solid fa-shield-halved" style="color:var(--accent-magenta);"></i>
+                <span>Sửa bảo mật</span>
+              </button>
+              <button class="prompt-chip" data-prompt="Hãy viết bộ kiểm thử Unit Test đầy đủ cho đoạn code trên.">
+                <i class="fa-solid fa-vial-circle-check" style="color:var(--accent-emerald);"></i>
+                <span>Sinh Unit Test</span>
+              </button>
+            </div>
           </div>
 
           <div class="staging-bar" id="staging-bar"></div>
@@ -833,7 +850,7 @@
             <button type="button" class="icon-btn" id="btn-pick-file" title="Đính kèm tệp"><i class="fa-solid fa-paperclip"></i></button>
             <button type="button" class="icon-btn" id="btn-pick-img" title="Tải ảnh lên"><i class="fa-regular fa-image"></i></button>
 
-            <textarea id="chat-input" rows="1" placeholder="Nhập câu hỏi... (Enter để gửi, Shift + Enter xuống dòng)"></textarea>
+            <textarea id="chat-input" rows="1" placeholder="Nhập câu hỏi hoặc dán mã nguồn... (Enter gửi, Shift+Enter xuống dòng)"></textarea>
 
             <button type="button" class="send-btn" id="btn-send"><i class="fa-solid fa-paper-plane"></i></button>
           </div>
@@ -876,7 +893,7 @@
       </aside>
     </div>
 
-    <!-- MOBILE TABBAR -->
+    <!-- MOBILE TABBAR (CHỈ CÒN ĐOẠN CHAT, PHÒNG CODE, TRANG CHỦ) -->
     <nav id="mobile-tabbar">
       <button class="mob-tab active" data-mob="chat">
         <i class="fa-solid fa-comments"></i>
@@ -886,10 +903,6 @@
         <i class="fa-solid fa-code"></i>
         <span>Phòng Code</span>
       </button>
-      <a href="dashboard.html" class="mob-tab" style="text-decoration:none;">
-        <i class="fa-solid fa-sliders"></i>
-        <span>Dashboard</span>
-      </a>
       <a href="index.html" class="mob-tab" style="text-decoration:none;">
         <i class="fa-solid fa-house"></i>
         <span>Trang Chủ</span>
@@ -925,7 +938,7 @@
       setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3200);
     }
 
-    // 1. ĐỒNG BỘ API KEY THẬT TỪ FIREBASE
+    // 1. ĐỒNG BỘ DỮ LIỆU TỪ NHÁNH RIÊNG BIỆT (aetheria_project/system_config)
     let remoteConfig = {
       api_key: '',
       api_locked: false,
@@ -933,29 +946,21 @@
       output_tokens: 0
     };
 
-    onValue(ref(rtdb, 'system_config'), (snap) => {
+    onValue(ref(rtdb, 'aetheria_project/system_config'), (snap) => {
       if (snap.exists()) {
         remoteConfig = { ...remoteConfig, ...snap.val() };
       }
       const dot = document.getElementById('engine-status-dot');
-      const quotaEl = document.getElementById('user-quota-readout');
-
       if (remoteConfig.api_locked) {
         dot.classList.add('locked');
-        quotaEl.textContent = 'ĐANG KHÓA';
-        quotaEl.style.color = 'var(--accent-magenta)';
       } else if (remoteConfig.api_key && remoteConfig.api_key.startsWith('sk-ant-')) {
         dot.classList.remove('locked');
-        quotaEl.textContent = 'API SẴN SÀNG';
-        quotaEl.style.color = 'var(--accent-emerald)';
       } else {
         dot.classList.add('locked');
-        quotaEl.textContent = 'CHƯA CÓ KEY';
-        quotaEl.style.color = 'var(--accent-amber)';
       }
     });
 
-    // 2. PARSE CODE DOM AN TOÀN TUYỆT ĐỐI (TRÁNH HOÀN TOÀN LỖI CLASS="TOK-CM")
+    // 2. PARSE CODE DOM AN TOÀN TUYỆT ĐỐI (TRÁNH LỖI CLASS="TOK-CM")
     const messagesBox = document.getElementById('messages-box');
 
     function createCodeCard(codeContent, lang = 'javascript') {
@@ -978,7 +983,7 @@
       const pre = document.createElement('pre');
       pre.className = 'code-block-pre';
       const codeEl = document.createElement('code');
-      codeEl.textContent = codeContent; // textContent ngăn chặn 100% việc rò rỉ thẻ HTML
+      codeEl.textContent = codeContent;
       pre.appendChild(codeEl);
 
       card.appendChild(header);
@@ -1023,7 +1028,7 @@
       return bubble;
     }
 
-    appendMessage('ai', 'Chào bạn! Tôi là trợ lý code Aetheria kết nối với Claude 3.5 Sonnet. Tôi sử dụng API Key thực tế được cấu hình từ Firebase Dashboard để giải đáp mọi bài toán.');
+    appendMessage('ai', 'Chào bạn! Tôi là trợ lý lập trình Aetheria. Tôi sẵn sàng hỗ trợ phân tích giải thuật, tìm lỗi và sinh mã nguồn sạch sẽ.');
 
     // 3. XỬ LÝ ĐÍNH KÈM TỆP VÀ ẢNH
     let stagedFiles = [];
@@ -1081,7 +1086,7 @@
       imgPicker.value = '';
     };
 
-    // 4. GỬI TIN NHẮN VÀ GỌI CLAUDE API THẬT
+    // 4. CHỌN MÔ HÌNH VÀ GỬI PROMPT
     let currentModel = 'claude-3-5-sonnet-20241022';
     const modelPicker = document.getElementById('model-picker');
     modelPicker.querySelector('.dropdown-trigger').onclick = (e) => {
@@ -1128,20 +1133,19 @@
       if (!text && !stagedFiles.length && !stagedImages.length) return;
 
       if (remoteConfig.api_locked) {
-        showToast('Hệ thống đang trong chế độ khóa bảo trì khẩn cấp!', 'error');
+        showToast('Hệ thống AI hiện đang tạm khóa bảo trì. Vui lòng thử lại sau!', 'error');
         return;
       }
 
-      // NẾU CHƯA CÓ API KEY THẬT TRÊN FIREBASE -> BÁO LỖI THẬT, KHÔNG TRẢ LỜI LINH TINH
+      // THÔNG BÁO LỊCH SỰ CHO NGƯỜI DÙNG KHI CHƯA CÓ KEY - KHÔNG LỘ PASSWORD HAY DASHBOARD
       if (!remoteConfig.api_key || !remoteConfig.api_key.startsWith('sk-ant-')) {
         appendMessage('user', text || '[Gửi tệp/ảnh]');
-        appendMessage('ai', 'Lỗi: Chưa cấu hình Claude API Key! Vui lòng truy cập trang Dashboard (dashboard.html, mật khẩu: ame1610@) và lưu API Key của bạn lên Firebase RTDB để kích hoạt bot.');
+        appendMessage('ai', 'Hệ thống AI hiện đang trong quá trình bảo trì kết nối máy chủ. Vui lòng thử lại sau ít phút.');
         chatInput.value = '';
         chatInput.style.height = 'auto';
         return;
       }
 
-      // Xây dựng payload gọi Claude API
       const userContent = [];
       stagedImages.forEach(img => {
         userContent.push({
@@ -1170,12 +1174,11 @@
       isWaiting = true;
       btnSend.disabled = true;
 
-      // Hộp thoại chờ
       const aiRow = document.createElement('div');
       aiRow.className = 'msg-row ai';
       aiRow.innerHTML = `
         <div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>
-        <div class="msg-bubble"><span id="loading-txt"><i class="fa-solid fa-circle-notch fa-spin"></i> Đang gọi Claude API...</span></div>
+        <div class="msg-bubble"><span id="loading-txt"><i class="fa-solid fa-circle-notch fa-spin"></i> Đang suy nghĩ và xử lý...</span></div>
       `;
       messagesBox.appendChild(aiRow);
       messagesBox.scrollTop = messagesBox.scrollHeight;
@@ -1193,7 +1196,7 @@
           body: JSON.stringify({
             model: currentModel,
             max_tokens: 3000,
-            system: 'Bạn là Chuyên gia Lập trình Aetheria. Trả lời bằng tiếng Việt trực diện, súc tích và luôn bọc code bên trong cặp ```ngôn_ngữ.',
+            system: 'Bạn là chuyên gia lập trình Aetheria. Trả lời bằng tiếng Việt trực diện, súc tích và luôn bọc code bên trong cặp ```tên_ngôn_ngữ.',
             messages: [{ role: 'user', content: userContent }]
           })
         });
@@ -1224,18 +1227,18 @@
           }
         }
 
-        // Cập nhật Token thật lên Firebase
+        // Cập nhật Token riêng vào nhánh aetheria_project
         if (data.usage) {
           const inT = data.usage.input_tokens || 0;
           const outT = data.usage.output_tokens || 0;
-          await update(ref(rtdb, 'system_config'), {
+          await update(ref(rtdb, 'aetheria_project/system_config'), {
             input_tokens: (remoteConfig.input_tokens || 0) + inT,
             output_tokens: (remoteConfig.output_tokens || 0) + outT
           });
-          await push(ref(rtdb, 'request_logs'), {
+          await push(ref(rtdb, 'aetheria_project/request_logs'), {
             time: new Date().toTimeString().split(' ')[0],
             model: currentModel,
-            fileInfo: text ? 'Câu hỏi' : 'Tệp/Ảnh',
+            fileInfo: text ? 'Câu hỏi trực tiếp' : 'Tệp/Ảnh',
             inTokens: inT,
             outTokens: outT,
             status: '200 OK',
@@ -1243,7 +1246,7 @@
           });
         }
       } catch (err) {
-        bubbleContainer.innerHTML = `<span style="color:var(--accent-magenta); font-family:var(--font-mono);"><i class="fa-solid fa-triangle-exclamation"></i> Lỗi API: ${err.message}</span>`;
+        bubbleContainer.innerHTML = `<span style="color:var(--accent-magenta);"><i class="fa-solid fa-triangle-exclamation"></i> Có lỗi xảy ra trong quá trình xử lý: ${err.message}</span>`;
       } finally {
         isWaiting = false;
         btnSend.disabled = false;
@@ -1291,7 +1294,7 @@
       URL.revokeObjectURL(u);
     };
 
-    // Mobile Navigation Switcher
+    // Mobile Navigation Switcher (Chỉ còn Chat, Studio, Trang Chủ)
     const pSidebar = document.getElementById('panel-sidebar');
     const pChat = document.getElementById('panel-chat');
     const pStudio = document.getElementById('panel-studio');
