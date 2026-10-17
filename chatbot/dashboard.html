@@ -455,7 +455,7 @@
 </head>
 <body>
 
-  <!-- MÀN HÌNH NHẬP MẬT KHẨU ame1610@ KÈM AVATAR MỚI -->
+  <!-- MÀN HÌNH NHẬP MẬT KHẨU ame1610@ KÈM AVATAR -->
   <div id="auth-gate-screen">
     <div class="auth-gate-box">
       <img src="https://i.ibb.co/tp7rRb8J/biospace-avatar-q-A9qs-J9c-1791556024025.jpg" alt="Admin Avatar" class="gate-avatar" />
@@ -486,12 +486,16 @@
         <div>
           <div>AETHERIA // COMMAND DASHBOARD</div>
           <div style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted); font-weight:400;">
-            Quản lý khóa API Claude, khóa khẩn cấp và giám sát Token dự án Aetheria
+            Quản lý khóa API, khóa khẩn cấp và giám sát Token dự án Aetheria
           </div>
         </div>
       </div>
 
       <div class="topbar-actions">
+        <a href="https://api.xpiki.com/key" target="_blank" class="btn-glass" title="Xem số dư token trên hệ thống nhà cung cấp">
+          <i class="fa-solid fa-magnifying-glass-chart"></i>
+          <span>Check Token Xpiki</span>
+        </a>
         <a href="chatbot.html" class="btn-neon">
           <i class="fa-solid fa-comments"></i>
           <span>Mở Trang Chatbot</span>
@@ -524,7 +528,7 @@
           <i class="fa-solid fa-coins" style="color:var(--accent-amber);"></i>
         </div>
         <div class="kpi-num" id="kpi-cost">$0.0000</div>
-        <div class="kpi-foot">Chuẩn Claude 3.5 ($3/$15 per MTok)</div>
+        <div class="kpi-foot">Định mức Xpiki ($4 / 1M Token)</div>
       </div>
 
       <div class="kpi-card">
@@ -555,9 +559,9 @@
         </div>
 
         <div class="field-box">
-          <label>CLAUDE / ANTHROPIC API KEY (sk-ant-...)</label>
+          <label>OPENAI-COMPATIBLE API KEY (sk-...)</label>
           <div class="input-group">
-            <input type="password" class="cyber-input" id="api-key-input" placeholder="sk-ant-api03-..." autocomplete="off" />
+            <input type="password" class="cyber-input" id="api-key-input" placeholder="sk-..." autocomplete="off" />
             <button class="btn-glass" id="btn-toggle-eye" title="Ẩn/Hiện Key">
               <i class="fa-regular fa-eye" id="eye-icon"></i>
             </button>
@@ -567,7 +571,7 @@
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
           <div class="field-box">
             <label>ĐẶT TÊN GỢI NHỚ</label>
-            <input type="text" class="cyber-input" id="api-key-label" value="Key Claude Production" />
+            <input type="text" class="cyber-input" id="api-key-label" value="Key Xpiki Production" />
           </div>
           <div class="field-box">
             <label>GIỚI HẠN REQUEST / NGÀY</label>
@@ -652,7 +656,7 @@
     </section>
   </div>
 
-  <!-- SCRIPT XÁC THỰC MẬT KHẨU HOẠT ĐỘNG NGAY LẬP TỨC -->
+  <!-- SCRIPT XÁC THỰC MẬT KHẨU ame1610@ -->
   <script>
     const AUTH_PASS = "ame1610@";
     const gateScreen = document.getElementById('auth-gate-screen');
@@ -775,7 +779,8 @@
       document.getElementById('kpi-total-tokens').textContent = total.toLocaleString('en-US');
       document.getElementById('kpi-io-breakdown').textContent = `In: ${inTok.toLocaleString('en-US')} | Out: ${outTok.toLocaleString('en-US')}`;
 
-      const cost = ((inTok / 1000) * 0.003 + (outTok / 1000) * 0.015).toFixed(4);
+      // TÍNH TOÁN THEO GIÁ $4 / 1 TRIỆU TOKEN CỦA GÓI XPIKI
+      const cost = ((total / 1000000) * 4.0).toFixed(4);
       document.getElementById('kpi-cost').textContent = `$${cost}`;
       document.getElementById('kpi-limit').textContent = currentState.max_requests_per_day || 100;
 
@@ -791,15 +796,15 @@
       }
 
       const masked = currentState.api_key
-        ? `${currentState.api_key.slice(0, 10)}...${currentState.api_key.slice(-4)}`
+        ? `${currentState.api_key.slice(0, 8)}...${currentState.api_key.slice(-4)}`
         : 'Chưa cấu hình API Key';
       document.getElementById('kpi-key-preview').textContent = `Key: ${masked}`;
     });
 
-    // LƯU API KEY VÀO ĐÚNG NHÁNH aetheria_project/system_config
+    // LƯU API KEY VÀO NHÁNH aetheria_project/system_config
     document.getElementById('btn-save-dispatch').onclick = async () => {
       const k = keyInput.value.trim();
-      const label = document.getElementById('api-key-label').value.trim() || 'Claude API Key';
+      const label = document.getElementById('api-key-label').value.trim() || 'Key Xpiki';
       const limit = parseInt(document.getElementById('max-req-input').value, 10) || 100;
 
       if (!k) {
@@ -841,7 +846,7 @@
       }
     };
 
-    // Danh sách khóa đã lưu trong kho của riêng dự án
+    // Danh sách khóa trong kho
     onValue(ref(rtdb, 'aetheria_project/api_key_vault'), (snap) => {
       const vaultList = document.getElementById('vault-list');
       vaultList.innerHTML = '';
@@ -851,7 +856,7 @@
       }
       const data = snap.val();
       Object.entries(data).reverse().forEach(([id, item]) => {
-        const masked = `${item.key.slice(0, 9)}...${item.key.slice(-4)}`;
+        const masked = `${item.key.slice(0, 8)}...${item.key.slice(-4)}`;
         const row = document.createElement('div');
         row.className = 'vault-item';
         row.innerHTML = `
@@ -876,7 +881,7 @@
       });
     });
 
-    // Lắng nghe Request Logs riêng biệt
+    // Lắng nghe Request Logs riêng
     let cachedLogs = [];
     onValue(ref(rtdb, 'aetheria_project/request_logs'), (snap) => {
       const tbody = document.getElementById('logs-tbody');
