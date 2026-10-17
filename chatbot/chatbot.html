@@ -274,6 +274,11 @@
       box-shadow: 0 0 8px var(--accent-emerald);
     }
 
+    .engine-dot.locked {
+      background: var(--accent-magenta);
+      box-shadow: 0 0 8px var(--accent-magenta);
+    }
+
     .messages-scroll-box {
       flex: 1;
       min-height: 0;
@@ -391,7 +396,7 @@
       color: #e2e8f0;
     }
 
-    /* INPUT CONSOLE (FULL 7 MODEL PICKER ĐƯỢC ĐẶT Ở ĐÂY) */
+    /* INPUT CONSOLE */
     .chat-input-zone {
       padding: 8px 12px 10px;
       border-top: 1px solid var(--border-glass);
@@ -409,7 +414,6 @@
       gap: 8px;
     }
 
-    /* CUSTOM MODEL PICKER IN CHAT ZONE */
     .custom-dropdown {
       position: relative;
     }
@@ -803,7 +807,7 @@
 
         <div class="chat-input-zone">
           <div class="input-zone-top-row">
-            <!-- FULL 7 MODEL THEO ĐÚNG HỆ THỐNG XPIKI -->
+            <!-- FULL 7 MODEL CHUẨN XPIKI -->
             <div class="custom-dropdown" id="model-picker">
               <div class="dropdown-trigger">
                 <i class="fa-solid fa-wand-magic-sparkles" style="color:var(--accent-cyan);"></i>
@@ -935,13 +939,19 @@
   <script type="module">
     import * as THREE from 'three';
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, update, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // 1. TÍCH HỢP TRỰC TIẾP API KEY VÀ CẤU HÌNH XPIKI (KHÔNG QUA FIREBASE NỮA)
+    // 1. CẤU HÌNH API VÀ CƠ CHẾ CORS PROXY TỰ ĐỘNG CHỐNG "FAILED TO FETCH"
     const DIRECT_API_KEY = "sk-2os8BC2DgSFtgJxRzfPQqSmfu0XQF8N6GLLzJTMMT9A";
-    const DIRECT_API_ENDPOINT = "https://api.xpiki.com/v1/chat/completions";
+    const TARGET_API_URL = "https://api.xpiki.com/v1/chat/completions";
 
-    // Cấu hình Firebase chỉ dùng để ghi log thống kê (nếu cần)
+    // Danh sách Endpoint: Thử gọi trực tiếp trước, nếu trình duyệt chặn CORS thì tự động chuyển sang Proxy
+    const ENDPOINT_CANDIDATES = [
+      TARGET_API_URL,
+      `https://corsproxy.io/?${encodeURIComponent(TARGET_API_URL)}`,
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(TARGET_API_URL)}`
+    ];
+
     const firebaseConfig = {
       apiKey: "AIzaSyAVuB8m14zkMPs-JTLAKB0Bp18QBKAMBt4",
       authDomain: "ideo-dd376.firebaseapp.com",
@@ -965,7 +975,6 @@
       setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3200);
     }
 
-    // Trạng thái AI luôn sẵn sàng hoạt động (chấm xanh)
     const statusDot = document.getElementById('engine-status-dot');
     if (statusDot) statusDot.classList.remove('locked');
 
@@ -1136,6 +1145,41 @@
       };
     });
 
+    // Hàm gọi API với cơ chế Fallback Proxy tự động nếu dính lỗi CORS
+    async function executeApiRequest(payload) {
+      let lastError = null;
+
+      for (const endpoint of ENDPOINT_CANDIDATES) {
+        try {
+          const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${DIRECT_API_KEY}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+          });
+
+          if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            throw new Error(errData.error?.message || `Lỗi HTTP ${response.status}`);
+          }
+
+          return await response.json();
+        } catch (err) {
+          lastError = err;
+          // Nếu gặp lỗi mạng / Failed to fetch (do CORS), tự động thử endpoint proxy tiếp theo
+          if (err.message.includes('fetch') || err.message.includes('NetworkError')) {
+            continue;
+          } else {
+            throw err;
+          }
+        }
+      }
+
+      throw lastError || new Error('Không thể kết nối đến máy chủ API (Lỗi mạng hoặc CORS)');
+    }
+
     async function sendPrompt() {
       if (isWaiting) return;
       const text = chatInput.value.trim();
@@ -1146,7 +1190,6 @@
         promptPayload += `\n\n--- Tệp đính kèm: ${f.name} ---\n${f.content}`;
       });
 
-      // Tạo payload chuẩn OpenAI-compatible gửi tới API Xpiki
       const messagesPayload = [
         {
           role: 'system',
@@ -1185,33 +1228,19 @@
       aiRow.className = 'msg-row ai';
       aiRow.innerHTML = `
         <div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>
-        <div class="msg-bubble"><span id="loading-txt"><i class="fa-solid fa-circle-notch fa-spin"></i> Đang suy nghĩ và xử lý...</span></div>
+        <div class="msg-bubble"><span id="loading-txt"><i class="fa-solid fa-circle-notch fa-spin"></i> Đang kết nối máy chủ AI...</span></div>
       `;
       messagesBox.appendChild(aiRow);
       messagesBox.scrollTop = messagesBox.scrollHeight;
       const bubbleContainer = aiRow.querySelector('.msg-bubble');
 
       try {
-        // GỌI TRỰC TIẾP API XPIKI BẰNG KEY VÀ ENDPOINT TÍCH HỢP SẴN
-        const response = await fetch(DIRECT_API_ENDPOINT, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${DIRECT_API_KEY}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            model: currentModel,
-            messages: messagesPayload,
-            max_tokens: 3000
-          })
+        const data = await executeApiRequest({
+          model: currentModel,
+          messages: messagesPayload,
+          max_tokens: 3000
         });
 
-        if (!response.ok) {
-          const errData = await response.json().catch(() => ({}));
-          throw new Error(errData.error?.message || `Lỗi HTTP ${response.status}`);
-        }
-
-        const data = await response.json();
         let aiResponseText = '';
         if (data.choices && data.choices[0] && data.choices[0].message) {
           aiResponseText = data.choices[0].message.content;
@@ -1239,7 +1268,6 @@
           }
         }
 
-        // Tự động đẩy thống kê Token tiêu thụ lên Firebase RTDB cho Dashboard
         if (data.usage) {
           const inT = data.usage.prompt_tokens || data.usage.input_tokens || 0;
           const outT = data.usage.completion_tokens || data.usage.output_tokens || 0;
