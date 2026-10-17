@@ -28,19 +28,50 @@
     * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent !important; }
     input, textarea { user-select: text !important; }
 
-    body { width: 100%; min-height: 100vh; background: radial-gradient(circle at top right, #10162f 0%, var(--bg-dark) 65%); color: var(--text-main); font-family: var(--font-sans); overflow-x: hidden; }
+    body {
+      width: 100%; min-height: 100vh;
+      background: radial-gradient(circle at top right, #10162f 0%, var(--bg-dark) 65%);
+      color: var(--text-main); font-family: var(--font-sans); overflow-x: hidden;
+    }
     ::-webkit-scrollbar { display: none; }
 
-    #auth-gate-screen { position: fixed; inset: 0; z-index: 10000; background: #040509; display: flex; align-items: center; justify-content: center; padding: 20px; }
-    .auth-gate-box { width: min(420px, 94vw); background: rgba(14, 17, 30, 0.95); border: 1px solid var(--border-glass); border-radius: 20px; padding: 30px; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 240, 255, 0.15); }
-    .gate-avatar { width: 76px; height: 76px; border-radius: 50%; border: 2px solid var(--accent-cyan); box-shadow: 0 0 22px rgba(0, 240, 255, 0.45); object-fit: cover; margin: 0 auto 16px; display: block; }
+    #auth-gate-screen {
+      position: fixed; inset: 0; z-index: 10000;
+      background: #040509; display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+
+    .auth-gate-box {
+      width: min(420px, 94vw); background: rgba(14, 17, 30, 0.95);
+      border: 1px solid var(--border-glass); border-radius: 20px; padding: 30px; text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 240, 255, 0.15);
+    }
+
+    .gate-avatar {
+      width: 76px; height: 76px; border-radius: 50%; border: 2px solid var(--accent-cyan);
+      box-shadow: 0 0 22px rgba(0, 240, 255, 0.45); object-fit: cover; margin: 0 auto 16px; display: block;
+    }
 
     .dashboard-container { width: min(1320px, 94vw); margin: 0 auto; padding: 28px 0 80px; display: none; }
     .dashboard-container.unlocked { display: block; }
 
-    .admin-topbar { background: var(--bg-panel); backdrop-filter: blur(22px); border: 1px solid var(--border-glass); border-radius: 18px; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 26px; }
-    .btn-neon { padding: 10px 18px; border-radius: 12px; background: linear-gradient(135deg, var(--accent-cyan), #6ef7ff); color: #040509; font-size: 13px; font-weight: 600; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; box-shadow: 0 0 18px rgba(0, 240, 255, 0.3); }
-    .btn-glass { padding: 10px 16px; border-radius: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-glass); color: #fff; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+    .admin-topbar {
+      background: var(--bg-panel); backdrop-filter: blur(22px); border: 1px solid var(--border-glass);
+      border-radius: 18px; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 14px; margin-bottom: 26px;
+    }
+
+    .btn-neon {
+      padding: 10px 18px; border-radius: 12px; background: linear-gradient(135deg, var(--accent-cyan), #6ef7ff);
+      color: #040509; font-size: 13px; font-weight: 600; border: none; cursor: pointer; display: inline-flex;
+      align-items: center; gap: 8px; text-decoration: none; box-shadow: 0 0 18px rgba(0, 240, 255, 0.3);
+    }
+
+    .btn-glass {
+      padding: 10px 16px; border-radius: 12px; background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-glass); color: #fff; font-size: 13px; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
+    }
+
     .btn-danger { background: rgba(255, 0, 127, 0.15); border-color: var(--accent-magenta); color: #ff85c0; }
 
     .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 24px; }
@@ -65,10 +96,18 @@
     .cyber-table th { text-align: left; padding: 12px 14px; color: var(--text-muted); border-bottom: 1px solid var(--border-glass); font-size: 11px; }
     .cyber-table td { padding: 12px 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
 
+    .status-tag {
+      padding: 3px 9px; border-radius: 999px; font-size: 10.5px;
+      background: rgba(0, 255, 157, 0.12); color: var(--accent-emerald); border: 1px solid rgba(0, 255, 157, 0.3);
+    }
+
     #toast-stack { position: fixed; top: 24px; right: 24px; z-index: 20000; display: flex; flex-direction: column; gap: 8px; }
     .cyber-toast { background: rgba(10, 12, 22, 0.96); border: 1px solid var(--border-glass); border-left: 4px solid var(--accent-cyan); border-radius: 10px; padding: 12px 16px; color: #fff; font-size: 12.5px; display: flex; align-items: center; gap: 10px; }
 
-    @media (max-width: 960px) { .kpi-row { grid-template-columns: repeat(2, 1fr); } .control-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 960px) {
+      .kpi-row { grid-template-columns: repeat(2, 1fr); }
+      .control-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -79,11 +118,17 @@
       <img src="https://i.ibb.co/tp7rRb8J/biospace-avatar-q-A9qs-J9c-1791556024025.jpg" class="gate-avatar" />
       <h2 style="font-size:20px; font-weight:700; margin-bottom:8px;">QUẢN TRỊ VIÊN AETHERIA</h2>
       <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:20px;">Vui lòng nhập mật khẩu quản trị:</p>
+      
       <div class="field-box">
         <input type="password" class="cyber-input" id="gate-password-input" placeholder="Nhập mật khẩu..." autofocus style="text-align:center; font-size:15px; letter-spacing:2px;" />
       </div>
+
+      <div id="gate-err" style="color:var(--accent-magenta); font-size:12px; font-family:var(--font-mono); margin-bottom:14px; display:none;">
+        <i class="fa-solid fa-triangle-exclamation"></i> Mật khẩu không chính xác!
+      </div>
+
       <button type="button" class="btn-neon" id="btn-submit-gate" style="width:100%; justify-content:center; padding:12px;">
-        <i class="fa-solid fa-key"></i> Mở Khóa
+        <i class="fa-solid fa-key"></i> Mở Khóa Bảng Điều Khiển
       </button>
     </div>
   </div>
@@ -96,56 +141,74 @@
         <img src="https://i.ibb.co/tp7rRb8J/biospace-avatar-q-A9qs-J9c-1791556024025.jpg" style="width:40px; height:40px; border-radius:50%; border:2px solid var(--accent-cyan);" />
         <div>
           <div style="font-weight:700; font-size:17px;">AETHERIA // COMMAND CENTER</div>
-          <div style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono);">Quản trị Model Online, Sửa tên trực tiếp, Pay2S & Link4M</div>
+          <div style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono);">Quản trị Model Online, Đồng bộ giá KiraAI, Pay2S & Link4M</div>
         </div>
       </div>
       <div style="display:flex; gap:10px;">
-        <a href="chatbot.html" class="btn-neon"><i class="fa-solid fa-comments"></i> Chat</a>
+        <a href="chatbot.html" class="btn-neon"><i class="fa-solid fa-comments"></i> Chatbot</a>
         <a href="recharge.html" class="btn-glass"><i class="fa-solid fa-coins"></i> Nạp Tiền</a>
-        <button class="btn-glass btn-danger" id="btn-lock-screen"><i class="fa-solid fa-lock"></i></button>
+        <button class="btn-glass btn-danger" id="btn-lock-screen"><i class="fa-solid fa-lock"></i> Khóa</button>
       </div>
     </header>
 
     <section class="kpi-row">
-      <div class="kpi-card"><div class="kpi-head"><span>TỔNG MODEL ONLINE</span></div><div class="kpi-num" id="kpi-model-count">0</div></div>
-      <div class="kpi-card"><div class="kpi-head"><span>TỔNG TOKEN TIÊU HAO</span></div><div class="kpi-num" id="kpi-total-tokens">0</div></div>
-      <div class="kpi-card"><div class="kpi-head"><span>TỔNG USER ĐĂNG KÝ</span></div><div class="kpi-num" id="kpi-user-count">0</div></div>
-      <div class="kpi-card"><div class="kpi-head"><span>CỔNG THANH TOÁN</span></div><div class="kpi-num" id="kpi-pay-status" style="font-size:20px; color:var(--accent-emerald);">SẴN SÀNG</div></div>
+      <div class="kpi-card"><div class="kpi-head"><span>TỔNG MODEL ONLINE</span><i class="fa-solid fa-microchip" style="color:var(--accent-cyan);"></i></div><div class="kpi-num" id="kpi-model-count">0</div><div class="kpi-foot">Tự động đồng bộ Firebase</div></div>
+      <div class="kpi-card"><div class="kpi-head"><span>TỔNG TOKEN TIÊU HAO</span><i class="fa-solid fa-coins" style="color:var(--accent-amber);"></i></div><div class="kpi-num" id="kpi-total-tokens">0</div><div class="kpi-foot">Ghi nhận từ Chatbot</div></div>
+      <div class="kpi-card"><div class="kpi-head"><span>TỔNG USER ĐĂNG KÝ</span><i class="fa-solid fa-users" style="color:var(--accent-emerald);"></i></div><div class="kpi-num" id="kpi-user-count">0</div><div class="kpi-foot">Đồng bộ Auth Firebase</div></div>
+      <div class="kpi-card"><div class="kpi-head"><span>CỔNG THANH TOÁN</span><i class="fa-solid fa-credit-card" style="color:var(--accent-magenta);"></i></div><div class="kpi-num" id="kpi-pay-status" style="font-size:20px; color:var(--accent-emerald);">SẴN SÀNG</div><div class="kpi-foot">Pay2S & Shortlinks</div></div>
     </section>
 
     <!-- SECTION 1: MODEL ONLINE -->
     <section class="control-grid">
       <div class="panel-card">
         <div class="panel-title">
-          <span><i class="fa-solid fa-terminal" style="color:var(--accent-cyan); margin-right:8px;"></i> Nhập Lệnh cURL</span>
+          <span><i class="fa-solid fa-terminal" style="color:var(--accent-cyan); margin-right:8px;"></i> Nhập Lệnh cURL (Tự Động Bóc Tách)</span>
+          <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent-emerald);">AUTO-PARSER</span>
         </div>
         <div class="field-box">
-          <textarea class="cyber-textarea" id="curl-input" placeholder="Dán lệnh curl -X POST https://kiraai.vn/api/v1/chat/completions ... vào đây"></textarea>
+          <label>DÁN NGUYÊN VĂN LỆNH CURL VÀO ĐÂY:</label>
+          <textarea class="cyber-textarea" id="curl-input" placeholder="curl -X POST https://kiraai.vn/api/v1/chat/completions \
+  -H &quot;Content-Type: application/json&quot; \
+  -H &quot;Authorization: Bearer YOUR_KIRA_API_KEY&quot; \
+  -d '{
+    &quot;model&quot;: &quot;longcat-2.5-preview-free&quot;,
+    &quot;messages&quot;: [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Hello!&quot;}]
+  }'"></textarea>
         </div>
-        <button type="button" class="btn-glass" id="btn-parse-curl" style="margin-bottom:14px; width:100%; justify-content:center;">Bóc Tách cURL</button>
+        <button type="button" class="btn-glass" id="btn-parse-curl" style="margin-bottom:14px; width:100%; justify-content:center;">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Bóc Tách Thông Số cURL
+        </button>
 
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-          <div class="field-box"><label>TÊN HIỂN THỊ</label><input type="text" class="cyber-input" id="m-name" /></div>
-          <div class="field-box"><label>MÃ MODEL GỐC</label><input type="text" class="cyber-input" id="m-id" /></div>
+          <div class="field-box"><label>TÊN HIỂN THỊ</label><input type="text" class="cyber-input" id="m-name" placeholder="VD: LongCat 2.5 Free" /></div>
+          <div class="field-box"><label>MÃ MODEL GỐC (GIỮ NGUYÊN DẤU CHẤM)</label><input type="text" class="cyber-input" id="m-id" placeholder="deepseek-v4.1-flash-free" /></div>
         </div>
-        <div class="field-box"><label>ENDPOINT URL</label><input type="text" class="cyber-input" id="m-endpoint" /></div>
-        <div class="field-box"><label>API KEY</label><input type="text" class="cyber-input" id="m-key" /></div>
+        <div class="field-box"><label>ENDPOINT URL</label><input type="text" class="cyber-input" id="m-endpoint" placeholder="https://kiraai.vn/api/v1/chat/completions" /></div>
+        <div class="field-box"><label>API KEY</label><input type="text" class="cyber-input" id="m-key" placeholder="kira_..." /></div>
         
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-           <span style="font-size:12px; color:var(--text-muted);">Giá Tokens sẽ được đồng bộ tự động.</span>
-           <div style="display:flex; align-items:center; gap:8px;">
-             <input type="checkbox" id="m-maint" /> <label for="m-maint" style="margin:0;">Bảo trì</label>
-           </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div class="field-box">
+            <label>TOKEN CỐ ĐỊNH / LẦN (0 NẾU THEO TỈ LỆ)</label>
+            <input type="number" class="cyber-input" id="m-cost" value="0" min="0" />
+          </div>
+          <div class="field-box" style="display:flex; align-items:center; gap:10px; margin-top:20px;">
+            <input type="checkbox" id="m-maint" style="width:18px; height:18px;" />
+            <label for="m-maint" style="margin:0; cursor:pointer;">Đang bảo trì</label>
+          </div>
         </div>
 
-        <button type="button" class="btn-neon" id="btn-save-model" style="width:100%; justify-content:center; padding:12px;">Lưu Model</button>
+        <button type="button" class="btn-neon" id="btn-save-model" style="width:100%; justify-content:center; padding:12px;">
+          <i class="fa-solid fa-plus"></i> Lưu Model Lên Firebase
+        </button>
       </div>
 
       <!-- DANH SÁCH MODEL -->
       <div class="panel-card">
         <div class="panel-title">
           <span><i class="fa-solid fa-list-check" style="color:var(--accent-magenta); margin-right:8px;"></i> Quản Lý & Sửa Tên Model</span>
-          <button class="btn-glass" id="btn-sync-price" style="padding:6px 12px; font-size:11px;"><i class="fa-solid fa-rotate"></i> Đồng Bộ Giá KiraAI</button>
+          <button class="btn-glass" id="btn-sync-price" style="padding:6px 12px; font-size:11px;">
+            <i class="fa-solid fa-rotate"></i> Đồng Bộ Giá KiraAI
+          </button>
         </div>
         <div id="model-list-container" style="max-height: 480px; overflow-y:auto;"></div>
       </div>
@@ -154,40 +217,61 @@
     <!-- SECTION 2: CẤU HÌNH PAY2S (CÓ ENDPOINT) & RÚT GỌN LINK -->
     <section class="control-grid">
       <div class="panel-card">
-        <div class="panel-title"><span><i class="fa-solid fa-credit-card" style="color:var(--accent-cyan); margin-right:8px;"></i> Cấu Hình Pay2S</span></div>
+        <div class="panel-title">
+          <span><i class="fa-solid fa-credit-card" style="color:var(--accent-cyan); margin-right:8px;"></i> Cấu Hình Pay2S Gateway</span>
+          <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent-emerald);">DYNAMIC ENDPOINT</span>
+        </div>
 
-        <!-- MỚI: TRƯỜNG API ENDPOINT PAY2S -->
         <div class="field-box">
           <label>API ENDPOINT PAY2S</label>
           <input type="text" class="cyber-input" id="pay2s-endpoint" value="https://payment.pay2s.vn/v1/gateway/api/create" />
         </div>
 
-        <div class="field-box"><label>PARTNER CODE</label><input type="text" class="cyber-input" id="pay2s-partner" /></div>
-        <div class="field-box"><label>ACCESS KEY</label><input type="text" class="cyber-input" id="pay2s-access" /></div>
-        <div class="field-box"><label>SECRET KEY</label><input type="password" class="cyber-input" id="pay2s-secret" /></div>
-        <div class="field-box"><label>TỈ GIÁ (1.000 VNĐ = ? TOKEN)</label><input type="number" class="cyber-input" id="token-rate" value="10000" /></div>
-        <button type="button" class="btn-neon" id="btn-save-pay2s" style="width:100%; justify-content:center; padding:12px;">Lưu Cấu Hình Pay2S</button>
+        <div class="field-box"><label>PARTNER CODE</label><input type="text" class="cyber-input" id="pay2s-partner" placeholder="Nhập Partner code..." /></div>
+        <div class="field-box"><label>ACCESS KEY</label><input type="text" class="cyber-input" id="pay2s-access" placeholder="Nhập Access key..." /></div>
+        <div class="field-box"><label>SECRET KEY</label><input type="password" class="cyber-input" id="pay2s-secret" placeholder="Nhập Secret key..." /></div>
+        <div class="field-box"><label>TỈ GIÁ (1.000 VNĐ = ? TOKEN)</label><input type="number" class="cyber-input" id="token-rate" value="10000" min="100" /></div>
+        
+        <button type="button" class="btn-neon" id="btn-save-pay2s" style="width:100%; justify-content:center; padding:12px;">
+          <i class="fa-solid fa-floppy-disk"></i> Lưu Cấu Hình Pay2S
+        </button>
       </div>
 
       <div class="panel-card">
-        <div class="panel-title"><span><i class="fa-solid fa-link" style="color:var(--accent-amber); margin-right:8px;"></i> Vượt Link Nhận Token</span></div>
-        <div class="field-box"><label>TOKEN THƯỞNG / LẦN (Gốc lãi từ 300đ/view)</label><input type="number" class="cyber-input" id="shortlink-reward" value="2500" /></div>
-        <div class="field-box"><label>GIỚI HẠN / NGÀY / CỔNG</label><input type="number" class="cyber-input" id="shortlink-limit" value="2" /></div>
-        <div class="field-box"><label>API KEY LINK4M</label><input type="text" class="cyber-input" id="link4m-api" /></div>
-        <div class="field-box"><label>API KEY TRAFFICTOP</label><input type="text" class="cyber-input" id="traffictop-api" /></div>
-        <button type="button" class="btn-neon" id="btn-save-shortlink" style="width:100%; justify-content:center; padding:12px;">Lưu Cấu Hình Rút Gọn Link</button>
+        <div class="panel-title">
+          <span><i class="fa-solid fa-link" style="color:var(--accent-amber); margin-right:8px;"></i> Vượt Link Nhận Token</span>
+          <span style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted);">TỐI ĐA 2 LẦN/NGÀY</span>
+        </div>
+        <div class="field-box"><label>TOKEN THƯỞNG / LẦN (Tính từ 300đ/view để có lãi)</label><input type="number" class="cyber-input" id="shortlink-reward" value="2500" min="100" /></div>
+        <div class="field-box"><label>GIỚI HẠN / NGÀY / CỔNG</label><input type="number" class="cyber-input" id="shortlink-limit" value="2" min="1" max="20" /></div>
+        <div class="field-box"><label>API KEY LINK4M</label><input type="text" class="cyber-input" id="link4m-api" value="6992df868b3d1e423d1ab833" /></div>
+        <div class="field-box"><label>API KEY TRAFFICTOP</label><input type="text" class="cyber-input" id="traffictop-api" value="tXk7A1HwG4QSXwGN6TU7yLOz" /></div>
+        
+        <button type="button" class="btn-neon" id="btn-save-shortlink" style="width:100%; justify-content:center; padding:12px;">
+          <i class="fa-solid fa-floppy-disk"></i> Lưu Cấu Hình Rút Gọn Link
+        </button>
       </div>
     </section>
 
     <!-- BẢNG NHẬT KÝ YÊU CẦU -->
     <section class="panel-card">
       <div class="panel-title">
-        <span><i class="fa-solid fa-list-check" style="color:var(--accent-emerald); margin-right:8px;"></i> Nhật Ký Truy Vấn</span>
-        <button class="btn-glass" id="btn-export-csv" style="padding:6px 12px; font-size:11.5px;"><i class="fa-solid fa-file-csv"></i> Xuất CSV</button>
+        <span><i class="fa-solid fa-list-check" style="color:var(--accent-emerald); margin-right:8px;"></i> Nhật Ký Truy Vấn Thời Gian Thực</span>
+        <button class="btn-glass" id="btn-export-csv" style="padding:6px 12px; font-size:11.5px;">
+          <i class="fa-solid fa-file-csv"></i> Xuất File CSV
+        </button>
       </div>
       <div class="table-wrap">
         <table class="cyber-table">
-          <thead><tr><th>THỜI GIAN</th><th>MÔ HÌNH</th><th>NGƯỜI DÙNG</th><th>TOKEN KHẤU TRỪ</th><th>TRẠNG THÁI</th></tr></thead>
+          <thead>
+            <tr>
+              <th>THỜI GIAN</th>
+              <th>MÔ HÌNH</th>
+              <th>NGƯỜI DÙNG</th>
+              <th>TOKEN KHẤU TRỪ</th>
+              <th>TRẠNG THÁI</th>
+            </tr>
+          </thead>
           <tbody id="logs-tbody"></tbody>
         </table>
       </div>
@@ -233,7 +317,8 @@
       projectId: "ideo-dd376",
       storageBucket: "ideo-dd376.firebasestorage.app",
       messagingSenderId: "689163185",
-      appId: "1:689163185:web:af4091213001180f364b90"
+      appId: "1:689163185:web:af4091213001180f364b90",
+      measurementId: "G-QP54CZ2BJT"
     };
     const app = initializeApp(firebaseConfig);
     const rtdb = getDatabase(app);
@@ -247,7 +332,7 @@
       setTimeout(() => d.remove(), 3200);
     }
 
-    // BÓC TÁCH CURL
+    // 1. BÓC TÁCH CURL TỰ ĐỘNG
     document.getElementById('btn-parse-curl').onclick = () => {
       const raw = document.getElementById('curl-input').value.trim();
       if (!raw) { alert('Vui lòng dán lệnh cURL vào ô trước!'); return; }
@@ -261,15 +346,16 @@
         document.getElementById('m-id').value = modelMatch[1];
         document.getElementById('m-name').value = modelMatch[1].toUpperCase();
       }
-      notify('Đã bóc tách thông số cURL!');
+      notify('Đã bóc tách thông số cURL thành công!');
     };
 
-    // LƯU MODEL
+    // 2. LƯU MÔ HÌNH VÀO FIREBASE (LƯU NGUYÊN VẸN MÃ MODEL GỐC CÓ DẤU CHẤM)
     document.getElementById('btn-save-model').onclick = async () => {
       const originalModelId = document.getElementById('m-id').value.trim();
       const mName = document.getElementById('m-name').value.trim() || originalModelId;
       const mEndpoint = document.getElementById('m-endpoint').value.trim();
       const mKey = document.getElementById('m-key').value.trim();
+      const mCost = parseInt(document.getElementById('m-cost').value, 10) || 0;
       const mMaint = document.getElementById('m-maint').checked;
 
       if (!originalModelId || !mEndpoint || !mKey) return alert('Vui lòng điền đủ Mã Model, Endpoint và API Key!');
@@ -280,52 +366,64 @@
         name: mName,
         endpoint: mEndpoint,
         apiKey: mKey,
-        priceIn: 0, // Sẽ được đồng bộ
-        priceOut: 0, // Sẽ được đồng bộ
+        costToken: mCost,
+        priceIn: 0,
+        priceOut: 0,
         maintenance: mMaint,
         updatedAt: Date.now()
       });
 
-      notify(`Đã lưu mô hình ${mName}!`);
+      notify(`Đã lưu mô hình ${mName} thành công!`);
     };
 
-    // ĐỒNG BỘ GIÁ KIRA AI QUA HTTP GET /v1/models
+    // 3. ĐỒNG BỘ BẢNG GIÁ KIRA AI (KIRAAI.VN/MODELS)
     document.getElementById('btn-sync-price').onclick = async () => {
-       notify("Đang tải dữ liệu bảng giá từ KiraAI...");
-       try {
-           // Gọi proxy hoặc gọi thẳng nếu họ cho phép CORS GET
-           const res = await fetch("https://kiraai.vn/api/v1/models");
-           if(!res.ok) throw new Error("API Models không hoạt động");
-           const data = await res.json();
-           const kiraModels = data.data || [];
+      notify("Đang lấy bảng giá mô hình từ KiraAI...");
+      try {
+        let kiraModels = [];
+        try {
+          const res = await fetch("https://kiraai.vn/api/v1/models");
+          if (res.ok) {
+            const data = await res.json();
+            kiraModels = data.data || [];
+          }
+        } catch(e) {
+          // Thử proxy nếu bị cors
+          const res = await fetch(`https://corsproxy.io/?${encodeURIComponent("https://kiraai.vn/api/v1/models")}`);
+          if (res.ok) {
+            const data = await res.json();
+            kiraModels = data.data || [];
+          }
+        }
 
-           const snap = await get(ref(rtdb, 'aetheria_project/models_config'));
-           if(!snap.exists()) return;
-           const dbModels = snap.val();
+        const snap = await get(ref(rtdb, 'aetheria_project/models_config'));
+        if (!snap.exists()) return alert("Chưa có model nào trong hệ thống để đồng bộ.");
+        const dbModels = snap.val();
 
-           let updated = 0;
-           for(const [safeKey, m] of Object.entries(dbModels)) {
-               const kModel = kiraModels.find(x => x.id === m.modelId);
-               if(kModel && kModel.pricing) {
-                   await update(ref(rtdb, `aetheria_project/models_config/${safeKey}`), {
-                       priceIn: kModel.pricing.prompt || 0,
-                       priceOut: kModel.pricing.completion || 0
-                   });
-                   updated++;
-               }
-           }
-           notify(`Đã đồng bộ giá thành công cho ${updated} mô hình!`);
-       } catch (err) {
-           alert("Không thể tự động đồng bộ (CORS/Lỗi): " + err.message);
-       }
+        let updated = 0;
+        for (const [safeKey, m] of Object.entries(dbModels)) {
+          const matched = kiraModels.find(x => x.id === m.modelId);
+          if (matched && matched.pricing) {
+            await update(ref(rtdb, `aetheria_project/models_config/${safeKey}`), {
+              priceIn: matched.pricing.prompt || 0,
+              priceOut: matched.pricing.completion || 0
+            });
+            updated++;
+          }
+        }
+        notify(`Đã đồng bộ giá thành công cho ${updated} mô hình!`);
+      } catch (err) {
+        alert("Lỗi khi đồng bộ giá từ KiraAI: " + err.message);
+      }
     };
 
-    // QUẢN LÝ DANH SÁCH MODEL
+    // 4. QUẢN LÝ DANH SÁCH MÔ HÌNH VÀ SỬA TÊN TRỰC TIẾP
     onValue(ref(rtdb, 'aetheria_project/models_config'), (snap) => {
       const box = document.getElementById('model-list-container');
       box.innerHTML = '';
 
       if (!snap.exists()) {
+        box.innerHTML = `<div style="color:var(--text-muted); padding:10px;">Chưa có model nào. Hãy nhập cURL để thêm!</div>`;
         document.getElementById('kpi-model-count').textContent = '0';
         return;
       }
@@ -341,39 +439,46 @@
           <div>
             <strong style="color:#fff;">${item.name || actualId}</strong>
             <span style="color:var(--text-muted); font-size:11px; margin-left:6px;">[${actualId}]</span>
-            <div style="color:var(--accent-cyan); font-size:11px; margin-top:2px;">Rate: ${item.priceIn || 0} In / ${item.priceOut || 0} Out</div>
+            <div style="color:var(--accent-cyan); font-size:11px; margin-top:2px;">
+              ${item.costToken > 0 ? item.costToken + ' Tok/lần' : (item.priceIn || 0) + ' In / ' + (item.priceOut || 0) + ' Out'}
+            </div>
             <div style="font-size:10px; color:${item.maintenance ? 'var(--accent-amber)' : 'var(--accent-emerald)'};">
               ${item.maintenance ? '<i class="fa-solid fa-wrench"></i> Đang bảo trì' : '<i class="fa-solid fa-circle-check"></i> Hoạt động'}
             </div>
           </div>
           <div style="display:flex; gap:6px;">
-            <button class="btn-glass btn-edit-name" style="padding:4px 9px; font-size:11px;"><i class="fa-solid fa-pen"></i></button>
-            <button class="btn-glass btn-toggle-maint" style="padding:4px 9px; font-size:11px;">
-              ${item.maintenance ? 'Mở' : 'Bảo trì'}
-            </button>
+            <button class="btn-glass btn-edit-name" style="padding:4px 9px; font-size:11px;" title="Sửa tên hiển thị"><i class="fa-solid fa-pen"></i> Sửa tên</button>
+            <button class="btn-glass btn-toggle-maint" style="padding:4px 9px; font-size:11px;">${item.maintenance ? 'Mở lại' : 'Bảo trì'}</button>
             <button class="btn-glass btn-danger btn-del-model" style="padding:4px 8px; font-size:11px;"><i class="fa-solid fa-trash"></i></button>
           </div>
         `;
 
         row.querySelector('.btn-edit-name').onclick = async () => {
-          const newName = prompt(`Nhập tên mới cho [${actualId}]:`, item.name || actualId);
-          if (newName && newName.trim()) {
+          const currentName = item.name || actualId;
+          const newName = prompt(`Nhập tên hiển thị mới cho [${actualId}]:`, currentName);
+          if (newName && newName.trim() && newName.trim() !== currentName) {
             await update(ref(rtdb, `aetheria_project/models_config/${safeKey}`), { name: newName.trim() });
-            notify('Đã đổi tên model!');
+            notify('Đã đổi tên model thành công!');
           }
         };
+
         row.querySelector('.btn-toggle-maint').onclick = async () => {
           await update(ref(rtdb, `aetheria_project/models_config/${safeKey}`), { maintenance: !item.maintenance });
+          notify('Đã cập nhật trạng thái bảo trì!');
         };
+
         row.querySelector('.btn-del-model').onclick = async () => {
-          if (confirm(`Xóa model ${actualId}?`)) await remove(ref(rtdb, `aetheria_project/models_config/${safeKey}`));
+          if (confirm(`Xác nhận xóa mô hình [${actualId}]?`)) {
+            await remove(ref(rtdb, `aetheria_project/models_config/${safeKey}`));
+            notify('Đã xóa model.');
+          }
         };
 
         box.appendChild(row);
       });
     });
 
-    // CẤU HÌNH PAY2S
+    // 5. CẤU HÌNH PAY2S (CÓ ENDPOINT)
     document.getElementById('btn-save-pay2s').onclick = async () => {
       const endpoint = document.getElementById('pay2s-endpoint').value.trim();
       const partner = document.getElementById('pay2s-partner').value.trim();
@@ -389,7 +494,7 @@
         tokenRate: rate,
         updatedAt: Date.now()
       });
-      notify('Đã lưu cấu hình Pay2S!');
+      notify('Đã lưu cấu hình Pay2S thành công!');
     };
 
     onValue(ref(rtdb, 'aetheria_project/payment_config/pay2s'), (snap) => {
@@ -403,7 +508,7 @@
       }
     });
 
-    // CẤU HÌNH LINK RÚT GỌN
+    // 6. CẤU HÌNH RÚT GỌN LINK
     document.getElementById('btn-save-shortlink').onclick = async () => {
       await set(ref(rtdb, 'aetheria_project/shortlink_config'), {
         rewardTokens: parseInt(document.getElementById('shortlink-reward').value, 10) || 2500,
@@ -412,7 +517,7 @@
         traffictopApi: document.getElementById('traffictop-api').value.trim(),
         updatedAt: Date.now()
       });
-      notify('Đã lưu cấu hình vượt link!');
+      notify('Đã lưu cấu hình vượt link nhận Token!');
     };
 
     onValue(ref(rtdb, 'aetheria_project/shortlink_config'), (snap) => {
@@ -425,24 +530,54 @@
       }
     });
 
-    // LẤY SỐ USER & LOG
-    onValue(ref(rtdb, 'aetheria_project/users'), (snap) => document.getElementById('kpi-user-count').textContent = snap.exists() ? Object.keys(snap.val()).length : 0);
-    
+    // 7. THỐNG KÊ USER VÀ NHẬT KÝ TRUY VẤN
+    onValue(ref(rtdb, 'aetheria_project/users'), (snap) => {
+      document.getElementById('kpi-user-count').textContent = snap.exists() ? Object.keys(snap.val()).length : 0;
+    });
+
     let cachedLogs = [];
     onValue(ref(rtdb, 'aetheria_project/request_logs'), (snap) => {
       const tbody = document.getElementById('logs-tbody');
       tbody.innerHTML = '';
       cachedLogs = [];
-      let total = 0;
+      let totalTokens = 0;
+
       if (snap.exists()) {
         Object.values(snap.val()).reverse().forEach(log => {
           cachedLogs.push(log);
-          total += (log.costTokens || 0);
-          tbody.innerHTML += `<tr><td>${log.time}</td><td>${log.model}</td><td>${log.userEmail || 'N/A'}</td><td>${(log.costTokens || 0).toLocaleString()} Tok</td><td><span class="status-tag">${log.status}</span></td></tr>`;
+          totalTokens += (log.costTokens || 0);
+          tbody.innerHTML += `
+            <tr>
+              <td>${log.time || 'N/A'}</td>
+              <td>${log.model || 'N/A'}</td>
+              <td>${log.userEmail || 'Khách'}</td>
+              <td>${(log.costTokens || 0).toLocaleString()} Tok</td>
+              <td><span class="status-tag">${log.status || '200 OK'}</span></td>
+            </tr>
+          `;
         });
       }
-      document.getElementById('kpi-total-tokens').textContent = total.toLocaleString();
+
+      document.getElementById('kpi-total-tokens').textContent = totalTokens.toLocaleString();
+      if (cachedLogs.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Chưa có nhật ký truy vấn nào từ Chatbot</td></tr>`;
+      }
     });
+
+    // XUẤT CSV
+    document.getElementById('btn-export-csv').onclick = () => {
+      if (cachedLogs.length === 0) return alert("Chưa có dữ liệu để xuất file CSV!");
+      const rows = [['Thoi Gian', 'Mo Hinh', 'Email User', 'Token Khau Tru', 'Trang Thai']];
+      cachedLogs.forEach(l => rows.push([l.time, l.model, l.userEmail || 'Khach', l.costTokens || 0, l.status]));
+      const csvContent = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'digitalxiao_request_logs.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    };
   </script>
 </body>
 </html>
