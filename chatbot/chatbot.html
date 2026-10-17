@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content" />
-  <title>AETHERIA // Trợ Lý AI & DigitalXiao</title>
+  <title>AETHERIA // Trợ Lý AI & Không Gian Lập Trình</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -272,11 +272,6 @@
       border-radius: 50%;
       background: var(--accent-emerald);
       box-shadow: 0 0 8px var(--accent-emerald);
-    }
-
-    .engine-dot.locked {
-      background: var(--accent-magenta);
-      box-shadow: 0 0 8px var(--accent-magenta);
     }
 
     .messages-scroll-box {
@@ -808,21 +803,25 @@
 
         <div class="chat-input-zone">
           <div class="input-zone-top-row">
-            <!-- FULL 7 MODELS THEO CHUẨN XPIKI -->
+            <!-- FULL 7 MODEL THEO ĐÚNG HỆ THỐNG XPIKI -->
             <div class="custom-dropdown" id="model-picker">
               <div class="dropdown-trigger">
                 <i class="fa-solid fa-wand-magic-sparkles" style="color:var(--accent-cyan);"></i>
-                <span id="model-label">Claude Sonnet 5</span>
+                <span id="model-label">Claude Sonnet 4</span>
                 <i class="fa-solid fa-chevron-up" style="font-size:9px;"></i>
               </div>
               <div class="dropdown-menu">
-                <div class="dropdown-option selected" data-model="claude-sonnet-5" data-label="Claude Sonnet 5">
-                  <span>Claude Sonnet 5</span>
+                <div class="dropdown-option selected" data-model="kr/claude-sonnet-4" data-label="Claude Sonnet 4">
+                  <span>Claude Sonnet 4 (kr)</span>
                   <i class="fa-solid fa-check" style="color:var(--accent-cyan);"></i>
+                </div>
+                <div class="dropdown-option" data-model="claude-sonnet-5" data-label="Claude Sonnet 5">
+                  <span>Claude Sonnet 5</span>
+                  <i class="fa-solid fa-code" style="color:var(--accent-cyan);"></i>
                 </div>
                 <div class="dropdown-option" data-model="claude-sonnet-4-6" data-label="Claude Sonnet 4.6">
                   <span>Claude Sonnet 4.6</span>
-                  <i class="fa-solid fa-code" style="color:var(--accent-cyan);"></i>
+                  <i class="fa-solid fa-code-branch" style="color:var(--accent-cyan);"></i>
                 </div>
                 <div class="dropdown-option" data-model="claude-opus-5" data-label="Claude Opus 5">
                   <span>Claude Opus 5</span>
@@ -936,8 +935,13 @@
   <script type="module">
     import * as THREE from 'three';
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, update, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, update, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
+    // 1. TÍCH HỢP TRỰC TIẾP API KEY VÀ CẤU HÌNH XPIKI (KHÔNG QUA FIREBASE NỮA)
+    const DIRECT_API_KEY = "sk-2os8BC2DgSFtgJxRzfPQqSmfu0XQF8N6GLLzJTMMT9A";
+    const DIRECT_API_ENDPOINT = "https://api.xpiki.com/v1/chat/completions";
+
+    // Cấu hình Firebase chỉ dùng để ghi log thống kê (nếu cần)
     const firebaseConfig = {
       apiKey: "AIzaSyAVuB8m14zkMPs-JTLAKB0Bp18QBKAMBt4",
       authDomain: "ideo-dd376.firebaseapp.com",
@@ -961,30 +965,9 @@
       setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3200);
     }
 
-    // 1. ĐỒNG BỘ DỮ LIỆU TỪ NHÁNH aetheria_project VÀ NHẬN DIỆN MỌI KEY HỢP LỆ (sk-...)
-    let remoteConfig = {
-      api_key: '',
-      api_locked: false,
-      input_tokens: 0,
-      output_tokens: 0
-    };
-
-    onValue(ref(rtdb, 'aetheria_project/system_config'), (snap) => {
-      if (snap.exists()) {
-        remoteConfig = { ...remoteConfig, ...snap.val() };
-      }
-      const dot = document.getElementById('engine-status-dot');
-      const cleanKey = (remoteConfig.api_key || '').trim();
-
-      // Chỉ cần key tồn tại và có độ dài hợp lệ là sẵn sàng (chấm xanh)
-      if (remoteConfig.api_locked) {
-        dot.classList.add('locked');
-      } else if (cleanKey.length > 8) {
-        dot.classList.remove('locked');
-      } else {
-        dot.classList.add('locked');
-      }
-    });
+    // Trạng thái AI luôn sẵn sàng hoạt động (chấm xanh)
+    const statusDot = document.getElementById('engine-status-dot');
+    if (statusDot) statusDot.classList.remove('locked');
 
     // 2. PARSE CODE DOM AN TOÀN TUYỆT ĐỐI
     const messagesBox = document.getElementById('messages-box');
@@ -1054,7 +1037,7 @@
       return bubble;
     }
 
-    appendMessage('ai', 'Chào bạn! Tôi là trợ lý lập trình Aetheria. Tôi sẵn sàng hỗ trợ phân tích giải thuật, tìm lỗi và sinh mã nguồn sạch sẽ.');
+    appendMessage('ai', 'Chào bạn! Tôi là trợ lý lập trình Aetheria. Tôi đã kết nối trực tiếp với API Claude của bạn và sẵn sàng hỗ trợ viết code, phân tích thuật toán hoặc sửa lỗi.');
 
     // 3. XỬ LÝ ĐÍNH KÈM TỆP VÀ ẢNH
     let stagedFiles = [];
@@ -1113,7 +1096,7 @@
     };
 
     // 4. CHỌN MÔ HÌNH VÀ GỬI PROMPT
-    let currentModel = 'claude-sonnet-5';
+    let currentModel = 'kr/claude-sonnet-4';
     const modelPicker = document.getElementById('model-picker');
     modelPicker.querySelector('.dropdown-trigger').onclick = (e) => {
       e.stopPropagation();
@@ -1158,27 +1141,12 @@
       const text = chatInput.value.trim();
       if (!text && !stagedFiles.length && !stagedImages.length) return;
 
-      if (remoteConfig.api_locked) {
-        showToast('Hệ thống AI hiện đang tạm khóa bảo trì. Vui lòng thử lại sau!', 'error');
-        return;
-      }
-
-      // KIỂM TRA KEY: CHẤP NHẬN BẤT KỲ KEY SK-... HỢP LỆ NÀO
-      const cleanKey = (remoteConfig.api_key || '').trim();
-      if (!cleanKey || cleanKey.length < 8) {
-        appendMessage('user', text || '[Gửi tệp/ảnh]');
-        appendMessage('ai', 'Hệ thống AI hiện đang trong quá trình bảo trì kết nối máy chủ. Vui lòng thử lại sau ít phút.');
-        chatInput.value = '';
-        chatInput.style.height = 'auto';
-        return;
-      }
-
       let promptPayload = text;
       stagedFiles.forEach(f => {
         promptPayload += `\n\n--- Tệp đính kèm: ${f.name} ---\n${f.content}`;
       });
 
-      // Xây dựng message payload chuẩn endpoint OpenAI-compatible
+      // Tạo payload chuẩn OpenAI-compatible gửi tới API Xpiki
       const messagesPayload = [
         {
           role: 'system',
@@ -1224,11 +1192,11 @@
       const bubbleContainer = aiRow.querySelector('.msg-bubble');
 
       try {
-        // GỌI TRỰC TIẾP ĐẾN ENDPOINT CHUẨN XPIKI
-        const response = await fetch('[https://api.xpiki.com/v1/chat/completions](https://api.xpiki.com/v1/chat/completions)', {
+        // GỌI TRỰC TIẾP API XPIKI BẰNG KEY VÀ ENDPOINT TÍCH HỢP SẴN
+        const response = await fetch(DIRECT_API_ENDPOINT, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${cleanKey}`,
+            'Authorization': `Bearer ${DIRECT_API_KEY}`,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
@@ -1271,23 +1239,21 @@
           }
         }
 
-        // Cập nhật Token riêng vào nhánh aetheria_project
+        // Tự động đẩy thống kê Token tiêu thụ lên Firebase RTDB cho Dashboard
         if (data.usage) {
           const inT = data.usage.prompt_tokens || data.usage.input_tokens || 0;
           const outT = data.usage.completion_tokens || data.usage.output_tokens || 0;
-          await update(ref(rtdb, 'aetheria_project/system_config'), {
-            input_tokens: (remoteConfig.input_tokens || 0) + inT,
-            output_tokens: (remoteConfig.output_tokens || 0) + outT
-          });
-          await push(ref(rtdb, 'aetheria_project/request_logs'), {
-            time: new Date().toTimeString().split(' ')[0],
-            model: currentModel,
-            fileInfo: text ? 'Câu hỏi trực tiếp' : 'Tệp/Ảnh',
-            inTokens: inT,
-            outTokens: outT,
-            status: '200 OK',
-            timestamp: Date.now()
-          });
+          try {
+            await push(ref(rtdb, 'aetheria_project/request_logs'), {
+              time: new Date().toTimeString().split(' ')[0],
+              model: currentModel,
+              fileInfo: text ? 'Câu hỏi trực tiếp' : 'Tệp/Ảnh',
+              inTokens: inT,
+              outTokens: outT,
+              status: '200 OK',
+              timestamp: Date.now()
+            });
+          } catch (e) {}
         }
       } catch (err) {
         bubbleContainer.innerHTML = `<span style="color:var(--accent-magenta);"><i class="fa-solid fa-triangle-exclamation"></i> Có lỗi xảy ra trong quá trình xử lý: ${err.message}</span>`;
