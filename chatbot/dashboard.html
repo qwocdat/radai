@@ -34,6 +34,8 @@
       color: var(--text-main); font-family: var(--font-sans); overflow-x: hidden;
     }
 
+    ::-webkit-scrollbar { display: none; }
+
     #auth-gate-screen {
       position: fixed; inset: 0; z-index: 10000;
       background: #040509; display: flex; align-items: center; justify-content: center; padding: 20px;
@@ -73,6 +75,20 @@
 
     .btn-danger { background: rgba(255, 0, 127, 0.15); border-color: var(--accent-magenta); color: #ff85c0; }
 
+    /* 4 KPI CARDS */
+    .kpi-row {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: var(--bg-panel); backdrop-filter: blur(20px); border: 1px solid var(--border-glass);
+      border-radius: 18px; padding: 20px;
+    }
+
+    .kpi-head { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+    .kpi-num { font-family: var(--font-mono); font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .kpi-foot { font-size: 11.5px; color: var(--accent-emerald); }
+
     .control-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-bottom: 24px; }
     .panel-card { background: var(--bg-panel); backdrop-filter: blur(22px); border: 1px solid var(--border-glass); border-radius: 20px; padding: 24px; margin-bottom: 24px; }
     .panel-title { font-size: 16px; font-weight: 600; padding-bottom: 14px; margin-bottom: 18px; border-bottom: 1px solid var(--border-glass); display: flex; justify-content: space-between; align-items: center; }
@@ -94,13 +110,27 @@
       align-items: center; margin-bottom: 8px; font-family: var(--font-mono); font-size: 12px;
     }
 
+    /* TABLE */
+    .table-wrap { overflow-x: auto; }
+    .cyber-table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 12px; }
+    .cyber-table th { text-align: left; padding: 12px 14px; color: var(--text-muted); border-bottom: 1px solid var(--border-glass); font-size: 11px; }
+    .cyber-table td { padding: 12px 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+
+    .status-tag {
+      padding: 3px 9px; border-radius: 999px; font-size: 10.5px;
+      background: rgba(0, 255, 157, 0.12); color: var(--accent-emerald); border: 1px solid rgba(0, 255, 157, 0.3);
+    }
+
     #toast-stack { position: fixed; top: 24px; right: 24px; z-index: 20000; display: flex; flex-direction: column; gap: 8px; }
     .cyber-toast {
       background: rgba(10, 12, 22, 0.96); border: 1px solid var(--border-glass); border-left: 4px solid var(--accent-cyan);
       border-radius: 10px; padding: 12px 16px; color: #fff; font-size: 12.5px; display: flex; align-items: center; gap: 10px;
     }
 
-    @media (max-width: 900px) { .control-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 960px) {
+      .kpi-row { grid-template-columns: repeat(2, 1fr); }
+      .control-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -134,7 +164,7 @@
         <img src="https://i.ibb.co/tp7rRb8J/biospace-avatar-q-A9qs-J9c-1791556024025.jpg" style="width:40px; height:40px; border-radius:50%; border:2px solid var(--accent-cyan);" />
         <div>
           <div style="font-weight:700; font-size:17px;">AETHERIA // COMMAND CENTER</div>
-          <div style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono);">Cấu hình Model Online, Lệnh cURL, Pay2S & Link4M</div>
+          <div style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono);">Quản trị Model Online, Sửa tên trực tiếp, Pay2S & Link4M</div>
         </div>
       </div>
 
@@ -144,6 +174,30 @@
         <button class="btn-glass btn-danger" id="btn-lock-screen"><i class="fa-solid fa-lock"></i> Khóa</button>
       </div>
     </header>
+
+    <!-- 4 THẺ KPI TOÀN HỆ THỐNG -->
+    <section class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-head"><span>TỔNG MODEL ONLINE</span><i class="fa-solid fa-microchip" style="color:var(--accent-cyan);"></i></div>
+        <div class="kpi-num" id="kpi-model-count">0</div>
+        <div class="kpi-foot">Tự động đồng bộ Firebase</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-head"><span>TỔNG TOKEN TIÊU HAO</span><i class="fa-solid fa-coins" style="color:var(--accent-amber);"></i></div>
+        <div class="kpi-num" id="kpi-total-tokens">0</div>
+        <div class="kpi-foot">Ghi nhận từ trang Chat</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-head"><span>TỔNG USER ĐĂNG KÝ</span><i class="fa-solid fa-users" style="color:var(--accent-emerald);"></i></div>
+        <div class="kpi-num" id="kpi-user-count">0</div>
+        <div class="kpi-foot">Hệ thống Auth Firebase</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-head"><span>CỔNG THANH TOÁN</span><i class="fa-solid fa-credit-card" style="color:var(--accent-magenta);"></i></div>
+        <div class="kpi-num" id="kpi-pay-status" style="font-size:20px; color:var(--accent-emerald);">SẴN SÀNG</div>
+        <div class="kpi-foot">Pay2S & Shortlinks</div>
+      </div>
+    </section>
 
     <!-- SECTION 1: PARSER CURL & THÊM MODEL ONLINE -->
     <section class="control-grid">
@@ -165,7 +219,7 @@
         </div>
 
         <button type="button" class="btn-glass" id="btn-parse-curl" style="margin-bottom:14px; width:100%; justify-content:center;">
-          <i class="fa-solid fa-wand-magic-sparkles"></i> Bóc Tách Thông Tin cURL
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Bóc Tách Thông Số cURL
         </button>
 
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
@@ -174,8 +228,8 @@
             <input type="text" class="cyber-input" id="m-name" placeholder="VD: LongCat 2.5 Free" />
           </div>
           <div class="field-box">
-            <label>MÃ MODEL (ID)</label>
-            <input type="text" class="cyber-input" id="m-id" placeholder="longcat-2.5-preview-free" />
+            <label>MÃ MODEL GỐC (GIỮ NGUYÊN DẤU CHẤM)</label>
+            <input type="text" class="cyber-input" id="m-id" placeholder="deepseek-v4.1-flash-free" />
           </div>
         </div>
 
@@ -201,14 +255,14 @@
         </div>
 
         <button type="button" class="btn-neon" id="btn-save-model" style="width:100%; justify-content:center; padding:12px;">
-          <i class="fa-solid fa-plus"></i> Lưu & Cập Nhật Model Lên Firebase
+          <i class="fa-solid fa-plus"></i> Lưu & Đưa Model Vào Hệ Thống
         </button>
       </div>
 
-      <!-- DANH SÁCH MODEL ONLINE TRÊN FIREBASE -->
+      <!-- DANH SÁCH MODEL ONLINE (CÓ NÚT SỬA TÊN TRỰC TIẾP) -->
       <div class="panel-card">
         <div class="panel-title">
-          <span><i class="fa-solid fa-list-check" style="color:var(--accent-magenta); margin-right:8px;"></i> Danh Sách Model Đang Hoạt Động</span>
+          <span><i class="fa-solid fa-list-check" style="color:var(--accent-magenta); margin-right:8px;"></i> Quản Lý & Sửa Tên Model Online</span>
           <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent-cyan);" id="model-count-badge">0 MODEL</span>
         </div>
 
@@ -216,13 +270,12 @@
       </div>
     </section>
 
-    <!-- SECTION 2: CẤU HÌNH CỔNG THANH TOÁN PAY2S & KIẾM TOKEN QUA LINK RÚT GỌN -->
+    <!-- SECTION 2: CẤU HÌNH PAY2S & RÚT GỌN LINK -->
     <section class="control-grid">
-      <!-- CẤU HÌNH PAY2S -->
       <div class="panel-card">
         <div class="panel-title">
           <span><i class="fa-solid fa-credit-card" style="color:var(--accent-cyan); margin-right:8px;"></i> Cấu Hình Cổng Thanh Toán Pay2S</span>
-          <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent-emerald);">PAYMENT GATEWAY</span>
+          <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent-emerald);">PAY2S GATEWAY</span>
         </div>
 
         <div class="field-box">
@@ -241,7 +294,7 @@
         </div>
 
         <div class="field-box">
-          <label>TỈ GIÁ TOKEN (1.000 VNĐ ĐỔI ĐƯỢC BAO NHIÊU TOKEN?)</label>
+          <label>TỈ GIÁ TOKEN (1.000 VNĐ = ? TOKEN)</label>
           <input type="number" class="cyber-input" id="token-rate" value="10000" min="100" />
         </div>
 
@@ -250,17 +303,16 @@
         </button>
       </div>
 
-      <!-- CẤU HÌNH LINK4M VÀ TRAFFICTOP -->
       <div class="panel-card">
         <div class="panel-title">
           <span><i class="fa-solid fa-link" style="color:var(--accent-amber); margin-right:8px;"></i> Vượt Link Nhận Token (Link4M & TrafficTop)</span>
-          <span style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted);">300đ/VIEW</span>
+          <span style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted);">TỐI ĐA 2 LẦN/NGÀY</span>
         </div>
 
         <div class="field-box">
-          <label>TOKEN THƯỞNG CHO MỖI LẦN VƯỢT LINK (Tính từ 300đ để lãi)</label>
+          <label>TOKEN THƯỞNG CHO MỖI LẦN VƯỢT LINK (Tính lãi từ 300đ/view)</label>
           <input type="number" class="cyber-input" id="shortlink-reward" value="2500" min="100" />
-          <div style="font-size:10.5px; color:var(--text-muted); margin-top:4px;">* Mỗi view bạn nhận 300đ. Đặt 2.500 Token tương đương giá vốn 250đ (bạn lãi 50đ/view).</div>
+          <div style="font-size:10.5px; color:var(--text-muted); margin-top:4px;">* 2.500 Token tương đương 250đ (bạn lãi 50đ mỗi lượt view).</div>
         </div>
 
         <div class="field-box">
@@ -281,6 +333,31 @@
         <button type="button" class="btn-neon" id="btn-save-shortlink" style="width:100%; justify-content:center; padding:12px;">
           <i class="fa-solid fa-floppy-disk"></i> Lưu Cấu Hình Rút Gọn Link
         </button>
+      </div>
+    </section>
+
+    <!-- BẢNG NHẬT KÝ YÊU CẦU THỜI GIAN THỰC -->
+    <section class="panel-card">
+      <div class="panel-title">
+        <span><i class="fa-solid fa-list-check" style="color:var(--accent-emerald); margin-right:8px;"></i> Nhật Ký Truy Vấn Thời Gian Thực</span>
+        <button class="btn-glass" id="btn-export-csv" style="padding:6px 12px; font-size:11.5px;">
+          <i class="fa-solid fa-file-csv"></i> Xuất File CSV
+        </button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="cyber-table">
+          <thead>
+            <tr>
+              <th>THỜI GIAN</th>
+              <th>MÔ HÌNH</th>
+              <th>NGƯỜI DÙNG</th>
+              <th>TOKEN KHẤU TRỪ</th>
+              <th>TRẠNG THÁI</th>
+            </tr>
+          </thead>
+          <tbody id="logs-tbody"></tbody>
+        </table>
       </div>
     </section>
   </div>
@@ -339,20 +416,17 @@
       setTimeout(() => d.remove(), 3200);
     }
 
-    // 1. BÓC TÁCH CURL TỰ ĐỘNG
+    // BÓC TÁCH CURL TỰ ĐỘNG
     document.getElementById('btn-parse-curl').onclick = () => {
       const raw = document.getElementById('curl-input').value.trim();
       if (!raw) { alert('Vui lòng dán lệnh cURL vào ô trước!'); return; }
 
-      // Bóc URL Endpoint
       const urlMatch = raw.match(/curl\s+(?:-X\s+\w+\s+)?['"]?(https?:\/\/[^\s'"]+)/i);
       if (urlMatch) document.getElementById('m-endpoint').value = urlMatch[1];
 
-      // Bóc API Key trong Authorization
       const keyMatch = raw.match(/Authorization:\s*Bearer\s+([^\s'"]+)/i);
       if (keyMatch) document.getElementById('m-key').value = keyMatch[1];
 
-      // Bóc model name trong JSON data
       const modelMatch = raw.match(/"model"\s*:\s*"([^"]+)"/i);
       if (modelMatch) {
         document.getElementById('m-id').value = modelMatch[1];
@@ -362,24 +436,24 @@
       notify('Đã bóc tách thành công thông số cURL!');
     };
 
-    // 2. LƯU MODEL MỚI HOẶC SỬA MODEL
+    // LƯU MODEL (GIỮ NGUYÊN MODEL ID GỐC ĐỂ TRÁNH LỖI KIRA AI)
     document.getElementById('btn-save-model').onclick = async () => {
-      const mId = document.getElementById('m-id').value.trim();
-      const mName = document.getElementById('m-name').value.trim() || mId;
+      const originalModelId = document.getElementById('m-id').value.trim();
+      const mName = document.getElementById('m-name').value.trim() || originalModelId;
       const mEndpoint = document.getElementById('m-endpoint').value.trim();
       const mKey = document.getElementById('m-key').value.trim();
       const mCost = parseInt(document.getElementById('m-cost').value, 10) || 0;
       const mMaint = document.getElementById('m-maint').checked;
 
-      if (!mId || !mEndpoint || !mKey) {
+      if (!originalModelId || !mEndpoint || !mKey) {
         alert('Vui lòng điền đủ Mã Model, Endpoint và API Key!');
         return;
       }
 
-      // Xử lý key hợp lệ cho Firebase
-      const safeId = mId.replace(/[.#$/\[\]]/g, '_');
+      const safeKey = originalModelId.replace(/[.#$/\[\]]/g, '_');
 
-      await set(ref(rtdb, `aetheria_project/models_config/${safeId}`), {
+      await set(ref(rtdb, `aetheria_project/models_config/${safeKey}`), {
+        modelId: originalModelId, // Giữ nguyên dấu chấm ở đây
         name: mName,
         endpoint: mEndpoint,
         apiKey: mKey,
@@ -393,33 +467,40 @@
       document.getElementById('m-name').value = '';
     };
 
-    // 3. HIỂN THỊ DANH SÁCH MODEL TỪ FIREBASE
+    // QUẢN LÝ DANH SÁCH MODEL + CHỨC NĂNG SỬA TÊN TRỰC TIẾP
     onValue(ref(rtdb, 'aetheria_project/models_config'), (snap) => {
       const box = document.getElementById('model-list-container');
       box.innerHTML = '';
 
       if (!snap.exists()) {
         box.innerHTML = `<div style="color:var(--text-muted); padding:10px;">Chưa có model nào. Hãy nhập cURL để thêm!</div>`;
+        document.getElementById('kpi-model-count').textContent = '0';
         return;
       }
 
       const list = snap.val();
       document.getElementById('model-count-badge').textContent = `${Object.keys(list).length} MODEL`;
+      document.getElementById('kpi-model-count').textContent = Object.keys(list).length;
 
-      Object.entries(list).forEach(([safeId, item]) => {
+      Object.entries(list).forEach(([safeKey, item]) => {
+        const actualId = item.modelId || safeKey.replace(/_/g, '.');
         const row = document.createElement('div');
         row.className = 'model-item-row';
         row.innerHTML = `
           <div>
-            <strong style="color:#fff;">${item.name || safeId}</strong>
-            <span style="color:var(--text-muted); margin-left:6px;">(${item.costToken === 0 ? 'FREE' : item.costToken + ' Tok'})</span>
+            <strong style="color:#fff;" class="model-display-name">${item.name || actualId}</strong>
+            <span style="color:var(--text-muted); font-size:11px; margin-left:6px;">[${actualId}]</span>
+            <span style="color:var(--accent-cyan); font-size:11px; margin-left:6px;">(${item.costToken === 0 ? 'FREE' : item.costToken + ' Tok'})</span>
             <div style="font-size:10px; color:${item.maintenance ? 'var(--accent-amber)' : 'var(--accent-emerald)'};">
               ${item.maintenance ? '<i class="fa-solid fa-wrench"></i> Đang bảo trì' : '<i class="fa-solid fa-circle-check"></i> Hoạt động'}
             </div>
           </div>
           <div style="display:flex; gap:6px;">
+            <button class="btn-glass btn-edit-name" style="padding:4px 9px; font-size:11px;" title="Sửa tên hiển thị">
+              <i class="fa-solid fa-pen"></i> Sửa tên
+            </button>
             <button class="btn-glass btn-toggle-maint" style="padding:4px 9px; font-size:11px;">
-              ${item.maintenance ? 'Mở lại' : 'Bảo trì'}
+              ${item.maintenance ? 'Mở' : 'Bảo trì'}
             </button>
             <button class="btn-glass btn-danger btn-del-model" style="padding:4px 8px; font-size:11px;">
               <i class="fa-solid fa-trash"></i>
@@ -427,14 +508,24 @@
           </div>
         `;
 
+        // SỬA TÊN MODEL SAU KHI LƯU
+        row.querySelector('.btn-edit-name').onclick = async () => {
+          const currentName = item.name || actualId;
+          const newName = prompt(`Nhập tên hiển thị mới cho model [${actualId}]:`, currentName);
+          if (newName && newName.trim() && newName.trim() !== currentName) {
+            await update(ref(rtdb, `aetheria_project/models_config/${safeKey}`), { name: newName.trim() });
+            notify(`Đã đổi tên model thành "${newName.trim()}"!`);
+          }
+        };
+
         row.querySelector('.btn-toggle-maint').onclick = async () => {
-          await update(ref(rtdb, `aetheria_project/models_config/${safeId}`), { maintenance: !item.maintenance });
+          await update(ref(rtdb, `aetheria_project/models_config/${safeKey}`), { maintenance: !item.maintenance });
           notify('Đã cập nhật trạng thái model!');
         };
 
         row.querySelector('.btn-del-model').onclick = async () => {
-          if (confirm(`Xóa model ${item.name}?`)) {
-            await remove(ref(rtdb, `aetheria_project/models_config/${safeId}`));
+          if (confirm(`Xác nhận xóa model ${item.name || actualId}?`)) {
+            await remove(ref(rtdb, `aetheria_project/models_config/${safeKey}`));
             notify('Đã xóa model.');
           }
         };
@@ -443,7 +534,7 @@
       });
     });
 
-    // 4. LƯU CẤU HÌNH PAY2S
+    // CẤU HÌNH PAY2S
     document.getElementById('btn-save-pay2s').onclick = async () => {
       const partner = document.getElementById('pay2s-partner').value.trim();
       const access = document.getElementById('pay2s-access').value.trim();
@@ -461,7 +552,6 @@
       notify('Đã lưu cấu hình cổng thanh toán Pay2S!');
     };
 
-    // Đọc cấu hình Pay2S
     onValue(ref(rtdb, 'aetheria_project/payment_config/pay2s'), (snap) => {
       if (snap.exists()) {
         const d = snap.val();
@@ -472,7 +562,7 @@
       }
     });
 
-    // 5. LƯU CẤU HÌNH RÚT GỌN LINK KIẾM TIỀN
+    // CẤU HÌNH LINK4M VÀ TRAFFICTOP
     document.getElementById('btn-save-shortlink').onclick = async () => {
       const reward = parseInt(document.getElementById('shortlink-reward').value, 10) || 2500;
       const limit = parseInt(document.getElementById('shortlink-limit').value, 10) || 2;
@@ -499,6 +589,61 @@
         if (d.traffictopApi) document.getElementById('traffictop-api').value = d.traffictopApi;
       }
     });
+
+    // SỐ LƯỢNG USER TỪ FIREBASE
+    onValue(ref(rtdb, 'aetheria_project/users'), (snap) => {
+      document.getElementById('kpi-user-count').textContent = snap.exists() ? Object.keys(snap.val()).length : 0;
+    });
+
+    // NHẬT KÝ TRUY VẤN
+    let cachedLogs = [];
+    onValue(ref(rtdb, 'aetheria_project/request_logs'), (snap) => {
+      const tbody = document.getElementById('logs-tbody');
+      tbody.innerHTML = '';
+      cachedLogs = [];
+      let totalTokens = 0;
+
+      if (snap.exists()) {
+        Object.values(snap.val()).reverse().forEach(log => {
+          cachedLogs.push(log);
+          totalTokens += (log.costTokens || 0);
+        });
+      }
+
+      document.getElementById('kpi-total-tokens').textContent = totalTokens.toLocaleString();
+
+      if (cachedLogs.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Chưa có nhật ký truy vấn nào từ Chatbot</td></tr>`;
+        return;
+      }
+
+      cachedLogs.forEach(l => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${l.time}</td>
+          <td>${l.model}</td>
+          <td>${l.userEmail || 'Khách'}</td>
+          <td>${(l.costTokens || 0).toLocaleString()} Tok</td>
+          <td><span class="status-tag">${l.status}</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    });
+
+    // XUẤT CSV
+    document.getElementById('btn-export-csv').onclick = () => {
+      if (cachedLogs.length === 0) { alert("Chưa có dữ liệu để xuất file CSV!"); return; }
+      const rows = [['Thoi Gian', 'Mo Hinh', 'Email User', 'Token Khau Tru', 'Trang Thai']];
+      cachedLogs.forEach(l => rows.push([l.time, l.model, l.userEmail || 'Khach', l.costTokens || 0, l.status]));
+      const csvContent = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'digitalxiao_request_logs.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    };
   </script>
 </body>
 </html>
