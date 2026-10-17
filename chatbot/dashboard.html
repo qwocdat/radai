@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>AETHERIA // Trung Tâm Quản Trị API Key & Thống Kê Token</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="preconnect" href="[https://fonts.googleapis.com](https://fonts.googleapis.com)">
+  <link rel="preconnect" href="[https://fonts.gstatic.com](https://fonts.gstatic.com)" crossorigin>
+  <link href="[https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap](https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap)" rel="stylesheet">
+  <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css)" />
 
   <style>
     :root {
@@ -54,7 +54,7 @@
       display: none;
     }
 
-    /* MÀN HÌNH KHÓA BẢO MẬT MẬT KHẨU */
+    /* MÀN HÌNH KHÓA BẢO MẬT MẬT KHẨU ame1610@ */
     #auth-gate-screen {
       position: fixed;
       inset: 0;
@@ -458,7 +458,7 @@
 </head>
 <body>
 
-  <!-- MÀN HÌNH NHẬP MẬT KHẨU BẢO VỆ DASHBOARD -->
+  <!-- MÀN HÌNH NHẬP MẬT KHẨU ame1610@ -->
   <div id="auth-gate-screen">
     <div class="auth-gate-box">
       <div class="gate-icon"><i class="fa-solid fa-lock"></i></div>
@@ -481,7 +481,7 @@
 
   <div id="toast-stack"></div>
 
-  <!-- CONTAINER DASHBOARD CHÍNH (CHỈ HIỆN KHI NHẬP ĐÚNG MẬT KHẨU) -->
+  <!-- DASHBOARD CHÍNH -->
   <div class="dashboard-container" id="dashboard-main">
     <header class="admin-topbar">
       <div class="admin-brand">
@@ -489,7 +489,7 @@
         <div>
           <div>AETHERIA // COMMAND DASHBOARD</div>
           <div style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted); font-weight:400;">
-            Quản lý khóa API Claude, khóa bảo mật khẩn cấp và giám sát Token thời gian thực
+            Quản lý khóa API Claude, khóa khẩn cấp và giám sát Token dự án Aetheria
           </div>
         </div>
       </div>
@@ -514,7 +514,7 @@
     <section class="kpi-row">
       <div class="kpi-card">
         <div class="kpi-head">
-          <span>TỔNG TOKEN TIÊU HAO THẬT</span>
+          <span>TỔNG TOKEN TIÊU HAO CỦA DỰ ÁN</span>
           <i class="fa-solid fa-microchip" style="color:var(--accent-cyan);"></i>
         </div>
         <div class="kpi-num" id="kpi-total-tokens">0</div>
@@ -545,7 +545,7 @@
           <i class="fa-solid fa-gauge-high" style="color:var(--accent-magenta);"></i>
         </div>
         <div class="kpi-num" id="kpi-limit">100</div>
-        <div class="kpi-foot">Tự động đồng bộ sang Chatbot</div>
+        <div class="kpi-foot">Áp dụng riêng dự án Aetheria</div>
       </div>
     </section>
 
@@ -553,8 +553,8 @@
     <section class="control-grid">
       <div class="panel-card">
         <div class="panel-title">
-          <span><i class="fa-solid fa-key" style="color:var(--accent-cyan); margin-right:8px;"></i> Lưu & Cấp Phát Claude API Key Cho Chatbot</span>
-          <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent-emerald);">FIREBASE RTDB</span>
+          <span><i class="fa-solid fa-key" style="color:var(--accent-cyan); margin-right:8px;"></i> Cấp Phát API Key Cho Chatbot (Nhánh aetheria_project)</span>
+          <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent-emerald);">ISOLATED DB</span>
         </div>
 
         <div class="field-box">
@@ -591,7 +591,7 @@
 
         <!-- KHO LƯU TRỮ CÁC KHÓA -->
         <div style="margin-top:20px;">
-          <div style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted);">DANH SÁCH KHÓA ĐÃ LƯU TRONG KHO</div>
+          <div style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted);">DANH SÁCH KHÓA ĐÃ LƯU TRONG KHO DỰ ÁN</div>
           <div class="vault-list" id="vault-list"></div>
         </div>
 
@@ -599,7 +599,7 @@
         <div class="lock-banner">
           <div>
             <div style="font-weight:600; font-size:14px;">Khóa API Khẩn Cấp (Emergency Kill-Switch)</div>
-            <div style="font-size:12px; color:var(--text-muted);">Khi bật, Chatbot sẽ lập tức bị chặn gọi API để tránh phát sinh chi phí</div>
+            <div style="font-size:12px; color:var(--text-muted);">Khi bật, Chatbot của Aetheria sẽ lập tức bị chặn gọi API</div>
           </div>
           <div class="cyber-switch" id="api-lock-switch"></div>
         </div>
@@ -623,7 +623,7 @@
         </div>
 
         <div style="font-size:12.5px; color:var(--text-muted); line-height:1.6;">
-          <div><i class="fa-solid fa-circle-check" style="color:var(--accent-emerald);"></i> Mọi truy vấn từ <strong>chatbot.html</strong> đều được tính toán token thực tế và đẩy bản ghi trực tiếp về bảng nhật ký bên dưới.</div>
+          <div><i class="fa-solid fa-circle-check" style="color:var(--accent-emerald);"></i> Chỉ ghi nhận và thống kê các lượt chat thực tế từ trang <strong>chatbot.html</strong> của dự án Aetheria.</div>
         </div>
       </div>
     </section>
@@ -631,7 +631,7 @@
     <!-- REALTIME REQUEST LOGS -->
     <section class="panel-card">
       <div class="panel-title">
-        <span><i class="fa-solid fa-list-check" style="color:var(--accent-emerald); margin-right:8px;"></i> Nhật Ký Truy Vấn Thời Gian Thực</span>
+        <span><i class="fa-solid fa-list-check" style="color:var(--accent-emerald); margin-right:8px;"></i> Nhật Ký Truy Vấn Của Riêng Dự Án Aetheria</span>
         <button class="btn-glass" id="btn-export-csv" style="padding:6px 12px; font-size:11.5px;">
           <i class="fa-solid fa-file-csv"></i>
           <span>Xuất File CSV</span>
@@ -656,10 +656,10 @@
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, set, update, push, remove, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { initializeApp } from "[https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js](https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js)";
+    import { getDatabase, ref, update, push, remove, onValue } from "[https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js](https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js)";
 
-    // 1. CƠ CHẾ XÁC THỰC MẬT KHẨU ame1610@
+    // 1. XÁC THỰC MẬT KHẨU QUẢN TRỊ ame1610@
     const AUTH_PASS = "ame1610@";
     const gateScreen = document.getElementById('auth-gate-screen');
     const dashboardMain = document.getElementById('dashboard-main');
@@ -699,11 +699,11 @@
 
     checkAuth();
 
-    // 2. KHỞI TẠO FIREBASE & XỬ LÝ LƯU TRỮ API KEY CHUẨN XÁC
+    // 2. KHỞI TẠO FIREBASE VỚI PHÂN VÙNG ĐỘC LẬP aetheria_project
     const firebaseConfig = {
       apiKey: "AIzaSyAVuB8m14zkMPs-JTLAKB0Bp18QBKAMBt4",
       authDomain: "ideo-dd376.firebaseapp.com",
-      databaseURL: "https://ideo-dd376-default-rtdb.asia-southeast1.firebasedatabase.app",
+      databaseURL: "[https://ideo-dd376-default-rtdb.asia-southeast1.firebasedatabase.app](https://ideo-dd376-default-rtdb.asia-southeast1.firebasedatabase.app)",
       projectId: "ideo-dd376",
       storageBucket: "ideo-dd376.firebasestorage.app",
       messagingSenderId: "689163185",
@@ -738,8 +738,8 @@
       max_requests_per_day: 100
     };
 
-    // Đọc trạng thái cấu hình thời gian thực từ Firebase
-    onValue(ref(rtdb, 'system_config'), (snap) => {
+    // ĐỌC DỮ LIỆU TỪ NHÁNH RIÊNG aetheria_project/system_config
+    onValue(ref(rtdb, 'aetheria_project/system_config'), (snap) => {
       if (snap.exists()) {
         currentState = { ...currentState, ...snap.val() };
       }
@@ -775,7 +775,7 @@
       document.getElementById('kpi-key-preview').textContent = `Key: ${masked}`;
     });
 
-    // LƯU API KEY LÊN FIREBASE (ĐÃ FIX LỖI 100%)
+    // LƯU API KEY VÀO ĐÚNG NHÁNH aetheria_project/system_config
     document.getElementById('btn-save-dispatch').onclick = async () => {
       const k = keyInput.value.trim();
       const label = document.getElementById('api-key-label').value.trim() || 'Claude API Key';
@@ -787,19 +787,19 @@
       }
 
       try {
-        await update(ref(rtdb, 'system_config'), {
+        await update(ref(rtdb, 'aetheria_project/system_config'), {
           api_key: k,
           max_requests_per_day: limit,
           updated_at: Date.now()
         });
 
-        await push(ref(rtdb, 'api_key_vault'), {
+        await push(ref(rtdb, 'aetheria_project/api_key_vault'), {
           label,
           key: k,
           createdAt: new Date().toLocaleTimeString('vi-VN')
         });
 
-        notify('Lưu thành công API Key lên Firebase RTDB!');
+        notify('Lưu thành công API Key vào nhánh Aetheria!');
       } catch (err) {
         alert("Lỗi khi lưu lên Firebase: " + err.message);
       }
@@ -808,20 +808,20 @@
     // Bật tắt khóa API khẩn cấp
     document.getElementById('api-lock-switch').onclick = async () => {
       const nextLock = !currentState.api_locked;
-      await update(ref(rtdb, 'system_config'), { api_locked: nextLock });
-      notify(nextLock ? 'Đã KHÓA API khẩn cấp trên toàn hệ thống!' : 'Đã MỞ KHÓA API cho Chatbot!');
+      await update(ref(rtdb, 'aetheria_project/system_config'), { api_locked: nextLock });
+      notify(nextLock ? 'Đã KHÓA API của dự án Aetheria!' : 'Đã MỞ KHÓA API cho Chatbot!');
     };
 
     // Đặt lại bộ đếm token
     document.getElementById('btn-reset-tokens').onclick = async () => {
-      if (confirm("Bạn có chắc chắn muốn đặt lại bộ đếm Token về 0?")) {
-        await update(ref(rtdb, 'system_config'), { input_tokens: 0, output_tokens: 0 });
-        notify('Đã đặt lại bộ đếm Token.');
+      if (confirm("Bạn có chắc chắn muốn đặt lại bộ đếm Token của dự án này về 0?")) {
+        await update(ref(rtdb, 'aetheria_project/system_config'), { input_tokens: 0, output_tokens: 0 });
+        notify('Đã đặt lại bộ đếm Token về 0.');
       }
     };
 
-    // Hiển thị danh sách khóa đã lưu
-    onValue(ref(rtdb, 'api_key_vault'), (snap) => {
+    // Danh sách khóa đã lưu trong kho của riêng dự án
+    onValue(ref(rtdb, 'aetheria_project/api_key_vault'), (snap) => {
       const vaultList = document.getElementById('vault-list');
       vaultList.innerHTML = '';
       if (!snap.exists()) {
@@ -845,19 +845,19 @@
         `;
         row.querySelector('.btn-use-key').onclick = async () => {
           keyInput.value = item.key;
-          await update(ref(rtdb, 'system_config'), { api_key: item.key });
+          await update(ref(rtdb, 'aetheria_project/system_config'), { api_key: item.key });
           notify(`Đã kích hoạt khóa "${item.label}"!`);
         };
         row.querySelector('.btn-del-key').onclick = async () => {
-          await remove(ref(rtdb, `api_key_vault/${id}`));
+          await remove(ref(rtdb, `aetheria_project/api_key_vault/${id}`));
         };
         vaultList.appendChild(row);
       });
     });
 
-    // Lắng nghe Request Logs thật từ Chatbot
+    // Lắng nghe Request Logs riêng biệt
     let cachedLogs = [];
-    onValue(ref(rtdb, 'request_logs'), (snap) => {
+    onValue(ref(rtdb, 'aetheria_project/request_logs'), (snap) => {
       const tbody = document.getElementById('logs-tbody');
       tbody.innerHTML = '';
       cachedLogs = [];
@@ -867,7 +867,7 @@
       }
 
       if (cachedLogs.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Chưa có nhật ký truy vấn nào từ trang Chatbot</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Chưa có nhật ký truy vấn nào từ trang Chatbot Aetheria</td></tr>`;
         return;
       }
 
