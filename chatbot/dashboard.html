@@ -51,7 +51,7 @@
       box-shadow: 0 0 22px rgba(0, 240, 255, 0.45); object-fit: cover; margin: 0 auto 16px; display: block;
     }
 
-    .dashboard-container { width: min(1320px, 94vw); margin: 0 auto; padding: 28px 0 80px; display: none; }
+    .dashboard-container { width: min(1340px, 95vw); margin: 0 auto; padding: 28px 0 80px; display: none; }
     .dashboard-container.unlocked { display: block; }
 
     .admin-topbar {
@@ -64,16 +64,22 @@
       padding: 10px 18px; border-radius: 12px; background: linear-gradient(135deg, var(--accent-cyan), #6ef7ff);
       color: #040509; font-size: 13px; font-weight: 600; border: none; cursor: pointer; display: inline-flex;
       align-items: center; gap: 8px; text-decoration: none; box-shadow: 0 0 18px rgba(0, 240, 255, 0.3);
+      transition: all 0.2s ease;
     }
+    .btn-neon:hover { transform: translateY(-2px); box-shadow: 0 0 24px rgba(0, 240, 255, 0.5); }
 
     .btn-glass {
       padding: 10px 16px; border-radius: 12px; background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border-glass); color: #fff; font-size: 13px; cursor: pointer;
       display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
+      transition: all 0.2s ease;
     }
+    .btn-glass:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
 
     .btn-danger { background: rgba(255, 0, 127, 0.15); border-color: var(--accent-magenta); color: #ff85c0; }
+    .btn-danger:hover { background: rgba(255, 0, 127, 0.3); border-color: var(--accent-magenta); color: #fff; }
 
+    /* KPI CARDS */
     .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 24px; }
     .kpi-card { background: var(--bg-panel); backdrop-filter: blur(20px); border: 1px solid var(--border-glass); border-radius: 18px; padding: 20px; }
     .kpi-head { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
@@ -82,24 +88,36 @@
 
     .control-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-bottom: 24px; }
     .panel-card { background: var(--bg-panel); backdrop-filter: blur(22px); border: 1px solid var(--border-glass); border-radius: 20px; padding: 24px; margin-bottom: 24px; }
-    .panel-title { font-size: 16px; font-weight: 600; padding-bottom: 14px; margin-bottom: 18px; border-bottom: 1px solid var(--border-glass); display: flex; justify-content: space-between; align-items: center; }
+    .panel-title { font-size: 16px; font-weight: 600; padding-bottom: 14px; margin-bottom: 18px; border-bottom: 1px solid var(--border-glass); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
 
     .field-box { margin-bottom: 14px; }
     .field-box label { display: block; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
     .cyber-input, .cyber-textarea { width: 100%; padding: 11px 14px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 11px; color: #fff; font-family: var(--font-mono); font-size: 13px; }
     .cyber-textarea { min-height: 110px; resize: vertical; line-height: 1.5; }
 
-    .model-item-row { padding: 12px 14px; border-radius: 12px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-family: var(--font-mono); font-size: 12px; }
+    .model-item-row { padding: 12px 14px; border-radius: 12px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-family: var(--font-mono); font-size: 12px; gap: 8px; flex-wrap: wrap; }
+
+    /* BIỂU ĐỒ LƯU LƯỢNG TOKEN */
+    .chart-box {
+      width: 100%; height: 180px; background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 14px; padding: 14px;
+      display: flex; align-items: flex-end; gap: 8px; overflow: hidden;
+    }
+    .chart-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
+    .chart-bar { width: 100%; background: linear-gradient(180deg, var(--accent-cyan), var(--accent-violet)); border-radius: 6px 6px 0 0; min-height: 6px; transition: height 0.3s ease; }
+    .chart-lbl { font-family: var(--font-mono); font-size: 9.5px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60px; }
+
+    /* BỘ LỌC NHẬT KÝ */
+    .filter-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+    .filter-input { flex: 1; min-width: 200px; padding: 9px 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 9px; color: #fff; font-family: var(--font-mono); font-size: 12px; }
 
     .table-wrap { overflow-x: auto; }
     .cyber-table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 12px; }
     .cyber-table th { text-align: left; padding: 12px 14px; color: var(--text-muted); border-bottom: 1px solid var(--border-glass); font-size: 11px; }
     .cyber-table td { padding: 12px 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
 
-    .status-tag {
-      padding: 3px 9px; border-radius: 999px; font-size: 10.5px;
-      background: rgba(0, 255, 157, 0.12); color: var(--accent-emerald); border: 1px solid rgba(0, 255, 157, 0.3);
-    }
+    .status-tag { padding: 3px 9px; border-radius: 999px; font-size: 10.5px; background: rgba(0, 255, 157, 0.12); color: var(--accent-emerald); border: 1px solid rgba(0, 255, 157, 0.3); }
+    .status-tag.blocked { background: rgba(255, 0, 127, 0.12); color: var(--accent-magenta); border: 1px solid rgba(255, 0, 127, 0.3); }
 
     #toast-stack { position: fixed; top: 24px; right: 24px; z-index: 20000; display: flex; flex-direction: column; gap: 8px; }
     .cyber-toast { background: rgba(10, 12, 22, 0.96); border: 1px solid var(--border-glass); border-left: 4px solid var(--accent-cyan); border-radius: 10px; padding: 12px 16px; color: #fff; font-size: 12.5px; display: flex; align-items: center; gap: 10px; }
@@ -112,12 +130,12 @@
 </head>
 <body>
 
-  <!-- MÀN HÌNH KHÓA ame1610@ -->
+  <!-- MÀN HÌNH KHÓA QUẢN TRỊ ame1610@ -->
   <div id="auth-gate-screen">
     <div class="auth-gate-box">
       <img src="https://i.ibb.co/tp7rRb8J/biospace-avatar-q-A9qs-J9c-1791556024025.jpg" class="gate-avatar" />
       <h2 style="font-size:20px; font-weight:700; margin-bottom:8px;">QUẢN TRỊ VIÊN AETHERIA</h2>
-      <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:20px;">Vui lòng nhập mật khẩu quản trị:</p>
+      <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:20px;">Vui lòng nhập mật khẩu quản trị để mở khóa hệ thống:</p>
       
       <div class="field-box">
         <input type="password" class="cyber-input" id="gate-password-input" placeholder="Nhập mật khẩu..." autofocus style="text-align:center; font-size:15px; letter-spacing:2px;" />
@@ -141,24 +159,44 @@
         <img src="https://i.ibb.co/tp7rRb8J/biospace-avatar-q-A9qs-J9c-1791556024025.jpg" style="width:40px; height:40px; border-radius:50%; border:2px solid var(--accent-cyan);" />
         <div>
           <div style="font-weight:700; font-size:17px;">AETHERIA // COMMAND CENTER</div>
-          <div style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono);">Quản trị Model Online, Đồng bộ giá KiraAI, Pay2S & Link4M</div>
+          <div style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono);">Quản trị Model Online, User Tokens, KiraAI Pricing, Pay2S & Link4M</div>
         </div>
       </div>
-      <div style="display:flex; gap:10px;">
+      <div style="display:flex; gap:10px; align-items:center;">
         <a href="chatbot.html" class="btn-neon"><i class="fa-solid fa-comments"></i> Chatbot</a>
         <a href="recharge.html" class="btn-glass"><i class="fa-solid fa-coins"></i> Nạp Tiền</a>
-        <button class="btn-glass btn-danger" id="btn-lock-screen"><i class="fa-solid fa-lock"></i> Khóa</button>
+        <button class="btn-glass btn-danger" id="btn-emergency-kill" title="Tạm dừng toàn bộ API khẩn cấp">
+          <i class="fa-solid fa-power-off"></i> Khẩn Cấp
+        </button>
+        <button class="btn-glass" id="btn-lock-screen" title="Khóa màn hình"><i class="fa-solid fa-lock"></i></button>
       </div>
     </header>
 
+    <!-- 4 THẺ KPI TOÀN HỆ THỐNG -->
     <section class="kpi-row">
-      <div class="kpi-card"><div class="kpi-head"><span>TỔNG MODEL ONLINE</span><i class="fa-solid fa-microchip" style="color:var(--accent-cyan);"></i></div><div class="kpi-num" id="kpi-model-count">0</div><div class="kpi-foot">Tự động đồng bộ Firebase</div></div>
-      <div class="kpi-card"><div class="kpi-head"><span>TỔNG TOKEN TIÊU HAO</span><i class="fa-solid fa-coins" style="color:var(--accent-amber);"></i></div><div class="kpi-num" id="kpi-total-tokens">0</div><div class="kpi-foot">Ghi nhận từ Chatbot</div></div>
-      <div class="kpi-card"><div class="kpi-head"><span>TỔNG USER ĐĂNG KÝ</span><i class="fa-solid fa-users" style="color:var(--accent-emerald);"></i></div><div class="kpi-num" id="kpi-user-count">0</div><div class="kpi-foot">Đồng bộ Auth Firebase</div></div>
-      <div class="kpi-card"><div class="kpi-head"><span>CỔNG THANH TOÁN</span><i class="fa-solid fa-credit-card" style="color:var(--accent-magenta);"></i></div><div class="kpi-num" id="kpi-pay-status" style="font-size:20px; color:var(--accent-emerald);">SẴN SÀNG</div><div class="kpi-foot">Pay2S & Shortlinks</div></div>
+      <div class="kpi-card">
+        <div class="kpi-head"><span>TỔNG MODEL ONLINE</span><i class="fa-solid fa-microchip" style="color:var(--accent-cyan);"></i></div>
+        <div class="kpi-num" id="kpi-model-count">0</div>
+        <div class="kpi-foot">Tự động đồng bộ Firebase</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-head"><span>TỔNG TOKEN TIÊU HAO</span><i class="fa-solid fa-coins" style="color:var(--accent-amber);"></i></div>
+        <div class="kpi-num" id="kpi-total-tokens">0</div>
+        <div class="kpi-foot">Bộ đếm thời gian thực</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-head"><span>TỔNG USER ĐĂNG KÝ</span><i class="fa-solid fa-users" style="color:var(--accent-emerald);"></i></div>
+        <div class="kpi-num" id="kpi-user-count">0</div>
+        <div class="kpi-foot">Mặc định 1.000 Tok/User mới</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-head"><span>CỔNG THANH TOÁN</span><i class="fa-solid fa-credit-card" style="color:var(--accent-magenta);"></i></div>
+        <div class="kpi-num" id="kpi-pay-status" style="font-size:20px; color:var(--accent-emerald);">SẴN SÀNG</div>
+        <div class="kpi-foot">Pay2S & Shortlinks</div>
+      </div>
     </section>
 
-    <!-- SECTION 1: MODEL ONLINE -->
+    <!-- SECTION 1: PARSER CURL & DANH SÁCH MODEL -->
     <section class="control-grid">
       <div class="panel-card">
         <div class="panel-title">
@@ -188,8 +226,8 @@
         
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
           <div class="field-box">
-            <label>TOKEN CỐ ĐỊNH / LẦN (0 NẾU THEO TỈ LỆ)</label>
-            <input type="number" class="cyber-input" id="m-cost" value="0" min="0" />
+            <label>TOKEN KHẤU TRỪ / LƯỢT CHAT (ĐẶT 0 NẾU TÍNH THEO TỈ LỆ)</label>
+            <input type="number" class="cyber-input" id="m-cost" value="50" min="0" />
           </div>
           <div class="field-box" style="display:flex; align-items:center; gap:10px; margin-top:20px;">
             <input type="checkbox" id="m-maint" style="width:18px; height:18px;" />
@@ -202,10 +240,10 @@
         </button>
       </div>
 
-      <!-- DANH SÁCH MODEL -->
+      <!-- DANH SÁCH MODEL ONLINE -->
       <div class="panel-card">
         <div class="panel-title">
-          <span><i class="fa-solid fa-list-check" style="color:var(--accent-magenta); margin-right:8px;"></i> Quản Lý & Sửa Tên Model</span>
+          <span><i class="fa-solid fa-list-check" style="color:var(--accent-magenta); margin-right:8px;"></i> Quản Lý, Sửa Tên & Giá Model</span>
           <button class="btn-glass" id="btn-sync-price" style="padding:6px 12px; font-size:11px;">
             <i class="fa-solid fa-rotate"></i> Đồng Bộ Giá KiraAI
           </button>
@@ -214,7 +252,26 @@
       </div>
     </section>
 
-    <!-- SECTION 2: CẤU HÌNH PAY2S (CÓ ENDPOINT) & RÚT GỌN LINK -->
+    <!-- SECTION 2: QUẢN LÝ TÀI KHOẢN & BIỂU ĐỒ LƯU LƯỢNG -->
+    <section class="control-grid">
+      <div class="panel-card">
+        <div class="panel-title">
+          <span><i class="fa-solid fa-users-gear" style="color:var(--accent-emerald); margin-right:8px;"></i> Quản Lý Số Dư Token Tài Khoản</span>
+          <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent-cyan);">USER WALLET MANAGER</span>
+        </div>
+        <div id="users-list-container" style="max-height: 260px; overflow-y:auto;"></div>
+      </div>
+
+      <div class="panel-card">
+        <div class="panel-title">
+          <span><i class="fa-solid fa-chart-column" style="color:var(--accent-cyan); margin-right:8px;"></i> Biểu Đồ Lưu Lượng Token Theo Model</span>
+          <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent-emerald);">REAL-TIME METRICS</span>
+        </div>
+        <div class="chart-box" id="token-usage-chart"></div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: CẤU HÌNH PAY2S & RÚT GỌN LINK -->
     <section class="control-grid">
       <div class="panel-card">
         <div class="panel-title">
@@ -253,14 +310,29 @@
       </div>
     </section>
 
-    <!-- BẢNG NHẬT KÝ YÊU CẦU -->
+    <!-- SECTION 4: BẢNG NHẬT KÝ YÊU CẦU THỜI GIAN THỰC -->
     <section class="panel-card">
       <div class="panel-title">
         <span><i class="fa-solid fa-list-check" style="color:var(--accent-emerald); margin-right:8px;"></i> Nhật Ký Truy Vấn Thời Gian Thực</span>
-        <button class="btn-glass" id="btn-export-csv" style="padding:6px 12px; font-size:11.5px;">
-          <i class="fa-solid fa-file-csv"></i> Xuất File CSV
-        </button>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-glass" id="btn-clear-logs" style="padding:6px 12px; font-size:11.5px; border-color:var(--accent-magenta); color:#ff85c0;">
+            <i class="fa-solid fa-trash"></i> Xóa Nhật Ký
+          </button>
+          <button class="btn-glass" id="btn-export-csv" style="padding:6px 12px; font-size:11.5px;">
+            <i class="fa-solid fa-file-csv"></i> Xuất File CSV
+          </button>
+        </div>
       </div>
+
+      <div class="filter-bar">
+        <input type="text" id="log-search-input" class="filter-input" placeholder="Tìm theo Email hoặc Mô hình..." />
+        <select id="log-status-filter" class="filter-input" style="max-width: 180px;">
+          <option value="ALL">Tất cả trạng thái</option>
+          <option value="200 OK">Thành công (200 OK)</option>
+          <option value="ERROR">Có lỗi / Bị chặn</option>
+        </select>
+      </div>
+
       <div class="table-wrap">
         <table class="cyber-table">
           <thead>
@@ -349,7 +421,7 @@
       notify('Đã bóc tách thông số cURL thành công!');
     };
 
-    // 2. LƯU MÔ HÌNH VÀO FIREBASE (LƯU NGUYÊN VẸN MÃ MODEL GỐC CÓ DẤU CHẤM)
+    // 2. LƯU MÔ HÌNH LÊN FIREBASE
     document.getElementById('btn-save-model').onclick = async () => {
       const originalModelId = document.getElementById('m-id').value.trim();
       const mName = document.getElementById('m-name').value.trim() || originalModelId;
@@ -376,7 +448,7 @@
       notify(`Đã lưu mô hình ${mName} thành công!`);
     };
 
-    // 3. ĐỒNG BỘ BẢNG GIÁ KIRA AI (KIRAAI.VN/MODELS)
+    // 3. ĐỒNG BỘ BẢNG GIÁ KIRAAI
     document.getElementById('btn-sync-price').onclick = async () => {
       notify("Đang lấy bảng giá mô hình từ KiraAI...");
       try {
@@ -388,7 +460,6 @@
             kiraModels = data.data || [];
           }
         } catch(e) {
-          // Thử proxy nếu bị cors
           const res = await fetch(`https://corsproxy.io/?${encodeURIComponent("https://kiraai.vn/api/v1/models")}`);
           if (res.ok) {
             const data = await res.json();
@@ -417,7 +488,22 @@
       }
     };
 
-    // 4. QUẢN LÝ DANH SÁCH MÔ HÌNH VÀ SỬA TÊN TRỰC TIẾP
+    // 4. KHÓA KHẨN CẤP TOÀN BỘ MÔ HÌNH
+    document.getElementById('btn-emergency-kill').onclick = async () => {
+      if (!confirm("BẠN CÓ CHẮC MUỐN TẠM DỪNG TOÀN BỘ CÁC MÔ HÌNH NGAY LẬP TỨC?")) return;
+      const snap = await get(ref(rtdb, 'aetheria_project/models_config'));
+      if (snap.exists()) {
+        const list = snap.val();
+        const updates = {};
+        for (const k of Object.keys(list)) {
+          updates[`${k}/maintenance`] = true;
+        }
+        await update(ref(rtdb, 'aetheria_project/models_config'), updates);
+        notify("ĐÃ KÍCH HOẠT DỪNG KHẨN CẤP TOÀN BỘ MÔ HÌNH!");
+      }
+    };
+
+    // 5. QUẢN LÝ DANH SÁCH MÔ HÌNH (SỬA TÊN + SỬA GIÁ TOKEN)
     onValue(ref(rtdb, 'aetheria_project/models_config'), (snap) => {
       const box = document.getElementById('model-list-container');
       box.innerHTML = '';
@@ -440,14 +526,15 @@
             <strong style="color:#fff;">${item.name || actualId}</strong>
             <span style="color:var(--text-muted); font-size:11px; margin-left:6px;">[${actualId}]</span>
             <div style="color:var(--accent-cyan); font-size:11px; margin-top:2px;">
-              ${item.costToken > 0 ? item.costToken + ' Tok/lần' : (item.priceIn || 0) + ' In / ' + (item.priceOut || 0) + ' Out'}
+              Chi phí: <strong>${item.costToken > 0 ? item.costToken + ' Tok/lượt' : (item.priceIn || 0) + ' In / ' + (item.priceOut || 0) + ' Out'}</strong>
             </div>
             <div style="font-size:10px; color:${item.maintenance ? 'var(--accent-amber)' : 'var(--accent-emerald)'};">
               ${item.maintenance ? '<i class="fa-solid fa-wrench"></i> Đang bảo trì' : '<i class="fa-solid fa-circle-check"></i> Hoạt động'}
             </div>
           </div>
-          <div style="display:flex; gap:6px;">
-            <button class="btn-glass btn-edit-name" style="padding:4px 9px; font-size:11px;" title="Sửa tên hiển thị"><i class="fa-solid fa-pen"></i> Sửa tên</button>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="btn-glass btn-edit-name" style="padding:4px 9px; font-size:11px;"><i class="fa-solid fa-pen"></i> Tên</button>
+            <button class="btn-glass btn-edit-cost" style="padding:4px 9px; font-size:11px;"><i class="fa-solid fa-coins"></i> Giá Tok</button>
             <button class="btn-glass btn-toggle-maint" style="padding:4px 9px; font-size:11px;">${item.maintenance ? 'Mở lại' : 'Bảo trì'}</button>
             <button class="btn-glass btn-danger btn-del-model" style="padding:4px 8px; font-size:11px;"><i class="fa-solid fa-trash"></i></button>
           </div>
@@ -459,6 +546,14 @@
           if (newName && newName.trim() && newName.trim() !== currentName) {
             await update(ref(rtdb, `aetheria_project/models_config/${safeKey}`), { name: newName.trim() });
             notify('Đã đổi tên model thành công!');
+          }
+        };
+
+        row.querySelector('.btn-edit-cost').onclick = async () => {
+          const newCost = prompt(`Nhập số Token khấu trừ mỗi lượt chat cho [${actualId}] (Nhập 0 nếu tính tự động theo độ dài):`, item.costToken || 0);
+          if (newCost !== null && !isNaN(parseInt(newCost, 10))) {
+            await update(ref(rtdb, `aetheria_project/models_config/${safeKey}`), { costToken: Math.max(0, parseInt(newCost, 10)) });
+            notify('Đã cập nhật giá Token cho model!');
           }
         };
 
@@ -478,7 +573,43 @@
       });
     });
 
-    // 5. CẤU HÌNH PAY2S (CÓ ENDPOINT)
+    // 6. QUẢN LÝ DANH SÁCH USER & CỘNG/TRỪ TOKEN TRỰC TIẾP
+    onValue(ref(rtdb, 'aetheria_project/users'), (snap) => {
+      const userBox = document.getElementById('users-list-container');
+      userBox.innerHTML = '';
+      if (!snap.exists()) {
+        document.getElementById('kpi-user-count').textContent = '0';
+        userBox.innerHTML = `<div style="color:var(--text-muted); padding:10px;">Chưa có tài khoản người dùng nào.</div>`;
+        return;
+      }
+      const users = snap.val();
+      document.getElementById('kpi-user-count').textContent = Object.keys(users).length;
+
+      Object.entries(users).forEach(([uid, uData]) => {
+        const row = document.createElement('div');
+        row.className = 'model-item-row';
+        const tok = Number(uData.tokens) || 0;
+        row.innerHTML = `
+          <div>
+            <strong style="color:#fff;">${uData.email || uid}</strong>
+            <div style="font-size:11px; color:var(--accent-cyan);">Số dư: <strong>${tok.toLocaleString()} Token</strong></div>
+          </div>
+          <button class="btn-glass btn-adjust-tok" style="padding:5px 10px; font-size:11px;">
+            <i class="fa-solid fa-sliders"></i> Sửa Token
+          </button>
+        `;
+        row.querySelector('.btn-adjust-tok').onclick = async () => {
+          const nextTok = prompt(`Nhập số dư Token mới cho tài khoản [${uData.email || uid}]:`, tok);
+          if (nextTok !== null && !isNaN(parseInt(nextTok, 10))) {
+            await update(ref(rtdb, `aetheria_project/users/${uid}`), { tokens: Math.max(0, parseInt(nextTok, 10)) });
+            notify(`Đã cập nhật Token cho ${uData.email || uid}!`);
+          }
+        };
+        userBox.appendChild(row);
+      });
+    });
+
+    // 7. CẤU HÌNH PAY2S
     document.getElementById('btn-save-pay2s').onclick = async () => {
       const endpoint = document.getElementById('pay2s-endpoint').value.trim();
       const partner = document.getElementById('pay2s-partner').value.trim();
@@ -508,7 +639,7 @@
       }
     });
 
-    // 6. CẤU HÌNH RÚT GỌN LINK
+    // 8. CẤU HÌNH RÚT GỌN LINK
     document.getElementById('btn-save-shortlink').onclick = async () => {
       await set(ref(rtdb, 'aetheria_project/shortlink_config'), {
         rewardTokens: parseInt(document.getElementById('shortlink-reward').value, 10) || 2500,
@@ -530,45 +661,98 @@
       }
     });
 
-    // 7. THỐNG KÊ USER VÀ NHẬT KÝ TRUY VẤN
-    onValue(ref(rtdb, 'aetheria_project/users'), (snap) => {
-      document.getElementById('kpi-user-count').textContent = snap.exists() ? Object.keys(snap.val()).length : 0;
-    });
+    // 9. NHẬT KÝ TRUY VẤN & BIỂU ĐỒ LƯU LƯỢNG TOKEN
+    let allLogs = [];
+    const tbody = document.getElementById('logs-tbody');
+    const searchInput = document.getElementById('log-search-input');
+    const statusFilter = document.getElementById('log-status-filter');
+    const chartBox = document.getElementById('token-usage-chart');
 
-    let cachedLogs = [];
-    onValue(ref(rtdb, 'aetheria_project/request_logs'), (snap) => {
-      const tbody = document.getElementById('logs-tbody');
+    function renderChart() {
+      chartBox.innerHTML = '';
+      const byModel = {};
+      allLogs.forEach(l => {
+        const m = l.model || 'Unknown';
+        byModel[m] = (byModel[m] || 0) + (Number(l.costTokens) || 0);
+      });
+      const entries = Object.entries(byModel);
+      if (entries.length === 0) {
+        chartBox.innerHTML = `<div style="margin:auto; color:var(--text-muted); font-size:12px;">Chưa có dữ liệu tiêu thụ Token</div>`;
+        return;
+      }
+      const maxVal = Math.max(...entries.map(e => e[1]), 100);
+      entries.forEach(([mName, val]) => {
+        const pct = Math.max(8, Math.round((val / maxVal) * 100));
+        const col = document.createElement('div');
+        col.className = 'chart-bar-col';
+        col.innerHTML = `
+          <span style="font-family:var(--font-mono); font-size:10px; color:var(--accent-cyan);">${val.toLocaleString()}</span>
+          <div class="chart-bar" style="height:${pct}%;"></div>
+          <span class="chart-lbl" title="${mName}">${mName}</span>
+        `;
+        chartBox.appendChild(col);
+      });
+    }
+
+    function renderLogsTable() {
       tbody.innerHTML = '';
-      cachedLogs = [];
+      const query = searchInput.value.toLowerCase().trim();
+      const st = statusFilter.value;
+
+      const filtered = allLogs.filter(l => {
+        const matchText = (l.userEmail || '').toLowerCase().includes(query) || (l.model || '').toLowerCase().includes(query);
+        const matchStatus = st === 'ALL' ? true : (st === '200 OK' ? l.status === '200 OK' : l.status !== '200 OK');
+        return matchText && matchStatus;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:16px;">Không tìm thấy bản ghi nhật ký phù hợp</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(log => {
+        const isOk = log.status === '200 OK';
+        tbody.innerHTML += `
+          <tr>
+            <td>${log.time || 'N/A'}</td>
+            <td><strong>${log.model || 'N/A'}</strong></td>
+            <td>${log.userEmail || 'Khách'}</td>
+            <td style="color:var(--accent-cyan); font-weight:600;">-${(log.costTokens || 0).toLocaleString()} Tok</td>
+            <td><span class="status-tag ${isOk ? '' : 'blocked'}">${log.status || 'ERROR'}</span></td>
+          </tr>
+        `;
+      });
+    }
+
+    searchInput.oninput = renderLogsTable;
+    statusFilter.onchange = renderLogsTable;
+
+    onValue(ref(rtdb, 'aetheria_project/request_logs'), (snap) => {
+      allLogs = [];
       let totalTokens = 0;
 
       if (snap.exists()) {
         Object.values(snap.val()).reverse().forEach(log => {
-          cachedLogs.push(log);
-          totalTokens += (log.costTokens || 0);
-          tbody.innerHTML += `
-            <tr>
-              <td>${log.time || 'N/A'}</td>
-              <td>${log.model || 'N/A'}</td>
-              <td>${log.userEmail || 'Khách'}</td>
-              <td>${(log.costTokens || 0).toLocaleString()} Tok</td>
-              <td><span class="status-tag">${log.status || '200 OK'}</span></td>
-            </tr>
-          `;
+          allLogs.push(log);
+          totalTokens += (Number(log.costTokens) || 0);
         });
       }
 
       document.getElementById('kpi-total-tokens').textContent = totalTokens.toLocaleString();
-      if (cachedLogs.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Chưa có nhật ký truy vấn nào từ Chatbot</td></tr>`;
-      }
+      renderLogsTable();
+      renderChart();
     });
 
-    // XUẤT CSV
+    document.getElementById('btn-clear-logs').onclick = async () => {
+      if (!confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử truy vấn trên hệ thống?")) return;
+      await remove(ref(rtdb, 'aetheria_project/request_logs'));
+      notify("Đã xóa sạch nhật ký truy vấn!");
+    };
+
     document.getElementById('btn-export-csv').onclick = () => {
-      if (cachedLogs.length === 0) return alert("Chưa có dữ liệu để xuất file CSV!");
+      if (allLogs.length === 0) return alert("Chưa có dữ liệu để xuất file CSV!");
       const rows = [['Thoi Gian', 'Mo Hinh', 'Email User', 'Token Khau Tru', 'Trang Thai']];
-      cachedLogs.forEach(l => rows.push([l.time, l.model, l.userEmail || 'Khach', l.costTokens || 0, l.status]));
+      allLogs.forEach(l => rows.push([l.time, l.model, l.userEmail || 'Khach', l.costTokens || 0, l.status]));
       const csvContent = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
