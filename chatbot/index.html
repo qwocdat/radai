@@ -234,6 +234,7 @@
       letter-spacing: 2px;
       color: #fff;
       text-decoration: none;
+      flex-shrink: 0;
     }
 
     .brand-icon-box {
@@ -247,6 +248,7 @@
       justify-content: center;
       color: var(--accent-cyan);
       box-shadow: 0 0 15px rgba(0, 240, 255, 0.35);
+      flex-shrink: 0;
     }
 
     #top-navbar.shrunk .brand-text {
@@ -273,6 +275,7 @@
       gap: 8px;
       text-decoration: none;
       transition: all 0.25s ease;
+      white-space: nowrap;
     }
 
     .nav-link-item:hover, .nav-link-item.active {
@@ -289,6 +292,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      flex-shrink: 0;
     }
 
     .btn-neon {
@@ -307,6 +311,8 @@
       text-decoration: none;
       box-shadow: 0 0 20px rgba(0, 240, 255, 0.35);
       transition: transform 0.2s ease, box-shadow 0.25s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .btn-neon:hover {
@@ -329,11 +335,21 @@
       gap: 8px;
       text-decoration: none;
       transition: all 0.25s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .btn-glass:hover {
       border-color: var(--accent-cyan);
       background: rgba(0, 240, 255, 0.12);
+    }
+
+    .text-desktop {
+      display: inline;
+    }
+
+    .text-mobile {
+      display: none;
     }
 
     /* MAIN LANDING CONTENT */
@@ -368,6 +384,7 @@
       color: var(--accent-cyan);
       letter-spacing: 1.5px;
       margin-bottom: 22px;
+      max-width: 100%;
     }
 
     .pulse-dot {
@@ -376,12 +393,13 @@
       border-radius: 50%;
       background: var(--accent-emerald);
       box-shadow: 0 0 10px var(--accent-emerald);
+      flex-shrink: 0;
     }
 
     .hero-heading {
-      font-size: clamp(36px, 5.6vw, 68px);
+      font-size: clamp(34px, 5.6vw, 68px);
       font-weight: 700;
-      line-height: 1.05;
+      line-height: 1.08;
       letter-spacing: -1.5px;
       margin-bottom: 24px;
     }
@@ -757,9 +775,91 @@
     .cyber-toast.success { border-left-color: var(--accent-emerald); }
     .cyber-toast.error { border-left-color: var(--accent-magenta); }
 
+    /* RESPONSIVE DESIGN TỐI ƯU HÓA HOÀN TOÀN CHO MOBILE */
     @media (max-width: 900px) {
-      .hero-grid { grid-template-columns: 1fr; }
+      .hero-grid { grid-template-columns: 1fr; gap: 32px; }
       .nav-links { display: none; }
+    }
+
+    @media (max-width: 680px) {
+      #top-navbar {
+        top: 10px;
+        height: 56px;
+        padding: 0 14px;
+        border-radius: 16px;
+        width: 95vw;
+      }
+
+      .nav-brand {
+        font-size: 15px;
+        gap: 8px;
+      }
+
+      .brand-icon-box {
+        width: 28px;
+        height: 28px;
+        font-size: 13px;
+      }
+
+      .nav-actions {
+        gap: 6px;
+      }
+
+      .btn-glass {
+        padding: 7px 11px;
+        font-size: 12px;
+      }
+
+      .btn-neon {
+        padding: 7px 13px;
+        font-size: 12px;
+      }
+
+      .text-desktop {
+        display: none;
+      }
+
+      .text-mobile {
+        display: inline;
+      }
+
+      #main-content {
+        padding-top: 86px;
+        padding-bottom: 60px;
+      }
+
+      .pill-tag {
+        font-size: 10px;
+        letter-spacing: 0.8px;
+        padding: 6px 12px;
+        line-height: 1.4;
+      }
+
+      .hero-heading {
+        font-size: 32px;
+        letter-spacing: -1px;
+      }
+
+      .hero-lead {
+        font-size: 14.5px;
+        margin-bottom: 24px;
+      }
+
+      .hero-cta-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .hero-cta-row .btn-neon,
+      .hero-cta-row .btn-glass {
+        justify-content: center;
+        width: 100%;
+        padding: 13px;
+      }
+
+      .telemetry-card {
+        padding: 20px;
+      }
     }
   </style>
 </head>
@@ -796,7 +896,7 @@
     </div>
   </div>
 
-  <!-- TOP NAVBAR (PUBLIC USER INTERFACE - ZERO ADMIN/FIREBASE MENTION) -->
+  <!-- TOP NAVBAR -->
   <header id="top-navbar">
     <a href="index.html" class="nav-brand">
       <div class="brand-icon-box"><i class="fa-solid fa-atom"></i></div>
@@ -824,7 +924,8 @@
         <span id="nav-user-label">Tài Khoản</span>
       </button>
       <a href="chatbot.html" class="btn-neon">
-        <span>Trải Nghiệm Chat Ngay</span>
+        <span class="text-desktop">Trải Nghiệm Chat Ngay</span>
+        <span class="text-mobile">Chat Ngay</span>
         <i class="fa-solid fa-arrow-right"></i>
       </a>
     </div>
