@@ -36,7 +36,7 @@
     .container { width: min(880px, 95vw); margin: 0 auto; }
 
     .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-    .btn-glass { padding: 9px 16px; border-radius: 999px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-glass); color: #fff; font-size: 12.5px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+    .btn-glass { padding: 9px 16px; border-radius: 999px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-glass); color: #fff; font-size: 12.5px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s; }
     .btn-glass:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
 
     .wallet-card { background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(122, 0, 255, 0.2)); border: 1px solid var(--border-glass); border-radius: 20px; padding: 24px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
@@ -74,8 +74,24 @@
 
     .quest-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 18px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
 
+    /* POPUP THÔNG BÁO NẠP THÀNH CÔNG VÀ ĐẾM NGƯỢC CHUYỂN TRANG */
+    .modal-backdrop-success {
+      position: fixed; inset: 0; z-index: 30000;
+      background: rgba(3, 4, 9, 0.88); backdrop-filter: blur(20px);
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+      opacity: 0; visibility: hidden; transition: all 0.3s ease;
+    }
+    .modal-backdrop-success.active { opacity: 1; visibility: visible; }
+
+    .success-modal-card {
+      width: min(440px, 94vw); background: rgba(14, 18, 32, 0.98);
+      border: 1px solid var(--accent-emerald); border-radius: 20px; padding: 28px; text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 40px rgba(0, 255, 157, 0.3);
+    }
+
     #toast-stack { position: fixed; top: 24px; right: 24px; z-index: 20000; display: flex; flex-direction: column; gap: 8px; }
     .cyber-toast { background: rgba(10, 12, 22, 0.96); border: 1px solid var(--border-glass); border-left: 4px solid var(--accent-cyan); border-radius: 10px; padding: 12px 16px; color: #fff; font-size: 12.5px; display: flex; align-items: center; gap: 10px; }
+    .cyber-toast.success { border-left-color: var(--accent-emerald); }
 
     @media (max-width: 680px) { .tab-btn { font-size: 11px; padding: 8px 4px; } }
   </style>
@@ -83,6 +99,25 @@
 <body>
 
   <div id="toast-stack"></div>
+
+  <!-- POPUP NẠP TIỀN THÀNH CÔNG TỰ ĐỘNG CHUYỂN VỀ CHATBOT.HTML -->
+  <div class="modal-backdrop-success" id="modal-success-redirect">
+    <div class="success-modal-card">
+      <div style="width:72px; height:72px; border-radius:50%; background:rgba(0,255,157,0.15); border:2px solid var(--accent-emerald); margin:0 auto 16px; display:flex; align-items:center; justify-content:center; box-shadow:0 0 24px rgba(0,255,157,0.4);">
+        <i class="fa-solid fa-check" style="font-size:32px; color:var(--accent-emerald);"></i>
+      </div>
+      <h3 style="font-size:21px; font-weight:700; color:#fff; margin-bottom:8px;">Giao Dịch Thành Công!</h3>
+      <p style="font-size:13.5px; color:var(--text-muted); margin-bottom:18px; line-height:1.6;" id="success-modal-desc">
+        Hệ thống đã nhận được tiền từ ACB và tự động cộng Token vào tài khoản của bạn.
+      </p>
+      <div style="font-family:var(--font-mono); font-size:12px; color:var(--accent-cyan); margin-bottom:20px;">
+        Đang chuyển về trang phòng chat trong <span id="redirect-counter" style="font-weight:700; font-size:15px; color:#fff;">2</span>s...
+      </div>
+      <a href="chatbot.html" class="btn-neon" style="text-decoration:none;">
+        <i class="fa-solid fa-comments"></i> Chuyển Về Đoạn Chat Ngay
+      </a>
+    </div>
+  </div>
 
   <div class="container">
     <div class="top-bar">
@@ -114,22 +149,22 @@
     <div class="tab-content active" id="tab-pay2s">
       <div class="card-box">
         <h3 style="margin-bottom:6px; font-size:17px;"><i class="fa-solid fa-shield-halved" style="color:var(--accent-cyan);"></i> Chọn Gói Nạp Token Pay2S</h3>
-        <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:18px;">Chọn gói nạp hoặc nhập số tiền tùy chọn (tối thiểu 5.000 VNĐ). Tỉ giá chuẩn 1 VNĐ = 1 Token:</p>
+        <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:18px;">Chọn gói nạp hoặc nhập số tiền tùy ý (tối thiểu 5.000 VNĐ). Khi nạp thành công web sẽ tự động chuyển về đoạn chat:</p>
 
         <!-- DROPDOWN CHỌN MỆNH GIÁ -->
         <div class="dropdown-container" id="amount-dropdown-container">
           <div class="dropdown-trigger" id="amount-trigger">
-            <div><span id="display-vnd">50.000 đ</span> <span style="color:var(--accent-emerald); font-size:12px; margin-left:6px;" id="display-tok">(+55.000 Tok - Tặng 10%)</span></div>
+            <div><span id="display-vnd">50.000 đ</span> <span style="color:var(--accent-emerald); font-size:12px; margin-left:6px;" id="display-tok">(+50.000 Tok)</span></div>
             <i class="fa-solid fa-chevron-down" style="font-size:12px; color:var(--accent-cyan);"></i>
           </div>
           <div class="dropdown-menu">
-            <div class="dropdown-item" data-val="5000" data-bonus="0"><span>5.000 đ (Tối thiểu)</span><span style="color:var(--accent-emerald);">+5.000 Tok</span></div>
-            <div class="dropdown-item" data-val="10000" data-bonus="0"><span>10.000 đ</span><span style="color:var(--accent-emerald);">+10.000 Tok</span></div>
-            <div class="dropdown-item" data-val="20000" data-bonus="1000"><span>20.000 đ</span><span style="color:var(--accent-emerald);">+21.000 Tok (Tặng 5%)</span></div>
-            <div class="dropdown-item" data-val="50000" data-bonus="5000"><span>50.000 đ</span><span style="color:var(--accent-emerald);">+55.000 Tok (Tặng 10%)</span></div>
-            <div class="dropdown-item" data-val="100000" data-bonus="15000"><span>100.000 đ</span><span style="color:var(--accent-emerald);">+115.000 Tok (Tặng 15%)</span></div>
-            <div class="dropdown-item" data-val="200000" data-bonus="40000"><span>200.000 đ</span><span style="color:var(--accent-emerald);">+240.000 Tok (Tặng 20%)</span></div>
-            <div class="dropdown-item" data-val="500000" data-bonus="150000"><span>500.000 đ</span><span style="color:var(--accent-emerald);">+650.000 Tok (Tặng 30%)</span></div>
+            <div class="dropdown-item" data-val="5000"><span>5.000 đ (Tối thiểu)</span><span style="color:var(--accent-emerald);">+5.000 Tok</span></div>
+            <div class="dropdown-item" data-val="10000"><span>10.000 đ</span><span style="color:var(--accent-emerald);">+10.000 Tok</span></div>
+            <div class="dropdown-item" data-val="20000"><span>20.000 đ</span><span style="color:var(--accent-emerald);">+20.000 Tok</span></div>
+            <div class="dropdown-item" data-val="50000"><span>50.000 đ</span><span style="color:var(--accent-emerald);">+50.000 Tok</span></div>
+            <div class="dropdown-item" data-val="100000"><span>100.000 đ</span><span style="color:var(--accent-emerald);">+100.000 Tok</span></div>
+            <div class="dropdown-item" data-val="200000"><span>200.000 đ</span><span style="color:var(--accent-emerald);">+200.000 Tok</span></div>
+            <div class="dropdown-item" data-val="500000"><span>500.000 đ</span><span style="color:var(--accent-emerald);">+500.000 Tok</span></div>
             <div class="custom-input-box">
               <input type="number" id="custom-amount-input" placeholder="Nhập số tiền tùy ý (Từ 5.000đ)..." min="5000" />
               <span style="font-family:var(--font-mono); font-size:12px; color:var(--accent-emerald); margin-left:10px;" id="custom-tok-preview">0 Tok</span>
@@ -137,10 +172,11 @@
           </div>
         </div>
 
-        <!-- THÔNG TIN ĐỊNH DANH TÀI KHOẢN -->
+        <!-- THÔNG TIN TÀI KHOẢN THỤ HƯỞNG & ACB -->
         <div class="tx-info-preview">
+          <div><i class="fa-solid fa-building-columns" style="color:var(--accent-cyan);"></i> Ngân hàng chuyển khoản: <strong>ACB (Á Châu) - STK: 28233851</strong></div>
           <div><i class="fa-solid fa-user-shield" style="color:var(--accent-cyan);"></i> Tài khoản nạp: <strong id="tx-preview-email">Đang tải...</strong></div>
-          <div><i class="fa-solid fa-fingerprint" style="color:var(--accent-emerald);"></i> Mã nội dung Webhook tự động: <strong id="tx-preview-uid">AETH_...</strong></div>
+          <div><i class="fa-solid fa-fingerprint" style="color:var(--accent-emerald);"></i> Nội dung chuyển khoản định danh: <strong id="tx-preview-uid">AETH_...</strong></div>
         </div>
 
         <button type="button" class="btn-neon" id="btn-create-pay2s">
@@ -160,7 +196,7 @@
       </div>
     </div>
 
-    <!-- TAB 3: VƯỢT LINK NHẬN TOKEN (LÃI TIỀN MẶT CHO ADMIN) -->
+    <!-- TAB 3: VƯỢT LINK NHẬN TOKEN -->
     <div class="tab-content" id="tab-quest">
       <div class="card-box">
         <h3 style="margin-bottom:8px; font-size:17px;"><i class="fa-solid fa-gift" style="color:var(--accent-emerald);"></i> Nhiệm Vụ Vượt Link Nhận Token Miễn Phí</h3>
@@ -200,6 +236,10 @@
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getDatabase, ref, get, set, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
+    // URL PROXY TẠO MÃ THANH TOÁN VÀ URL WEBHOOK TRÊN HOSTING PHP CỦA BẠN
+    const PAY2S_PROXY_URL = "https://apibank.infy.click/pay2s_proxy.php";
+    const WEBHOOK_IPN_URL = "https://apibank.infy.click/webhook.php";
+
     const firebaseConfig = {
       apiKey: "AIzaSyAVuB8m14zkMPs-JTLAKB0Bp18QBKAMBt4",
       authDomain: "ideo-dd376.firebaseapp.com",
@@ -215,22 +255,52 @@
     const rtdb = getDatabase(app);
 
     let currentUser = null;
+    let initialTokens = null;
     let currentTokens = 0;
-    // TỈ GIÁ CHUẨN ĐẢM BẢO CÓ LÃI: 1.000 VNĐ = 1.000 Token (1 VNĐ = 1 Token)
     let tokenExchangeRate = 1; 
     let selectedAmount = 50000;
     let pay2sConfig = {};
     let shortlinkConfig = { rewardTokens: 200, dailyLimit: 2, link4mApi: "6992df868b3d1e423d1ab833", traffictopApi: "tXk7A1HwG4QSXwGN6TU7yLOz" };
+    let hasTriggeredSuccess = false;
 
-    function notify(msg) {
+    function notify(msg, type = 'info') {
       const stack = document.getElementById('toast-stack');
       const d = document.createElement('div');
-      d.className = 'cyber-toast';
+      d.className = `cyber-toast ${type}`;
       d.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--accent-emerald);"></i><span>${msg}</span>`;
       stack.appendChild(d);
       setTimeout(() => d.remove(), 3200);
     }
 
+    // TỰ ĐỘNG BẬT THÔNG BÁO VÀ CHUYỂN HƯỚNG VỀ CHATBOT.HTML
+    function triggerPaymentSuccessAndRedirect(addedAmount = null) {
+      if (hasTriggeredSuccess) return;
+      hasTriggeredSuccess = true;
+
+      const modal = document.getElementById('modal-success-redirect');
+      const desc = document.getElementById('success-modal-desc');
+      const counter = document.getElementById('redirect-counter');
+
+      if (addedAmount) {
+        desc.innerHTML = `Thanh toán thành công! Tài khoản của bạn đã được cộng <strong style="color:var(--accent-emerald); font-size:16px;">+${addedAmount.toLocaleString()} Token</strong>.`;
+      }
+
+      modal.classList.add('active');
+      let timeLeft = 2;
+      counter.textContent = timeLeft;
+
+      const timer = setInterval(() => {
+        timeLeft -= 1;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          window.location.href = "chatbot.html";
+        } else {
+          counter.textContent = timeLeft;
+        }
+      }, 1000);
+    }
+
+    // TAB SWITCHER
     function switchTab(tabId) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === tabId));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === tabId));
@@ -252,11 +322,10 @@
     document.querySelectorAll('.dropdown-item').forEach(item => {
       item.onclick = () => {
         selectedAmount = parseInt(item.getAttribute('data-val'), 10);
-        const bonus = parseInt(item.getAttribute('data-bonus') || 0, 10);
-        const totalTok = (selectedAmount * tokenExchangeRate) + bonus;
+        const totalTok = selectedAmount * tokenExchangeRate;
 
         displayVND.textContent = `${selectedAmount.toLocaleString()} đ`;
-        displayTok.textContent = `(+${totalTok.toLocaleString()} Tok${bonus > 0 ? ' - Thưởng' : ''})`;
+        displayTok.textContent = `(+${totalTok.toLocaleString()} Tok)`;
         labelPay.textContent = `${selectedAmount.toLocaleString()} đ`;
         customInput.value = '';
         ddContainer.classList.remove('active');
@@ -279,7 +348,7 @@
       }
     };
 
-    // ĐỒNG BỘ TÀI KHOẢN TỪ FIREBASE AUTH & LOCALSTORAGE
+    // ĐỒNG BỘ TÀI KHOẢN TỪ FIREBASE AUTH VÀ LOCALSTORAGE
     function getFallbackUser() {
       const keys = ['aetheria_user', 'digitalxiao_user', 'user', 'currentUser'];
       for (const k of keys) {
@@ -300,12 +369,25 @@
       currentUser = uObj;
       document.getElementById('user-email-text').textContent = `Tài khoản: ${uObj.email}`;
       document.getElementById('tx-preview-email').textContent = uObj.email;
-      document.getElementById('tx-preview-uid').textContent = `NAP_${uObj.uid}`;
+      document.getElementById('tx-preview-uid').textContent = `AETH_${uObj.uid}`;
 
+      // LẮNG NGHE SỐ DƯ TOKEN: NẾU TOKEN TĂNG DO WEBHOOK CỘNG -> HIỆN THÔNG BÁO VÀ CHUYỂN VỀ CHATBOT.HTML
       onValue(ref(rtdb, `aetheria_project/users/${uObj.uid}/tokens`), (snap) => {
-        currentTokens = snap.exists() ? Math.max(0, Number(snap.val()) || 0) : 0;
+        const newBal = snap.exists() ? Math.max(0, Number(snap.val()) || 0) : 0;
+        
+        if (initialTokens !== null && newBal > initialTokens) {
+          const diff = newBal - initialTokens;
+          triggerPaymentSuccessAndRedirect(diff);
+        }
+
+        initialTokens = newBal;
+        currentTokens = newBal;
         document.getElementById('user-tokens-text').textContent = `${currentTokens.toLocaleString()} TOKEN`;
       });
+
+      if (urlParams.get('status') === 'success' || urlParams.get('payment') === 'success') {
+        triggerPaymentSuccessAndRedirect();
+      }
 
       const verifyQuest = urlParams.get('verify_quest');
       if (verifyQuest) await handleQuestReward(verifyQuest);
@@ -330,7 +412,6 @@
       if (snap.exists()) {
         pay2sConfig = snap.val();
         if (pay2sConfig.tokenRate) {
-          // Tính tỷ giá: Nếu admin cấu hình tokenRate (ví dụ 1000 = 1000đ đổi 1000 token)
           tokenExchangeRate = Number(pay2sConfig.tokenRate) / 1000;
           document.getElementById('rate-display').textContent = Number(pay2sConfig.tokenRate).toLocaleString();
         }
@@ -347,7 +428,7 @@
       }
     });
 
-    // TẠO GIAO DỊCH PAY2S QUA CLOUDFLARE PROXY NỘI BỘ
+    // TIẾN HÀNH TẠO MÃ THANH TOÁN GỌI TRỰC TIẾP TỚI https://apibank.infy.click/pay2s_proxy.php
     document.getElementById('btn-create-pay2s').onclick = async () => {
       if (!currentUser) return alert("Chưa xác định được tài khoản người dùng!");
       if (selectedAmount < 5000) {
@@ -362,14 +443,15 @@
         return;
       }
 
+      // Tạo mã đơn có gắn UID tài khoản để Webhook nhận diện chính xác
       const orderId = `AETH_${currentUser.uid}_${Date.now()}`;
-      const orderInfo = `NAP_${currentUser.uid}_${currentUser.email}`;
-      notify("Đang khởi tạo giao dịch Pay2S...");
+      const orderInfo = `AETH_${currentUser.uid}`;
+      notify("Đang khởi tạo mã thanh toán Pay2S...", "info");
 
       const endpoint = pay2sConfig.endpoint || "https://payment.pay2s.vn/v1/gateway/api/create";
 
       try {
-        const proxyResponse = await fetch("/api/pay2s", {
+        const proxyResponse = await fetch(PAY2S_PROXY_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -380,13 +462,13 @@
             amount: String(selectedAmount),
             orderInfo: orderInfo,
             redirectUrl: window.location.href,
-            ipnUrl: window.location.origin + "/api/webhook"
+            ipnUrl: WEBHOOK_IPN_URL
           })
         });
 
         if (!proxyResponse.ok) {
           const errData = await proxyResponse.json().catch(() => ({}));
-          throw new Error(errData.message || `Lỗi HTTP ${proxyResponse.status}. Đảm bảo functions/api/pay2s.js đã deploy.`);
+          throw new Error(errData.message || `Lỗi HTTP ${proxyResponse.status} từ máy chủ apibank.infy.click`);
         }
 
         const data = await proxyResponse.json();
