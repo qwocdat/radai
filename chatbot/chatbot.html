@@ -348,7 +348,7 @@
       white-space: pre-wrap;
     }
 
-    /* CODE BLOCK SẠCH AN TOÀN */
+    /* CODE BLOCK */
     .code-block-card {
       margin-top: 10px;
       border-radius: 8px;
@@ -436,8 +436,8 @@
       position: absolute;
       bottom: calc(100% + 6px);
       left: 0;
-      min-width: 240px;
-      max-height: 260px;
+      min-width: 260px;
+      max-height: 270px;
       overflow-y: auto;
       background: rgba(10, 12, 22, 0.98);
       backdrop-filter: blur(24px);
@@ -472,6 +472,10 @@
     .dropdown-option:hover, .dropdown-option.selected {
       background: rgba(0, 240, 255, 0.14);
       color: #fff;
+    }
+
+    .dropdown-option.maintenance-opt {
+      opacity: 0.55;
     }
 
     .quick-prompts-row {
@@ -807,45 +811,51 @@
 
         <div class="chat-input-zone">
           <div class="input-zone-top-row">
-            <!-- FULL 7 MODEL CHUẨN XPIKI -->
+            <!-- MODEL PICKER: MODEL MỚI HOẠT ĐỘNG + CÁC MODEL CŨ BẢO TRÌ -->
             <div class="custom-dropdown" id="model-picker">
               <div class="dropdown-trigger">
                 <i class="fa-solid fa-wand-magic-sparkles" style="color:var(--accent-cyan);"></i>
-                <span id="model-label">Claude Sonnet 4</span>
+                <span id="model-label">DeepSeek V4.1 Flash</span>
                 <i class="fa-solid fa-chevron-up" style="font-size:9px;"></i>
               </div>
               <div class="dropdown-menu">
-                <div class="dropdown-option selected" data-model="kr/claude-sonnet-4" data-label="Claude Sonnet 4">
-                  <span>Claude Sonnet 4 (kr)</span>
-                  <i class="fa-solid fa-check" style="color:var(--accent-cyan);"></i>
+                <!-- MODEL MỚI KHẢ DỤNG -->
+                <div class="dropdown-option selected" data-model="deepseek-v4.1-flash-free" data-label="DeepSeek V4.1 Flash" data-status="active">
+                  <span>DeepSeek V4.1 Flash (Hoạt động)</span>
+                  <i class="fa-solid fa-check" style="color:var(--accent-emerald);"></i>
                 </div>
-                <div class="dropdown-option" data-model="claude-sonnet-5" data-label="Claude Sonnet 5">
-                  <span>Claude Sonnet 5</span>
-                  <i class="fa-solid fa-code" style="color:var(--accent-cyan);"></i>
+                <!-- CÁC MODEL CŨ CHO VÀO BẢO TRÌ -->
+                <div class="dropdown-option maintenance-opt" data-model="kr/claude-sonnet-4" data-label="Claude Sonnet 4" data-status="maintenance">
+                  <span>Claude Sonnet 4 (Bảo trì)</span>
+                  <i class="fa-solid fa-wrench" style="color:var(--accent-amber);"></i>
                 </div>
-                <div class="dropdown-option" data-model="claude-sonnet-4-6" data-label="Claude Sonnet 4.6">
-                  <span>Claude Sonnet 4.6</span>
-                  <i class="fa-solid fa-code-branch" style="color:var(--accent-cyan);"></i>
+                <div class="dropdown-option maintenance-opt" data-model="claude-sonnet-5" data-label="Claude Sonnet 5" data-status="maintenance">
+                  <span>Claude Sonnet 5 (Bảo trì)</span>
+                  <i class="fa-solid fa-wrench" style="color:var(--accent-amber);"></i>
                 </div>
-                <div class="dropdown-option" data-model="claude-opus-5" data-label="Claude Opus 5">
-                  <span>Claude Opus 5</span>
-                  <i class="fa-solid fa-crown" style="color:var(--accent-amber);"></i>
+                <div class="dropdown-option maintenance-opt" data-model="claude-sonnet-4-6" data-label="Claude Sonnet 4.6" data-status="maintenance">
+                  <span>Claude Sonnet 4.6 (Bảo trì)</span>
+                  <i class="fa-solid fa-wrench" style="color:var(--accent-amber);"></i>
                 </div>
-                <div class="dropdown-option" data-model="claude-opus-4-8" data-label="Claude Opus 4.8">
-                  <span>Claude Opus 4.8</span>
-                  <i class="fa-solid fa-gem" style="color:var(--accent-amber);"></i>
+                <div class="dropdown-option maintenance-opt" data-model="claude-opus-5" data-label="Claude Opus 5" data-status="maintenance">
+                  <span>Claude Opus 5 (Bảo trì)</span>
+                  <i class="fa-solid fa-wrench" style="color:var(--accent-amber);"></i>
                 </div>
-                <div class="dropdown-option" data-model="claude-opus-4-7" data-label="Claude Opus 4.7">
-                  <span>Claude Opus 4.7</span>
-                  <i class="fa-solid fa-star" style="color:var(--accent-amber);"></i>
+                <div class="dropdown-option maintenance-opt" data-model="claude-opus-4-8" data-label="Claude Opus 4.8" data-status="maintenance">
+                  <span>Claude Opus 4.8 (Bảo trì)</span>
+                  <i class="fa-solid fa-wrench" style="color:var(--accent-amber);"></i>
                 </div>
-                <div class="dropdown-option" data-model="claude-haiku-4-5" data-label="Claude Haiku 4.5">
-                  <span>Claude Haiku 4.5</span>
-                  <i class="fa-solid fa-bolt" style="color:var(--accent-emerald);"></i>
+                <div class="dropdown-option maintenance-opt" data-model="claude-opus-4-7" data-label="Claude Opus 4.7" data-status="maintenance">
+                  <span>Claude Opus 4.7 (Bảo trì)</span>
+                  <i class="fa-solid fa-wrench" style="color:var(--accent-amber);"></i>
                 </div>
-                <div class="dropdown-option" data-model="claude-fable-5" data-label="Claude Fable 5">
-                  <span>Claude Fable 5</span>
-                  <i class="fa-solid fa-feather" style="color:var(--accent-magenta);"></i>
+                <div class="dropdown-option maintenance-opt" data-model="claude-haiku-4-5" data-label="Claude Haiku 4.5" data-status="maintenance">
+                  <span>Claude Haiku 4.5 (Bảo trì)</span>
+                  <i class="fa-solid fa-wrench" style="color:var(--accent-amber);"></i>
+                </div>
+                <div class="dropdown-option maintenance-opt" data-model="claude-fable-5" data-label="Claude Fable 5" data-status="maintenance">
+                  <span>Claude Fable 5 (Bảo trì)</span>
+                  <i class="fa-solid fa-wrench" style="color:var(--accent-amber);"></i>
                 </div>
               </div>
             </div>
@@ -941,11 +951,11 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // 1. CẤU HÌNH API VÀ CƠ CHẾ CORS PROXY TỰ ĐỘNG CHỐNG "FAILED TO FETCH"
-    const DIRECT_API_KEY = "sk-2os8BC2DgSFtgJxRzfPQqSmfu0XQF8N6GLLzJTMMT9A";
-    const TARGET_API_URL = "https://api.xpiki.com/v1/chat/completions";
+    // 1. CẤU HÌNH API KEY VÀ ENDPOINT MỚI (KIRAAI DEEPSEEK)
+    const DIRECT_API_KEY = "kira_f0698d610541bcac2c90a6ca64f4a3ae";
+    const TARGET_API_URL = "https://kiraai.vn/api/v1/chat/completions";
 
-    // Danh sách Endpoint: Thử gọi trực tiếp trước, nếu trình duyệt chặn CORS thì tự động chuyển sang Proxy
+    // Danh sách Endpoint kèm Proxy tự động phòng ngừa CORS trên trình duyệt
     const ENDPOINT_CANDIDATES = [
       TARGET_API_URL,
       `https://corsproxy.io/?${encodeURIComponent(TARGET_API_URL)}`,
@@ -1046,7 +1056,7 @@
       return bubble;
     }
 
-    appendMessage('ai', 'Chào bạn! Tôi là trợ lý lập trình Aetheria. Tôi đã kết nối trực tiếp với API Claude của bạn và sẵn sàng hỗ trợ viết code, phân tích thuật toán hoặc sửa lỗi.');
+    appendMessage('ai', 'Chào bạn! Tôi là trợ lý lập trình Aetheria. Tôi đã kết nối với mô hình DeepSeek V4.1 Flash và sẵn sàng hỗ trợ viết code, phân tích thuật toán hoặc sửa lỗi.');
 
     // 3. XỬ LÝ ĐÍNH KÈM TỆP VÀ ẢNH
     let stagedFiles = [];
@@ -1105,7 +1115,7 @@
     };
 
     // 4. CHỌN MÔ HÌNH VÀ GỬI PROMPT
-    let currentModel = 'kr/claude-sonnet-4';
+    let currentModel = 'deepseek-v4.1-flash-free';
     const modelPicker = document.getElementById('model-picker');
     modelPicker.querySelector('.dropdown-trigger').onclick = (e) => {
       e.stopPropagation();
@@ -1113,6 +1123,11 @@
     };
     modelPicker.querySelectorAll('.dropdown-option').forEach(opt => {
       opt.onclick = () => {
+        const isMaintenance = opt.getAttribute('data-status') === 'maintenance';
+        if (isMaintenance) {
+          showToast('Mô hình này đang bảo trì, vui lòng chọn DeepSeek V4.1 Flash!', 'error');
+          return;
+        }
         modelPicker.querySelectorAll('.dropdown-option').forEach(o => o.classList.remove('selected'));
         opt.classList.add('selected');
         currentModel = opt.getAttribute('data-model');
@@ -1145,7 +1160,7 @@
       };
     });
 
-    // Hàm gọi API với cơ chế Fallback Proxy tự động nếu dính lỗi CORS
+    // Hàm gọi API kèm Fallback tự động
     async function executeApiRequest(payload) {
       let lastError = null;
 
@@ -1168,8 +1183,7 @@
           return await response.json();
         } catch (err) {
           lastError = err;
-          // Nếu gặp lỗi mạng / Failed to fetch (do CORS), tự động thử endpoint proxy tiếp theo
-          if (err.message.includes('fetch') || err.message.includes('NetworkError')) {
+          if (err.message.includes('fetch') || err.message.includes('NetworkError') || err.message.includes('403')) {
             continue;
           } else {
             throw err;
@@ -1177,7 +1191,7 @@
         }
       }
 
-      throw lastError || new Error('Không thể kết nối đến máy chủ API (Lỗi mạng hoặc CORS)');
+      throw lastError || new Error('Không thể kết nối đến máy chủ AI (Lỗi mạng hoặc CORS)');
     }
 
     async function sendPrompt() {
