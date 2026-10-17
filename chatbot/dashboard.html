@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>AETHERIA // Trung Tâm Quản Trị API Key & Thống Kê Token</title>
-  <link rel="preconnect" href="[https://fonts.googleapis.com](https://fonts.googleapis.com)">
-  <link rel="preconnect" href="[https://fonts.gstatic.com](https://fonts.gstatic.com)" crossorigin>
-  <link href="[https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap](https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap)" rel="stylesheet">
-  <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css)" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
   <style>
     :root {
@@ -76,18 +76,15 @@
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 240, 255, 0.15);
     }
 
-    .gate-icon {
-      width: 50px;
-      height: 50px;
-      border-radius: 12px;
-      background: rgba(0, 240, 255, 0.12);
-      border: 1px solid var(--accent-cyan);
-      color: var(--accent-cyan);
-      font-size: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .gate-avatar {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      border: 2px solid var(--accent-cyan);
+      box-shadow: 0 0 22px rgba(0, 240, 255, 0.45);
+      object-fit: cover;
       margin: 0 auto 16px;
+      display: block;
     }
 
     .dashboard-container {
@@ -458,22 +455,22 @@
 </head>
 <body>
 
-  <!-- MÀN HÌNH NHẬP MẬT KHẨU ame1610@ -->
+  <!-- MÀN HÌNH NHẬP MẬT KHẨU ame1610@ KÈM AVATAR MỚI -->
   <div id="auth-gate-screen">
     <div class="auth-gate-box">
-      <div class="gate-icon"><i class="fa-solid fa-lock"></i></div>
+      <img src="https://i.ibb.co/tp7rRb8J/biospace-avatar-q-A9qs-J9c-1791556024025.jpg" alt="Admin Avatar" class="gate-avatar" />
       <h2 style="font-size:20px; font-weight:700; margin-bottom:8px;">XÁC THỰC QUẢN TRỊ</h2>
       <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:20px;">Vui lòng nhập mật khẩu quản trị hệ thống để truy cập:</p>
       
       <div class="field-box">
-        <input type="password" class="cyber-input" id="gate-password-input" placeholder="Nhập mật khẩu..." autofocus style="text-align:center; font-size:15px; letter-spacing:2px;" />
+        <input type="password" class="cyber-input" id="gate-password-input" placeholder="Nhập mật khẩu..." autofocus style="text-align:center; font-size:15px; letter-spacing:2px;" autocomplete="off" />
       </div>
 
       <div id="gate-err" style="color:var(--accent-magenta); font-size:12px; font-family:var(--font-mono); margin-bottom:14px; display:none;">
         <i class="fa-solid fa-triangle-exclamation"></i> Mật khẩu không chính xác!
       </div>
 
-      <button class="btn-neon" id="btn-submit-gate" style="width:100%; justify-content:center; padding:12px;">
+      <button type="button" class="btn-neon" id="btn-submit-gate" style="width:100%; justify-content:center; padding:12px;">
         <i class="fa-solid fa-key"></i> Xác Nhận Đăng Nhập
       </button>
     </div>
@@ -655,19 +652,24 @@
     </section>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "[https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js](https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js)";
-    import { getDatabase, ref, update, push, remove, onValue } from "[https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js](https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js)";
-
-    // 1. XÁC THỰC MẬT KHẨU QUẢN TRỊ ame1610@
+  <!-- SCRIPT XÁC THỰC MẬT KHẨU HOẠT ĐỘNG NGAY LẬP TỨC -->
+  <script>
     const AUTH_PASS = "ame1610@";
     const gateScreen = document.getElementById('auth-gate-screen');
     const dashboardMain = document.getElementById('dashboard-main');
     const passInput = document.getElementById('gate-password-input');
     const gateErr = document.getElementById('gate-err');
+    const btnSubmitGate = document.getElementById('btn-submit-gate');
 
     function checkAuth() {
-      if (sessionStorage.getItem('aetheria_dashboard_auth') === 'true') {
+      let isAuthed = false;
+      try {
+        isAuthed = sessionStorage.getItem('aetheria_dashboard_auth') === 'true';
+      } catch (e) {
+        isAuthed = window._aetheria_temp_auth === true;
+      }
+
+      if (isAuthed) {
         gateScreen.style.display = 'none';
         dashboardMain.classList.add('unlocked');
       } else {
@@ -676,9 +678,14 @@
       }
     }
 
-    document.getElementById('btn-submit-gate').addEventListener('click', () => {
-      if (passInput.value === AUTH_PASS) {
-        sessionStorage.setItem('aetheria_dashboard_auth', 'true');
+    function handleGateSubmit() {
+      const entered = (passInput.value || '').trim();
+      if (entered === AUTH_PASS) {
+        try {
+          sessionStorage.setItem('aetheria_dashboard_auth', 'true');
+        } catch (e) {
+          window._aetheria_temp_auth = true;
+        }
         gateErr.style.display = 'none';
         checkAuth();
       } else {
@@ -686,24 +693,38 @@
         passInput.value = '';
         passInput.focus();
       }
+    }
+
+    btnSubmitGate.addEventListener('click', handleGateSubmit);
+
+    passInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleGateSubmit();
+      }
     });
 
-    passInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') document.getElementById('btn-submit-gate').click();
-    });
-
-    document.getElementById('btn-lock-screen').addEventListener('click', () => {
-      sessionStorage.removeItem('aetheria_dashboard_auth');
+    document.getElementById('btn-lock-screen').addEventListener('click', function() {
+      try {
+        sessionStorage.removeItem('aetheria_dashboard_auth');
+      } catch (e) {
+        window._aetheria_temp_auth = false;
+      }
       checkAuth();
     });
 
     checkAuth();
+  </script>
 
-    // 2. KHỞI TẠO FIREBASE VỚI PHÂN VÙNG ĐỘC LẬP aetheria_project
+  <!-- SCRIPT MODULE ĐỒNG BỘ DỮ LIỆU FIREBASE RTDB -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, update, push, remove, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
     const firebaseConfig = {
       apiKey: "AIzaSyAVuB8m14zkMPs-JTLAKB0Bp18QBKAMBt4",
       authDomain: "ideo-dd376.firebaseapp.com",
-      databaseURL: "[https://ideo-dd376-default-rtdb.asia-southeast1.firebasedatabase.app](https://ideo-dd376-default-rtdb.asia-southeast1.firebasedatabase.app)",
+      databaseURL: "https://ideo-dd376-default-rtdb.asia-southeast1.firebasedatabase.app",
       projectId: "ideo-dd376",
       storageBucket: "ideo-dd376.firebasestorage.app",
       messagingSenderId: "689163185",
