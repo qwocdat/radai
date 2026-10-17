@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>AETHERIA // Trung Tâm Quản Trị API Key & Thống Kê Token</title>
+  <title>AETHERIA // Trung Tâm Quản Trị Hệ Thống digitalxiao</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -12,7 +12,7 @@
   <style>
     :root {
       --bg-dark: #040509;
-      --bg-panel: rgba(12, 15, 26, 0.86);
+      --bg-panel: rgba(12, 15, 26, 0.88);
       --border-glass: rgba(255, 255, 255, 0.12);
       --accent-cyan: #00f0ff;
       --accent-violet: #7a00ff;
@@ -25,445 +25,95 @@
       --font-mono: 'JetBrains Mono', monospace;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent !important;
-      user-select: none !important;
-      -webkit-user-select: none !important;
-      outline: none;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent !important; }
+    input, textarea { user-select: text !important; }
 
-    input {
-      user-select: text !important;
-      -webkit-user-select: text !important;
-    }
-
-    html, body {
-      width: 100%;
-      min-height: 100vh;
+    body {
+      width: 100%; min-height: 100vh;
       background: radial-gradient(circle at top right, #10162f 0%, var(--bg-dark) 65%);
-      color: var(--text-main);
-      font-family: var(--font-sans);
-      overflow-x: hidden;
-      scrollbar-width: none;
+      color: var(--text-main); font-family: var(--font-sans); overflow-x: hidden;
     }
 
-    ::-webkit-scrollbar {
-      display: none;
-    }
-
-    /* MÀN HÌNH KHÓA BẢO MẬT MẬT KHẨU ame1610@ */
     #auth-gate-screen {
-      position: fixed;
-      inset: 0;
-      z-index: 10000;
-      background: #040509;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
+      position: fixed; inset: 0; z-index: 10000;
+      background: #040509; display: flex; align-items: center; justify-content: center; padding: 20px;
     }
 
     .auth-gate-box {
-      width: min(420px, 94vw);
-      background: rgba(14, 17, 30, 0.95);
-      border: 1px solid var(--border-glass);
-      border-radius: 20px;
-      padding: 30px;
-      text-align: center;
+      width: min(420px, 94vw); background: rgba(14, 17, 30, 0.95);
+      border: 1px solid var(--border-glass); border-radius: 20px; padding: 30px; text-align: center;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 240, 255, 0.15);
     }
 
     .gate-avatar {
-      width: 76px;
-      height: 76px;
-      border-radius: 50%;
-      border: 2px solid var(--accent-cyan);
-      box-shadow: 0 0 22px rgba(0, 240, 255, 0.45);
-      object-fit: cover;
-      margin: 0 auto 16px;
-      display: block;
+      width: 76px; height: 76px; border-radius: 50%; border: 2px solid var(--accent-cyan);
+      box-shadow: 0 0 22px rgba(0, 240, 255, 0.45); object-fit: cover; margin: 0 auto 16px; display: block;
     }
 
-    .dashboard-container {
-      width: min(1320px, 94vw);
-      margin: 0 auto;
-      padding: 28px 0 80px;
-      display: none;
-    }
+    .dashboard-container { width: min(1320px, 94vw); margin: 0 auto; padding: 28px 0 80px; display: none; }
+    .dashboard-container.unlocked { display: block; }
 
-    .dashboard-container.unlocked {
-      display: block;
-    }
-
-    /* TOP ADMIN BAR */
     .admin-topbar {
-      background: var(--bg-panel);
-      backdrop-filter: blur(22px);
-      border: 1px solid var(--border-glass);
-      border-radius: 18px;
-      padding: 16px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 14px;
-      margin-bottom: 26px;
-    }
-
-    .admin-brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 700;
-      font-size: 18px;
-    }
-
-    .admin-badge-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      background: rgba(0, 240, 255, 0.14);
-      border: 1px solid var(--accent-cyan);
-      color: var(--accent-cyan);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .topbar-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
+      background: var(--bg-panel); backdrop-filter: blur(22px); border: 1px solid var(--border-glass);
+      border-radius: 18px; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 14px; margin-bottom: 26px;
     }
 
     .btn-neon {
-      padding: 10px 18px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, var(--accent-cyan), #6ef7ff);
-      color: #040509;
-      font-family: var(--font-sans);
-      font-size: 13px;
-      font-weight: 600;
-      border: none;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      text-decoration: none;
-      box-shadow: 0 0 18px rgba(0, 240, 255, 0.3);
-      transition: all 0.2s;
-    }
-
-    .btn-neon:hover {
-      box-shadow: 0 0 24px rgba(0, 240, 255, 0.6);
-      transform: translateY(-1px);
+      padding: 10px 18px; border-radius: 12px; background: linear-gradient(135deg, var(--accent-cyan), #6ef7ff);
+      color: #040509; font-size: 13px; font-weight: 600; border: none; cursor: pointer; display: inline-flex;
+      align-items: center; gap: 8px; text-decoration: none; box-shadow: 0 0 18px rgba(0, 240, 255, 0.3);
     }
 
     .btn-glass {
-      padding: 10px 16px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-glass);
-      color: #fff;
-      font-family: var(--font-sans);
-      font-size: 13px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      text-decoration: none;
-      transition: all 0.2s;
+      padding: 10px 16px; border-radius: 12px; background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-glass); color: #fff; font-size: 13px; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
     }
 
-    .btn-glass:hover {
-      border-color: var(--accent-cyan);
-      color: var(--accent-cyan);
+    .btn-danger { background: rgba(255, 0, 127, 0.15); border-color: var(--accent-magenta); color: #ff85c0; }
+
+    .control-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-bottom: 24px; }
+    .panel-card { background: var(--bg-panel); backdrop-filter: blur(22px); border: 1px solid var(--border-glass); border-radius: 20px; padding: 24px; margin-bottom: 24px; }
+    .panel-title { font-size: 16px; font-weight: 600; padding-bottom: 14px; margin-bottom: 18px; border-bottom: 1px solid var(--border-glass); display: flex; justify-content: space-between; align-items: center; }
+
+    .field-box { margin-bottom: 14px; }
+    .field-box label { display: block; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
+
+    .cyber-input, .cyber-textarea {
+      width: 100%; padding: 11px 14px; background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 11px; color: #fff;
+      font-family: var(--font-mono); font-size: 13px;
     }
 
-    .btn-danger {
-      background: rgba(255, 0, 127, 0.15);
-      border-color: var(--accent-magenta);
-      color: #ff85c0;
+    .cyber-textarea { min-height: 110px; resize: vertical; line-height: 1.5; }
+
+    .model-item-row {
+      padding: 12px 14px; border-radius: 12px; background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 8px; font-family: var(--font-mono); font-size: 12px;
     }
 
-    /* 4 KPI CARDS */
-    .kpi-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 18px;
-      margin-bottom: 24px;
-    }
-
-    .kpi-card {
-      background: var(--bg-panel);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--border-glass);
-      border-radius: 18px;
-      padding: 20px;
-    }
-
-    .kpi-head {
-      display: flex;
-      justify-content: space-between;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-bottom: 8px;
-    }
-
-    .kpi-num {
-      font-family: var(--font-mono);
-      font-size: 26px;
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 6px;
-    }
-
-    .kpi-foot {
-      font-size: 11.5px;
-      color: var(--accent-emerald);
-    }
-
-    /* MAIN CONTROL GRID */
-    .control-grid {
-      display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      gap: 22px;
-      margin-bottom: 24px;
-    }
-
-    .panel-card {
-      background: var(--bg-panel);
-      backdrop-filter: blur(22px);
-      border: 1px solid var(--border-glass);
-      border-radius: 20px;
-      padding: 24px;
-    }
-
-    .panel-title {
-      font-size: 16px;
-      font-weight: 600;
-      padding-bottom: 14px;
-      margin-bottom: 18px;
-      border-bottom: 1px solid var(--border-glass);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .field-box {
-      margin-bottom: 16px;
-    }
-
-    .field-box label {
-      display: block;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-bottom: 7px;
-    }
-
-    .input-group {
-      display: flex;
-      gap: 8px;
-    }
-
-    .cyber-input {
-      width: 100%;
-      padding: 11px 14px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      border-radius: 11px;
-      color: #fff;
-      font-family: var(--font-mono);
-      font-size: 13px;
-    }
-
-    .cyber-input:focus {
-      border-color: var(--accent-cyan);
-    }
-
-    .vault-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 14px;
-      max-height: 150px;
-      overflow-y: auto;
-    }
-
-    .vault-item {
-      padding: 10px 12px;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-family: var(--font-mono);
-      font-size: 12px;
-    }
-
-    .lock-banner {
-      padding: 14px 16px;
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border-glass);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 16px;
-    }
-
-    .cyber-switch {
-      width: 50px;
-      height: 26px;
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 999px;
-      position: relative;
-      cursor: pointer;
-      transition: background 0.25s ease;
-    }
-
-    .cyber-switch::after {
-      content: '';
-      position: absolute;
-      top: 4px;
-      left: 4px;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: #fff;
-      transition: transform 0.25s ease;
-    }
-
-    .cyber-switch.locked {
-      background: var(--accent-magenta);
-      box-shadow: 0 0 14px rgba(255, 0, 127, 0.5);
-    }
-
-    .cyber-switch.locked::after {
-      transform: translateX(24px);
-    }
-
-    /* BAR CHART */
-    .chart-stage {
-      height: 180px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 20px 8px 10px;
-      border-bottom: 1px solid var(--border-glass);
-      margin-bottom: 14px;
-    }
-
-    .chart-col {
-      flex: 1;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .chart-bar {
-      width: 100%;
-      max-width: 36px;
-      background: linear-gradient(180deg, var(--accent-cyan), var(--accent-violet));
-      border-radius: 6px 6px 2px 2px;
-      box-shadow: 0 0 12px rgba(0, 240, 255, 0.25);
-    }
-
-    .chart-lbl {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      color: var(--text-muted);
-    }
-
-    /* TABLE */
-    .table-wrap {
-      overflow-x: auto;
-    }
-
-    .cyber-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-family: var(--font-mono);
-      font-size: 12px;
-    }
-
-    .cyber-table th {
-      text-align: left;
-      padding: 12px 14px;
-      color: var(--text-muted);
-      border-bottom: 1px solid var(--border-glass);
-      font-size: 11px;
-    }
-
-    .cyber-table td {
-      padding: 12px 14px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .status-tag {
-      padding: 3px 9px;
-      border-radius: 999px;
-      font-size: 10.5px;
-      background: rgba(0, 255, 157, 0.12);
-      color: var(--accent-emerald);
-      border: 1px solid rgba(0, 255, 157, 0.3);
-    }
-
-    #toast-stack {
-      position: fixed;
-      top: 24px;
-      right: 24px;
-      z-index: 20000;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
+    #toast-stack { position: fixed; top: 24px; right: 24px; z-index: 20000; display: flex; flex-direction: column; gap: 8px; }
     .cyber-toast {
-      background: rgba(10, 12, 22, 0.96);
-      border: 1px solid var(--border-glass);
-      border-left: 4px solid var(--accent-cyan);
-      border-radius: 10px;
-      padding: 12px 16px;
-      color: #fff;
-      font-size: 12.5px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      background: rgba(10, 12, 22, 0.96); border: 1px solid var(--border-glass); border-left: 4px solid var(--accent-cyan);
+      border-radius: 10px; padding: 12px 16px; color: #fff; font-size: 12.5px; display: flex; align-items: center; gap: 10px;
     }
 
-    @media (max-width: 960px) {
-      .kpi-row { grid-template-columns: repeat(2, 1fr); }
-      .control-grid { grid-template-columns: 1fr; }
-    }
-    @media (max-width: 600px) {
-      .kpi-row { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 900px) { .control-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
 
-  <!-- MÀN HÌNH NHẬP MẬT KHẨU ame1610@ KÈM AVATAR -->
+  <!-- MÀN HÌNH KHÓA ame1610@ -->
   <div id="auth-gate-screen">
     <div class="auth-gate-box">
-      <img src="https://i.ibb.co/tp7rRb8J/biospace-avatar-q-A9qs-J9c-1791556024025.jpg" alt="Admin Avatar" class="gate-avatar" />
-      <h2 style="font-size:20px; font-weight:700; margin-bottom:8px;">XÁC THỰC QUẢN TRỊ</h2>
-      <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:20px;">Vui lòng nhập mật khẩu quản trị hệ thống để truy cập:</p>
+      <img src="https://i.ibb.co/tp7rRb8J/biospace-avatar-q-A9qs-J9c-1791556024025.jpg" class="gate-avatar" />
+      <h2 style="font-size:20px; font-weight:700; margin-bottom:8px;">QUẢN TRỊ VIÊN AETHERIA</h2>
+      <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:20px;">Vui lòng nhập mật khẩu quản trị để vào hệ thống:</p>
       
       <div class="field-box">
-        <input type="password" class="cyber-input" id="gate-password-input" placeholder="Nhập mật khẩu..." autofocus style="text-align:center; font-size:15px; letter-spacing:2px;" autocomplete="off" />
+        <input type="password" class="cyber-input" id="gate-password-input" placeholder="Nhập mật khẩu..." autofocus style="text-align:center; font-size:15px; letter-spacing:2px;" />
       </div>
 
       <div id="gate-err" style="color:var(--accent-magenta); font-size:12px; font-family:var(--font-mono); margin-bottom:14px; display:none;">
@@ -471,192 +121,170 @@
       </div>
 
       <button type="button" class="btn-neon" id="btn-submit-gate" style="width:100%; justify-content:center; padding:12px;">
-        <i class="fa-solid fa-key"></i> Xác Nhận Đăng Nhập
+        <i class="fa-solid fa-key"></i> Mở Khóa Bảng Điều Khiển
       </button>
     </div>
   </div>
 
   <div id="toast-stack"></div>
 
-  <!-- DASHBOARD CHÍNH -->
   <div class="dashboard-container" id="dashboard-main">
     <header class="admin-topbar">
-      <div class="admin-brand">
-        <div class="admin-badge-icon"><i class="fa-solid fa-shield-halved"></i></div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <img src="https://i.ibb.co/tp7rRb8J/biospace-avatar-q-A9qs-J9c-1791556024025.jpg" style="width:40px; height:40px; border-radius:50%; border:2px solid var(--accent-cyan);" />
         <div>
-          <div>AETHERIA // COMMAND DASHBOARD</div>
-          <div style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted); font-weight:400;">
-            Quản lý khóa API, khóa khẩn cấp và giám sát Token dự án Aetheria
-          </div>
+          <div style="font-weight:700; font-size:17px;">AETHERIA // COMMAND CENTER</div>
+          <div style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono);">Cấu hình Model Online, Lệnh cURL, Pay2S & Link4M</div>
         </div>
       </div>
 
-      <div class="topbar-actions">
-        <a href="https://api.xpiki.com/key" target="_blank" class="btn-glass" title="Xem số dư token trên hệ thống nhà cung cấp">
-          <i class="fa-solid fa-magnifying-glass-chart"></i>
-          <span>Check Token Xpiki</span>
-        </a>
-        <a href="chatbot.html" class="btn-neon">
-          <i class="fa-solid fa-comments"></i>
-          <span>Mở Trang Chatbot</span>
-        </a>
-        <a href="index.html" class="btn-glass">
-          <i class="fa-solid fa-house"></i>
-          <span>Trang Chủ</span>
-        </a>
-        <button class="btn-glass btn-danger" id="btn-lock-screen">
-          <i class="fa-solid fa-lock"></i>
-          <span>Khóa Trang</span>
-        </button>
+      <div style="display:flex; gap:10px;">
+        <a href="chatbot.html" class="btn-neon"><i class="fa-solid fa-comments"></i> Trang Chat</a>
+        <a href="recharge.html" class="btn-glass"><i class="fa-solid fa-coins"></i> Trang Nạp Tiền</a>
+        <button class="btn-glass btn-danger" id="btn-lock-screen"><i class="fa-solid fa-lock"></i> Khóa</button>
       </div>
     </header>
 
-    <!-- 4 KPI CARDS -->
-    <section class="kpi-row">
-      <div class="kpi-card">
-        <div class="kpi-head">
-          <span>TỔNG TOKEN TIÊU HAO CỦA DỰ ÁN</span>
-          <i class="fa-solid fa-microchip" style="color:var(--accent-cyan);"></i>
-        </div>
-        <div class="kpi-num" id="kpi-total-tokens">0</div>
-        <div class="kpi-foot" id="kpi-io-breakdown">In: 0 | Out: 0</div>
-      </div>
-
-      <div class="kpi-card">
-        <div class="kpi-head">
-          <span>CHI PHÍ THỰC TẾ (USD)</span>
-          <i class="fa-solid fa-coins" style="color:var(--accent-amber);"></i>
-        </div>
-        <div class="kpi-num" id="kpi-cost">$0.0000</div>
-        <div class="kpi-foot">Định mức Xpiki ($4 / 1M Token)</div>
-      </div>
-
-      <div class="kpi-card">
-        <div class="kpi-head">
-          <span>TRẠNG THÁI KHÓA API</span>
-          <i class="fa-solid fa-lock" style="color:var(--accent-emerald);"></i>
-        </div>
-        <div class="kpi-num" id="kpi-lock-state" style="color:var(--accent-emerald);">ĐANG MỞ</div>
-        <div class="kpi-foot" id="kpi-key-preview">Key: Đang kiểm tra...</div>
-      </div>
-
-      <div class="kpi-card">
-        <div class="kpi-head">
-          <span>HẠN MỨC REQUEST / NGÀY</span>
-          <i class="fa-solid fa-gauge-high" style="color:var(--accent-magenta);"></i>
-        </div>
-        <div class="kpi-num" id="kpi-limit">100</div>
-        <div class="kpi-foot">Áp dụng riêng dự án Aetheria</div>
-      </div>
-    </section>
-
-    <!-- CẤU HÌNH API KEY VÀ BIỂU ĐỒ -->
+    <!-- SECTION 1: PARSER CURL & THÊM MODEL ONLINE -->
     <section class="control-grid">
       <div class="panel-card">
         <div class="panel-title">
-          <span><i class="fa-solid fa-key" style="color:var(--accent-cyan); margin-right:8px;"></i> Cấp Phát API Key Cho Chatbot (Nhánh aetheria_project)</span>
-          <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent-emerald);">ISOLATED DB</span>
+          <span><i class="fa-solid fa-terminal" style="color:var(--accent-cyan); margin-right:8px;"></i> Nhập Lệnh cURL (Tự Động Bóc Tách)</span>
+          <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent-emerald);">AUTO-PARSER</span>
         </div>
 
         <div class="field-box">
-          <label>OPENAI-COMPATIBLE API KEY (sk-...)</label>
-          <div class="input-group">
-            <input type="password" class="cyber-input" id="api-key-input" placeholder="sk-..." autocomplete="off" />
-            <button class="btn-glass" id="btn-toggle-eye" title="Ẩn/Hiện Key">
-              <i class="fa-regular fa-eye" id="eye-icon"></i>
-            </button>
-          </div>
+          <label>DÁN NGUYÊN VĂN LỆNH CURL VÀO ĐÂY:</label>
+          <textarea class="cyber-textarea" id="curl-input" placeholder="curl -X POST https://kiraai.vn/api/v1/chat/completions \
+  -H &quot;Content-Type: application/json&quot; \
+  -H &quot;Authorization: Bearer YOUR_KIRA_API_KEY&quot; \
+  -d '{
+    &quot;model&quot;: &quot;longcat-2.5-preview-free&quot;,
+    &quot;messages&quot;: [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Hello!&quot;}]
+  }'"></textarea>
         </div>
 
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+        <button type="button" class="btn-glass" id="btn-parse-curl" style="margin-bottom:14px; width:100%; justify-content:center;">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Bóc Tách Thông Tin cURL
+        </button>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
           <div class="field-box">
-            <label>ĐẶT TÊN GỢI NHỚ</label>
-            <input type="text" class="cyber-input" id="api-key-label" value="Key Xpiki Production" />
+            <label>TÊN HIỂN THỊ MODEL</label>
+            <input type="text" class="cyber-input" id="m-name" placeholder="VD: LongCat 2.5 Free" />
           </div>
           <div class="field-box">
-            <label>GIỚI HẠN REQUEST / NGÀY</label>
-            <input type="number" class="cyber-input" id="max-req-input" value="100" min="1" max="50000" />
+            <label>MÃ MODEL (ID)</label>
+            <input type="text" class="cyber-input" id="m-id" placeholder="longcat-2.5-preview-free" />
           </div>
         </div>
 
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button class="btn-neon" id="btn-save-dispatch">
-            <i class="fa-solid fa-floppy-disk"></i>
-            <span>Lưu API Key Ngay</span>
-          </button>
-          <button class="btn-glass" id="btn-reset-tokens">
-            <i class="fa-solid fa-rotate-left"></i>
-            <span>Đặt Lại Bộ Đếm Token</span>
-          </button>
+        <div class="field-box">
+          <label>ENDPOINT URL</label>
+          <input type="text" class="cyber-input" id="m-endpoint" placeholder="https://kiraai.vn/api/v1/chat/completions" />
         </div>
 
-        <!-- KHO LƯU TRỮ CÁC KHÓA -->
-        <div style="margin-top:20px;">
-          <div style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted);">DANH SÁCH KHÓA ĐÃ LƯU TRONG KHO DỰ ÁN</div>
-          <div class="vault-list" id="vault-list"></div>
+        <div class="field-box">
+          <label>API KEY</label>
+          <input type="text" class="cyber-input" id="m-key" placeholder="kira_..." />
         </div>
 
-        <!-- CÔNG TẮC KHÓA KHẨN CẤP -->
-        <div class="lock-banner">
-          <div>
-            <div style="font-weight:600; font-size:14px;">Khóa API Khẩn Cấp (Emergency Kill-Switch)</div>
-            <div style="font-size:12px; color:var(--text-muted);">Khi bật, Chatbot của Aetheria sẽ lập tức bị chặn gọi API</div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div class="field-box">
+            <label>GIÁ TOKEN / LẦN (0 LÀ FREE)</label>
+            <input type="number" class="cyber-input" id="m-cost" value="0" min="0" />
           </div>
-          <div class="cyber-switch" id="api-lock-switch"></div>
-        </div>
-      </div>
-
-      <!-- BIỂU ĐỒ TOKEN -->
-      <div class="panel-card">
-        <div class="panel-title">
-          <span><i class="fa-solid fa-chart-column" style="color:var(--accent-magenta); margin-right:8px;"></i> Thống Kê Tiêu Hao Token 7 Ngày</span>
-          <span style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted);">REALTIME SYNC</span>
+          <div class="field-box" style="display:flex; align-items:center; gap:10px; margin-top:20px;">
+            <input type="checkbox" id="m-maint" style="width:18px; height:18px;" />
+            <label for="m-maint" style="margin:0; cursor:pointer;">Đang bảo trì</label>
+          </div>
         </div>
 
-        <div class="chart-stage">
-          <div class="chart-col"><div class="chart-bar" style="height:35%;"></div><span class="chart-lbl">T2</span></div>
-          <div class="chart-col"><div class="chart-bar" style="height:50%;"></div><span class="chart-lbl">T3</span></div>
-          <div class="chart-col"><div class="chart-bar" style="height:25%;"></div><span class="chart-lbl">T4</span></div>
-          <div class="chart-col"><div class="chart-bar" style="height:65%;"></div><span class="chart-lbl">T5</span></div>
-          <div class="chart-col"><div class="chart-bar" style="height:45%;"></div><span class="chart-lbl">T6</span></div>
-          <div class="chart-col"><div class="chart-bar" style="height:75%;"></div><span class="chart-lbl">T7</span></div>
-          <div class="chart-col"><div class="chart-bar" id="bar-today" style="height:80%;"></div><span class="chart-lbl" style="color:var(--accent-cyan);">HÔM NAY</span></div>
-        </div>
-
-        <div style="font-size:12.5px; color:var(--text-muted); line-height:1.6;">
-          <div><i class="fa-solid fa-circle-check" style="color:var(--accent-emerald);"></i> Chỉ ghi nhận và thống kê các lượt chat thực tế từ trang <strong>chatbot.html</strong> của dự án Aetheria.</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- REALTIME REQUEST LOGS -->
-    <section class="panel-card">
-      <div class="panel-title">
-        <span><i class="fa-solid fa-list-check" style="color:var(--accent-emerald); margin-right:8px;"></i> Nhật Ký Truy Vấn Của Riêng Dự Án Aetheria</span>
-        <button class="btn-glass" id="btn-export-csv" style="padding:6px 12px; font-size:11.5px;">
-          <i class="fa-solid fa-file-csv"></i>
-          <span>Xuất File CSV</span>
+        <button type="button" class="btn-neon" id="btn-save-model" style="width:100%; justify-content:center; padding:12px;">
+          <i class="fa-solid fa-plus"></i> Lưu & Cập Nhật Model Lên Firebase
         </button>
       </div>
 
-      <div class="table-wrap">
-        <table class="cyber-table">
-          <thead>
-            <tr>
-              <th>THỜI GIAN</th>
-              <th>MÔ HÌNH</th>
-              <th>TỆP KÈM</th>
-              <th>TOKEN (IN / OUT)</th>
-              <th>TRẠNG THÁI</th>
-            </tr>
-          </thead>
-          <tbody id="logs-tbody"></tbody>
-        </table>
+      <!-- DANH SÁCH MODEL ONLINE TRÊN FIREBASE -->
+      <div class="panel-card">
+        <div class="panel-title">
+          <span><i class="fa-solid fa-list-check" style="color:var(--accent-magenta); margin-right:8px;"></i> Danh Sách Model Đang Hoạt Động</span>
+          <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent-cyan);" id="model-count-badge">0 MODEL</span>
+        </div>
+
+        <div id="model-list-container" style="max-height: 480px; overflow-y:auto;"></div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: CẤU HÌNH CỔNG THANH TOÁN PAY2S & KIẾM TOKEN QUA LINK RÚT GỌN -->
+    <section class="control-grid">
+      <!-- CẤU HÌNH PAY2S -->
+      <div class="panel-card">
+        <div class="panel-title">
+          <span><i class="fa-solid fa-credit-card" style="color:var(--accent-cyan); margin-right:8px;"></i> Cấu Hình Cổng Thanh Toán Pay2S</span>
+          <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent-emerald);">PAYMENT GATEWAY</span>
+        </div>
+
+        <div class="field-box">
+          <label>PARTNER CODE</label>
+          <input type="text" class="cyber-input" id="pay2s-partner" placeholder="Nhập Partner code của bạn..." />
+        </div>
+
+        <div class="field-box">
+          <label>ACCESS KEY</label>
+          <input type="text" class="cyber-input" id="pay2s-access" placeholder="Nhập Access key..." />
+        </div>
+
+        <div class="field-box">
+          <label>SECRET KEY</label>
+          <input type="password" class="cyber-input" id="pay2s-secret" placeholder="Nhập Secret key..." />
+        </div>
+
+        <div class="field-box">
+          <label>TỈ GIÁ TOKEN (1.000 VNĐ ĐỔI ĐƯỢC BAO NHIÊU TOKEN?)</label>
+          <input type="number" class="cyber-input" id="token-rate" value="10000" min="100" />
+        </div>
+
+        <button type="button" class="btn-neon" id="btn-save-pay2s" style="width:100%; justify-content:center; padding:12px;">
+          <i class="fa-solid fa-floppy-disk"></i> Lưu Cấu Hình Pay2S Lên Firebase
+        </button>
+      </div>
+
+      <!-- CẤU HÌNH LINK4M VÀ TRAFFICTOP -->
+      <div class="panel-card">
+        <div class="panel-title">
+          <span><i class="fa-solid fa-link" style="color:var(--accent-amber); margin-right:8px;"></i> Vượt Link Nhận Token (Link4M & TrafficTop)</span>
+          <span style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted);">300đ/VIEW</span>
+        </div>
+
+        <div class="field-box">
+          <label>TOKEN THƯỞNG CHO MỖI LẦN VƯỢT LINK (Tính từ 300đ để lãi)</label>
+          <input type="number" class="cyber-input" id="shortlink-reward" value="2500" min="100" />
+          <div style="font-size:10.5px; color:var(--text-muted); margin-top:4px;">* Mỗi view bạn nhận 300đ. Đặt 2.500 Token tương đương giá vốn 250đ (bạn lãi 50đ/view).</div>
+        </div>
+
+        <div class="field-box">
+          <label>GIỚI HẠN LƯỢT VƯỢT / NGÀY / CỔNG (MẶC ĐỊNH: 2)</label>
+          <input type="number" class="cyber-input" id="shortlink-limit" value="2" min="1" max="20" />
+        </div>
+
+        <div class="field-box">
+          <label>API KEY LINK4M</label>
+          <input type="text" class="cyber-input" id="link4m-api" value="6992df868b3d1e423d1ab833" />
+        </div>
+
+        <div class="field-box">
+          <label>API KEY TRAFFICTOP</label>
+          <input type="text" class="cyber-input" id="traffictop-api" value="tXk7A1HwG4QSXwGN6TU7yLOz" />
+        </div>
+
+        <button type="button" class="btn-neon" id="btn-save-shortlink" style="width:100%; justify-content:center; padding:12px;">
+          <i class="fa-solid fa-floppy-disk"></i> Lưu Cấu Hình Rút Gọn Link
+        </button>
       </div>
     </section>
   </div>
 
-  <!-- SCRIPT XÁC THỰC MẬT KHẨU ame1610@ -->
   <script>
     const AUTH_PASS = "ame1610@";
     const gateScreen = document.getElementById('auth-gate-screen');
@@ -667,63 +295,27 @@
 
     function checkAuth() {
       let isAuthed = false;
-      try {
-        isAuthed = sessionStorage.getItem('aetheria_dashboard_auth') === 'true';
-      } catch (e) {
-        isAuthed = window._aetheria_temp_auth === true;
-      }
-
-      if (isAuthed) {
-        gateScreen.style.display = 'none';
-        dashboardMain.classList.add('unlocked');
-      } else {
-        gateScreen.style.display = 'flex';
-        dashboardMain.classList.remove('unlocked');
-      }
+      try { isAuthed = sessionStorage.getItem('aetheria_dashboard_auth') === 'true'; } catch(e) {}
+      if (isAuthed) { gateScreen.style.display = 'none'; dashboardMain.classList.add('unlocked'); }
+      else { gateScreen.style.display = 'flex'; dashboardMain.classList.remove('unlocked'); }
     }
 
-    function handleGateSubmit() {
-      const entered = (passInput.value || '').trim();
-      if (entered === AUTH_PASS) {
-        try {
-          sessionStorage.setItem('aetheria_dashboard_auth', 'true');
-        } catch (e) {
-          window._aetheria_temp_auth = true;
-        }
-        gateErr.style.display = 'none';
-        checkAuth();
-      } else {
-        gateErr.style.display = 'block';
-        passInput.value = '';
-        passInput.focus();
-      }
+    function handleGate() {
+      if ((passInput.value || '').trim() === AUTH_PASS) {
+        try { sessionStorage.setItem('aetheria_dashboard_auth', 'true'); } catch(e) {}
+        gateErr.style.display = 'none'; checkAuth();
+      } else { gateErr.style.display = 'block'; passInput.value = ''; passInput.focus(); }
     }
 
-    btnSubmitGate.addEventListener('click', handleGateSubmit);
-
-    passInput.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        handleGateSubmit();
-      }
-    });
-
-    document.getElementById('btn-lock-screen').addEventListener('click', function() {
-      try {
-        sessionStorage.removeItem('aetheria_dashboard_auth');
-      } catch (e) {
-        window._aetheria_temp_auth = false;
-      }
-      checkAuth();
-    });
-
+    btnSubmitGate.onclick = handleGate;
+    passInput.onkeydown = (e) => { if (e.key === 'Enter') handleGate(); };
+    document.getElementById('btn-lock-screen').onclick = () => { sessionStorage.removeItem('aetheria_dashboard_auth'); checkAuth(); };
     checkAuth();
   </script>
 
-  <!-- SCRIPT MODULE ĐỒNG BỘ DỮ LIỆU FIREBASE RTDB -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, update, push, remove, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, set, update, remove, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAVuB8m14zkMPs-JTLAKB0Bp18QBKAMBt4",
@@ -747,186 +339,166 @@
       setTimeout(() => d.remove(), 3200);
     }
 
-    const keyInput = document.getElementById('api-key-input');
-    const eyeIcon = document.getElementById('eye-icon');
-    document.getElementById('btn-toggle-eye').onclick = () => {
-      const isPass = keyInput.type === 'password';
-      keyInput.type = isPass ? 'text' : 'password';
-      eyeIcon.className = isPass ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye';
+    // 1. BÓC TÁCH CURL TỰ ĐỘNG
+    document.getElementById('btn-parse-curl').onclick = () => {
+      const raw = document.getElementById('curl-input').value.trim();
+      if (!raw) { alert('Vui lòng dán lệnh cURL vào ô trước!'); return; }
+
+      // Bóc URL Endpoint
+      const urlMatch = raw.match(/curl\s+(?:-X\s+\w+\s+)?['"]?(https?:\/\/[^\s'"]+)/i);
+      if (urlMatch) document.getElementById('m-endpoint').value = urlMatch[1];
+
+      // Bóc API Key trong Authorization
+      const keyMatch = raw.match(/Authorization:\s*Bearer\s+([^\s'"]+)/i);
+      if (keyMatch) document.getElementById('m-key').value = keyMatch[1];
+
+      // Bóc model name trong JSON data
+      const modelMatch = raw.match(/"model"\s*:\s*"([^"]+)"/i);
+      if (modelMatch) {
+        document.getElementById('m-id').value = modelMatch[1];
+        document.getElementById('m-name').value = modelMatch[1].toUpperCase();
+      }
+
+      notify('Đã bóc tách thành công thông số cURL!');
     };
 
-    let currentState = {
-      api_key: '',
-      api_locked: false,
-      input_tokens: 0,
-      output_tokens: 0,
-      max_requests_per_day: 100
-    };
+    // 2. LƯU MODEL MỚI HOẶC SỬA MODEL
+    document.getElementById('btn-save-model').onclick = async () => {
+      const mId = document.getElementById('m-id').value.trim();
+      const mName = document.getElementById('m-name').value.trim() || mId;
+      const mEndpoint = document.getElementById('m-endpoint').value.trim();
+      const mKey = document.getElementById('m-key').value.trim();
+      const mCost = parseInt(document.getElementById('m-cost').value, 10) || 0;
+      const mMaint = document.getElementById('m-maint').checked;
 
-    // ĐỌC DỮ LIỆU TỪ NHÁNH RIÊNG aetheria_project/system_config
-    onValue(ref(rtdb, 'aetheria_project/system_config'), (snap) => {
-      if (snap.exists()) {
-        currentState = { ...currentState, ...snap.val() };
-      }
-      if (currentState.api_key && !keyInput.value) {
-        keyInput.value = currentState.api_key;
-      }
-
-      const inTok = currentState.input_tokens || 0;
-      const outTok = currentState.output_tokens || 0;
-      const total = inTok + outTok;
-
-      document.getElementById('kpi-total-tokens').textContent = total.toLocaleString('en-US');
-      document.getElementById('kpi-io-breakdown').textContent = `In: ${inTok.toLocaleString('en-US')} | Out: ${outTok.toLocaleString('en-US')}`;
-
-      // TÍNH TOÁN THEO GIÁ $4 / 1 TRIỆU TOKEN CỦA GÓI XPIKI
-      const cost = ((total / 1000000) * 4.0).toFixed(4);
-      document.getElementById('kpi-cost').textContent = `$${cost}`;
-      document.getElementById('kpi-limit').textContent = currentState.max_requests_per_day || 100;
-
-      const lockSwitch = document.getElementById('api-lock-switch');
-      const lockStateEl = document.getElementById('kpi-lock-state');
-      lockSwitch.classList.toggle('locked', !!currentState.api_locked);
-      if (currentState.api_locked) {
-        lockStateEl.textContent = 'ĐÃ KHÓA API';
-        lockStateEl.style.color = 'var(--accent-magenta)';
-      } else {
-        lockStateEl.textContent = 'ĐANG MỞ';
-        lockStateEl.style.color = 'var(--accent-emerald)';
-      }
-
-      const masked = currentState.api_key
-        ? `${currentState.api_key.slice(0, 8)}...${currentState.api_key.slice(-4)}`
-        : 'Chưa cấu hình API Key';
-      document.getElementById('kpi-key-preview').textContent = `Key: ${masked}`;
-    });
-
-    // LƯU API KEY VÀO NHÁNH aetheria_project/system_config
-    document.getElementById('btn-save-dispatch').onclick = async () => {
-      const k = keyInput.value.trim();
-      const label = document.getElementById('api-key-label').value.trim() || 'Key Xpiki';
-      const limit = parseInt(document.getElementById('max-req-input').value, 10) || 100;
-
-      if (!k) {
-        alert("Vui lòng nhập API Key trước khi lưu!");
+      if (!mId || !mEndpoint || !mKey) {
+        alert('Vui lòng điền đủ Mã Model, Endpoint và API Key!');
         return;
       }
 
-      try {
-        await update(ref(rtdb, 'aetheria_project/system_config'), {
-          api_key: k,
-          max_requests_per_day: limit,
-          updated_at: Date.now()
-        });
+      // Xử lý key hợp lệ cho Firebase
+      const safeId = mId.replace(/[.#$/\[\]]/g, '_');
 
-        await push(ref(rtdb, 'aetheria_project/api_key_vault'), {
-          label,
-          key: k,
-          createdAt: new Date().toLocaleTimeString('vi-VN')
-        });
+      await set(ref(rtdb, `aetheria_project/models_config/${safeId}`), {
+        name: mName,
+        endpoint: mEndpoint,
+        apiKey: mKey,
+        costToken: mCost,
+        maintenance: mMaint,
+        updatedAt: Date.now()
+      });
 
-        notify('Lưu thành công API Key vào nhánh Aetheria!');
-      } catch (err) {
-        alert("Lỗi khi lưu lên Firebase: " + err.message);
-      }
+      notify(`Đã lưu mô hình ${mName} thành công lên Firebase!`);
+      document.getElementById('m-id').value = '';
+      document.getElementById('m-name').value = '';
     };
 
-    // Bật tắt khóa API khẩn cấp
-    document.getElementById('api-lock-switch').onclick = async () => {
-      const nextLock = !currentState.api_locked;
-      await update(ref(rtdb, 'aetheria_project/system_config'), { api_locked: nextLock });
-      notify(nextLock ? 'Đã KHÓA API của dự án Aetheria!' : 'Đã MỞ KHÓA API cho Chatbot!');
-    };
+    // 3. HIỂN THỊ DANH SÁCH MODEL TỪ FIREBASE
+    onValue(ref(rtdb, 'aetheria_project/models_config'), (snap) => {
+      const box = document.getElementById('model-list-container');
+      box.innerHTML = '';
 
-    // Đặt lại bộ đếm token
-    document.getElementById('btn-reset-tokens').onclick = async () => {
-      if (confirm("Bạn có chắc chắn muốn đặt lại bộ đếm Token của dự án này về 0?")) {
-        await update(ref(rtdb, 'aetheria_project/system_config'), { input_tokens: 0, output_tokens: 0 });
-        notify('Đã đặt lại bộ đếm Token về 0.');
-      }
-    };
-
-    // Danh sách khóa trong kho
-    onValue(ref(rtdb, 'aetheria_project/api_key_vault'), (snap) => {
-      const vaultList = document.getElementById('vault-list');
-      vaultList.innerHTML = '';
       if (!snap.exists()) {
-        vaultList.innerHTML = `<div class="vault-item"><span>Chưa có khóa phụ trong kho</span></div>`;
+        box.innerHTML = `<div style="color:var(--text-muted); padding:10px;">Chưa có model nào. Hãy nhập cURL để thêm!</div>`;
         return;
       }
-      const data = snap.val();
-      Object.entries(data).reverse().forEach(([id, item]) => {
-        const masked = `${item.key.slice(0, 8)}...${item.key.slice(-4)}`;
+
+      const list = snap.val();
+      document.getElementById('model-count-badge').textContent = `${Object.keys(list).length} MODEL`;
+
+      Object.entries(list).forEach(([safeId, item]) => {
         const row = document.createElement('div');
-        row.className = 'vault-item';
+        row.className = 'model-item-row';
         row.innerHTML = `
           <div>
-            <strong style="color:#fff;">${item.label}</strong>
-            <span style="color:var(--text-muted); margin-left:8px;">${masked}</span>
+            <strong style="color:#fff;">${item.name || safeId}</strong>
+            <span style="color:var(--text-muted); margin-left:6px;">(${item.costToken === 0 ? 'FREE' : item.costToken + ' Tok'})</span>
+            <div style="font-size:10px; color:${item.maintenance ? 'var(--accent-amber)' : 'var(--accent-emerald)'};">
+              ${item.maintenance ? '<i class="fa-solid fa-wrench"></i> Đang bảo trì' : '<i class="fa-solid fa-circle-check"></i> Hoạt động'}
+            </div>
           </div>
           <div style="display:flex; gap:6px;">
-            <button class="btn-glass btn-use-key" style="padding:4px 10px; font-size:11px;">Kích Hoạt</button>
-            <button class="btn-glass btn-danger btn-del-key" style="padding:4px 9px; font-size:11px;"><i class="fa-solid fa-trash"></i></button>
+            <button class="btn-glass btn-toggle-maint" style="padding:4px 9px; font-size:11px;">
+              ${item.maintenance ? 'Mở lại' : 'Bảo trì'}
+            </button>
+            <button class="btn-glass btn-danger btn-del-model" style="padding:4px 8px; font-size:11px;">
+              <i class="fa-solid fa-trash"></i>
+            </button>
           </div>
         `;
-        row.querySelector('.btn-use-key').onclick = async () => {
-          keyInput.value = item.key;
-          await update(ref(rtdb, 'aetheria_project/system_config'), { api_key: item.key });
-          notify(`Đã kích hoạt khóa "${item.label}"!`);
+
+        row.querySelector('.btn-toggle-maint').onclick = async () => {
+          await update(ref(rtdb, `aetheria_project/models_config/${safeId}`), { maintenance: !item.maintenance });
+          notify('Đã cập nhật trạng thái model!');
         };
-        row.querySelector('.btn-del-key').onclick = async () => {
-          await remove(ref(rtdb, `aetheria_project/api_key_vault/${id}`));
+
+        row.querySelector('.btn-del-model').onclick = async () => {
+          if (confirm(`Xóa model ${item.name}?`)) {
+            await remove(ref(rtdb, `aetheria_project/models_config/${safeId}`));
+            notify('Đã xóa model.');
+          }
         };
-        vaultList.appendChild(row);
+
+        box.appendChild(row);
       });
     });
 
-    // Lắng nghe Request Logs riêng
-    let cachedLogs = [];
-    onValue(ref(rtdb, 'aetheria_project/request_logs'), (snap) => {
-      const tbody = document.getElementById('logs-tbody');
-      tbody.innerHTML = '';
-      cachedLogs = [];
+    // 4. LƯU CẤU HÌNH PAY2S
+    document.getElementById('btn-save-pay2s').onclick = async () => {
+      const partner = document.getElementById('pay2s-partner').value.trim();
+      const access = document.getElementById('pay2s-access').value.trim();
+      const secret = document.getElementById('pay2s-secret').value.trim();
+      const rate = parseInt(document.getElementById('token-rate').value, 10) || 10000;
 
-      if (snap.exists()) {
-        Object.values(snap.val()).reverse().forEach(log => cachedLogs.push(log));
-      }
-
-      if (cachedLogs.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Chưa có nhật ký truy vấn nào từ trang Chatbot Aetheria</td></tr>`;
-        return;
-      }
-
-      cachedLogs.forEach(l => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${l.time}</td>
-          <td>${l.model}</td>
-          <td>${l.fileInfo || 'Không'}</td>
-          <td>${l.inTokens} / ${l.outTokens}</td>
-          <td><span class="status-tag">${l.status}</span></td>
-        `;
-        tbody.appendChild(tr);
+      await set(ref(rtdb, 'aetheria_project/payment_config/pay2s'), {
+        partnerCode: partner,
+        accessKey: access,
+        secretKey: secret,
+        tokenRate: rate,
+        updatedAt: Date.now()
       });
-    });
 
-    // Xuất CSV
-    document.getElementById('btn-export-csv').onclick = () => {
-      if (cachedLogs.length === 0) {
-        alert("Chưa có dữ liệu để xuất file CSV!");
-        return;
-      }
-      const rows = [['Thoi Gian', 'Mo Hinh', 'Tep Dinh Kem', 'Input Tokens', 'Output Tokens', 'Trang Thai']];
-      cachedLogs.forEach(l => rows.push([l.time, l.model, l.fileInfo || 'Khong', l.inTokens, l.outTokens, l.status]));
-      const csvContent = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'aetheria_token_logs.csv';
-      a.click();
-      URL.revokeObjectURL(url);
+      notify('Đã lưu cấu hình cổng thanh toán Pay2S!');
     };
+
+    // Đọc cấu hình Pay2S
+    onValue(ref(rtdb, 'aetheria_project/payment_config/pay2s'), (snap) => {
+      if (snap.exists()) {
+        const d = snap.val();
+        if (d.partnerCode) document.getElementById('pay2s-partner').value = d.partnerCode;
+        if (d.accessKey) document.getElementById('pay2s-access').value = d.accessKey;
+        if (d.secretKey) document.getElementById('pay2s-secret').value = d.secretKey;
+        if (d.tokenRate) document.getElementById('token-rate').value = d.tokenRate;
+      }
+    });
+
+    // 5. LƯU CẤU HÌNH RÚT GỌN LINK KIẾM TIỀN
+    document.getElementById('btn-save-shortlink').onclick = async () => {
+      const reward = parseInt(document.getElementById('shortlink-reward').value, 10) || 2500;
+      const limit = parseInt(document.getElementById('shortlink-limit').value, 10) || 2;
+      const l4m = document.getElementById('link4m-api').value.trim();
+      const tt = document.getElementById('traffictop-api').value.trim();
+
+      await set(ref(rtdb, 'aetheria_project/shortlink_config'), {
+        rewardTokens: reward,
+        dailyLimit: limit,
+        link4mApi: l4m,
+        traffictopApi: tt,
+        updatedAt: Date.now()
+      });
+
+      notify('Đã lưu cấu hình vượt link nhận Token!');
+    };
+
+    onValue(ref(rtdb, 'aetheria_project/shortlink_config'), (snap) => {
+      if (snap.exists()) {
+        const d = snap.val();
+        if (d.rewardTokens) document.getElementById('shortlink-reward').value = d.rewardTokens;
+        if (d.dailyLimit) document.getElementById('shortlink-limit').value = d.dailyLimit;
+        if (d.link4mApi) document.getElementById('link4m-api').value = d.link4mApi;
+        if (d.traffictopApi) document.getElementById('traffictop-api').value = d.traffictopApi;
+      }
+    });
   </script>
 </body>
 </html>
