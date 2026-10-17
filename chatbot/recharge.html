@@ -64,6 +64,12 @@
     .custom-input-box input { flex: 1; background: transparent; border: none; border-bottom: 1px dashed var(--accent-cyan); color: #fff; font-family: var(--font-mono); font-size: 15px; padding: 6px; outline: none; }
     .custom-input-box input::placeholder { color: var(--text-muted); font-size: 13px; }
 
+    .tx-info-preview {
+      padding: 12px 16px; border-radius: 12px; background: rgba(0, 240, 255, 0.06);
+      border: 1px dashed rgba(0, 240, 255, 0.3); font-family: var(--font-mono); font-size: 12px;
+      margin-bottom: 18px; color: var(--text-main); line-height: 1.6;
+    }
+
     .btn-neon { width: 100%; padding: 14px; border-radius: 12px; background: linear-gradient(135deg, var(--accent-cyan), #6ef7ff); color: #040509; font-weight: 700; font-size: 14px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
 
     .quest-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 18px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
@@ -88,8 +94,8 @@
     <div class="wallet-card">
       <div>
         <div style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted); margin-bottom:4px;">SỐ DƯ TOKEN CỦA BẠN</div>
-        <div style="font-family:var(--font-mono); font-size:32px; font-weight:700; color:var(--accent-cyan);" id="user-tokens-text">-- TOKEN</div>
-        <div style="font-size:12px; color:var(--text-muted);" id="user-email-text">Đang kiểm tra tài khoản...</div>
+        <div style="font-family:var(--font-mono); font-size:32px; font-weight:700; color:var(--accent-cyan);" id="user-tokens-text">0 TOKEN</div>
+        <div style="font-size:12px; color:var(--text-muted);" id="user-email-text">Đang đồng bộ tài khoản...</div>
       </div>
       <div style="text-align:right;">
         <span style="padding:6px 14px; border-radius:999px; background:rgba(0,255,157,0.12); color:var(--accent-emerald); font-family:var(--font-mono); font-size:11.5px; border:1px solid rgba(0,255,157,0.3);">
@@ -108,7 +114,7 @@
     <div class="tab-content active" id="tab-pay2s">
       <div class="card-box">
         <h3 style="margin-bottom:6px; font-size:17px;"><i class="fa-solid fa-shield-halved" style="color:var(--accent-cyan);"></i> Chọn Gói Nạp Token Pay2S</h3>
-        <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:18px;">Hệ thống sẽ tự động quét mã QR và cộng Token vào tài khoản dựa trên mã giao dịch.</p>
+        <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:18px;">Bấm vào ô bên dưới để mở thanh lựa chọn mệnh giá hoặc nhập số tiền tùy ý (tối thiểu 5.000 VNĐ):</p>
 
         <!-- DROPDOWN CHỌN MỆNH GIÁ -->
         <div class="dropdown-container" id="amount-dropdown-container">
@@ -117,16 +123,23 @@
             <i class="fa-solid fa-chevron-down" style="font-size:12px; color:var(--accent-cyan);"></i>
           </div>
           <div class="dropdown-menu">
+            <div class="dropdown-item" data-val="5000"><span>5.000 đ (Tối thiểu)</span><span style="color:var(--accent-emerald);">+50.000 Tok</span></div>
             <div class="dropdown-item" data-val="10000"><span>10.000 đ</span><span style="color:var(--accent-emerald);">+100.000 Tok</span></div>
             <div class="dropdown-item" data-val="20000"><span>20.000 đ</span><span style="color:var(--accent-emerald);">+200.000 Tok</span></div>
             <div class="dropdown-item" data-val="50000"><span>50.000 đ</span><span style="color:var(--accent-emerald);">+500.000 Tok</span></div>
             <div class="dropdown-item" data-val="100000"><span>100.000 đ</span><span style="color:var(--accent-emerald);">+1.000.000 Tok</span></div>
             <div class="dropdown-item" data-val="200000"><span>200.000 đ</span><span style="color:var(--accent-emerald);">+2.000.000 Tok</span></div>
             <div class="custom-input-box">
-              <input type="number" id="custom-amount-input" placeholder="Tùy chọn (Tối thiểu 5.000đ)" min="5000" />
+              <input type="number" id="custom-amount-input" placeholder="Nhập số tiền tùy chọn (Từ 5.000đ)..." min="5000" />
               <span style="font-family:var(--font-mono); font-size:12px; color:var(--accent-emerald); margin-left:10px;" id="custom-tok-preview">0 Tok</span>
             </div>
           </div>
+        </div>
+
+        <!-- THÔNG TIN ĐỊNH DANH TÀI KHOẢN & NỘI DUNG GIAO DỊCH -->
+        <div class="tx-info-preview">
+          <div><i class="fa-solid fa-user-shield" style="color:var(--accent-cyan);"></i> Tài khoản thụ hưởng: <strong id="tx-preview-email">Đang tải...</strong></div>
+          <div><i class="fa-solid fa-fingerprint" style="color:var(--accent-emerald);"></i> Nội dung / Mã định danh cộng tự động: <strong id="tx-preview-uid">AETH_...</strong></div>
         </div>
 
         <button type="button" class="btn-neon" id="btn-create-pay2s">
@@ -149,7 +162,7 @@
     <!-- TAB 3: VƯỢT LINK -->
     <div class="tab-content" id="tab-quest">
       <div class="card-box">
-        <h3 style="margin-bottom:8px; font-size:17px;"><i class="fa-solid fa-gift" style="color:var(--accent-emerald);"></i> Nhiệm Vụ Vượt Link</h3>
+        <h3 style="margin-bottom:8px; font-size:17px;"><i class="fa-solid fa-gift" style="color:var(--accent-emerald);"></i> Nhiệm Vụ Vượt Link Nhận Token</h3>
         <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:20px;">
           Cộng ngay <strong style="color:var(--accent-cyan);"><span id="reward-display">2.500</span> Token</strong> vào tài khoản. Tối đa <strong style="color:#fff;"><span id="limit-display">2</span> lần/ngày/cổng</strong>.
         </p>
@@ -184,7 +197,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, get, set, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAVuB8m14zkMPs-JTLAKB0Bp18QBKAMBt4",
@@ -261,23 +274,51 @@
       }
     };
 
-    // AUTH BẮT BUỘC & LIÊN KẾT TÀI KHOẢN TỪ INDEX.HTML
-    onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        window.location.href = "index.html#auth";
-        return;
+    // ĐỒNG BỘ TÀI KHOẢN ĐA TẦNG TỪ FIREBASE AUTH & INDEX.HTML LOCALSTORAGE
+    function getFallbackUser() {
+      const keys = ['aetheria_user', 'digitalxiao_user', 'user', 'currentUser'];
+      for (const k of keys) {
+        try {
+          const raw = localStorage.getItem(k) || sessionStorage.getItem(k);
+          if (raw) {
+            const p = JSON.parse(raw);
+            if (p && (p.uid || p.email)) {
+              return { uid: p.uid || p.email.replace(/[.#$/\[\]@]/g, '_'), email: p.email };
+            }
+          }
+        } catch (e) {}
       }
-      currentUser = user;
-      document.getElementById('user-email-text').textContent = user.email;
+      return null;
+    }
 
-      onValue(ref(rtdb, `aetheria_project/users/${user.uid}/tokens`), (snap) => {
-        currentTokens = snap.exists() ? snap.val() : 0;
+    async function initUserWallet(uObj) {
+      currentUser = uObj;
+      document.getElementById('user-email-text').textContent = `Tài khoản: ${uObj.email}`;
+      document.getElementById('tx-preview-email').textContent = uObj.email;
+      document.getElementById('tx-preview-uid').textContent = `NAP_${uObj.uid}`;
+
+      onValue(ref(rtdb, `aetheria_project/users/${uObj.uid}/tokens`), (snap) => {
+        currentTokens = snap.exists() ? Math.max(0, Number(snap.val()) || 0) : 0;
         document.getElementById('user-tokens-text').textContent = `${currentTokens.toLocaleString()} TOKEN`;
       });
 
       const verifyQuest = urlParams.get('verify_quest');
-      if (verifyQuest) handleQuestReward(verifyQuest);
-      else updateQuestStats();
+      if (verifyQuest) await handleQuestReward(verifyQuest);
+      else await updateQuestStats();
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        await initUserWallet({ uid: user.uid, email: user.email });
+      } else {
+        const fbUser = getFallbackUser();
+        if (fbUser) {
+          await initUserWallet(fbUser);
+        } else {
+          alert("Vui lòng đăng nhập tài khoản trước khi nạp Token!");
+          window.location.href = "chatbot.html";
+        }
+      }
     });
 
     onValue(ref(rtdb, 'aetheria_project/payment_config/pay2s'), (snap) => {
@@ -301,8 +342,9 @@
       }
     });
 
-    // KHỞI TẠO GIAO DỊCH VÀ NHÚNG UID VÀO ORDERID CHO WEBHOOK
+    // TẠO GIAO DỊCH PAY2S CÓ NHÚNG TRỰC TIẾP UID VÀ EMAIL VÀO ORDER INFO
     document.getElementById('btn-create-pay2s').onclick = async () => {
+      if (!currentUser) return alert("Chưa xác định được tài khoản người dùng!");
       if (selectedAmount < 5000) {
         alert("Số tiền nạp tối thiểu là 5.000 VNĐ!");
         ddContainer.classList.add('active');
@@ -311,13 +353,13 @@
       }
 
       if (!pay2sConfig.partnerCode || !pay2sConfig.accessKey) {
-        alert("Cổng Pay2S chưa được Admin cấu hình Endpoint/Key trên Dashboard!");
+        alert("Cổng Pay2S chưa được Admin cấu hình Partner Code / Access Key trên Dashboard!");
         return;
       }
 
-      // Nhúng trực tiếp UID vào OrderId để Webhook tự động nhận diện và cộng Token
       const orderId = `AETH_${currentUser.uid}_${Date.now()}`;
-      notify("Đang kết nối cổng Pay2S...");
+      const orderInfo = `NAP_${currentUser.uid}_${currentUser.email}`;
+      notify("Đang khởi tạo giao dịch Pay2S...");
 
       const endpoint = pay2sConfig.endpoint || "https://payment.pay2s.vn/v1/gateway/api/create";
 
@@ -331,7 +373,7 @@
             accessKey: pay2sConfig.accessKey,
             orderId: orderId,
             amount: String(selectedAmount),
-            orderInfo: currentUser.uid,
+            orderInfo: orderInfo,
             redirectUrl: window.location.href,
             ipnUrl: window.location.origin + "/api/webhook"
           })
@@ -341,7 +383,7 @@
         const data = await proxyResponse.json();
 
         if (data.payUrl) window.location.href = data.payUrl;
-        else alert("Lỗi từ Pay2S: " + (data.message || JSON.stringify(data)));
+        else alert("Thông báo từ Pay2S: " + (data.message || JSON.stringify(data)));
       } catch (err) {
         try {
           const fbResponse = await fetch(`https://corsproxy.io/?${encodeURIComponent(endpoint)}`, {
@@ -352,16 +394,16 @@
               accessKey: pay2sConfig.accessKey,
               orderId: orderId,
               amount: String(selectedAmount),
-              orderInfo: currentUser.uid,
+              orderInfo: orderInfo,
               redirectUrl: window.location.href,
               ipnUrl: window.location.origin + "/api/webhook"
             })
           });
           const fbData = await fbResponse.json();
           if (fbData.payUrl) window.location.href = fbData.payUrl;
-          else alert("Lỗi Pay2S (Fallback): " + (fbData.message || JSON.stringify(fbData)));
+          else alert("Thông báo Pay2S: " + (fbData.message || JSON.stringify(fbData)));
         } catch(fallbackErr) {
-          alert("Lỗi kết nối Pay2S (CORS Failed): " + fallbackErr.message);
+          alert("Lỗi kết nối Pay2S: " + fallbackErr.message);
         }
       }
     };
@@ -385,19 +427,22 @@
         stats[type] = (stats[type] || 0) + 1;
         await set(ref(rtdb, `aetheria_project/users/${currentUser.uid}/quests/${todayKey}`), stats);
 
-        const reward = shortlinkConfig.rewardTokens || 2500;
-        await set(ref(rtdb, `aetheria_project/users/${currentUser.uid}/tokens`), currentTokens + reward);
+        const reward = Number(shortlinkConfig.rewardTokens) || 2500;
+        await runTransaction(ref(rtdb, `aetheria_project/users/${currentUser.uid}/tokens`), (cur) => {
+          return (Number(cur) || 0) + reward;
+        });
 
-        alert(`Chúc mừng! Bạn đã nhận được +${reward.toLocaleString()} Token!`);
+        alert(`Chúc mừng! Tài khoản ${currentUser.email} đã được cộng +${reward.toLocaleString()} Token!`);
         window.history.replaceState({}, document.title, window.location.pathname);
       } else {
         alert(`Bạn đã đạt giới hạn ${maxLimit} lần/ngày cho cổng này!`);
         window.history.replaceState({}, document.title, window.location.pathname);
       }
-      updateQuestStats();
+      await updateQuestStats();
     }
 
     document.getElementById('btn-quest-link4m').onclick = async () => {
+      if (!currentUser) return;
       const snap = await get(ref(rtdb, `aetheria_project/users/${currentUser.uid}/quests/${todayKey}/link4m`));
       if ((snap.exists() ? snap.val() : 0) >= (shortlinkConfig.dailyLimit || 2)) return alert("Bạn đã hết lượt vượt Link4M hôm nay!");
       const targetUrl = encodeURIComponent(`${window.location.origin}${window.location.pathname}?verify_quest=link4m`);
@@ -405,6 +450,7 @@
     };
 
     document.getElementById('btn-quest-traffictop').onclick = async () => {
+      if (!currentUser) return;
       const snap = await get(ref(rtdb, `aetheria_project/users/${currentUser.uid}/quests/${todayKey}/traffictop`));
       if ((snap.exists() ? snap.val() : 0) >= (shortlinkConfig.dailyLimit || 2)) return alert("Bạn đã hết lượt vượt TrafficTop hôm nay!");
       const targetUrl = encodeURIComponent(`${window.location.origin}${window.location.pathname}?verify_quest=traffictop`);
