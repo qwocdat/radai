@@ -99,7 +99,7 @@
       </div>
       <div style="text-align:right;">
         <span style="padding:6px 14px; border-radius:999px; background:rgba(0,255,157,0.12); color:var(--accent-emerald); font-family:var(--font-mono); font-size:11.5px; border:1px solid rgba(0,255,157,0.3);">
-          TỈ GIÁ: 1.000đ = <span id="rate-display">10.000</span> Tok
+          TỈ GIÁ: 1.000đ = <span id="rate-display">1.000</span> Tok
         </span>
       </div>
     </div>
@@ -114,32 +114,33 @@
     <div class="tab-content active" id="tab-pay2s">
       <div class="card-box">
         <h3 style="margin-bottom:6px; font-size:17px;"><i class="fa-solid fa-shield-halved" style="color:var(--accent-cyan);"></i> Chọn Gói Nạp Token Pay2S</h3>
-        <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:18px;">Bấm vào ô bên dưới để mở thanh lựa chọn mệnh giá hoặc nhập số tiền tùy ý (tối thiểu 5.000 VNĐ):</p>
+        <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:18px;">Chọn gói nạp hoặc nhập số tiền tùy chọn (tối thiểu 5.000 VNĐ). Tỉ giá chuẩn 1 VNĐ = 1 Token:</p>
 
         <!-- DROPDOWN CHỌN MỆNH GIÁ -->
         <div class="dropdown-container" id="amount-dropdown-container">
           <div class="dropdown-trigger" id="amount-trigger">
-            <div><span id="display-vnd">50.000 đ</span> <span style="color:var(--text-muted); font-size:12px; margin-left:6px;" id="display-tok">(+500.000 Tok)</span></div>
+            <div><span id="display-vnd">50.000 đ</span> <span style="color:var(--accent-emerald); font-size:12px; margin-left:6px;" id="display-tok">(+55.000 Tok - Tặng 10%)</span></div>
             <i class="fa-solid fa-chevron-down" style="font-size:12px; color:var(--accent-cyan);"></i>
           </div>
           <div class="dropdown-menu">
-            <div class="dropdown-item" data-val="5000"><span>5.000 đ (Tối thiểu)</span><span style="color:var(--accent-emerald);">+50.000 Tok</span></div>
-            <div class="dropdown-item" data-val="10000"><span>10.000 đ</span><span style="color:var(--accent-emerald);">+100.000 Tok</span></div>
-            <div class="dropdown-item" data-val="20000"><span>20.000 đ</span><span style="color:var(--accent-emerald);">+200.000 Tok</span></div>
-            <div class="dropdown-item" data-val="50000"><span>50.000 đ</span><span style="color:var(--accent-emerald);">+500.000 Tok</span></div>
-            <div class="dropdown-item" data-val="100000"><span>100.000 đ</span><span style="color:var(--accent-emerald);">+1.000.000 Tok</span></div>
-            <div class="dropdown-item" data-val="200000"><span>200.000 đ</span><span style="color:var(--accent-emerald);">+2.000.000 Tok</span></div>
+            <div class="dropdown-item" data-val="5000" data-bonus="0"><span>5.000 đ (Tối thiểu)</span><span style="color:var(--accent-emerald);">+5.000 Tok</span></div>
+            <div class="dropdown-item" data-val="10000" data-bonus="0"><span>10.000 đ</span><span style="color:var(--accent-emerald);">+10.000 Tok</span></div>
+            <div class="dropdown-item" data-val="20000" data-bonus="1000"><span>20.000 đ</span><span style="color:var(--accent-emerald);">+21.000 Tok (Tặng 5%)</span></div>
+            <div class="dropdown-item" data-val="50000" data-bonus="5000"><span>50.000 đ</span><span style="color:var(--accent-emerald);">+55.000 Tok (Tặng 10%)</span></div>
+            <div class="dropdown-item" data-val="100000" data-bonus="15000"><span>100.000 đ</span><span style="color:var(--accent-emerald);">+115.000 Tok (Tặng 15%)</span></div>
+            <div class="dropdown-item" data-val="200000" data-bonus="40000"><span>200.000 đ</span><span style="color:var(--accent-emerald);">+240.000 Tok (Tặng 20%)</span></div>
+            <div class="dropdown-item" data-val="500000" data-bonus="150000"><span>500.000 đ</span><span style="color:var(--accent-emerald);">+650.000 Tok (Tặng 30%)</span></div>
             <div class="custom-input-box">
-              <input type="number" id="custom-amount-input" placeholder="Nhập số tiền tùy chọn (Từ 5.000đ)..." min="5000" />
+              <input type="number" id="custom-amount-input" placeholder="Nhập số tiền tùy ý (Từ 5.000đ)..." min="5000" />
               <span style="font-family:var(--font-mono); font-size:12px; color:var(--accent-emerald); margin-left:10px;" id="custom-tok-preview">0 Tok</span>
             </div>
           </div>
         </div>
 
-        <!-- THÔNG TIN ĐỊNH DANH TÀI KHOẢN & NỘI DUNG GIAO DỊCH -->
+        <!-- THÔNG TIN ĐỊNH DANH TÀI KHOẢN -->
         <div class="tx-info-preview">
-          <div><i class="fa-solid fa-user-shield" style="color:var(--accent-cyan);"></i> Tài khoản thụ hưởng: <strong id="tx-preview-email">Đang tải...</strong></div>
-          <div><i class="fa-solid fa-fingerprint" style="color:var(--accent-emerald);"></i> Nội dung / Mã định danh cộng tự động: <strong id="tx-preview-uid">AETH_...</strong></div>
+          <div><i class="fa-solid fa-user-shield" style="color:var(--accent-cyan);"></i> Tài khoản nạp: <strong id="tx-preview-email">Đang tải...</strong></div>
+          <div><i class="fa-solid fa-fingerprint" style="color:var(--accent-emerald);"></i> Mã nội dung Webhook tự động: <strong id="tx-preview-uid">AETH_...</strong></div>
         </div>
 
         <button type="button" class="btn-neon" id="btn-create-pay2s">
@@ -159,12 +160,12 @@
       </div>
     </div>
 
-    <!-- TAB 3: VƯỢT LINK -->
+    <!-- TAB 3: VƯỢT LINK NHẬN TOKEN (LÃI TIỀN MẶT CHO ADMIN) -->
     <div class="tab-content" id="tab-quest">
       <div class="card-box">
-        <h3 style="margin-bottom:8px; font-size:17px;"><i class="fa-solid fa-gift" style="color:var(--accent-emerald);"></i> Nhiệm Vụ Vượt Link Nhận Token</h3>
+        <h3 style="margin-bottom:8px; font-size:17px;"><i class="fa-solid fa-gift" style="color:var(--accent-emerald);"></i> Nhiệm Vụ Vượt Link Nhận Token Miễn Phí</h3>
         <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:20px;">
-          Cộng ngay <strong style="color:var(--accent-cyan);"><span id="reward-display">2.500</span> Token</strong> vào tài khoản. Tối đa <strong style="color:#fff;"><span id="limit-display">2</span> lần/ngày/cổng</strong>.
+          Mỗi lượt vượt link thành công sẽ được hệ thống cộng ngay <strong style="color:var(--accent-cyan);"><span id="reward-display">200</span> Token</strong> vào tài khoản. Tối đa <strong style="color:#fff;"><span id="limit-display">2</span> lần/ngày/cổng</strong>.
         </p>
 
         <div class="quest-card">
@@ -215,10 +216,11 @@
 
     let currentUser = null;
     let currentTokens = 0;
-    let tokenExchangeRate = 10; 
+    // TỈ GIÁ CHUẨN ĐẢM BẢO CÓ LÃI: 1.000 VNĐ = 1.000 Token (1 VNĐ = 1 Token)
+    let tokenExchangeRate = 1; 
     let selectedAmount = 50000;
     let pay2sConfig = {};
-    let shortlinkConfig = { rewardTokens: 2500, dailyLimit: 2, link4mApi: "6992df868b3d1e423d1ab833", traffictopApi: "tXk7A1HwG4QSXwGN6TU7yLOz" };
+    let shortlinkConfig = { rewardTokens: 200, dailyLimit: 2, link4mApi: "6992df868b3d1e423d1ab833", traffictopApi: "tXk7A1HwG4QSXwGN6TU7yLOz" };
 
     function notify(msg) {
       const stack = document.getElementById('toast-stack');
@@ -250,8 +252,11 @@
     document.querySelectorAll('.dropdown-item').forEach(item => {
       item.onclick = () => {
         selectedAmount = parseInt(item.getAttribute('data-val'), 10);
+        const bonus = parseInt(item.getAttribute('data-bonus') || 0, 10);
+        const totalTok = (selectedAmount * tokenExchangeRate) + bonus;
+
         displayVND.textContent = `${selectedAmount.toLocaleString()} đ`;
-        displayTok.textContent = `(+${(selectedAmount * tokenExchangeRate).toLocaleString()} Tok)`;
+        displayTok.textContent = `(+${totalTok.toLocaleString()} Tok${bonus > 0 ? ' - Thưởng' : ''})`;
         labelPay.textContent = `${selectedAmount.toLocaleString()} đ`;
         customInput.value = '';
         ddContainer.classList.remove('active');
@@ -274,7 +279,7 @@
       }
     };
 
-    // ĐỒNG BỘ TÀI KHOẢN ĐA TẦNG TỪ FIREBASE AUTH & INDEX.HTML LOCALSTORAGE
+    // ĐỒNG BỘ TÀI KHOẢN TỪ FIREBASE AUTH & LOCALSTORAGE
     function getFallbackUser() {
       const keys = ['aetheria_user', 'digitalxiao_user', 'user', 'currentUser'];
       for (const k of keys) {
@@ -325,9 +330,9 @@
       if (snap.exists()) {
         pay2sConfig = snap.val();
         if (pay2sConfig.tokenRate) {
-          tokenExchangeRate = pay2sConfig.tokenRate / 1000;
-          document.getElementById('rate-display').textContent = pay2sConfig.tokenRate.toLocaleString();
-          displayTok.textContent = `(+${(selectedAmount * tokenExchangeRate).toLocaleString()} Tok)`;
+          // Tính tỷ giá: Nếu admin cấu hình tokenRate (ví dụ 1000 = 1000đ đổi 1000 token)
+          tokenExchangeRate = Number(pay2sConfig.tokenRate) / 1000;
+          document.getElementById('rate-display').textContent = Number(pay2sConfig.tokenRate).toLocaleString();
         }
       }
     });
@@ -335,14 +340,14 @@
     onValue(ref(rtdb, 'aetheria_project/shortlink_config'), (snap) => {
       if (snap.exists()) {
         shortlinkConfig = snap.val();
-        document.getElementById('reward-display').textContent = (shortlinkConfig.rewardTokens || 2500).toLocaleString();
+        document.getElementById('reward-display').textContent = (shortlinkConfig.rewardTokens || 200).toLocaleString();
         document.getElementById('limit-display').textContent = shortlinkConfig.dailyLimit || 2;
         document.getElementById('l4m-max').textContent = shortlinkConfig.dailyLimit || 2;
         document.getElementById('tt-max').textContent = shortlinkConfig.dailyLimit || 2;
       }
     });
 
-    // TẠO GIAO DỊCH PAY2S CÓ NHÚNG TRỰC TIẾP UID VÀ EMAIL VÀO ORDER INFO
+    // TẠO GIAO DỊCH PAY2S QUA CLOUDFLARE PROXY NỘI BỘ
     document.getElementById('btn-create-pay2s').onclick = async () => {
       if (!currentUser) return alert("Chưa xác định được tài khoản người dùng!");
       if (selectedAmount < 5000) {
@@ -379,32 +384,20 @@
           })
         });
 
-        if (!proxyResponse.ok) throw new Error(`Lỗi HTTP ${proxyResponse.status}`);
+        if (!proxyResponse.ok) {
+          const errData = await proxyResponse.json().catch(() => ({}));
+          throw new Error(errData.message || `Lỗi HTTP ${proxyResponse.status}. Đảm bảo functions/api/pay2s.js đã deploy.`);
+        }
+
         const data = await proxyResponse.json();
 
-        if (data.payUrl) window.location.href = data.payUrl;
-        else alert("Thông báo từ Pay2S: " + (data.message || JSON.stringify(data)));
-      } catch (err) {
-        try {
-          const fbResponse = await fetch(`https://corsproxy.io/?${encodeURIComponent(endpoint)}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              partnerCode: pay2sConfig.partnerCode,
-              accessKey: pay2sConfig.accessKey,
-              orderId: orderId,
-              amount: String(selectedAmount),
-              orderInfo: orderInfo,
-              redirectUrl: window.location.href,
-              ipnUrl: window.location.origin + "/api/webhook"
-            })
-          });
-          const fbData = await fbResponse.json();
-          if (fbData.payUrl) window.location.href = fbData.payUrl;
-          else alert("Thông báo Pay2S: " + (fbData.message || JSON.stringify(fbData)));
-        } catch(fallbackErr) {
-          alert("Lỗi kết nối Pay2S: " + fallbackErr.message);
+        if (data.payUrl) {
+          window.location.href = data.payUrl;
+        } else {
+          alert("Thông báo từ Pay2S: " + (data.message || JSON.stringify(data)));
         }
+      } catch (err) {
+        alert("Lỗi kết nối cổng thanh toán: " + err.message);
       }
     };
 
@@ -427,7 +420,7 @@
         stats[type] = (stats[type] || 0) + 1;
         await set(ref(rtdb, `aetheria_project/users/${currentUser.uid}/quests/${todayKey}`), stats);
 
-        const reward = Number(shortlinkConfig.rewardTokens) || 2500;
+        const reward = Number(shortlinkConfig.rewardTokens) || 200;
         await runTransaction(ref(rtdb, `aetheria_project/users/${currentUser.uid}/tokens`), (cur) => {
           return (Number(cur) || 0) + reward;
         });
