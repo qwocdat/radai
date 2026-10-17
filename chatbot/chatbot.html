@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content" />
-  <title>AETHERIA // Trợ Lý AI & Không Gian Lập Trình</title>
+  <title>AETHERIA // Trợ Lý AI & DigitalXiao</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -396,7 +396,7 @@
       color: #e2e8f0;
     }
 
-    /* INPUT CONSOLE (MODEL PICKER ĐƯỢC ĐẶT Ở ĐÂY) */
+    /* INPUT CONSOLE (FULL 7 MODEL PICKER ĐƯỢC ĐẶT Ở ĐÂY) */
     .chat-input-zone {
       padding: 8px 12px 10px;
       border-top: 1px solid var(--border-glass);
@@ -437,7 +437,9 @@
       position: absolute;
       bottom: calc(100% + 6px);
       left: 0;
-      min-width: 220px;
+      min-width: 240px;
+      max-height: 260px;
+      overflow-y: auto;
       background: rgba(10, 12, 22, 0.98);
       backdrop-filter: blur(24px);
       border: 1px solid rgba(0, 240, 255, 0.35);
@@ -465,6 +467,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      transition: all 0.15s;
     }
 
     .dropdown-option:hover, .dropdown-option.selected {
@@ -805,7 +808,7 @@
 
         <div class="chat-input-zone">
           <div class="input-zone-top-row">
-            <!-- MODEL PICKER KHẢ DỤNG CHO API XPIKI -->
+            <!-- FULL 7 MODELS THEO CHUẨN XPIKI -->
             <div class="custom-dropdown" id="model-picker">
               <div class="dropdown-trigger">
                 <i class="fa-solid fa-wand-magic-sparkles" style="color:var(--accent-cyan);"></i>
@@ -814,16 +817,32 @@
               </div>
               <div class="dropdown-menu">
                 <div class="dropdown-option selected" data-model="claude-sonnet-5" data-label="Claude Sonnet 5">
-                  <span>Claude Sonnet 5 (Code chuẩn & Cân bằng)</span>
+                  <span>Claude Sonnet 5</span>
                   <i class="fa-solid fa-check" style="color:var(--accent-cyan);"></i>
                 </div>
+                <div class="dropdown-option" data-model="claude-sonnet-4-6" data-label="Claude Sonnet 4.6">
+                  <span>Claude Sonnet 4.6</span>
+                  <i class="fa-solid fa-code" style="color:var(--accent-cyan);"></i>
+                </div>
                 <div class="dropdown-option" data-model="claude-opus-5" data-label="Claude Opus 5">
-                  <span>Claude Opus 5 (Siêu thông minh & Phức tạp)</span>
+                  <span>Claude Opus 5</span>
                   <i class="fa-solid fa-crown" style="color:var(--accent-amber);"></i>
                 </div>
+                <div class="dropdown-option" data-model="claude-opus-4-8" data-label="Claude Opus 4.8">
+                  <span>Claude Opus 4.8</span>
+                  <i class="fa-solid fa-gem" style="color:var(--accent-amber);"></i>
+                </div>
+                <div class="dropdown-option" data-model="claude-opus-4-7" data-label="Claude Opus 4.7">
+                  <span>Claude Opus 4.7</span>
+                  <i class="fa-solid fa-star" style="color:var(--accent-amber);"></i>
+                </div>
                 <div class="dropdown-option" data-model="claude-haiku-4-5" data-label="Claude Haiku 4.5">
-                  <span>Claude Haiku 4.5 (Phản hồi siêu tốc độ)</span>
+                  <span>Claude Haiku 4.5</span>
                   <i class="fa-solid fa-bolt" style="color:var(--accent-emerald);"></i>
+                </div>
+                <div class="dropdown-option" data-model="claude-fable-5" data-label="Claude Fable 5">
+                  <span>Claude Fable 5</span>
+                  <i class="fa-solid fa-feather" style="color:var(--accent-magenta);"></i>
                 </div>
               </div>
             </div>
@@ -942,7 +961,7 @@
       setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3200);
     }
 
-    // 1. ĐỒNG BỘ DỮ LIỆU TỪ NHÁNH aetheria_project
+    // 1. ĐỒNG BỘ DỮ LIỆU TỪ NHÁNH aetheria_project VÀ NHẬN DIỆN MỌI KEY HỢP LỆ (sk-...)
     let remoteConfig = {
       api_key: '',
       api_locked: false,
@@ -955,9 +974,12 @@
         remoteConfig = { ...remoteConfig, ...snap.val() };
       }
       const dot = document.getElementById('engine-status-dot');
+      const cleanKey = (remoteConfig.api_key || '').trim();
+
+      // Chỉ cần key tồn tại và có độ dài hợp lệ là sẵn sàng (chấm xanh)
       if (remoteConfig.api_locked) {
         dot.classList.add('locked');
-      } else if (remoteConfig.api_key && remoteConfig.api_key.trim().length > 10) {
+      } else if (cleanKey.length > 8) {
         dot.classList.remove('locked');
       } else {
         dot.classList.add('locked');
@@ -1141,9 +1163,9 @@
         return;
       }
 
-      // KIỂM TRA API KEY THỰC TẾ
+      // KIỂM TRA KEY: CHẤP NHẬN BẤT KỲ KEY SK-... HỢP LỆ NÀO
       const cleanKey = (remoteConfig.api_key || '').trim();
-      if (!cleanKey || cleanKey.length < 10) {
+      if (!cleanKey || cleanKey.length < 8) {
         appendMessage('user', text || '[Gửi tệp/ảnh]');
         appendMessage('ai', 'Hệ thống AI hiện đang trong quá trình bảo trì kết nối máy chủ. Vui lòng thử lại sau ít phút.');
         chatInput.value = '';
@@ -1156,7 +1178,7 @@
         promptPayload += `\n\n--- Tệp đính kèm: ${f.name} ---\n${f.content}`;
       });
 
-      // Xây dựng messages theo chuẩn OpenAI-compatible
+      // Xây dựng message payload chuẩn endpoint OpenAI-compatible
       const messagesPayload = [
         {
           role: 'system',
@@ -1202,7 +1224,7 @@
       const bubbleContainer = aiRow.querySelector('.msg-bubble');
 
       try {
-        // GỌI CHÍNH XÁC ENDPOINT OPENAI-COMPATIBLE CỦA XPIKI
+        // GỌI TRỰC TIẾP ĐẾN ENDPOINT CHUẨN XPIKI
         const response = await fetch('[https://api.xpiki.com/v1/chat/completions](https://api.xpiki.com/v1/chat/completions)', {
           method: 'POST',
           headers: {
