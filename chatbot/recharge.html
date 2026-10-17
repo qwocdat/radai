@@ -35,84 +35,43 @@
 
     .container { width: min(880px, 95vw); margin: 0 auto; }
 
-    .top-bar {
-      display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;
-    }
-
-    .btn-glass {
-      padding: 9px 16px; border-radius: 999px; background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-glass); color: #fff; font-size: 12.5px; text-decoration: none;
-      display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
-    }
-
+    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .btn-glass { padding: 9px 16px; border-radius: 999px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-glass); color: #fff; font-size: 12.5px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
     .btn-glass:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
 
-    .wallet-card {
-      background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(122, 0, 255, 0.2));
-      border: 1px solid var(--border-glass); border-radius: 20px; padding: 24px; margin-bottom: 24px;
-      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;
-    }
-
-    .tab-bar {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: rgba(255, 255, 255, 0.04);
-      padding: 5px; border-radius: 14px; margin-bottom: 24px;
-    }
-
-    .tab-btn {
-      padding: 11px; border-radius: 10px; border: none; background: transparent; color: var(--text-muted);
-      font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
-      transition: all 0.2s;
-    }
-
-    .tab-btn.active {
-      background: rgba(0, 240, 255, 0.15); color: var(--accent-cyan); box-shadow: 0 0 12px rgba(0,240,255,0.25);
-    }
-
+    .wallet-card { background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(122, 0, 255, 0.2)); border: 1px solid var(--border-glass); border-radius: 20px; padding: 24px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
+    .tab-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: rgba(255, 255, 255, 0.04); padding: 5px; border-radius: 14px; margin-bottom: 24px; }
+    .tab-btn { padding: 11px; border-radius: 10px; border: none; background: transparent; color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; }
+    .tab-btn.active { background: rgba(0, 240, 255, 0.15); color: var(--accent-cyan); box-shadow: 0 0 12px rgba(0,240,255,0.25); }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    .card-box {
-      background: var(--bg-panel); border: 1px solid var(--border-glass); border-radius: 20px; padding: 24px; margin-bottom: 20px;
-    }
+    .card-box { background: var(--bg-panel); border: 1px solid var(--border-glass); border-radius: 20px; padding: 24px; margin-bottom: 20px; }
 
-    /* GIAO DIỆN CHỌN MỆNH GIÁ TỰ THIẾT KẾ (ZERO NATIVE SELECT) */
-    .amount-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 22px;
-    }
+    /* DROPDOWN CHỌN MỆNH GIÁ */
+    .dropdown-container { position: relative; margin-bottom: 20px; }
+    .dropdown-trigger { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-family: var(--font-mono); font-size: 15px; color: #fff; transition: all 0.2s; }
+    .dropdown-trigger:hover, .dropdown-trigger.active { border-color: var(--accent-cyan); box-shadow: 0 0 12px rgba(0, 240, 255, 0.2); }
+    
+    .dropdown-menu { position: absolute; top: 100%; left: 0; width: 100%; background: rgba(12, 15, 26, 0.98); backdrop-filter: blur(20px); border: 1px solid var(--accent-cyan); border-radius: 12px; margin-top: 8px; z-index: 100; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.2s; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .dropdown-container.active .dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+    
+    .dropdown-item { padding: 14px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); display: flex; justify-content: space-between; cursor: pointer; transition: 0.2s; font-family: var(--font-mono); }
+    .dropdown-item:hover { background: rgba(0, 240, 255, 0.1); }
+    .dropdown-item:last-child { border-bottom: none; }
+    
+    .custom-input-box { display: flex; align-items: center; padding: 12px 18px; background: rgba(255, 255, 255, 0.02); }
+    .custom-input-box input { flex: 1; background: transparent; border: none; border-bottom: 1px dashed var(--accent-cyan); color: #fff; font-family: var(--font-mono); font-size: 15px; padding: 6px; outline: none; }
+    .custom-input-box input::placeholder { color: var(--text-muted); font-size: 13px; }
 
-    .amount-tile {
-      background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass);
-      border-radius: 14px; padding: 16px 12px; text-align: center; cursor: pointer; transition: all 0.22s ease;
-    }
+    .btn-neon { width: 100%; padding: 14px; border-radius: 12px; background: linear-gradient(135deg, var(--accent-cyan), #6ef7ff); color: #040509; font-weight: 700; font-size: 14px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
 
-    .amount-tile:hover, .amount-tile.selected {
-      background: rgba(0, 240, 255, 0.12); border-color: var(--accent-cyan);
-      box-shadow: 0 0 18px rgba(0, 240, 255, 0.25); transform: translateY(-2px);
-    }
-
-    .amount-val { font-family: var(--font-mono); font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 4px; }
-    .amount-tok { font-family: var(--font-mono); font-size: 11.5px; color: var(--accent-emerald); }
-
-    .btn-neon {
-      width: 100%; padding: 14px; border-radius: 12px; background: linear-gradient(135deg, var(--accent-cyan), #6ef7ff);
-      color: #040509; font-weight: 700; font-size: 14px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
-    }
-
-    .quest-card {
-      background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 14px; padding: 18px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
-    }
+    .quest-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 18px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
 
     #toast-stack { position: fixed; top: 24px; right: 24px; z-index: 20000; display: flex; flex-direction: column; gap: 8px; }
-    .cyber-toast {
-      background: rgba(10, 12, 22, 0.96); border: 1px solid var(--border-glass); border-left: 4px solid var(--accent-cyan);
-      border-radius: 10px; padding: 12px 16px; color: #fff; font-size: 12.5px; display: flex; align-items: center; gap: 10px;
-    }
+    .cyber-toast { background: rgba(10, 12, 22, 0.96); border: 1px solid var(--border-glass); border-left: 4px solid var(--accent-cyan); border-radius: 10px; padding: 12px 16px; color: #fff; font-size: 12.5px; display: flex; align-items: center; gap: 10px; }
 
-    @media (max-width: 680px) {
-      .amount-grid { grid-template-columns: repeat(2, 1fr); }
-      .tab-btn { font-size: 11px; padding: 8px 4px; }
-    }
+    @media (max-width: 680px) { .tab-btn { font-size: 11px; padding: 8px 4px; } }
   </style>
 </head>
 <body>
@@ -139,54 +98,44 @@
       </div>
     </div>
 
-    <!-- THANH CHUYỂN TAB -->
     <div class="tab-bar">
       <button class="tab-btn active" data-tab="tab-pay2s"><i class="fa-solid fa-qrcode"></i> Nạp Pay2S (QR)</button>
       <button class="tab-btn" data-tab="tab-card"><i class="fa-solid fa-credit-card"></i> Thẻ Cào</button>
       <button class="tab-btn" data-tab="tab-quest"><i class="fa-solid fa-link"></i> Vượt Link (+Tok)</button>
     </div>
 
-    <!-- TAB 1: NẠP PAY2S TỰ LÀM GIAO DIỆN CHỌN MỆNH GIÁ -->
+    <!-- TAB 1: NẠP PAY2S -->
     <div class="tab-content active" id="tab-pay2s">
       <div class="card-box">
         <h3 style="margin-bottom:6px; font-size:17px;"><i class="fa-solid fa-shield-halved" style="color:var(--accent-cyan);"></i> Chọn Gói Nạp Token Pay2S</h3>
-        <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:18px;">Chọn gói nạp bên dưới để thanh toán quét mã QR qua cổng Pay2S tự động:</p>
+        <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:18px;">Hệ thống sẽ tự động quét mã QR và cộng Token vào tài khoản dựa trên mã giao dịch.</p>
 
-        <!-- LƯỚI CHỌN MỆNH GIÁ TÙY BIẾN -->
-        <div class="amount-grid" id="amount-selector-grid">
-          <div class="amount-tile" data-val="10000">
-            <div class="amount-val">10.000 đ</div>
-            <div class="amount-tok">+100.000 Tok</div>
+        <!-- DROPDOWN CHỌN MỆNH GIÁ -->
+        <div class="dropdown-container" id="amount-dropdown-container">
+          <div class="dropdown-trigger" id="amount-trigger">
+            <div><span id="display-vnd">50.000 đ</span> <span style="color:var(--text-muted); font-size:12px; margin-left:6px;" id="display-tok">(+500.000 Tok)</span></div>
+            <i class="fa-solid fa-chevron-down" style="font-size:12px; color:var(--accent-cyan);"></i>
           </div>
-          <div class="amount-tile" data-val="20000">
-            <div class="amount-val">20.000 đ</div>
-            <div class="amount-tok">+200.000 Tok</div>
-          </div>
-          <div class="amount-tile selected" data-val="50000">
-            <div class="amount-val">50.000 đ</div>
-            <div class="amount-tok">+500.000 Tok</div>
-          </div>
-          <div class="amount-tile" data-val="100000">
-            <div class="amount-val">100.000 đ</div>
-            <div class="amount-tok">+1.000.000 Tok</div>
-          </div>
-          <div class="amount-tile" data-val="200000">
-            <div class="amount-val">200.000 đ</div>
-            <div class="amount-tok">+2.000.000 Tok</div>
-          </div>
-          <div class="amount-tile" data-val="500000">
-            <div class="amount-val">500.000 đ</div>
-            <div class="amount-tok">+5.000.000 Tok</div>
+          <div class="dropdown-menu">
+            <div class="dropdown-item" data-val="10000"><span>10.000 đ</span><span style="color:var(--accent-emerald);">+100.000 Tok</span></div>
+            <div class="dropdown-item" data-val="20000"><span>20.000 đ</span><span style="color:var(--accent-emerald);">+200.000 Tok</span></div>
+            <div class="dropdown-item" data-val="50000"><span>50.000 đ</span><span style="color:var(--accent-emerald);">+500.000 Tok</span></div>
+            <div class="dropdown-item" data-val="100000"><span>100.000 đ</span><span style="color:var(--accent-emerald);">+1.000.000 Tok</span></div>
+            <div class="dropdown-item" data-val="200000"><span>200.000 đ</span><span style="color:var(--accent-emerald);">+2.000.000 Tok</span></div>
+            <div class="custom-input-box">
+              <input type="number" id="custom-amount-input" placeholder="Tùy chọn (Tối thiểu 5.000đ)" min="5000" />
+              <span style="font-family:var(--font-mono); font-size:12px; color:var(--accent-emerald); margin-left:10px;" id="custom-tok-preview">0 Tok</span>
+            </div>
           </div>
         </div>
 
         <button type="button" class="btn-neon" id="btn-create-pay2s">
-          <i class="fa-solid fa-qrcode"></i> Tiến Hành Tạo Giao Dịch Pay2S (<span id="pay-selected-label">50.000 đ</span>)
+          <i class="fa-solid fa-qrcode"></i> Tiến Hành Thanh Toán (<span id="pay-selected-label">50.000 đ</span>)
         </button>
       </div>
     </div>
 
-    <!-- TAB 2: THẺ CÀO (ĐANG PHÁT TRIỂN) -->
+    <!-- TAB 2: THẺ CÀO -->
     <div class="tab-content" id="tab-card">
       <div class="card-box" style="text-align:center; padding:48px 20px;">
         <i class="fa-solid fa-screwdriver-wrench" style="font-size:42px; color:var(--accent-amber); margin-bottom:16px;"></i>
@@ -194,26 +143,22 @@
         <p style="font-size:13px; color:var(--text-muted); max-width:440px; margin:0 auto 20px; line-height:1.6;">
           Hệ thống gạch thẻ tự động Viettel, Vinaphone, Mobifone, Zing đang trong quá trình tích hợp API đối tác. Vui lòng sử dụng nạp QR Pay2S hoặc tính năng Vượt link.
         </p>
-        <span style="padding:6px 16px; border-radius:999px; background:rgba(255,184,0,0.12); color:var(--accent-amber); font-family:var(--font-mono); font-size:11px;">
-          ĐANG PHÁT TRIỂN // AUTO TELCO GATE
-        </span>
       </div>
     </div>
 
-    <!-- TAB 3: VƯỢT LINK NHẬN TOKEN (TỐI ĐA 2 LẦN/NGÀY) -->
+    <!-- TAB 3: VƯỢT LINK -->
     <div class="tab-content" id="tab-quest">
       <div class="card-box">
-        <h3 style="margin-bottom:8px; font-size:17px;"><i class="fa-solid fa-gift" style="color:var(--accent-emerald);"></i> Nhiệm Vụ Vượt Link Nhận Token Miễn Phí</h3>
+        <h3 style="margin-bottom:8px; font-size:17px;"><i class="fa-solid fa-gift" style="color:var(--accent-emerald);"></i> Nhiệm Vụ Vượt Link</h3>
         <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:20px;">
-          Mỗi lượt vượt link thành công sẽ được hệ thống cộng ngay <strong style="color:var(--accent-cyan);"><span id="reward-display">2.500</span> Token</strong> vào tài khoản. Tối đa <strong style="color:#fff;"><span id="limit-display">2</span> lần/ngày/cổng</strong>.
+          Cộng ngay <strong style="color:var(--accent-cyan);"><span id="reward-display">2.500</span> Token</strong> vào tài khoản. Tối đa <strong style="color:#fff;"><span id="limit-display">2</span> lần/ngày/cổng</strong>.
         </p>
 
-        <!-- LINK4M -->
         <div class="quest-card">
           <div>
             <div style="font-weight:700; font-size:15px; color:#fff;">Cổng Link4M Fast Link</div>
             <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">
-              Đã hoàn thành hôm nay: <strong style="color:var(--accent-cyan);" id="l4m-used">0</strong>/<span id="l4m-max">2</span> lượt
+              Hôm nay: <strong style="color:var(--accent-cyan);" id="l4m-used">0</strong>/<span id="l4m-max">2</span> lượt
             </div>
           </div>
           <button type="button" class="btn-glass" id="btn-quest-link4m" style="border-color:var(--accent-cyan); color:var(--accent-cyan);">
@@ -221,12 +166,11 @@
           </button>
         </div>
 
-        <!-- TRAFFICTOP -->
         <div class="quest-card">
           <div>
             <div style="font-weight:700; font-size:15px; color:#fff;">Cổng TrafficTop Premium</div>
             <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">
-              Đã hoàn thành hôm nay: <strong style="color:var(--accent-cyan);" id="tt-used">0</strong>/<span id="tt-max">2</span> lượt
+              Hôm nay: <strong style="color:var(--accent-cyan);" id="tt-used">0</strong>/<span id="tt-max">2</span> lượt
             </div>
           </div>
           <button type="button" class="btn-glass" id="btn-quest-traffictop" style="border-color:var(--accent-magenta); color:var(--accent-magenta);">
@@ -258,6 +202,7 @@
 
     let currentUser = null;
     let currentTokens = 0;
+    let tokenExchangeRate = 10; 
     let selectedAmount = 50000;
     let pay2sConfig = {};
     let shortlinkConfig = { rewardTokens: 2500, dailyLimit: 2, link4mApi: "6992df868b3d1e423d1ab833", traffictopApi: "tXk7A1HwG4QSXwGN6TU7yLOz" };
@@ -271,32 +216,52 @@
       setTimeout(() => d.remove(), 3200);
     }
 
-    // CHUYỂN TAB VÀ ĐỌC URL PARAM
     function switchTab(tabId) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === tabId));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === tabId));
     }
-
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.onclick = () => switchTab(btn.getAttribute('data-tab'));
-    });
-
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.onclick = () => switchTab(btn.getAttribute('data-tab')));
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('tab') === 'quest') {
-      switchTab('tab-quest');
-    }
+    if (urlParams.get('tab') === 'quest') switchTab('tab-quest');
 
-    // GIAO DIỆN CHỌN MỆNH GIÁ TÙY BIẾN (ZERO NATIVE SELECT)
-    document.querySelectorAll('.amount-tile').forEach(tile => {
-      tile.onclick = () => {
-        document.querySelectorAll('.amount-tile').forEach(t => t.classList.remove('selected'));
-        tile.classList.add('selected');
-        selectedAmount = parseInt(tile.getAttribute('data-val'), 10);
-        document.getElementById('pay-selected-label').textContent = `${selectedAmount.toLocaleString()} đ`;
+    // LOGIC DROPDOWN CHỌN MỆNH GIÁ
+    const ddContainer = document.getElementById('amount-dropdown-container');
+    const ddTrigger = document.getElementById('amount-trigger');
+    const displayVND = document.getElementById('display-vnd');
+    const displayTok = document.getElementById('display-tok');
+    const customInput = document.getElementById('custom-amount-input');
+    const labelPay = document.getElementById('pay-selected-label');
+
+    ddTrigger.onclick = () => ddContainer.classList.toggle('active');
+    
+    document.querySelectorAll('.dropdown-item').forEach(item => {
+      item.onclick = () => {
+        selectedAmount = parseInt(item.getAttribute('data-val'), 10);
+        displayVND.textContent = `${selectedAmount.toLocaleString()} đ`;
+        displayTok.textContent = `(+${(selectedAmount * tokenExchangeRate).toLocaleString()} Tok)`;
+        labelPay.textContent = `${selectedAmount.toLocaleString()} đ`;
+        customInput.value = '';
+        ddContainer.classList.remove('active');
       };
     });
 
-    // LẮNG NGHE TÀI KHOẢN VÀ TOKEN
+    customInput.oninput = (e) => {
+      let val = parseInt(e.target.value, 10);
+      if (isNaN(val)) val = 0;
+      document.getElementById('custom-tok-preview').textContent = `+${(val * tokenExchangeRate).toLocaleString()} Tok`;
+      if (val >= 5000) {
+        selectedAmount = val;
+        displayVND.textContent = `${val.toLocaleString()} đ`;
+        displayTok.textContent = `(+${(val * tokenExchangeRate).toLocaleString()} Tok)`;
+        labelPay.textContent = `${val.toLocaleString()} đ`;
+      } else {
+        displayVND.textContent = `Tối thiểu 5.000 đ`;
+        displayTok.textContent = ``;
+        labelPay.textContent = `Tối thiểu 5.000 đ`;
+      }
+    };
+
+    // AUTH BẮT BUỘC & LIÊN KẾT TÀI KHOẢN TỪ INDEX.HTML
     onAuthStateChanged(auth, (user) => {
       if (!user) {
         window.location.href = "index.html#auth";
@@ -310,19 +275,19 @@
         document.getElementById('user-tokens-text').textContent = `${currentTokens.toLocaleString()} TOKEN`;
       });
 
-      // Kiểm tra callback vượt link
       const verifyQuest = urlParams.get('verify_quest');
-      if (verifyQuest) {
-        handleQuestReward(verifyQuest);
-      } else {
-        updateQuestStats();
-      }
+      if (verifyQuest) handleQuestReward(verifyQuest);
+      else updateQuestStats();
     });
 
     onValue(ref(rtdb, 'aetheria_project/payment_config/pay2s'), (snap) => {
       if (snap.exists()) {
         pay2sConfig = snap.val();
-        if (pay2sConfig.tokenRate) document.getElementById('rate-display').textContent = (pay2sConfig.tokenRate * 10).toLocaleString();
+        if (pay2sConfig.tokenRate) {
+          tokenExchangeRate = pay2sConfig.tokenRate / 1000;
+          document.getElementById('rate-display').textContent = pay2sConfig.tokenRate.toLocaleString();
+          displayTok.textContent = `(+${(selectedAmount * tokenExchangeRate).toLocaleString()} Tok)`;
+        }
       }
     });
 
@@ -336,46 +301,71 @@
       }
     });
 
-    // TẠO GIAO DỊCH PAY2S THẬT
+    // KHỞI TẠO GIAO DỊCH VÀ NHÚNG UID VÀO ORDERID CHO WEBHOOK
     document.getElementById('btn-create-pay2s').onclick = async () => {
-      const partnerCode = pay2sConfig.partnerCode;
-      const accessKey = pay2sConfig.accessKey;
-
-      if (!partnerCode || !accessKey) {
-        alert("Cổng Pay2S chưa được cấu hình Partner code/Access key trên trang Dashboard!");
+      if (selectedAmount < 5000) {
+        alert("Số tiền nạp tối thiểu là 5.000 VNĐ!");
+        ddContainer.classList.add('active');
+        customInput.focus();
         return;
       }
 
-      const orderId = `AETH_${Date.now()}`;
+      if (!pay2sConfig.partnerCode || !pay2sConfig.accessKey) {
+        alert("Cổng Pay2S chưa được Admin cấu hình Endpoint/Key trên Dashboard!");
+        return;
+      }
+
+      // Nhúng trực tiếp UID vào OrderId để Webhook tự động nhận diện và cộng Token
+      const orderId = `AETH_${currentUser.uid}_${Date.now()}`;
       notify("Đang kết nối cổng Pay2S...");
 
+      const endpoint = pay2sConfig.endpoint || "https://payment.pay2s.vn/v1/gateway/api/create";
+
       try {
-        const res = await fetch("https://payment.pay2s.vn/v1/gateway/api/create", {
+        const proxyResponse = await fetch("/api/pay2s", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            partnerCode,
-            accessKey,
-            orderId,
+            endpoint: endpoint,
+            partnerCode: pay2sConfig.partnerCode,
+            accessKey: pay2sConfig.accessKey,
+            orderId: orderId,
             amount: String(selectedAmount),
-            orderInfo: `Nap token cho ${currentUser.email}`,
+            orderInfo: currentUser.uid,
             redirectUrl: window.location.href,
-            ipnUrl: "https://ideo-dd376.firebaseapp.com"
+            ipnUrl: window.location.origin + "/api/webhook"
           })
         });
 
-        const data = await res.json();
-        if (data.payUrl) {
-          window.location.href = data.payUrl;
-        } else {
-          alert("Thông báo từ Pay2S: " + (data.message || JSON.stringify(data)));
-        }
+        if (!proxyResponse.ok) throw new Error(`Lỗi HTTP ${proxyResponse.status}`);
+        const data = await proxyResponse.json();
+
+        if (data.payUrl) window.location.href = data.payUrl;
+        else alert("Lỗi từ Pay2S: " + (data.message || JSON.stringify(data)));
       } catch (err) {
-        alert("Lỗi kết nối Pay2S: " + err.message);
+        try {
+          const fbResponse = await fetch(`https://corsproxy.io/?${encodeURIComponent(endpoint)}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              partnerCode: pay2sConfig.partnerCode,
+              accessKey: pay2sConfig.accessKey,
+              orderId: orderId,
+              amount: String(selectedAmount),
+              orderInfo: currentUser.uid,
+              redirectUrl: window.location.href,
+              ipnUrl: window.location.origin + "/api/webhook"
+            })
+          });
+          const fbData = await fbResponse.json();
+          if (fbData.payUrl) window.location.href = fbData.payUrl;
+          else alert("Lỗi Pay2S (Fallback): " + (fbData.message || JSON.stringify(fbData)));
+        } catch(fallbackErr) {
+          alert("Lỗi kết nối Pay2S (CORS Failed): " + fallbackErr.message);
+        }
       }
     };
 
-    // LOGIC VƯỢT LINK TỐI ĐA 2 LẦN/NGÀY
     const todayKey = new Date().toISOString().split('T')[0];
 
     async function updateQuestStats() {
@@ -398,7 +388,7 @@
         const reward = shortlinkConfig.rewardTokens || 2500;
         await set(ref(rtdb, `aetheria_project/users/${currentUser.uid}/tokens`), currentTokens + reward);
 
-        alert(`Chúc mừng! Bạn đã hoàn thành vượt link ${type} và nhận được +${reward.toLocaleString()} Token!`);
+        alert(`Chúc mừng! Bạn đã nhận được +${reward.toLocaleString()} Token!`);
         window.history.replaceState({}, document.title, window.location.pathname);
       } else {
         alert(`Bạn đã đạt giới hạn ${maxLimit} lần/ngày cho cổng này!`);
@@ -409,32 +399,16 @@
 
     document.getElementById('btn-quest-link4m').onclick = async () => {
       const snap = await get(ref(rtdb, `aetheria_project/users/${currentUser.uid}/quests/${todayKey}/link4m`));
-      const used = snap.exists() ? snap.val() : 0;
-      const maxLimit = shortlinkConfig.dailyLimit || 2;
-
-      if (used >= maxLimit) {
-        alert(`Bạn đã hết lượt vượt Link4M hôm nay (Tối đa ${maxLimit} lần/ngày)!`);
-        return;
-      }
-
-      const api = shortlinkConfig.link4mApi || "6992df868b3d1e423d1ab833";
+      if ((snap.exists() ? snap.val() : 0) >= (shortlinkConfig.dailyLimit || 2)) return alert("Bạn đã hết lượt vượt Link4M hôm nay!");
       const targetUrl = encodeURIComponent(`${window.location.origin}${window.location.pathname}?verify_quest=link4m`);
-      window.location.href = `https://link4m.co/st?api=${api}&url=${targetUrl}`;
+      window.location.href = `https://link4m.co/st?api=${shortlinkConfig.link4mApi || "6992df868b3d1e423d1ab833"}&url=${targetUrl}`;
     };
 
     document.getElementById('btn-quest-traffictop').onclick = async () => {
       const snap = await get(ref(rtdb, `aetheria_project/users/${currentUser.uid}/quests/${todayKey}/traffictop`));
-      const used = snap.exists() ? snap.val() : 0;
-      const maxLimit = shortlinkConfig.dailyLimit || 2;
-
-      if (used >= maxLimit) {
-        alert(`Bạn đã hết lượt vượt TrafficTop hôm nay (Tối đa ${maxLimit} lần/ngày)!`);
-        return;
-      }
-
-      const api = shortlinkConfig.traffictopApi || "tXk7A1HwG4QSXwGN6TU7yLOz";
+      if ((snap.exists() ? snap.val() : 0) >= (shortlinkConfig.dailyLimit || 2)) return alert("Bạn đã hết lượt vượt TrafficTop hôm nay!");
       const targetUrl = encodeURIComponent(`${window.location.origin}${window.location.pathname}?verify_quest=traffictop`);
-      window.location.href = `https://traffictop.net/st?api=${api}&url=${targetUrl}`;
+      window.location.href = `https://traffictop.net/st?api=${shortlinkConfig.traffictopApi || "tXk7A1HwG4QSXwGN6TU7yLOz"}&url=${targetUrl}`;
     };
   </script>
 </body>
