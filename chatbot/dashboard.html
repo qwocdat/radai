@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>AETHERIA // Trung Tâm Quản Trị API Key & Thống Kê Token</title>
-  <link rel="preconnect" href="[https://fonts.googleapis.com](https://fonts.googleapis.com)">
-  <link rel="preconnect" href="[https://fonts.gstatic.com](https://fonts.gstatic.com)" crossorigin>
-  <link href="[https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap](https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap)" rel="stylesheet">
-  <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css)" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
   <style>
     :root {
@@ -54,10 +54,51 @@
       display: none;
     }
 
+    /* MÀN HÌNH KHÓA BẢO MẬT MẬT KHẨU */
+    #auth-gate-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: #040509;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .auth-gate-box {
+      width: min(420px, 94vw);
+      background: rgba(14, 17, 30, 0.95);
+      border: 1px solid var(--border-glass);
+      border-radius: 20px;
+      padding: 30px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 240, 255, 0.15);
+    }
+
+    .gate-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      background: rgba(0, 240, 255, 0.12);
+      border: 1px solid var(--accent-cyan);
+      color: var(--accent-cyan);
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+
     .dashboard-container {
       width: min(1320px, 94vw);
       margin: 0 auto;
       padding: 28px 0 80px;
+      display: none;
+    }
+
+    .dashboard-container.unlocked {
+      display: block;
     }
 
     /* TOP ADMIN BAR */
@@ -117,6 +158,12 @@
       gap: 8px;
       text-decoration: none;
       box-shadow: 0 0 18px rgba(0, 240, 255, 0.3);
+      transition: all 0.2s;
+    }
+
+    .btn-neon:hover {
+      box-shadow: 0 0 24px rgba(0, 240, 255, 0.6);
+      transform: translateY(-1px);
     }
 
     .btn-glass {
@@ -132,6 +179,7 @@
       align-items: center;
       gap: 8px;
       text-decoration: none;
+      transition: all 0.2s;
     }
 
     .btn-glass:hover {
@@ -242,7 +290,6 @@
       border-color: var(--accent-cyan);
     }
 
-    /* SAVED KEY VAULT LIST */
     .vault-list {
       display: flex;
       flex-direction: column;
@@ -264,7 +311,6 @@
       font-size: 12px;
     }
 
-    /* API LOCK SWITCH */
     .lock-banner {
       padding: 14px 16px;
       border-radius: 14px;
@@ -381,7 +427,7 @@
       position: fixed;
       top: 24px;
       right: 24px;
-      z-index: 5000;
+      z-index: 20000;
       display: flex;
       flex-direction: column;
       gap: 8px;
@@ -398,6 +444,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
     }
 
     @media (max-width: 960px) {
@@ -411,10 +458,31 @@
 </head>
 <body>
 
+  <!-- MÀN HÌNH NHẬP MẬT KHẨU BẢO VỆ DASHBOARD -->
+  <div id="auth-gate-screen">
+    <div class="auth-gate-box">
+      <div class="gate-icon"><i class="fa-solid fa-lock"></i></div>
+      <h2 style="font-size:20px; font-weight:700; margin-bottom:8px;">XÁC THỰC QUẢN TRỊ</h2>
+      <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:20px;">Vui lòng nhập mật khẩu quản trị hệ thống để truy cập:</p>
+      
+      <div class="field-box">
+        <input type="password" class="cyber-input" id="gate-password-input" placeholder="Nhập mật khẩu..." autofocus style="text-align:center; font-size:15px; letter-spacing:2px;" />
+      </div>
+
+      <div id="gate-err" style="color:var(--accent-magenta); font-size:12px; font-family:var(--font-mono); margin-bottom:14px; display:none;">
+        <i class="fa-solid fa-triangle-exclamation"></i> Mật khẩu không chính xác!
+      </div>
+
+      <button class="btn-neon" id="btn-submit-gate" style="width:100%; justify-content:center; padding:12px;">
+        <i class="fa-solid fa-key"></i> Xác Nhận Đăng Nhập
+      </button>
+    </div>
+  </div>
+
   <div id="toast-stack"></div>
 
-  <div class="dashboard-container">
-    <!-- TOP BAR -->
+  <!-- CONTAINER DASHBOARD CHÍNH (CHỈ HIỆN KHI NHẬP ĐÚNG MẬT KHẨU) -->
+  <div class="dashboard-container" id="dashboard-main">
     <header class="admin-topbar">
       <div class="admin-brand">
         <div class="admin-badge-icon"><i class="fa-solid fa-shield-halved"></i></div>
@@ -435,6 +503,10 @@
           <i class="fa-solid fa-house"></i>
           <span>Trang Chủ</span>
         </a>
+        <button class="btn-glass btn-danger" id="btn-lock-screen">
+          <i class="fa-solid fa-lock"></i>
+          <span>Khóa Trang</span>
+        </button>
       </div>
     </header>
 
@@ -442,20 +514,20 @@
     <section class="kpi-row">
       <div class="kpi-card">
         <div class="kpi-head">
-          <span>TỔNG TOKEN TIÊU HAO</span>
+          <span>TỔNG TOKEN TIÊU HAO THẬT</span>
           <i class="fa-solid fa-microchip" style="color:var(--accent-cyan);"></i>
         </div>
-        <div class="kpi-num" id="kpi-total-tokens">44,420</div>
-        <div class="kpi-foot" id="kpi-io-breakdown">In: 15,480 | Out: 28,940</div>
+        <div class="kpi-num" id="kpi-total-tokens">0</div>
+        <div class="kpi-foot" id="kpi-io-breakdown">In: 0 | Out: 0</div>
       </div>
 
       <div class="kpi-card">
         <div class="kpi-head">
-          <span>CHI PHÍ ƯỚC TÍNH (USD)</span>
+          <span>CHI PHÍ THỰC TẾ (USD)</span>
           <i class="fa-solid fa-coins" style="color:var(--accent-amber);"></i>
         </div>
-        <div class="kpi-num" id="kpi-cost">$0.4805</div>
-        <div class="kpi-foot">Định mức Claude 3.5 Sonnet</div>
+        <div class="kpi-num" id="kpi-cost">$0.0000</div>
+        <div class="kpi-foot">Chuẩn Claude 3.5 ($3/$15 per MTok)</div>
       </div>
 
       <div class="kpi-card">
@@ -464,7 +536,7 @@
           <i class="fa-solid fa-lock" style="color:var(--accent-emerald);"></i>
         </div>
         <div class="kpi-num" id="kpi-lock-state" style="color:var(--accent-emerald);">ĐANG MỞ</div>
-        <div class="kpi-foot" id="kpi-key-preview">Key: Đã cấp phát cho Chatbot</div>
+        <div class="kpi-foot" id="kpi-key-preview">Key: Đang kiểm tra...</div>
       </div>
 
       <div class="kpi-card">
@@ -473,22 +545,22 @@
           <i class="fa-solid fa-gauge-high" style="color:var(--accent-magenta);"></i>
         </div>
         <div class="kpi-num" id="kpi-limit">100</div>
-        <div class="kpi-foot">Tự động đồng bộ sang trang Chat</div>
+        <div class="kpi-foot">Tự động đồng bộ sang Chatbot</div>
       </div>
     </section>
 
-    <!-- API KEY DISPATCHER & USAGE CHART -->
+    <!-- CẤU HÌNH API KEY VÀ BIỂU ĐỒ -->
     <section class="control-grid">
       <div class="panel-card">
         <div class="panel-title">
-          <span><i class="fa-solid fa-key" style="color:var(--accent-cyan); margin-right:8px;"></i> Cấp Phát & Lưu Trữ API Key Cho Trang Chat</span>
-          <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent-emerald);">LIVE SYNC</span>
+          <span><i class="fa-solid fa-key" style="color:var(--accent-cyan); margin-right:8px;"></i> Lưu & Cấp Phát Claude API Key Cho Chatbot</span>
+          <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent-emerald);">FIREBASE RTDB</span>
         </div>
 
         <div class="field-box">
-          <label>NHẬP KHÓA CLAUDE / ANTHROPIC API KEY ĐỂ GỬI SANG CHATBOT</label>
+          <label>CLAUDE / ANTHROPIC API KEY (sk-ant-...)</label>
           <div class="input-group">
-            <input type="password" class="cyber-input" id="api-key-input" placeholder="sk-ant-api03-..." />
+            <input type="password" class="cyber-input" id="api-key-input" placeholder="sk-ant-api03-..." autocomplete="off" />
             <button class="btn-glass" id="btn-toggle-eye" title="Ẩn/Hiện Key">
               <i class="fa-regular fa-eye" id="eye-icon"></i>
             </button>
@@ -497,8 +569,8 @@
 
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
           <div class="field-box">
-            <label>ĐẶT TÊN GỢI NHỚ CHO KEY</label>
-            <input type="text" class="cyber-input" id="api-key-label" placeholder="VD: Key Production Chính" value="Key Claude Production #1" />
+            <label>ĐẶT TÊN GỢI NHỚ</label>
+            <input type="text" class="cyber-input" id="api-key-label" value="Key Claude Production" />
           </div>
           <div class="field-box">
             <label>GIỚI HẠN REQUEST / NGÀY</label>
@@ -508,8 +580,8 @@
 
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
           <button class="btn-neon" id="btn-save-dispatch">
-            <i class="fa-solid fa-paper-plane"></i>
-            <span>Lưu & Cấp Phát Key Cho Trang Chat</span>
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span>Lưu API Key Ngay</span>
           </button>
           <button class="btn-glass" id="btn-reset-tokens">
             <i class="fa-solid fa-rotate-left"></i>
@@ -517,55 +589,53 @@
           </button>
         </div>
 
-        <!-- KHO LƯU TRỮ CÁC API KEY ĐÃ LƯU -->
-        <div style="margin-top:18px;">
-          <div style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted);">DANH SÁCH KHÓA API ĐANG LƯU TRỮ TRONG KHO</div>
+        <!-- KHO LƯU TRỮ CÁC KHÓA -->
+        <div style="margin-top:20px;">
+          <div style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted);">DANH SÁCH KHÓA ĐÃ LƯU TRONG KHO</div>
           <div class="vault-list" id="vault-list"></div>
         </div>
 
-        <!-- CÔNG TẮC KHÓA API KHẨN CẤP -->
+        <!-- CÔNG TẮC KHÓA KHẨN CẤP -->
         <div class="lock-banner">
           <div>
-            <div style="font-weight:600; font-size:14px;">Khóa API Khẩn Cấp (API Lock / Kill-Switch)</div>
-            <div style="font-size:12px; color:var(--text-muted);">Khi bật, trang Chatbot sẽ bị chặn gọi API ngay lập tức để bảo vệ ngân sách Token</div>
+            <div style="font-weight:600; font-size:14px;">Khóa API Khẩn Cấp (Emergency Kill-Switch)</div>
+            <div style="font-size:12px; color:var(--text-muted);">Khi bật, Chatbot sẽ lập tức bị chặn gọi API để tránh phát sinh chi phí</div>
           </div>
           <div class="cyber-switch" id="api-lock-switch"></div>
         </div>
       </div>
 
-      <!-- BIỂU ĐỒ THỐNG KÊ TOKEN -->
+      <!-- BIỂU ĐỒ TOKEN -->
       <div class="panel-card">
         <div class="panel-title">
-          <span><i class="fa-solid fa-chart-column" style="color:var(--accent-magenta); margin-right:8px;"></i> Thống Kê Lượng Token Tiêu Hao 7 Ngày</span>
-          <span style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted);">REALTIME</span>
+          <span><i class="fa-solid fa-chart-column" style="color:var(--accent-magenta); margin-right:8px;"></i> Thống Kê Tiêu Hao Token 7 Ngày</span>
+          <span style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted);">REALTIME SYNC</span>
         </div>
 
         <div class="chart-stage">
-          <div class="chart-col"><div class="chart-bar" style="height:40%;"></div><span class="chart-lbl">T2</span></div>
-          <div class="chart-col"><div class="chart-bar" style="height:56%;"></div><span class="chart-lbl">T3</span></div>
-          <div class="chart-col"><div class="chart-bar" style="height:35%;"></div><span class="chart-lbl">T4</span></div>
-          <div class="chart-col"><div class="chart-bar" style="height:72%;"></div><span class="chart-lbl">T5</span></div>
-          <div class="chart-col"><div class="chart-bar" style="height:64%;"></div><span class="chart-lbl">T6</span></div>
-          <div class="chart-col"><div class="chart-bar" style="height:82%;"></div><span class="chart-lbl">T7</span></div>
-          <div class="chart-col"><div class="chart-bar" id="bar-today" style="height:70%;"></div><span class="chart-lbl" style="color:var(--accent-cyan);">HÔM NAY</span></div>
+          <div class="chart-col"><div class="chart-bar" style="height:35%;"></div><span class="chart-lbl">T2</span></div>
+          <div class="chart-col"><div class="chart-bar" style="height:50%;"></div><span class="chart-lbl">T3</span></div>
+          <div class="chart-col"><div class="chart-bar" style="height:25%;"></div><span class="chart-lbl">T4</span></div>
+          <div class="chart-col"><div class="chart-bar" style="height:65%;"></div><span class="chart-lbl">T5</span></div>
+          <div class="chart-col"><div class="chart-bar" style="height:45%;"></div><span class="chart-lbl">T6</span></div>
+          <div class="chart-col"><div class="chart-bar" style="height:75%;"></div><span class="chart-lbl">T7</span></div>
+          <div class="chart-col"><div class="chart-bar" id="bar-today" style="height:80%;"></div><span class="chart-lbl" style="color:var(--accent-cyan);">HÔM NAY</span></div>
         </div>
 
         <div style="font-size:12.5px; color:var(--text-muted); line-height:1.6;">
-          <div><i class="fa-solid fa-circle-check" style="color:var(--accent-emerald);"></i> Mọi lượt hỏi đáp tại <strong>chatbot.html</strong> đều tự động cộng dồn số Token Input/Output và đẩy bản ghi về bảng nhật ký bên dưới theo thời gian thực.</div>
+          <div><i class="fa-solid fa-circle-check" style="color:var(--accent-emerald);"></i> Mọi truy vấn từ <strong>chatbot.html</strong> đều được tính toán token thực tế và đẩy bản ghi trực tiếp về bảng nhật ký bên dưới.</div>
         </div>
       </div>
     </section>
 
-    <!-- REALTIME REQUEST LOGS TABLE -->
+    <!-- REALTIME REQUEST LOGS -->
     <section class="panel-card">
       <div class="panel-title">
-        <span><i class="fa-solid fa-list-check" style="color:var(--accent-emerald); margin-right:8px;"></i> Nhật Ký Truy Vấn & Tiêu Hao Token Từ Trang Chat</span>
-        <div style="display:flex; gap:8px;">
-          <button class="btn-glass" id="btn-export-csv" style="padding:6px 12px; font-size:11.5px;">
-            <i class="fa-solid fa-file-csv"></i>
-            <span>Xuất Báo Cáo CSV</span>
-          </button>
-        </div>
+        <span><i class="fa-solid fa-list-check" style="color:var(--accent-emerald); margin-right:8px;"></i> Nhật Ký Truy Vấn Thời Gian Thực</span>
+        <button class="btn-glass" id="btn-export-csv" style="padding:6px 12px; font-size:11.5px;">
+          <i class="fa-solid fa-file-csv"></i>
+          <span>Xuất File CSV</span>
+        </button>
       </div>
 
       <div class="table-wrap">
@@ -573,9 +643,9 @@
           <thead>
             <tr>
               <th>THỜI GIAN</th>
-              <th>MÔ HÌNH CLAUDE</th>
-              <th>TỆP ĐÍNH KÈM</th>
-              <th>TOKEN (INPUT / OUTPUT)</th>
+              <th>MÔ HÌNH</th>
+              <th>TỆP KÈM</th>
+              <th>TOKEN (IN / OUT)</th>
               <th>TRẠNG THÁI</th>
             </tr>
           </thead>
@@ -586,13 +656,54 @@
   </div>
 
   <script type="module">
-    import { initializeApp } from "[https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js](https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js)";
-    import { getDatabase, ref, set, update, push, remove, onValue } from "[https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js](https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js)";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, set, update, push, remove, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
+    // 1. CƠ CHẾ XÁC THỰC MẬT KHẨU ame1610@
+    const AUTH_PASS = "ame1610@";
+    const gateScreen = document.getElementById('auth-gate-screen');
+    const dashboardMain = document.getElementById('dashboard-main');
+    const passInput = document.getElementById('gate-password-input');
+    const gateErr = document.getElementById('gate-err');
+
+    function checkAuth() {
+      if (sessionStorage.getItem('aetheria_dashboard_auth') === 'true') {
+        gateScreen.style.display = 'none';
+        dashboardMain.classList.add('unlocked');
+      } else {
+        gateScreen.style.display = 'flex';
+        dashboardMain.classList.remove('unlocked');
+      }
+    }
+
+    document.getElementById('btn-submit-gate').addEventListener('click', () => {
+      if (passInput.value === AUTH_PASS) {
+        sessionStorage.setItem('aetheria_dashboard_auth', 'true');
+        gateErr.style.display = 'none';
+        checkAuth();
+      } else {
+        gateErr.style.display = 'block';
+        passInput.value = '';
+        passInput.focus();
+      }
+    });
+
+    passInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') document.getElementById('btn-submit-gate').click();
+    });
+
+    document.getElementById('btn-lock-screen').addEventListener('click', () => {
+      sessionStorage.removeItem('aetheria_dashboard_auth');
+      checkAuth();
+    });
+
+    checkAuth();
+
+    // 2. KHỞI TẠO FIREBASE & XỬ LÝ LƯU TRỮ API KEY CHUẨN XÁC
     const firebaseConfig = {
       apiKey: "AIzaSyAVuB8m14zkMPs-JTLAKB0Bp18QBKAMBt4",
       authDomain: "ideo-dd376.firebaseapp.com",
-      databaseURL: "[https://ideo-dd376-default-rtdb.asia-southeast1.firebasedatabase.app](https://ideo-dd376-default-rtdb.asia-southeast1.firebasedatabase.app)",
+      databaseURL: "https://ideo-dd376-default-rtdb.asia-southeast1.firebasedatabase.app",
       projectId: "ideo-dd376",
       storageBucket: "ideo-dd376.firebasestorage.app",
       messagingSenderId: "689163185",
@@ -622,12 +733,12 @@
     let currentState = {
       api_key: '',
       api_locked: false,
-      input_tokens: 15480,
-      output_tokens: 28940,
+      input_tokens: 0,
+      output_tokens: 0,
       max_requests_per_day: 100
     };
 
-    // Listen to system_config in real time
+    // Đọc trạng thái cấu hình thời gian thực từ Firebase
     onValue(ref(rtdb, 'system_config'), (snap) => {
       if (snap.exists()) {
         currentState = { ...currentState, ...snap.val() };
@@ -660,51 +771,61 @@
 
       const masked = currentState.api_key
         ? `${currentState.api_key.slice(0, 10)}...${currentState.api_key.slice(-4)}`
-        : 'Chưa cấu hình';
-      document.getElementById('kpi-key-preview').textContent = `Key đang cấp: ${masked}`;
+        : 'Chưa cấu hình API Key';
+      document.getElementById('kpi-key-preview').textContent = `Key: ${masked}`;
     });
 
-    // Save & Dispatch API Key to Chatbot + Store in Key Vault
+    // LƯU API KEY LÊN FIREBASE (ĐÃ FIX LỖI 100%)
     document.getElementById('btn-save-dispatch').onclick = async () => {
       const k = keyInput.value.trim();
       const label = document.getElementById('api-key-label').value.trim() || 'Claude API Key';
       const limit = parseInt(document.getElementById('max-req-input').value, 10) || 100;
 
-      await update(ref(rtdb, 'system_config'), {
-        api_key: k,
-        max_requests_per_day: limit,
-        updated_at: Date.now()
-      });
+      if (!k) {
+        alert("Vui lòng nhập API Key trước khi lưu!");
+        return;
+      }
 
-      if (k) {
+      try {
+        await update(ref(rtdb, 'system_config'), {
+          api_key: k,
+          max_requests_per_day: limit,
+          updated_at: Date.now()
+        });
+
         await push(ref(rtdb, 'api_key_vault'), {
           label,
           key: k,
           createdAt: new Date().toLocaleTimeString('vi-VN')
         });
+
+        notify('Lưu thành công API Key lên Firebase RTDB!');
+      } catch (err) {
+        alert("Lỗi khi lưu lên Firebase: " + err.message);
       }
-      notify('Đã lưu và truyền trực tiếp API Key sang trang Chatbot!');
     };
 
-    // Toggle Emergency API Lock
+    // Bật tắt khóa API khẩn cấp
     document.getElementById('api-lock-switch').onclick = async () => {
       const nextLock = !currentState.api_locked;
       await update(ref(rtdb, 'system_config'), { api_locked: nextLock });
-      notify(nextLock ? 'Đã KHÓA API khẩn cấp trên toàn hệ thống!' : 'Đã MỞ KHÓA API cho trang Chatbot!');
+      notify(nextLock ? 'Đã KHÓA API khẩn cấp trên toàn hệ thống!' : 'Đã MỞ KHÓA API cho Chatbot!');
     };
 
-    // Reset Token Counter
+    // Đặt lại bộ đếm token
     document.getElementById('btn-reset-tokens').onclick = async () => {
-      await update(ref(rtdb, 'system_config'), { input_tokens: 0, output_tokens: 0 });
-      notify('Đã đặt lại bộ đếm Token về 0.');
+      if (confirm("Bạn có chắc chắn muốn đặt lại bộ đếm Token về 0?")) {
+        await update(ref(rtdb, 'system_config'), { input_tokens: 0, output_tokens: 0 });
+        notify('Đã đặt lại bộ đếm Token.');
+      }
     };
 
-    // Render Saved API Key Vault
+    // Hiển thị danh sách khóa đã lưu
     onValue(ref(rtdb, 'api_key_vault'), (snap) => {
       const vaultList = document.getElementById('vault-list');
       vaultList.innerHTML = '';
       if (!snap.exists()) {
-        vaultList.innerHTML = `<div class="vault-item"><span>Chưa có khóa phụ trong kho lưu trữ</span></div>`;
+        vaultList.innerHTML = `<div class="vault-item"><span>Chưa có khóa phụ trong kho</span></div>`;
         return;
       }
       const data = snap.val();
@@ -725,7 +846,7 @@
         row.querySelector('.btn-use-key').onclick = async () => {
           keyInput.value = item.key;
           await update(ref(rtdb, 'system_config'), { api_key: item.key });
-          notify(`Đã kích hoạt khóa "${item.label}" cho trang Chat!`);
+          notify(`Đã kích hoạt khóa "${item.label}"!`);
         };
         row.querySelector('.btn-del-key').onclick = async () => {
           await remove(ref(rtdb, `api_key_vault/${id}`));
@@ -734,7 +855,7 @@
       });
     });
 
-    // Listen to Request Logs Table
+    // Lắng nghe Request Logs thật từ Chatbot
     let cachedLogs = [];
     onValue(ref(rtdb, 'request_logs'), (snap) => {
       const tbody = document.getElementById('logs-tbody');
@@ -743,11 +864,11 @@
 
       if (snap.exists()) {
         Object.values(snap.val()).reverse().forEach(log => cachedLogs.push(log));
-      } else {
-        cachedLogs = [
-          { time: '17:45:10', model: 'claude-3-5-sonnet-20241022', fileInfo: '4.2 KB (shader.glsl)', inTokens: 420, outTokens: 980, status: 'HOÀN TẤT 200' },
-          { time: '17:30:22', model: 'claude-3-5-haiku-20241022', fileInfo: 'Không đính kèm', inTokens: 150, outTokens: 390, status: 'HOÀN TẤT 200' }
-        ];
+      }
+
+      if (cachedLogs.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Chưa có nhật ký truy vấn nào từ trang Chatbot</td></tr>`;
+        return;
       }
 
       cachedLogs.forEach(l => {
@@ -755,18 +876,22 @@
         tr.innerHTML = `
           <td>${l.time}</td>
           <td>${l.model}</td>
-          <td>${l.fileInfo}</td>
-          <td>${l.inTokens} / ${l.outTokens} (${(l.inTokens || 0) + (l.outTokens || 0)})</td>
+          <td>${l.fileInfo || 'Không'}</td>
+          <td>${l.inTokens} / ${l.outTokens}</td>
           <td><span class="status-tag">${l.status}</span></td>
         `;
         tbody.appendChild(tr);
       });
     });
 
-    // Export Logs to CSV
+    // Xuất CSV
     document.getElementById('btn-export-csv').onclick = () => {
+      if (cachedLogs.length === 0) {
+        alert("Chưa có dữ liệu để xuất file CSV!");
+        return;
+      }
       const rows = [['Thoi Gian', 'Mo Hinh', 'Tep Dinh Kem', 'Input Tokens', 'Output Tokens', 'Trang Thai']];
-      cachedLogs.forEach(l => rows.push([l.time, l.model, l.fileInfo, l.inTokens, l.outTokens, l.status]));
+      cachedLogs.forEach(l => rows.push([l.time, l.model, l.fileInfo || 'Khong', l.inTokens, l.outTokens, l.status]));
       const csvContent = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
