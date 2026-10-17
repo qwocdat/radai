@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>AETHERIA // Nền Tảng Trí Tuệ Nhân Tạo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+        "gsap": "https://cdn.jsdelivr.net/npm/gsap@3.12.5/index.js"
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --bg-dark: #040509;
+      --bg-panel: rgba(12, 14, 24, 0.74);
+      --border-glass: rgba(255, 255, 255, 0.11);
+      --accent-cyan: #00f0ff;
+      --accent-violet: #7a00ff;
+      --accent-magenta: #ff007f;
+      --accent-emerald: #00ff9d;
+      --text-main: #f1f5f9;
+      --text-muted: #8b96a8;
+      --font-sans: 'Space Grotesk', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent !important;
+      user-select: none !important;
+      -webkit-user-select: none !important;
+      outline: none;
+    }
+
+    input {
+      user-select: text !important;
+      -webkit-user-select: text !important;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      overflow-x: hidden;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    html::-webkit-scrollbar,
+    body::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+
+    .custom-scroll-track {
+      position: fixed;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 150px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 4px;
+      z-index: 900;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .custom-scroll-thumb {
+      width: 100%;
+      height: 40px;
+      background: linear-gradient(180deg, var(--accent-cyan), var(--accent-magenta));
+      border-radius: 4px;
+      box-shadow: 0 0 10px var(--accent-cyan);
+      transform: translateY(0);
+    }
+
+    #webgl-main-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* LOADING SCREEN */
+    #loading-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: radial-gradient(circle at center, rgba(14, 17, 32, 0.85) 0%, #030408 100%);
+      backdrop-filter: blur(22px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 42px;
+      transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.85s;
+    }
+
+    #loading-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loader-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--accent-cyan);
+      letter-spacing: 1.5px;
+    }
+
+    .loader-center {
+      text-align: center;
+      margin-top: auto;
+      margin-bottom: 38px;
+      pointer-events: none;
+    }
+
+    .loader-title {
+      font-size: clamp(26px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, #fff, var(--accent-cyan), var(--accent-magenta));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+
+    .loader-sub {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+    }
+
+    .loader-progress-box {
+      width: min(440px, 88vw);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .loader-bar-bg {
+      width: 100%;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .loader-bar-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-magenta));
+      box-shadow: 0 0 14px var(--accent-cyan);
+      transition: width 0.12s linear;
+    }
+
+    .loader-meta {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* TOP NAVBAR WITH SPRING PHYSICS */
+    #top-navbar {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translate3d(-50%, 0, 0);
+      width: min(1240px, 94vw);
+      height: 68px;
+      background: var(--bg-panel);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid var(--border-glass);
+      border-radius: 22px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      cursor: grab;
+      will-change: transform, width, height, border-radius, box-shadow;
+      transition: width 0.42s cubic-bezier(0.16, 1, 0.3, 1),
+                  height 0.42s cubic-bezier(0.16, 1, 0.3, 1),
+                  padding 0.42s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-radius 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    #top-navbar:active {
+      cursor: grabbing;
+    }
+
+    #top-navbar.shrunk {
+      width: min(680px, 92vw);
+      height: 54px;
+      border-radius: 999px;
+      padding: 0 18px;
+      background: rgba(8, 10, 18, 0.88);
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: 2px;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .brand-icon-box {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(122, 0, 255, 0.3));
+      border: 1px solid var(--accent-cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-cyan);
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.35);
+    }
+
+    #top-navbar.shrunk .brand-text {
+      display: none;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-link-item {
+      padding: 9px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: transparent;
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      transition: all 0.25s ease;
+    }
+
+    .nav-link-item:hover, .nav-link-item.active {
+      color: #fff;
+      background: rgba(0, 240, 255, 0.1);
+      border-color: rgba(0, 240, 255, 0.3);
+    }
+
+    #top-navbar.shrunk .nav-link-item span {
+      display: none;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-neon {
+      padding: 10px 20px;
+      border-radius: 999px;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 600;
+      color: #040509;
+      background: linear-gradient(135deg, var(--accent-cyan), #6ef7ff);
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.35);
+      transition: transform 0.2s ease, box-shadow 0.25s ease;
+    }
+
+    .btn-neon:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 28px rgba(0, 240, 255, 0.65);
+    }
+
+    .btn-glass {
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 500;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-glass);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      transition: all 0.25s ease;
+    }
+
+    .btn-glass:hover {
+      border-color: var(--accent-cyan);
+      background: rgba(0, 240, 255, 0.12);
+    }
+
+    /* MAIN LANDING CONTENT */
+    #main-content {
+      position: relative;
+      z-index: 10;
+      width: min(1240px, 92vw);
+      margin: 0 auto;
+      padding-top: 120px;
+      padding-bottom: 100px;
+    }
+
+    .hero-grid {
+      min-height: 76vh;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      align-items: center;
+      gap: 44px;
+      padding: 36px 0;
+    }
+
+    .pill-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 16px;
+      border-radius: 999px;
+      background: rgba(0, 240, 255, 0.08);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--accent-cyan);
+      letter-spacing: 1.5px;
+      margin-bottom: 22px;
+    }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent-emerald);
+      box-shadow: 0 0 10px var(--accent-emerald);
+    }
+
+    .hero-heading {
+      font-size: clamp(36px, 5.6vw, 68px);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -1.5px;
+      margin-bottom: 24px;
+    }
+
+    .hero-heading .grad-text {
+      background: linear-gradient(135deg, var(--accent-cyan) 0%, #ffffff 50%, var(--accent-magenta) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-lead {
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--text-muted);
+      max-width: 560px;
+      margin-bottom: 34px;
+    }
+
+    .hero-cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .telemetry-card {
+      background: var(--bg-panel);
+      backdrop-filter: blur(24px);
+      border: 1px solid var(--border-glass);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+    }
+
+    .telemetry-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .telemetry-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .stat-tile {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .stat-tile-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .stat-tile-value {
+      font-family: var(--font-mono);
+      font-size: 21px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    /* FEATURE MATRIX SECTION */
+    .features-section {
+      padding: 70px 0 30px;
+    }
+
+    .section-head {
+      margin-bottom: 44px;
+    }
+
+    .section-head h2 {
+      font-size: clamp(28px, 3.8vw, 42px);
+      font-weight: 700;
+    }
+
+    .feature-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 22px;
+    }
+
+    .feature-card {
+      background: var(--bg-panel);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-glass);
+      border-radius: 22px;
+      padding: 28px;
+      transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(0, 240, 255, 0.45);
+      box-shadow: 0 20px 40px rgba(0, 240, 255, 0.12);
+    }
+
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(0, 240, 255, 0.1);
+      border: 1px solid rgba(0, 240, 255, 0.28);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-cyan);
+      font-size: 18px;
+      margin-bottom: 18px;
+    }
+
+    .feature-card h3 {
+      font-size: 19px;
+      margin-bottom: 10px;
+    }
+
+    .feature-card p {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* MODALS (AUTH & 3D CAPTCHA) */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 3000;
+      background: rgba(3, 4, 9, 0.82);
+      backdrop-filter: blur(18px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.32s ease, visibility 0.32s ease;
+    }
+
+    .modal-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .custom-modal {
+      width: min(460px, 95vw);
+      background: rgba(13, 15, 26, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 24px;
+      padding: 28px;
+      position: relative;
+      transform: scale(0.94) translateY(14px);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.8);
+    }
+
+    .modal-backdrop.active .custom-modal {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-glass);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 4px;
+      border-radius: 12px;
+      margin: 16px 0 20px;
+    }
+
+    .auth-tab {
+      padding: 9px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-radius: 9px;
+      cursor: pointer;
+    }
+
+    .auth-tab.active {
+      background: rgba(0, 240, 255, 0.15);
+      color: var(--accent-cyan);
+    }
+
+    .field-group {
+      margin-bottom: 15px;
+    }
+
+    .field-group label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .cyber-input {
+      width: 100%;
+      padding: 12px 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 11px;
+      color: #fff;
+      font-family: var(--font-sans);
+      font-size: 13.5px;
+    }
+
+    .cyber-input:focus {
+      border-color: var(--accent-cyan);
+    }
+
+    #register-captcha-box {
+      display: none;
+      margin: 14px 0 18px;
+    }
+
+    #register-captcha-box.visible {
+      display: block;
+    }
+
+    .captcha-launch-btn {
+      width: 100%;
+      padding: 13px 16px;
+      border-radius: 12px;
+      background: rgba(0, 240, 255, 0.07);
+      border: 1px dashed rgba(0, 240, 255, 0.45);
+      color: var(--accent-cyan);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .captcha-launch-btn.verified {
+      background: rgba(0, 255, 157, 0.12);
+      border: 1px solid var(--accent-emerald);
+      color: var(--accent-emerald);
+    }
+
+    #captcha-canvas-container {
+      width: 100%;
+      height: 240px;
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      background: radial-gradient(circle at center, #14192d 0%, #06070d 100%);
+      border: 1px solid var(--border-glass);
+      margin: 14px 0;
+      cursor: ew-resize;
+    }
+
+    #captcha-webgl-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .captcha-hud {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+
+    .cyber-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    .cyber-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent-cyan);
+      border: 2px solid #fff;
+      box-shadow: 0 0 10px var(--accent-cyan);
+    }
+
+    .auth-alert {
+      display: none;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      margin-bottom: 14px;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .auth-alert.error {
+      display: flex;
+      background: rgba(255, 0, 127, 0.15);
+      border: 1px solid var(--accent-magenta);
+      color: #ff85c0;
+    }
+
+    .auth-alert.success {
+      display: flex;
+      background: rgba(0, 255, 157, 0.14);
+      border: 1px solid var(--accent-emerald);
+      color: var(--accent-emerald);
+    }
+
+    #toast-stack {
+      position: fixed;
+      top: 96px;
+      right: 22px;
+      z-index: 6000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .cyber-toast {
+      min-width: 280px;
+      max-width: 360px;
+      background: rgba(10, 12, 22, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-glass);
+      border-left: 4px solid var(--accent-cyan);
+      border-radius: 12px;
+      padding: 13px 16px;
+      color: #fff;
+      font-size: 12.5px;
+      transform: translateX(120%);
+      transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .cyber-toast.show { transform: translateX(0); }
+    .cyber-toast.success { border-left-color: var(--accent-emerald); }
+    .cyber-toast.error { border-left-color: var(--accent-magenta); }
+
+    @media (max-width: 900px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="custom-scroll-track">
+    <div class="custom-scroll-thumb" id="scroll-thumb"></div>
+  </div>
+
+  <div id="toast-stack"></div>
+
+  <canvas id="webgl-main-canvas"></canvas>
+
+  <!-- LOADING SCREEN -->
+  <div id="loading-screen">
+    <div class="loader-header">
+      <span><i class="fa-solid fa-atom"></i> AETHERIA // ENGINE ĐỒ HỌA 3D & TRÍ TUỆ NHÂN TẠO</span>
+      <span id="loader-coords">GÓC TƯƠNG TÁC: [0.00, 0.00]</span>
+    </div>
+
+    <div class="loader-center">
+      <h1 class="loader-title">Aetheria Studio</h1>
+      <p class="loader-sub">DI CHUYỂN CHUỘT HOẶC XOAY THIẾT BỊ ĐỂ TƯƠNG TÁC KHỐI SIMPLEX NOISE 3D</p>
+    </div>
+
+    <div class="loader-progress-box">
+      <div class="loader-bar-bg">
+        <div class="loader-bar-fill" id="loader-bar"></div>
+      </div>
+      <div class="loader-meta">
+        <span id="loader-status">ĐANG KHỞI TẠO SHADER KERNEL...</span>
+        <span id="loader-percent">0%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOP NAVBAR (PUBLIC USER INTERFACE - ZERO ADMIN/FIREBASE MENTION) -->
+  <header id="top-navbar">
+    <a href="index.html" class="nav-brand">
+      <div class="brand-icon-box"><i class="fa-solid fa-atom"></i></div>
+      <span class="brand-text">AETHERIA</span>
+    </a>
+
+    <nav class="nav-links">
+      <a href="#hero-sec" class="nav-link-item active">
+        <i class="fa-solid fa-compass"></i>
+        <span>Giới Thiệu</span>
+      </a>
+      <a href="#features-sec" class="nav-link-item">
+        <i class="fa-solid fa-layer-group"></i>
+        <span>Công Nghệ Lõi</span>
+      </a>
+      <a href="chatbot.html" class="nav-link-item">
+        <i class="fa-solid fa-terminal"></i>
+        <span>Không Gian AI</span>
+      </a>
+    </nav>
+
+    <div class="nav-actions">
+      <button class="btn-glass" id="btn-open-auth">
+        <i class="fa-regular fa-user"></i>
+        <span id="nav-user-label">Tài Khoản</span>
+      </button>
+      <a href="chatbot.html" class="btn-neon">
+        <span>Trải Nghiệm Chat Ngay</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </a>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main id="main-content">
+    <section class="hero-grid" id="hero-sec">
+      <div>
+        <div class="pill-tag">
+          <span class="pulse-dot"></span>
+          <span>KIẾN TRÚC ĐỒ HỌA SHADER 3D & TRỢ LÝ LẬP TRÌNH THẾ HỆ MỚI</span>
+        </div>
+        <h1 class="hero-heading">
+          Khai Phá Sức Mạnh <span class="grad-text">Trí Tuệ Nhân Tạo</span> Trong Không Gian 3D.
+        </h1>
+        <p class="hero-lead">
+          Sự giao thoa hoàn mỹ giữa thuật toán biến dạng lưới 3D Simplex Noise thời gian thực, hiệu ứng chuyển động Cinematic Motion Blur và không gian đối thoại lập trình chuyên sâu.
+        </p>
+        <div class="hero-cta-row">
+          <a href="chatbot.html" class="btn-neon" style="padding: 15px 30px; font-size: 15px;">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>Bắt Đầu Chat Ngay</span>
+          </a>
+          <a href="#features-sec" class="btn-glass" style="padding: 15px 24px; font-size: 14px;">
+            <i class="fa-solid fa-microchip"></i>
+            <span>Khám Phá Kiến Trúc</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="telemetry-card">
+        <div class="telemetry-top">
+          <span>THÔNG SỐ ĐỒ HỌA THỜI GIAN THỰC</span>
+          <span id="fps-readout" style="color:var(--accent-emerald);">60 FPS</span>
+        </div>
+        <div class="telemetry-stats">
+          <div class="stat-tile">
+            <div class="stat-tile-label">BIÊN ĐỘ SÓNG SHADER</div>
+            <div class="stat-tile-value">0.38 RAD</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">VẬN TỐC CHUYỂN CẢNH</div>
+            <div class="stat-tile-value" id="velocity-readout">0.000</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">ĐÀN HỒI THANH ĐIỀU HƯỚNG</div>
+            <div class="stat-tile-value" id="spring-readout">ỔN ĐỊNH</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">TRẠNG THÁI LÕI AI</div>
+            <div class="stat-tile-value" style="color:var(--accent-cyan);">SẴN SÀNG</div>
+          </div>
+        </div>
+        <p style="font-size:12px; color:var(--text-muted); font-family:var(--font-mono); line-height:1.6;">
+          <i class="fa-solid fa-hand-pointer" style="color:var(--accent-cyan);"></i> Nhấn giữ và kéo thanh điều hướng phía trên để cảm nhận lực đàn hồi vật lý Hooke's Law và hào quang biến thiên theo tọa độ.
+        </p>
+      </div>
+    </section>
+
+    <section class="features-section" id="features-sec">
+      <div class="section-head">
+        <div class="pill-tag">MA TRẬN CÔNG NGHỆ</div>
+        <h2>Nền Tảng Kỹ Thuật Độc Bản</h2>
+      </div>
+
+      <div class="feature-cards-grid">
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-cubes"></i></div>
+          <h3>GLSL Simplex Noise 3D</h3>
+          <p>Khối đa diện mật độ cao biến dạng liên tục trên GPU bằng hàm toán học 3D Simplex Noise kết hợp ánh sáng viền Fresnel Rim kép.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-wind"></i></div>
+          <h3>Velocity Motion Blur</h3>
+          <p>Pipeline hậu kỳ EffectComposer tự động tính toán độ lệch vector khi cuộn trang để tái tạo hiệu ứng nhòe chuyển động điện ảnh.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
+          <h3>Xác Thực Không Gian 3D</h3>
+          <p>Bảo vệ luồng khởi tạo tài khoản bằng thử thách xoay khối khóa đa diện khớp góc phối cảnh với dung sai chính xác ±3 độ.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-code"></i></div>
+          <h3>Trợ Lý AI & Code Studio</h3>
+          <p>Tích hợp môi trường đối thoại thông minh hỗ trợ đính kèm tệp mã nguồn, hình ảnh trực quan và chạy thử nghiệm trực tiếp.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL TÀI KHOẢN (CÓ 3D CAPTCHA DUY NHẤT Ở TAB ĐĂNG KÝ) -->
+  <div class="modal-backdrop" id="modal-auth">
+    <div class="custom-modal">
+      <button class="modal-close-btn" data-close="modal-auth"><i class="fa-solid fa-xmark"></i></button>
+      <div style="font-family:var(--font-mono); font-size:11px; color:var(--accent-cyan);">
+        <i class="fa-solid fa-fingerprint"></i> TRUNG TÂM ĐỊNH DANH THÀNH VIÊN
+      </div>
+      <h3 style="font-size:22px; margin-top:6px;">Tài Khoản Aetheria</h3>
+
+      <div class="auth-tabs">
+        <div class="auth-tab active" data-mode="login">Đăng Nhập</div>
+        <div class="auth-tab" data-mode="register">Đăng Ký Mới</div>
+      </div>
+
+      <div class="auth-alert" id="auth-alert-box"></div>
+
+      <form id="auth-form" onsubmit="return false;">
+        <div class="field-group">
+          <label>ĐỊA CHỈ EMAIL</label>
+          <input type="email" class="cyber-input" id="auth-email" placeholder="thanhvien@aetheria.vn" required />
+        </div>
+        <div class="field-group">
+          <label>MẬT KHẨU BẢO MẬT</label>
+          <input type="password" class="cyber-input" id="auth-password" placeholder="••••••••••••" required />
+        </div>
+
+        <!-- NÚT KÍCH HOẠT 3D CAPTCHA CHỈ HIỆN Ở TAB ĐĂNG KÝ -->
+        <div id="register-captcha-box">
+          <button type="button" class="captcha-launch-btn" id="btn-launch-captcha">
+            <span><i class="fa-solid fa-cube"></i> <span id="captcha-btn-text">Xác minh danh tính 3D (Bắt buộc)</span></span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+
+        <button type="submit" class="btn-neon" style="width:100%; justify-content:center; padding:13px; margin-top:8px;">
+          <i class="fa-solid fa-right-to-bracket"></i>
+          <span id="auth-submit-label">Đăng Nhập Ngay</span>
+        </button>
+      </form>
+
+      <div id="user-session-box" style="display:none; margin-top:16px; padding-top:14px; border-top:1px solid var(--border-glass); justify-content:space-between; align-items:center;">
+        <span id="active-user-email" style="font-family:var(--font-mono); font-size:12px; color:var(--accent-emerald);"></span>
+        <button type="button" class="btn-glass" id="btn-logout" style="padding:6px 14px; font-size:12px;">
+          <i class="fa-solid fa-power-off"></i> Đăng Xuất
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3D PERSPECTIVE CAPTCHA -->
+  <div class="modal-backdrop" id="modal-captcha">
+    <div class="custom-modal" style="width:min(500px, 95vw);">
+      <button class="modal-close-btn" data-close="modal-captcha"><i class="fa-solid fa-xmark"></i></button>
+      <div style="font-family:var(--font-mono); font-size:11px; color:var(--accent-cyan);">
+        <i class="fa-solid fa-cubes-stacked"></i> KIỂM TRA PHỐI CẢNH KHÔNG GIAN 3D
+      </div>
+      <h3 style="font-size:19px; margin:6px 0;">Căn Chỉnh Khối Đa Diện</h3>
+      <p style="font-size:12.5px; color:var(--text-muted); line-height:1.5;">
+        Kéo thanh trượt hoặc vuốt trực tiếp trên mô hình 3D để xoay khối <strong>Khóa Đa Diện</strong> khớp với khung lưới mục tiêu (Dung sai: <strong>±3.0°</strong>).
+      </p>
+
+      <div id="captcha-canvas-container">
+        <canvas id="captcha-webgl-canvas"></canvas>
+        <div class="captcha-hud">
+          <div style="display:flex; justify-content:space-between; color:var(--accent-cyan);">
+            <span id="cap-cur-deg">HIỆN TẠI: 0.0°</span>
+            <span id="cap-tar-deg">MỤC TIÊU: 0.0°</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; color:var(--text-muted);">
+            <span id="cap-delta-deg">ĐỘ LỆCH: --°</span>
+            <span>DUNG SAI: ±3.0°</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-group" style="margin-bottom:16px;">
+        <input type="range" class="cyber-slider" id="captcha-slider" min="-180" max="180" step="0.5" value="0" />
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button type="button" class="btn-glass" id="btn-cap-random" style="flex:0.4; justify-content:center;">
+          <i class="fa-solid fa-rotate"></i> Đổi Góc
+        </button>
+        <button type="button" class="btn-neon" id="btn-cap-verify" style="flex:0.6; justify-content:center;">
+          <i class="fa-solid fa-check"></i> Xác Nhận
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+    import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+    import gsap from 'gsap';
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getDatabase, ref, set, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAVuB8m14zkMPs-JTLAKB0Bp18QBKAMBt4",
+      authDomain: "ideo-dd376.firebaseapp.com",
+      databaseURL: "https://ideo-dd376-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "ideo-dd376",
+      storageBucket: "ideo-dd376.firebasestorage.app",
+      messagingSenderId: "689163185",
+      appId: "1:689163185:web:af4091213001180f364b90",
+      measurementId: "G-QP54CZ2BJT"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const rtdb = getDatabase(app);
+
+    function showToast(msg, type = 'info') {
+      const stack = document.getElementById('toast-stack');
+      const el = document.createElement('div');
+      el.className = `cyber-toast ${type}`;
+      const icon = type === 'success' ? 'fa-circle-check' : (type === 'error' ? 'fa-triangle-exclamation' : 'fa-circle-info');
+      el.innerHTML = `<i class="fa-solid ${icon}"></i><span>${msg}</span>`;
+      stack.appendChild(el);
+      requestAnimationFrame(() => el.classList.add('show'));
+      setTimeout(() => {
+        el.classList.remove('show');
+        setTimeout(() => el.remove(), 350);
+      }, 3400);
+    }
+
+    function openModal(id) { document.getElementById(id)?.classList.add('active'); }
+    function closeModal(id) { document.getElementById(id)?.classList.remove('active'); }
+
+    document.querySelectorAll('[data-close]').forEach(b => {
+      b.addEventListener('click', () => closeModal(b.getAttribute('data-close')));
+    });
+
+    // 3D SIMPLEX NOISE SHADER & MOTION BLUR SCENE
+    const vertexShader = `
+      uniform float uTime;
+      uniform vec2 uPointer;
+      varying vec3 vNormal;
+      varying vec3 vViewPos;
+      varying float vNoise;
+
+      vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
+      vec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}
+      float snoise(vec3 v){
+        const vec2 C = vec2(1.0/6.0, 1.0/3.0);
+        const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+        vec3 i  = floor(v + dot(v, C.yyy));
+        vec3 x0 = v - i + dot(i, C.xxx);
+        vec3 g = step(x0.yzx, x0.xyz);
+        vec3 l = 1.0 - g;
+        vec3 i1 = min(g.xyz, l.zxy);
+        vec3 i2 = max(g.xyz, l.zxy);
+        vec3 x1 = x0 - i1 + C.xxx;
+        vec3 x2 = x0 - i2 + 2.0 * C.xxx;
+        vec3 x3 = x0 - 1.0 + 3.0 * C.xxx;
+        i = mod(i, 289.0);
+        vec4 p = permute(permute(permute(i.z + vec4(0.0, i1.z, i2.z, 1.0)) + i.y + vec4(0.0, i1.y, i2.y, 1.0)) + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+        float n_ = 1.0/7.0;
+        vec3 ns = n_ * D.wyz - D.xzx;
+        vec4 j = p - 49.0 * floor(p * ns.z *ns.z);
+        vec4 x_ = floor(j * ns.z);
+        vec4 y_ = floor(j - 7.0 * x_);
+        vec4 x = x_ *ns.x + ns.yyyy;
+        vec4 y = y_ *ns.x + ns.yyyy;
+        vec4 h = 1.0 - abs(x) - abs(y);
+        vec4 b0 = vec4(x.xy, y.xy);
+        vec4 b1 = vec4(x.zw, y.zw);
+        vec4 s0 = floor(b0)*2.0 + 1.0;
+        vec4 s1 = floor(b1)*2.0 + 1.0;
+        vec4 sh = -step(h, vec4(0.0));
+        vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy;
+        vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww;
+        vec3 p0 = vec3(a0.xy,h.x);
+        vec3 p1 = vec3(a0.zw,h.y);
+        vec3 p2 = vec3(a1.xy,h.z);
+        vec3 p3 = vec3(a1.zw,h.w);
+        vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
+        p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+        vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+        m = m * m;
+        return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
+      }
+
+      void main() {
+        vNormal = normalize(normalMatrix * normal);
+        float n = snoise(position * 1.6 + vec3(uTime * 0.5, uPointer.x, uPointer.y));
+        vNoise = n;
+        vec3 pos = position + normal * (n * 0.38);
+        vec4 mv = modelViewMatrix * vec4(pos, 1.0);
+        vViewPos = -mv.xyz;
+        gl_Position = projectionMatrix * mv;
+      }
+    `;
+
+    const fragmentShader = `
+      uniform float uWire;
+      varying vec3 vNormal;
+      varying vec3 vViewPos;
+      varying float vNoise;
+      void main() {
+        vec3 viewDir = normalize(vViewPos);
+        float fresnel = pow(1.0 - abs(dot(normalize(vNormal), viewDir)), 2.4);
+        vec3 colA = vec3(0.0, 0.94, 1.0);
+        vec3 colB = vec3(1.0, 0.0, 0.5);
+        vec3 colC = vec3(0.48, 0.0, 1.0);
+        vec3 base = mix(colC * 0.5, colB * 0.8, smoothstep(-0.6, 0.6, vNoise));
+        vec3 finalCol = mix(base, colA, fresnel * 1.4);
+        gl_FragColor = vec4(finalCol, uWire > 0.5 ? (0.35 + fresnel * 0.55) : 0.82);
+      }
+    `;
+
+    const MotionBlurShader = {
+      uniforms: {
+        tDiffuse: { value: null },
+        uVelocity: { value: new THREE.Vector2(0, 0) }
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }
+      `,
+      fragmentShader: `
+        uniform sampler2D tDiffuse;
+        uniform vec2 uVelocity;
+        varying vec2 vUv;
+        void main() {
+          if (length(uVelocity) < 0.0002) { gl_FragColor = texture2D(tDiffuse, vUv); return; }
+          vec4 acc = vec4(0.0);
+          float wSum = 0.0;
+          for (int i = 0; i < 10; i++) {
+            float t = (float(i) / 9.0) - 0.5;
+            float w = 1.0 - abs(t) * 0.8;
+            acc += texture2D(tDiffuse, clamp(vUv + uVelocity * t, 0.001, 0.999)) * w;
+            wSum += w;
+          }
+          gl_FragColor = acc / wSum;
+        }
+      `
+    };
+
+    const canvas = document.getElementById('webgl-main-canvas');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 0, 5.2);
+
+    const uniforms = { uTime: { value: 0 }, uPointer: { value: new THREE.Vector2(0, 0) } };
+    const coreGroup = new THREE.Group();
+    scene.add(coreGroup);
+
+    coreGroup.add(new THREE.Mesh(
+      new THREE.IcosahedronGeometry(1.48, 28),
+      new THREE.ShaderMaterial({ vertexShader, fragmentShader, uniforms: { ...uniforms, uWire: { value: 0.0 } }, transparent: true })
+    ));
+
+    coreGroup.add(new THREE.Mesh(
+      new THREE.IcosahedronGeometry(1.52, 14),
+      new THREE.ShaderMaterial({ vertexShader, fragmentShader, uniforms: { ...uniforms, uWire: { value: 1.0 } }, wireframe: true, transparent: true, blending: THREE.AdditiveBlending })
+    ));
+
+    const composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
+    const blurPass = new ShaderPass(MotionBlurShader);
+    composer.addPass(blurPass);
+
+    const targetPtr = new THREE.Vector2(0, 0);
+    const smoothPtr = new THREE.Vector2(0, 0);
+    const prevPtr = new THREE.Vector2(0, 0);
+
+    window.addEventListener('pointermove', (e) => {
+      targetPtr.set((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1);
+      const c = document.getElementById('loader-coords');
+      if (c) c.textContent = `GÓC TƯƠNG TÁC: [${targetPtr.x.toFixed(2)}, ${targetPtr.y.toFixed(2)}]`;
+    });
+
+    // Loading simulation
+    let pct = 0;
+    const loadTimer = setInterval(() => {
+      pct += Math.random() * 22 + 10;
+      if (pct >= 100) {
+        pct = 100;
+        clearInterval(loadTimer);
+        setTimeout(() => document.getElementById('loading-screen').classList.add('hidden'), 320);
+      }
+      document.getElementById('loader-bar').style.width = `${pct}%`;
+      document.getElementById('loader-percent').textContent = `${Math.floor(pct)}%`;
+    }, 120);
+
+    // Hooke's Law Spring Navbar
+    const navEl = document.getElementById('top-navbar');
+    const springReadout = document.getElementById('spring-readout');
+    let navDragging = false, startX = 0, startY = 0, posX = 0, posY = 0, velX = 0, velY = 0;
+
+    navEl.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('a') || e.target.closest('button')) return;
+      navDragging = true;
+      startX = e.clientX - posX;
+      startY = e.clientY - posY;
+      navEl.setPointerCapture(e.pointerId);
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      if (!navDragging) return;
+      posX = (e.clientX - startX) * 0.55;
+      posY = (e.clientY - startY) * 0.55;
+      const hue = Math.floor((e.clientX / window.innerWidth) * 360);
+      navEl.style.borderColor = `hsla(${hue}, 100%, 65%, 0.85)`;
+      navEl.style.boxShadow = `0 0 28px hsla(${hue}, 100%, 60%, 0.55)`;
+      if (springReadout) springReadout.textContent = `[${Math.round(posX)}, ${Math.round(posY)}]`;
+    });
+
+    window.addEventListener('pointerup', () => {
+      if (!navDragging) return;
+      navDragging = false;
+      navEl.style.borderColor = '';
+      navEl.style.boxShadow = '';
+    });
+
+    let lastY = window.scrollY, scrollVel = 0;
+    window.addEventListener('scroll', () => {
+      const y = window.scrollY;
+      scrollVel = THREE.MathUtils.clamp((y - lastY) * 0.0025, -0.1, 0.1);
+      lastY = y;
+      navEl.classList.toggle('shrunk', y > 60);
+      const maxS = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      document.getElementById('scroll-thumb').style.transform = `translateY(${(y / maxS) * 110}px)`;
+    }, { passive: true });
+
+    // 3D Captcha inside Registration Modal
+    let captchaVerified = false, tarDeg = 60, curDeg = -45;
+    const capCanvas = document.getElementById('captcha-webgl-canvas');
+    const capRenderer = new THREE.WebGLRenderer({ canvas: capCanvas, antialias: true, alpha: true });
+    capRenderer.setSize(440, 240);
+    const capScene = new THREE.Scene();
+    const capCam = new THREE.PerspectiveCamera(45, 440 / 240, 0.1, 50);
+    capCam.position.set(0, 0.35, 4.1);
+    capCam.lookAt(0, 0, 0);
+
+    const polyGeo = new THREE.OctahedronGeometry(1.0, 0);
+    polyGeo.scale(1.4, 0.72, 0.78);
+    const cageMesh = new THREE.Mesh(polyGeo, new THREE.MeshBasicMaterial({ color: 0x00ff9d, wireframe: true, transparent: true, opacity: 0.45 }));
+    capScene.add(cageMesh);
+
+    const keyMat = new THREE.ShaderMaterial({
+      uniforms: { uAligned: { value: 0 } },
+      vertexShader: `varying vec3 vN; void main(){ vN = normalize(normalMatrix * normal); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
+      fragmentShader: `uniform float uAligned; varying vec3 vN; void main(){ float d = max(dot(vN, normalize(vec3(1.0,1.2,1.0))), 0.2); vec3 c = mix(vec3(0.0,0.75,1.0)*d + vec3(0.3,0.0,0.5), vec3(0.0,1.0,0.62)*(d+0.35), uAligned); gl_FragColor = vec4(c, 0.92); }`,
+      transparent: true
+    });
+    const keyMesh = new THREE.Mesh(polyGeo, keyMat);
+    capScene.add(keyMesh);
+
+    const capSlider = document.getElementById('captcha-slider');
+    function updateCapHUD() {
+      const diff = Math.abs(curDeg - tarDeg);
+      document.getElementById('cap-cur-deg').textContent = `HIỆN TẠI: ${curDeg.toFixed(1)}°`;
+      document.getElementById('cap-tar-deg').textContent = `MỤC TIÊU: ${tarDeg.toFixed(1)}°`;
+      const dEl = document.getElementById('cap-delta-deg');
+      dEl.textContent = `ĐỘ LỆCH: ${diff.toFixed(1)}°`;
+      dEl.style.color = diff <= 3.0 ? 'var(--accent-emerald)' : '#ff85c0';
+      keyMat.uniforms.uAligned.value = diff <= 3.0 ? 1.0 : 0.0;
+      cageMesh.rotation.set(0.32, THREE.MathUtils.degToRad(tarDeg), 0);
+      keyMesh.rotation.set(0.32, THREE.MathUtils.degToRad(curDeg), 0);
+    }
+
+    function randomizeCap() {
+      tarDeg = Math.round((Math.random() * 240 - 120) * 2) / 2;
+      do { curDeg = Math.round((Math.random() * 300 - 150) * 2) / 2; } while (Math.abs(curDeg - tarDeg) < 35);
+      capSlider.value = curDeg;
+      updateCapHUD();
+    }
+
+    capSlider.addEventListener('input', (e) => { curDeg = parseFloat(e.target.value); updateCapHUD(); });
+    document.getElementById('btn-cap-random').addEventListener('click', randomizeCap);
+    document.getElementById('btn-launch-captcha').addEventListener('click', () => { randomizeCap(); openModal('modal-captcha'); });
+
+    document.getElementById('btn-cap-verify').addEventListener('click', () => {
+      const diff = Math.abs(curDeg - tarDeg);
+      if (diff <= 3.0) {
+        captchaVerified = true;
+        const btn = document.getElementById('btn-launch-captcha');
+        btn.classList.add('verified');
+        document.getElementById('captcha-btn-text').textContent = 'Đã xác thực 3D thành công';
+        closeModal('modal-captcha');
+        showToast('Xác minh không gian 3D thành công!', 'success');
+      } else {
+        showToast(`Góc xoay còn lệch ${diff.toFixed(1)}° (Yêu cầu ±3.0°)`, 'error');
+      }
+    });
+
+    // Auth Logic
+    let authMode = 'login';
+    document.getElementById('btn-open-auth').addEventListener('click', () => openModal('modal-auth'));
+    document.querySelectorAll('.auth-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        authMode = tab.getAttribute('data-mode');
+        document.getElementById('register-captcha-box').classList.toggle('visible', authMode === 'register');
+        document.getElementById('auth-submit-label').textContent = authMode === 'login' ? 'Đăng Nhập Ngay' : 'Hoàn Tất Đăng Ký';
+      });
+    });
+
+    onAuthStateChanged(auth, (u) => {
+      document.getElementById('nav-user-label').textContent = u ? u.email.split('@')[0] : 'Tài Khoản';
+      document.getElementById('user-session-box').style.display = u ? 'flex' : 'none';
+      if (u) document.getElementById('active-user-email').textContent = u.email;
+    });
+
+    document.getElementById('btn-logout').addEventListener('click', () => signOut(auth));
+
+    document.getElementById('auth-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const alertEl = document.getElementById('auth-alert-box');
+      if (authMode === 'register' && !captchaVerified) {
+        alertEl.className = 'auth-alert error';
+        alertEl.textContent = 'Vui lòng hoàn thành xác minh 3D trước khi đăng ký!';
+        return;
+      }
+      const email = document.getElementById('auth-email').value.trim();
+      const pass = document.getElementById('auth-password').value;
+      try {
+        if (authMode === 'login') await signInWithEmailAndPassword(auth, email, pass);
+        else await createUserWithEmailAndPassword(auth, email, pass);
+        closeModal('modal-auth');
+        showToast('Xác thực tài khoản thành công!', 'success');
+      } catch (err) {
+        alertEl.className = 'auth-alert error';
+        alertEl.textContent = 'Thông tin xác thực không hợp lệ hoặc tài khoản đã tồn tại.';
+      }
+    });
+
+    const clock = new THREE.Clock();
+    function animate() {
+      requestAnimationFrame(animate);
+      const dt = clock.getDelta();
+      uniforms.uTime.value += dt;
+      smoothPtr.lerp(targetPtr, 0.08);
+      uniforms.uPointer.value.copy(smoothPtr);
+
+      coreGroup.rotation.y += dt * 0.24 + smoothPtr.x * 0.015;
+      coreGroup.rotation.x = THREE.MathUtils.lerp(coreGroup.rotation.x, -smoothPtr.y * 0.5, 0.06);
+
+      const vx = (smoothPtr.x - prevPtr.x) * 0.3;
+      const vy = (smoothPtr.y - prevPtr.y) * 0.3 + scrollVel;
+      prevPtr.copy(smoothPtr);
+      blurPass.uniforms.uVelocity.value.set(vx, vy);
+      scrollVel *= 0.85;
+
+      const vRead = document.getElementById('velocity-readout');
+      if (vRead) vRead.textContent = Math.hypot(vx, vy).toFixed(3);
+
+      if (!navDragging) {
+        velX = (velX - 0.15 * posX) * 0.75;
+        velY = (velY - 0.15 * posY) * 0.75;
+        posX += velX;
+        posY += velY;
+        if (Math.abs(posX) < 0.1 && springReadout) springReadout.textContent = 'ỔN ĐỊNH';
+      }
+      navEl.style.transform = `translate3d(calc(-50% + ${posX.toFixed(2)}px), ${posY.toFixed(2)}px, 0) skewX(${THREE.MathUtils.clamp(velX * 0.3, -7, 7).toFixed(2)}deg)`;
+
+      composer.render();
+      if (document.getElementById('modal-captcha').classList.contains('active')) {
+        capRenderer.render(capScene, capCam);
+      }
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      composer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
