@@ -70,11 +70,12 @@
       margin-bottom: 18px; color: var(--text-main); line-height: 1.6;
     }
 
-    .btn-neon { width: 100%; padding: 14px; border-radius: 12px; background: linear-gradient(135deg, var(--accent-cyan), #6ef7ff); color: #040509; font-weight: 700; font-size: 14px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-neon { width: 100%; padding: 14px; border-radius: 12px; background: linear-gradient(135deg, var(--accent-cyan), #6ef7ff); color: #040509; font-weight: 700; font-size: 14px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; }
+    .btn-neon:hover { box-shadow: 0 0 20px rgba(0, 240, 255, 0.4); transform: translateY(-2px); }
 
     .quest-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 18px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
 
-    /* POPUP THÔNG BÁO NẠP THÀNH CÔNG VÀ ĐẾM NGƯỢC CHUYỂN TRANG */
+    /* POPUP THÀNH CÔNG VÀ CHUYỂN HƯỚNG */
     .modal-backdrop-success {
       position: fixed; inset: 0; z-index: 30000;
       background: rgba(3, 4, 9, 0.88); backdrop-filter: blur(20px);
@@ -149,7 +150,7 @@
     <div class="tab-content active" id="tab-pay2s">
       <div class="card-box">
         <h3 style="margin-bottom:6px; font-size:17px;"><i class="fa-solid fa-shield-halved" style="color:var(--accent-cyan);"></i> Chọn Gói Nạp Token Pay2S</h3>
-        <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:18px;">Chọn gói nạp hoặc nhập số tiền tùy ý (tối thiểu 5.000 VNĐ). Khi nạp thành công web sẽ tự động chuyển về đoạn chat:</p>
+        <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:18px;">Chọn gói nạp hoặc nhập số tiền tùy ý (tối thiểu 5.000 VNĐ). Khi nạp xong web sẽ tự động chuyển về đoạn chat:</p>
 
         <!-- DROPDOWN CHỌN MỆNH GIÁ -->
         <div class="dropdown-container" id="amount-dropdown-container">
@@ -172,11 +173,11 @@
           </div>
         </div>
 
-        <!-- THÔNG TIN TÀI KHOẢN THỤ HƯỞNG & ACB -->
+        <!-- THÔNG TIN TÀI KHOẢN ACB -->
         <div class="tx-info-preview">
-          <div><i class="fa-solid fa-building-columns" style="color:var(--accent-cyan);"></i> Ngân hàng chuyển khoản: <strong>ACB (Á Châu) - STK: 28233851</strong></div>
+          <div><i class="fa-solid fa-building-columns" style="color:var(--accent-cyan);"></i> Ngân hàng thụ hưởng: <strong>ACB (Á Châu) - STK: 28233851</strong></div>
           <div><i class="fa-solid fa-user-shield" style="color:var(--accent-cyan);"></i> Tài khoản nạp: <strong id="tx-preview-email">Đang tải...</strong></div>
-          <div><i class="fa-solid fa-fingerprint" style="color:var(--accent-emerald);"></i> Nội dung chuyển khoản định danh: <strong id="tx-preview-uid">AETH_...</strong></div>
+          <div><i class="fa-solid fa-fingerprint" style="color:var(--accent-emerald);"></i> Mã đơn hàng định danh: <strong id="tx-preview-uid">AETH_...</strong></div>
         </div>
 
         <button type="button" class="btn-neon" id="btn-create-pay2s">
@@ -196,7 +197,7 @@
       </div>
     </div>
 
-    <!-- TAB 3: VƯỢT LINK NHẬN TOKEN -->
+    <!-- TAB 3: VƯỢT LINK -->
     <div class="tab-content" id="tab-quest">
       <div class="card-box">
         <h3 style="margin-bottom:8px; font-size:17px;"><i class="fa-solid fa-gift" style="color:var(--accent-emerald);"></i> Nhiệm Vụ Vượt Link Nhận Token Miễn Phí</h3>
@@ -236,9 +237,8 @@
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getDatabase, ref, get, set, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // URL PROXY TẠO MÃ THANH TOÁN VÀ URL WEBHOOK TRÊN HOSTING PHP CỦA BẠN
-    const PAY2S_PROXY_URL = "https://apibank.infy.click/pay2s_proxy.php";
-    const WEBHOOK_IPN_URL = "https://apibank.infy.click/webhook.php";
+    // URL PROXY TẠO ĐƠN THANH TOÁN PAY2S TRÊN HOSTING PHP
+    const BACKEND_PAY2S_PROXY_URL = "https://apibank.infy.click/pay2s_proxy.php";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAVuB8m14zkMPs-JTLAKB0Bp18QBKAMBt4",
@@ -259,7 +259,6 @@
     let currentTokens = 0;
     let tokenExchangeRate = 1; 
     let selectedAmount = 50000;
-    let pay2sConfig = {};
     let shortlinkConfig = { rewardTokens: 200, dailyLimit: 2, link4mApi: "6992df868b3d1e423d1ab833", traffictopApi: "tXk7A1HwG4QSXwGN6TU7yLOz" };
     let hasTriggeredSuccess = false;
 
@@ -272,7 +271,6 @@
       setTimeout(() => d.remove(), 3200);
     }
 
-    // TỰ ĐỘNG BẬT THÔNG BÁO VÀ CHUYỂN HƯỚNG VỀ CHATBOT.HTML
     function triggerPaymentSuccessAndRedirect(addedAmount = null) {
       if (hasTriggeredSuccess) return;
       hasTriggeredSuccess = true;
@@ -300,7 +298,6 @@
       }, 1000);
     }
 
-    // TAB SWITCHER
     function switchTab(tabId) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === tabId));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === tabId));
@@ -309,7 +306,6 @@
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('tab') === 'quest') switchTab('tab-quest');
 
-    // LOGIC DROPDOWN CHỌN MỆNH GIÁ
     const ddContainer = document.getElementById('amount-dropdown-container');
     const ddTrigger = document.getElementById('amount-trigger');
     const displayVND = document.getElementById('display-vnd');
@@ -348,7 +344,6 @@
       }
     };
 
-    // ĐỒNG BỘ TÀI KHOẢN TỪ FIREBASE AUTH VÀ LOCALSTORAGE
     function getFallbackUser() {
       const keys = ['aetheria_user', 'digitalxiao_user', 'user', 'currentUser'];
       for (const k of keys) {
@@ -371,7 +366,6 @@
       document.getElementById('tx-preview-email').textContent = uObj.email;
       document.getElementById('tx-preview-uid').textContent = `AETH_${uObj.uid}`;
 
-      // LẮNG NGHE SỐ DƯ TOKEN: NẾU TOKEN TĂNG DO WEBHOOK CỘNG -> HIỆN THÔNG BÁO VÀ CHUYỂN VỀ CHATBOT.HTML
       onValue(ref(rtdb, `aetheria_project/users/${uObj.uid}/tokens`), (snap) => {
         const newBal = snap.exists() ? Math.max(0, Number(snap.val()) || 0) : 0;
         
@@ -410,10 +404,10 @@
 
     onValue(ref(rtdb, 'aetheria_project/payment_config/pay2s'), (snap) => {
       if (snap.exists()) {
-        pay2sConfig = snap.val();
-        if (pay2sConfig.tokenRate) {
-          tokenExchangeRate = Number(pay2sConfig.tokenRate) / 1000;
-          document.getElementById('rate-display').textContent = Number(pay2sConfig.tokenRate).toLocaleString();
+        const d = snap.val();
+        if (d.tokenRate) {
+          tokenExchangeRate = Number(d.tokenRate) / 1000;
+          document.getElementById('rate-display').textContent = Number(d.tokenRate).toLocaleString();
         }
       }
     });
@@ -428,7 +422,7 @@
       }
     });
 
-    // TIẾN HÀNH TẠO MÃ THANH TOÁN GỌI TRỰC TIẾP TỚI https://apibank.infy.click/pay2s_proxy.php
+    // TIẾN HÀNH TẠO LINK THANH TOÁN PAY2S QUA PHP PROXY
     document.getElementById('btn-create-pay2s').onclick = async () => {
       if (!currentUser) return alert("Chưa xác định được tài khoản người dùng!");
       if (selectedAmount < 5000) {
@@ -438,37 +432,22 @@
         return;
       }
 
-      if (!pay2sConfig.partnerCode || !pay2sConfig.accessKey) {
-        alert("Cổng Pay2S chưa được Admin cấu hình Partner Code / Access Key trên Dashboard!");
-        return;
-      }
-
-      // Tạo mã đơn có gắn UID tài khoản để Webhook nhận diện chính xác
-      const orderId = `AETH_${currentUser.uid}_${Date.now()}`;
-      const orderInfo = `AETH_${currentUser.uid}`;
-      notify("Đang khởi tạo mã thanh toán Pay2S...", "info");
-
-      const endpoint = pay2sConfig.endpoint || "https://payment.pay2s.vn/v1/gateway/api/create";
+      notify("Đang tạo liên kết thanh toán Pay2S V2...", "info");
 
       try {
-        const proxyResponse = await fetch(PAY2S_PROXY_URL, {
+        const proxyResponse = await fetch(BACKEND_PAY2S_PROXY_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            endpoint: endpoint,
-            partnerCode: pay2sConfig.partnerCode,
-            accessKey: pay2sConfig.accessKey,
-            orderId: orderId,
-            amount: String(selectedAmount),
-            orderInfo: orderInfo,
-            redirectUrl: window.location.href,
-            ipnUrl: WEBHOOK_IPN_URL
+            amount: selectedAmount,
+            uid: currentUser.uid,
+            email: currentUser.email
           })
         });
 
         if (!proxyResponse.ok) {
           const errData = await proxyResponse.json().catch(() => ({}));
-          throw new Error(errData.message || `Lỗi HTTP ${proxyResponse.status} từ máy chủ apibank.infy.click`);
+          throw new Error(errData.message || `Lỗi HTTP ${proxyResponse.status} từ máy chủ thanh toán`);
         }
 
         const data = await proxyResponse.json();
