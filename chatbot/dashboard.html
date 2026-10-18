@@ -77,7 +77,6 @@
     .btn-glass:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
 
     .btn-danger { background: rgba(255, 0, 127, 0.15); border-color: var(--accent-magenta); color: #ff85c0; }
-    .btn-danger:hover { background: rgba(255, 0, 127, 0.3); border-color: var(--accent-magenta); color: #fff; }
 
     /* KPI CARDS */
     .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 24px; }
@@ -97,7 +96,7 @@
 
     .model-item-row { padding: 12px 14px; border-radius: 12px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-family: var(--font-mono); font-size: 12px; gap: 8px; flex-wrap: wrap; }
 
-    /* BIỂU ĐỒ LƯU LƯỢNG TOKEN */
+    /* BIỂU ĐỒ */
     .chart-box {
       width: 100%; height: 180px; background: rgba(0, 0, 0, 0.25);
       border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 14px; padding: 14px;
@@ -107,7 +106,7 @@
     .chart-bar { width: 100%; background: linear-gradient(180deg, var(--accent-cyan), var(--accent-violet)); border-radius: 6px 6px 0 0; min-height: 6px; transition: height 0.3s ease; }
     .chart-lbl { font-family: var(--font-mono); font-size: 9.5px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60px; }
 
-    /* BỘ LỌC NHẬT KÝ */
+    /* BỘ LỌC */
     .filter-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
     .filter-input { flex: 1; min-width: 200px; padding: 9px 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 9px; color: #fff; font-family: var(--font-mono); font-size: 12px; }
 
@@ -130,12 +129,12 @@
 </head>
 <body>
 
-  <!-- MÀN HÌNH KHÓA QUẢN TRỊ ame1610@ -->
+  <!-- MÀN HÌNH KHÓA ame1610@ -->
   <div id="auth-gate-screen">
     <div class="auth-gate-box">
       <img src="https://i.ibb.co/tp7rRb8J/biospace-avatar-q-A9qs-J9c-1791556024025.jpg" class="gate-avatar" />
       <h2 style="font-size:20px; font-weight:700; margin-bottom:8px;">QUẢN TRỊ VIÊN AETHERIA</h2>
-      <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:20px;">Vui lòng nhập mật khẩu quản trị để mở khóa hệ thống:</p>
+      <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:20px;">Vui lòng nhập mật khẩu quản trị:</p>
       
       <div class="field-box">
         <input type="password" class="cyber-input" id="gate-password-input" placeholder="Nhập mật khẩu..." autofocus style="text-align:center; font-size:15px; letter-spacing:2px;" />
@@ -159,7 +158,7 @@
         <img src="https://i.ibb.co/tp7rRb8J/biospace-avatar-q-A9qs-J9c-1791556024025.jpg" style="width:40px; height:40px; border-radius:50%; border:2px solid var(--accent-cyan);" />
         <div>
           <div style="font-weight:700; font-size:17px;">AETHERIA // COMMAND CENTER</div>
-          <div style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono);">Quản trị Model Online, User Tokens, KiraAI Pricing, Pay2S & Link4M</div>
+          <div style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono);">Quản trị Model Online, Đồng bộ Xpiki AI & KiraAI, Pay2S & Link4M</div>
         </div>
       </div>
       <div style="display:flex; gap:10px; align-items:center;">
@@ -172,12 +171,12 @@
       </div>
     </header>
 
-    <!-- 4 THẺ KPI TOÀN HỆ THỐNG -->
+    <!-- KPI STATS -->
     <section class="kpi-row">
       <div class="kpi-card">
         <div class="kpi-head"><span>TỔNG MODEL ONLINE</span><i class="fa-solid fa-microchip" style="color:var(--accent-cyan);"></i></div>
         <div class="kpi-num" id="kpi-model-count">0</div>
-        <div class="kpi-foot">Tự động đồng bộ Firebase</div>
+        <div class="kpi-foot">Claude (Xpiki) + DeepSeek</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-head"><span>TỔNG TOKEN TIÊU HAO</span><i class="fa-solid fa-coins" style="color:var(--accent-amber);"></i></div>
@@ -187,7 +186,7 @@
       <div class="kpi-card">
         <div class="kpi-head"><span>TỔNG USER ĐĂNG KÝ</span><i class="fa-solid fa-users" style="color:var(--accent-emerald);"></i></div>
         <div class="kpi-num" id="kpi-user-count">0</div>
-        <div class="kpi-foot">Mặc định 1.000 Tok/User mới</div>
+        <div class="kpi-foot">Khởi tạo 1.000 Tok/User</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-head"><span>CỔNG THANH TOÁN</span><i class="fa-solid fa-credit-card" style="color:var(--accent-magenta);"></i></div>
@@ -200,34 +199,31 @@
     <section class="control-grid">
       <div class="panel-card">
         <div class="panel-title">
-          <span><i class="fa-solid fa-terminal" style="color:var(--accent-cyan); margin-right:8px;"></i> Nhập Lệnh cURL (Tự Động Bóc Tách)</span>
-          <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent-emerald);">AUTO-PARSER</span>
+          <span><i class="fa-solid fa-terminal" style="color:var(--accent-cyan); margin-right:8px;"></i> Nhập cURL (Xpiki, KiraAI, OpenAI...)</span>
+          <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent-emerald);">MULTI-PROVIDER</span>
         </div>
         <div class="field-box">
-          <label>DÁN NGUYÊN VĂN LỆNH CURL VÀO ĐÂY:</label>
-          <textarea class="cyber-textarea" id="curl-input" placeholder="curl -X POST https://kiraai.vn/api/v1/chat/completions \
+          <label>DÁN LỆNH CURL VÀO ĐÂY (TỰ BÓC TÁCH HEADER & MODEL):</label>
+          <textarea class="cyber-textarea" id="curl-input" placeholder="curl https://api.xpiki.com/v1/chat/completions \
+  -H &quot;Authorization: Bearer sk-2os8BC2DgSFtgJxRzfPQqSmfu0XQF8N6GLLzJTMMT9A&quot; \
   -H &quot;Content-Type: application/json&quot; \
-  -H &quot;Authorization: Bearer YOUR_KIRA_API_KEY&quot; \
-  -d '{
-    &quot;model&quot;: &quot;longcat-2.5-preview-free&quot;,
-    &quot;messages&quot;: [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Hello!&quot;}]
-  }'"></textarea>
+  -d '{&quot;model&quot;:&quot;kr/claude-sonnet-4&quot;,&quot;messages&quot;:[{&quot;role&quot;:&quot;user&quot;,&quot;content&quot;:&quot;Hi&quot;}]}'"></textarea>
         </div>
         <button type="button" class="btn-glass" id="btn-parse-curl" style="margin-bottom:14px; width:100%; justify-content:center;">
           <i class="fa-solid fa-wand-magic-sparkles"></i> Bóc Tách Thông Số cURL
         </button>
 
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-          <div class="field-box"><label>TÊN HIỂN THỊ</label><input type="text" class="cyber-input" id="m-name" placeholder="VD: LongCat 2.5 Free" /></div>
-          <div class="field-box"><label>MÃ MODEL GỐC (GIỮ NGUYÊN DẤU CHẤM)</label><input type="text" class="cyber-input" id="m-id" placeholder="deepseek-v4.1-flash-free" /></div>
+          <div class="field-box"><label>TÊN HIỂN THỊ</label><input type="text" class="cyber-input" id="m-name" placeholder="VD: Claude Sonnet 4" /></div>
+          <div class="field-box"><label>MÃ MODEL GỐC (GIỮ NGUYÊN TIỀN TỐ)</label><input type="text" class="cyber-input" id="m-id" placeholder="kr/claude-sonnet-4" /></div>
         </div>
-        <div class="field-box"><label>ENDPOINT URL</label><input type="text" class="cyber-input" id="m-endpoint" placeholder="https://kiraai.vn/api/v1/chat/completions" /></div>
-        <div class="field-box"><label>API KEY</label><input type="text" class="cyber-input" id="m-key" placeholder="kira_..." /></div>
+        <div class="field-box"><label>ENDPOINT URL</label><input type="text" class="cyber-input" id="m-endpoint" placeholder="https://api.xpiki.com/v1/chat/completions" /></div>
+        <div class="field-box"><label>API KEY</label><input type="text" class="cyber-input" id="m-key" placeholder="sk-..." /></div>
         
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
           <div class="field-box">
-            <label>TOKEN KHẤU TRỪ / LƯỢT CHAT (ĐẶT 0 NẾU TÍNH THEO TỈ LỆ)</label>
-            <input type="number" class="cyber-input" id="m-cost" value="50" min="0" />
+            <label>TOKEN KHẤU TRỪ / LƯỢT CHAT (0: TỰ ĐỘNG THEO TỪ)</label>
+            <input type="number" class="cyber-input" id="m-cost" value="150" min="0" />
           </div>
           <div class="field-box" style="display:flex; align-items:center; gap:10px; margin-top:20px;">
             <input type="checkbox" id="m-maint" style="width:18px; height:18px;" />
@@ -240,32 +236,37 @@
         </button>
       </div>
 
-      <!-- DANH SÁCH MODEL ONLINE -->
+      <!-- DANH SÁCH MODEL VÀ ĐỒNG BỘ ĐA NGUỒN -->
       <div class="panel-card">
         <div class="panel-title">
-          <span><i class="fa-solid fa-list-check" style="color:var(--accent-magenta); margin-right:8px;"></i> Quản Lý, Sửa Tên & Giá Model</span>
-          <button class="btn-glass" id="btn-sync-price" style="padding:6px 12px; font-size:11px;">
-            <i class="fa-solid fa-rotate"></i> Đồng Bộ Giá KiraAI
-          </button>
+          <span><i class="fa-solid fa-list-check" style="color:var(--accent-magenta); margin-right:8px;"></i> Quản Lý & Đồng Bộ Giá Online</span>
+          <div style="display:flex; gap:6px;">
+            <button class="btn-glass" id="btn-sync-xpiki" style="padding:6px 10px; font-size:11px;">
+              <i class="fa-solid fa-bolt"></i> Đồng Bộ Xpiki
+            </button>
+            <button class="btn-glass" id="btn-sync-price" style="padding:6px 10px; font-size:11px;">
+              <i class="fa-solid fa-rotate"></i> Đồng Bộ KiraAI
+            </button>
+          </div>
         </div>
         <div id="model-list-container" style="max-height: 480px; overflow-y:auto;"></div>
       </div>
     </section>
 
-    <!-- SECTION 2: QUẢN LÝ TÀI KHOẢN & BIỂU ĐỒ LƯU LƯỢNG -->
+    <!-- SECTION 2: QUẢN LÝ USER VÀ BIỂU ĐỒ LƯU LƯỢNG -->
     <section class="control-grid">
       <div class="panel-card">
         <div class="panel-title">
           <span><i class="fa-solid fa-users-gear" style="color:var(--accent-emerald); margin-right:8px;"></i> Quản Lý Số Dư Token Tài Khoản</span>
-          <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent-cyan);">USER WALLET MANAGER</span>
+          <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent-cyan);">USER WALLETS</span>
         </div>
         <div id="users-list-container" style="max-height: 260px; overflow-y:auto;"></div>
       </div>
 
       <div class="panel-card">
         <div class="panel-title">
-          <span><i class="fa-solid fa-chart-column" style="color:var(--accent-cyan); margin-right:8px;"></i> Biểu Đồ Lưu Lượng Token Theo Model</span>
-          <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent-emerald);">REAL-TIME METRICS</span>
+          <span><i class="fa-solid fa-chart-column" style="color:var(--accent-cyan); margin-right:8px;"></i> Biểu Đồ Tiêu Thụ Token Theo Model</span>
+          <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent-emerald);">METRICS</span>
         </div>
         <div class="chart-box" id="token-usage-chart"></div>
       </div>
@@ -287,7 +288,7 @@
         <div class="field-box"><label>PARTNER CODE</label><input type="text" class="cyber-input" id="pay2s-partner" placeholder="Nhập Partner code..." /></div>
         <div class="field-box"><label>ACCESS KEY</label><input type="text" class="cyber-input" id="pay2s-access" placeholder="Nhập Access key..." /></div>
         <div class="field-box"><label>SECRET KEY</label><input type="password" class="cyber-input" id="pay2s-secret" placeholder="Nhập Secret key..." /></div>
-        <div class="field-box"><label>TỈ GIÁ (1.000 VNĐ = ? TOKEN)</label><input type="number" class="cyber-input" id="token-rate" value="10000" min="100" /></div>
+        <div class="field-box"><label>TỈ GIÁ (1.000 VNĐ = ? TOKEN)</label><input type="number" class="cyber-input" id="token-rate" value="1000" min="100" /></div>
         
         <button type="button" class="btn-neon" id="btn-save-pay2s" style="width:100%; justify-content:center; padding:12px;">
           <i class="fa-solid fa-floppy-disk"></i> Lưu Cấu Hình Pay2S
@@ -299,7 +300,7 @@
           <span><i class="fa-solid fa-link" style="color:var(--accent-amber); margin-right:8px;"></i> Vượt Link Nhận Token</span>
           <span style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted);">TỐI ĐA 2 LẦN/NGÀY</span>
         </div>
-        <div class="field-box"><label>TOKEN THƯỞNG / LẦN (Tính từ 300đ/view để có lãi)</label><input type="number" class="cyber-input" id="shortlink-reward" value="2500" min="100" /></div>
+        <div class="field-box"><label>TOKEN THƯỞNG / LẦN (Tính từ 300đ/view để có lãi)</label><input type="number" class="cyber-input" id="shortlink-reward" value="200" min="50" /></div>
         <div class="field-box"><label>GIỚI HẠN / NGÀY / CỔNG</label><input type="number" class="cyber-input" id="shortlink-limit" value="2" min="1" max="20" /></div>
         <div class="field-box"><label>API KEY LINK4M</label><input type="text" class="cyber-input" id="link4m-api" value="6992df868b3d1e423d1ab833" /></div>
         <div class="field-box"><label>API KEY TRAFFICTOP</label><input type="text" class="cyber-input" id="traffictop-api" value="tXk7A1HwG4QSXwGN6TU7yLOz" /></div>
@@ -310,7 +311,7 @@
       </div>
     </section>
 
-    <!-- SECTION 4: BẢNG NHẬT KÝ YÊU CẦU THỜI GIAN THỰC -->
+    <!-- SECTION 4: NHẬT KÝ TRUY VẤN -->
     <section class="panel-card">
       <div class="panel-title">
         <span><i class="fa-solid fa-list-check" style="color:var(--accent-emerald); margin-right:8px;"></i> Nhật Ký Truy Vấn Thời Gian Thực</span>
@@ -404,7 +405,7 @@
       setTimeout(() => d.remove(), 3200);
     }
 
-    // 1. BÓC TÁCH CURL TỰ ĐỘNG
+    // BÓC TÁCH CURL ĐA NGUỒN (XPIKI, KIRAAI, OPENAI)
     document.getElementById('btn-parse-curl').onclick = () => {
       const raw = document.getElementById('curl-input').value.trim();
       if (!raw) { alert('Vui lòng dán lệnh cURL vào ô trước!'); return; }
@@ -421,7 +422,7 @@
       notify('Đã bóc tách thông số cURL thành công!');
     };
 
-    // 2. LƯU MÔ HÌNH LÊN FIREBASE
+    // LƯU MODEL
     document.getElementById('btn-save-model').onclick = async () => {
       const originalModelId = document.getElementById('m-id').value.trim();
       const mName = document.getElementById('m-name').value.trim() || originalModelId;
@@ -448,9 +449,61 @@
       notify(`Đã lưu mô hình ${mName} thành công!`);
     };
 
-    // 3. ĐỒNG BỘ BẢNG GIÁ KIRAAI
+    // ĐỒNG BỘ DANH SÁCH TỪ XPIKI AI (GET /v1/models)
+    document.getElementById('btn-sync-xpiki').onclick = async () => {
+      notify("Đang truy vấn danh sách model khả dụng từ Xpiki AI...");
+      try {
+        const apiKey = "sk-2os8BC2DgSFtgJxRzfPQqSmfu0XQF8N6GLLzJTMMT9A";
+        let xpikiModels = [];
+        try {
+          const res = await fetch("https://api.xpiki.com/v1/models", {
+            headers: { "Authorization": `Bearer ${apiKey}` }
+          });
+          if (res.ok) {
+            const data = await res.json();
+            xpikiModels = data.data || [];
+          }
+        } catch(e) {
+          const res = await fetch(`https://corsproxy.io/?${encodeURIComponent("https://api.xpiki.com/v1/models")}`, {
+            headers: { "Authorization": `Bearer ${apiKey}` }
+          });
+          if (res.ok) {
+            const data = await res.json();
+            xpikiModels = data.data || [];
+          }
+        }
+
+        if (xpikiModels.length > 0) {
+          let added = 0;
+          for (const m of xpikiModels) {
+            const mId = m.id;
+            const safeKey = mId.replace(/[.#$/\[\]]/g, '_');
+            const snap = await get(ref(rtdb, `aetheria_project/models_config/${safeKey}`));
+            if (!snap.exists()) {
+              await set(ref(rtdb, `aetheria_project/models_config/${safeKey}`), {
+                modelId: mId,
+                name: mId.toUpperCase(),
+                endpoint: "https://api.xpiki.com/v1/chat/completions",
+                apiKey: apiKey,
+                costToken: mId.includes("opus") ? 350 : 150,
+                maintenance: false,
+                updatedAt: Date.now()
+              });
+              added++;
+            }
+          }
+          notify(`Đã đồng bộ ${xpikiModels.length} mô hình Xpiki (Thêm mới: ${added})!`);
+        } else {
+          alert("Không nhận được dữ liệu models từ Xpiki API.");
+        }
+      } catch(err) {
+        alert("Lỗi khi kết nối Xpiki: " + err.message);
+      }
+    };
+
+    // ĐỒNG BỘ KIRAAI
     document.getElementById('btn-sync-price').onclick = async () => {
-      notify("Đang lấy bảng giá mô hình từ KiraAI...");
+      notify("Đang lấy bảng giá từ KiraAI...");
       try {
         let kiraModels = [];
         try {
@@ -468,7 +521,7 @@
         }
 
         const snap = await get(ref(rtdb, 'aetheria_project/models_config'));
-        if (!snap.exists()) return alert("Chưa có model nào trong hệ thống để đồng bộ.");
+        if (!snap.exists()) return alert("Chưa có model nào trong hệ thống.");
         const dbModels = snap.val();
 
         let updated = 0;
@@ -482,34 +535,32 @@
             updated++;
           }
         }
-        notify(`Đã đồng bộ giá thành công cho ${updated} mô hình!`);
+        notify(`Đã cập nhật giá cho ${updated} mô hình KiraAI!`);
       } catch (err) {
-        alert("Lỗi khi đồng bộ giá từ KiraAI: " + err.message);
+        alert("Lỗi: " + err.message);
       }
     };
 
-    // 4. KHÓA KHẨN CẤP TOÀN BỘ MÔ HÌNH
+    // DỪNG KHẨN CẤP
     document.getElementById('btn-emergency-kill').onclick = async () => {
-      if (!confirm("BẠN CÓ CHẮC MUỐN TẠM DỪNG TOÀN BỘ CÁC MÔ HÌNH NGAY LẬP TỨC?")) return;
+      if (!confirm("BẠN CÓ CHẮC MUỐN TẠM DỪNG TOÀN BỘ CÁC MÔ HÌNH?")) return;
       const snap = await get(ref(rtdb, 'aetheria_project/models_config'));
       if (snap.exists()) {
         const list = snap.val();
         const updates = {};
-        for (const k of Object.keys(list)) {
-          updates[`${k}/maintenance`] = true;
-        }
+        for (const k of Object.keys(list)) updates[`${k}/maintenance`] = true;
         await update(ref(rtdb, 'aetheria_project/models_config'), updates);
-        notify("ĐÃ KÍCH HOẠT DỪNG KHẨN CẤP TOÀN BỘ MÔ HÌNH!");
+        notify("ĐÃ KÍCH HOẠT DỪNG KHẨN CẤP!");
       }
     };
 
-    // 5. QUẢN LÝ DANH SÁCH MÔ HÌNH (SỬA TÊN + SỬA GIÁ TOKEN)
+    // RENDER DANH SÁCH MÔ HÌNH
     onValue(ref(rtdb, 'aetheria_project/models_config'), (snap) => {
       const box = document.getElementById('model-list-container');
       box.innerHTML = '';
 
       if (!snap.exists()) {
-        box.innerHTML = `<div style="color:var(--text-muted); padding:10px;">Chưa có model nào. Hãy nhập cURL để thêm!</div>`;
+        box.innerHTML = `<div style="color:var(--text-muted); padding:10px;">Chưa có model nào.</div>`;
         document.getElementById('kpi-model-count').textContent = '0';
         return;
       }
@@ -526,7 +577,7 @@
             <strong style="color:#fff;">${item.name || actualId}</strong>
             <span style="color:var(--text-muted); font-size:11px; margin-left:6px;">[${actualId}]</span>
             <div style="color:var(--accent-cyan); font-size:11px; margin-top:2px;">
-              Chi phí: <strong>${item.costToken > 0 ? item.costToken + ' Tok/lượt' : (item.priceIn || 0) + ' In / ' + (item.priceOut || 0) + ' Out'}</strong>
+              Chi phí: <strong>${item.costToken > 0 ? item.costToken + ' Tok/lượt' : 'Auto'}</strong> - Endpoint: <strong>${item.endpoint.includes('xpiki') ? 'Xpiki' : 'KiraAI'}</strong>
             </div>
             <div style="font-size:10px; color:${item.maintenance ? 'var(--accent-amber)' : 'var(--accent-emerald)'};">
               ${item.maintenance ? '<i class="fa-solid fa-wrench"></i> Đang bảo trì' : '<i class="fa-solid fa-circle-check"></i> Hoạt động'}
@@ -534,7 +585,7 @@
           </div>
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
             <button class="btn-glass btn-edit-name" style="padding:4px 9px; font-size:11px;"><i class="fa-solid fa-pen"></i> Tên</button>
-            <button class="btn-glass btn-edit-cost" style="padding:4px 9px; font-size:11px;"><i class="fa-solid fa-coins"></i> Giá Tok</button>
+            <button class="btn-glass btn-edit-cost" style="padding:4px 9px; font-size:11px;"><i class="fa-solid fa-coins"></i> Giá</button>
             <button class="btn-glass btn-toggle-maint" style="padding:4px 9px; font-size:11px;">${item.maintenance ? 'Mở lại' : 'Bảo trì'}</button>
             <button class="btn-glass btn-danger btn-del-model" style="padding:4px 8px; font-size:11px;"><i class="fa-solid fa-trash"></i></button>
           </div>
@@ -542,24 +593,24 @@
 
         row.querySelector('.btn-edit-name').onclick = async () => {
           const currentName = item.name || actualId;
-          const newName = prompt(`Nhập tên hiển thị mới cho [${actualId}]:`, currentName);
+          const newName = prompt(`Nhập tên mới cho [${actualId}]:`, currentName);
           if (newName && newName.trim() && newName.trim() !== currentName) {
             await update(ref(rtdb, `aetheria_project/models_config/${safeKey}`), { name: newName.trim() });
-            notify('Đã đổi tên model thành công!');
+            notify('Đã đổi tên model!');
           }
         };
 
         row.querySelector('.btn-edit-cost').onclick = async () => {
-          const newCost = prompt(`Nhập số Token khấu trừ mỗi lượt chat cho [${actualId}] (Nhập 0 nếu tính tự động theo độ dài):`, item.costToken || 0);
+          const newCost = prompt(`Nhập Token khấu trừ mỗi lượt chat cho [${actualId}]:`, item.costToken || 0);
           if (newCost !== null && !isNaN(parseInt(newCost, 10))) {
             await update(ref(rtdb, `aetheria_project/models_config/${safeKey}`), { costToken: Math.max(0, parseInt(newCost, 10)) });
-            notify('Đã cập nhật giá Token cho model!');
+            notify('Đã cập nhật giá Token!');
           }
         };
 
         row.querySelector('.btn-toggle-maint').onclick = async () => {
           await update(ref(rtdb, `aetheria_project/models_config/${safeKey}`), { maintenance: !item.maintenance });
-          notify('Đã cập nhật trạng thái bảo trì!');
+          notify('Đã cập nhật trạng thái!');
         };
 
         row.querySelector('.btn-del-model').onclick = async () => {
@@ -573,13 +624,13 @@
       });
     });
 
-    // 6. QUẢN LÝ DANH SÁCH USER & CỘNG/TRỪ TOKEN TRỰC TIẾP
+    // DANH SÁCH USER
     onValue(ref(rtdb, 'aetheria_project/users'), (snap) => {
       const userBox = document.getElementById('users-list-container');
       userBox.innerHTML = '';
       if (!snap.exists()) {
         document.getElementById('kpi-user-count').textContent = '0';
-        userBox.innerHTML = `<div style="color:var(--text-muted); padding:10px;">Chưa có tài khoản người dùng nào.</div>`;
+        userBox.innerHTML = `<div style="color:var(--text-muted); padding:10px;">Chưa có người dùng.</div>`;
         return;
       }
       const users = snap.val();
@@ -599,23 +650,23 @@
           </button>
         `;
         row.querySelector('.btn-adjust-tok').onclick = async () => {
-          const nextTok = prompt(`Nhập số dư Token mới cho tài khoản [${uData.email || uid}]:`, tok);
+          const nextTok = prompt(`Nhập số dư Token mới cho [${uData.email || uid}]:`, tok);
           if (nextTok !== null && !isNaN(parseInt(nextTok, 10))) {
             await update(ref(rtdb, `aetheria_project/users/${uid}`), { tokens: Math.max(0, parseInt(nextTok, 10)) });
-            notify(`Đã cập nhật Token cho ${uData.email || uid}!`);
+            notify(`Đã cập nhật Token!`);
           }
         };
         userBox.appendChild(row);
       });
     });
 
-    // 7. CẤU HÌNH PAY2S
+    // CẤU HÌNH PAY2S
     document.getElementById('btn-save-pay2s').onclick = async () => {
       const endpoint = document.getElementById('pay2s-endpoint').value.trim();
       const partner = document.getElementById('pay2s-partner').value.trim();
       const access = document.getElementById('pay2s-access').value.trim();
       const secret = document.getElementById('pay2s-secret').value.trim();
-      const rate = parseInt(document.getElementById('token-rate').value, 10) || 10000;
+      const rate = parseInt(document.getElementById('token-rate').value, 10) || 1000;
 
       await set(ref(rtdb, 'aetheria_project/payment_config/pay2s'), {
         endpoint: endpoint,
@@ -625,7 +676,7 @@
         tokenRate: rate,
         updatedAt: Date.now()
       });
-      notify('Đã lưu cấu hình Pay2S thành công!');
+      notify('Đã lưu cấu hình Pay2S!');
     };
 
     onValue(ref(rtdb, 'aetheria_project/payment_config/pay2s'), (snap) => {
@@ -639,16 +690,16 @@
       }
     });
 
-    // 8. CẤU HÌNH RÚT GỌN LINK
+    // CẤU HÌNH VƯỢT LINK
     document.getElementById('btn-save-shortlink').onclick = async () => {
       await set(ref(rtdb, 'aetheria_project/shortlink_config'), {
-        rewardTokens: parseInt(document.getElementById('shortlink-reward').value, 10) || 2500,
+        rewardTokens: parseInt(document.getElementById('shortlink-reward').value, 10) || 200,
         dailyLimit: parseInt(document.getElementById('shortlink-limit').value, 10) || 2,
         link4mApi: document.getElementById('link4m-api').value.trim(),
         traffictopApi: document.getElementById('traffictop-api').value.trim(),
         updatedAt: Date.now()
       });
-      notify('Đã lưu cấu hình vượt link nhận Token!');
+      notify('Đã lưu cấu hình vượt link!');
     };
 
     onValue(ref(rtdb, 'aetheria_project/shortlink_config'), (snap) => {
@@ -661,7 +712,7 @@
       }
     });
 
-    // 9. NHẬT KÝ TRUY VẤN & BIỂU ĐỒ LƯU LƯỢNG TOKEN
+    // BIỂU ĐỒ & LOGS
     let allLogs = [];
     const tbody = document.getElementById('logs-tbody');
     const searchInput = document.getElementById('log-search-input');
@@ -706,7 +757,7 @@
       });
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:16px;">Không tìm thấy bản ghi nhật ký phù hợp</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:16px;">Không tìm thấy bản ghi nào</td></tr>`;
         return;
       }
 
@@ -744,13 +795,13 @@
     });
 
     document.getElementById('btn-clear-logs').onclick = async () => {
-      if (!confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử truy vấn trên hệ thống?")) return;
+      if (!confirm("Xóa toàn bộ lịch sử truy vấn?")) return;
       await remove(ref(rtdb, 'aetheria_project/request_logs'));
-      notify("Đã xóa sạch nhật ký truy vấn!");
+      notify("Đã xóa nhật ký!");
     };
 
     document.getElementById('btn-export-csv').onclick = () => {
-      if (allLogs.length === 0) return alert("Chưa có dữ liệu để xuất file CSV!");
+      if (allLogs.length === 0) return alert("Chưa có dữ liệu!");
       const rows = [['Thoi Gian', 'Mo Hinh', 'Email User', 'Token Khau Tru', 'Trang Thai']];
       allLogs.forEach(l => rows.push([l.time, l.model, l.userEmail || 'Khach', l.costTokens || 0, l.status]));
       const csvContent = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
