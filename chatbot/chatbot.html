@@ -9,14 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
-      }
-    }
-  </script>
-
   <style>
     :root {
       --bg-dark: #040509;
@@ -1103,7 +1095,7 @@
   </div>
 
   <script type="module">
-    import * as THREE from 'three';
+    import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getDatabase, ref, get, set, update, push, remove, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -1215,6 +1207,7 @@
       return bubble;
     }
 
+    // Hiển thị lời chào mặc định ngay lập tức
     appendMessageDOM('ai', DEFAULT_GREETING);
 
     // ĐỒNG BỘ TÀI KHOẢN TỪ INDEX.HTML
@@ -1251,28 +1244,32 @@
         email: userObj.email
       }));
 
-      const userRef = ref(rtdb, `aetheria_project/users/${userObj.uid}`);
-      const snap = await get(userRef);
-      if (!snap.exists() || snap.val().tokens === undefined) {
-        await set(userRef, {
-          email: userObj.email,
-          tokens: 1000,
-          createdAt: Date.now()
-        });
-        userTokens = 1000;
-        showToast('Chào mừng bạn! Tài khoản mới được cấp 1.000 Token.', 'success');
-      } else {
-        userTokens = Number(snap.val().tokens) || 0;
-      }
-
-      onValue(ref(rtdb, `aetheria_project/users/${userObj.uid}/tokens`), (tSnap) => {
-        if (tSnap.exists()) {
-          userTokens = Math.max(0, Number(tSnap.val()) || 0);
-          document.getElementById('nav-user-tokens').textContent = `${userTokens.toLocaleString()} Tok`;
+      try {
+        const userRef = ref(rtdb, `aetheria_project/users/${userObj.uid}`);
+        const snap = await get(userRef);
+        if (!snap.exists() || snap.val().tokens === undefined) {
+          await set(userRef, {
+            email: userObj.email,
+            tokens: 1000,
+            createdAt: Date.now()
+          });
+          userTokens = 1000;
+          showToast('Chào mừng bạn! Tài khoản mới được cấp 1.000 Token.', 'success');
+        } else {
+          userTokens = Number(snap.val().tokens) || 0;
         }
-      });
 
-      await loadUserSessionsFromFirebase(userObj.uid);
+        onValue(ref(rtdb, `aetheria_project/users/${userObj.uid}/tokens`), (tSnap) => {
+          if (tSnap.exists()) {
+            userTokens = Math.max(0, Number(tSnap.val()) || 0);
+            document.getElementById('nav-user-tokens').textContent = `${userTokens.toLocaleString()} Tok`;
+          }
+        });
+
+        await loadUserSessionsFromFirebase(userObj.uid);
+      } catch (err) {
+        console.warn("Lỗi đồng bộ Firebase:", err);
+      }
     }
 
     onAuthStateChanged(auth, async (fbUser) => {
@@ -1492,83 +1489,64 @@
       }
     };
 
-    // MÔ HÌNH VÀ CẤU HÌNH CLAUDE / DEEPSEEK
-    let dynamicModels = {};
+    // CẤU HÌNH MÔ HÌNH VÀ TỰ ĐỘNG KHỞI TẠO MẶC ĐỊNH
+    let dynamicModels = {
+      "kr_claude-sonnet-4": {
+        modelId: "kr/claude-sonnet-4",
+        name: "Claude Sonnet 4",
+        endpoint: XPIKI_ENDPOINT,
+        apiKey: XPIKI_API_KEY,
+        costToken: 150,
+        maintenance: false
+      },
+      "kr_claude-sonnet-5": {
+        modelId: "kr/claude-sonnet-5",
+        name: "Claude Sonnet 5",
+        endpoint: XPIKI_ENDPOINT,
+        apiKey: XPIKI_API_KEY,
+        costToken: 200,
+        maintenance: false
+      },
+      "kr_claude-opus-5": {
+        modelId: "kr/claude-opus-5",
+        name: "Claude Opus 5",
+        endpoint: XPIKI_ENDPOINT,
+        apiKey: XPIKI_API_KEY,
+        costToken: 500,
+        maintenance: false
+      },
+      "kr_claude-opus-4-8": {
+        modelId: "kr/claude-opus-4.8",
+        name: "Claude Opus 4.8",
+        endpoint: XPIKI_ENDPOINT,
+        apiKey: XPIKI_API_KEY,
+        costToken: 350,
+        maintenance: false
+      },
+      "kr_claude-haiku-4-5": {
+        modelId: "kr/claude-haiku-4.5",
+        name: "Claude Haiku 4.5",
+        endpoint: XPIKI_ENDPOINT,
+        apiKey: XPIKI_API_KEY,
+        costToken: 50,
+        maintenance: false
+      },
+      "deepseek-v4_1-flash-free": {
+        modelId: "deepseek-v4.1-flash-free",
+        name: "DeepSeek V4.1 Flash",
+        endpoint: "https://kiraai.vn/api/v1/chat/completions",
+        apiKey: "kira_f0698d610541bcac2c90a6ca64f4a3ae",
+        costToken: 50,
+        maintenance: false
+      }
+    };
     let selectedModelData = null;
 
-    onValue(ref(rtdb, 'aetheria_project/models_config'), (snap) => {
+    function renderModelPickerOptions() {
       const dropdownList = document.getElementById('model-dropdown-list');
       dropdownList.innerHTML = '';
-
-      if (snap.exists()) {
-        dynamicModels = snap.val();
-      } else {
-        dynamicModels = {
-          "kr_claude-sonnet-4": {
-            modelId: "kr/claude-sonnet-4",
-            name: "Claude Sonnet 4",
-            endpoint: XPIKI_ENDPOINT,
-            apiKey: XPIKI_API_KEY,
-            costToken: 150,
-            priceIn: 0.2,
-            priceOut: 0.4,
-            maintenance: false
-          },
-          "kr_claude-sonnet-5": {
-            modelId: "kr/claude-sonnet-5",
-            name: "Claude Sonnet 5",
-            endpoint: XPIKI_ENDPOINT,
-            apiKey: XPIKI_API_KEY,
-            costToken: 200,
-            priceIn: 0.25,
-            priceOut: 0.5,
-            maintenance: false
-          },
-          "kr_claude-opus-5": {
-            modelId: "kr/claude-opus-5",
-            name: "Claude Opus 5",
-            endpoint: XPIKI_ENDPOINT,
-            apiKey: XPIKI_API_KEY,
-            costToken: 500,
-            priceIn: 0.5,
-            priceOut: 1.0,
-            maintenance: false
-          },
-          "kr_claude-opus-4-8": {
-            modelId: "kr/claude-opus-4.8",
-            name: "Claude Opus 4.8",
-            endpoint: XPIKI_ENDPOINT,
-            apiKey: XPIKI_API_KEY,
-            costToken: 350,
-            priceIn: 0.35,
-            priceOut: 0.7,
-            maintenance: false
-          },
-          "kr_claude-haiku-4-5": {
-            modelId: "kr/claude-haiku-4.5",
-            name: "Claude Haiku 4.5",
-            endpoint: XPIKI_ENDPOINT,
-            apiKey: XPIKI_API_KEY,
-            costToken: 50,
-            priceIn: 0.1,
-            priceOut: 0.2,
-            maintenance: false
-          },
-          "deepseek-v4_1-flash-free": {
-            modelId: "deepseek-v4.1-flash-free",
-            name: "DeepSeek V4.1 Flash",
-            endpoint: "https://kiraai.vn/api/v1/chat/completions",
-            apiKey: "kira_f0698d610541bcac2c90a6ca64f4a3ae",
-            costToken: 50,
-            priceIn: 0.1,
-            priceOut: 0.2,
-            maintenance: false
-          }
-        };
-        set(ref(rtdb, 'aetheria_project/models_config'), dynamicModels);
-      }
-
       let hasSelected = false;
+
       Object.entries(dynamicModels).forEach(([safeKey, cfg]) => {
         const actualModelId = cfg.modelId || safeKey.replace(/_/g, '.');
         const opt = document.createElement('div');
@@ -1602,7 +1580,22 @@
         }
         dropdownList.appendChild(opt);
       });
-    });
+    }
+
+    // Hiển thị danh sách model mặc định ngay lập tức
+    renderModelPickerOptions();
+
+    // Lắng nghe cấu hình thời gian thực từ Firebase
+    try {
+      onValue(ref(rtdb, 'aetheria_project/models_config'), (snap) => {
+        if (snap.exists()) {
+          dynamicModels = snap.val();
+          renderModelPickerOptions();
+        }
+      });
+    } catch (e) {
+      console.warn("Lỗi tải models_config từ Firebase:", e);
+    }
 
     const modelPicker = document.getElementById('model-picker');
     modelPicker.querySelector('.dropdown-trigger').onclick = (e) => {
@@ -1690,7 +1683,7 @@
       }
     };
 
-    // HÀM GỌI API THÔNG QUA CLOUDFLARE WORKER PROXY (radai.digitalsmod.workers.dev)
+    // HÀM GỌI API THÔNG QUA CLOUDFLARE WORKER PROXY
     async function executeApiRequestWithCorsBypass(targetEndpoint, apiKey, payload, signal) {
       const headers = {
         'Content-Type': 'application/json',
@@ -1735,9 +1728,11 @@
         return;
       }
 
-      const latestTokenSnap = await get(ref(rtdb, `aetheria_project/users/${currentUser.uid}/tokens`));
-      userTokens = latestTokenSnap.exists() ? Math.max(0, Number(latestTokenSnap.val()) || 0) : 0;
-      document.getElementById('nav-user-tokens').textContent = `${userTokens.toLocaleString()} Tok`;
+      try {
+        const latestTokenSnap = await get(ref(rtdb, `aetheria_project/users/${currentUser.uid}/tokens`));
+        userTokens = latestTokenSnap.exists() ? Math.max(0, Number(latestTokenSnap.val()) || 0) : 0;
+        document.getElementById('nav-user-tokens').textContent = `${userTokens.toLocaleString()} Tok`;
+      } catch (e) {}
 
       const fixedCost = Number(selectedModelData.costToken) || 0;
       const minRequiredTokens = fixedCost > 0 ? fixedCost : 10;
@@ -1888,11 +1883,13 @@
           deductedTokens = Math.max(50, usageBasedCost);
         }
 
-        const userTokenRef = ref(rtdb, `aetheria_project/users/${currentUser.uid}/tokens`);
-        await runTransaction(userTokenRef, (currentVal) => {
-          const cur = Number(currentVal) || 0;
-          return Math.max(0, cur - deductedTokens);
-        });
+        try {
+          const userTokenRef = ref(rtdb, `aetheria_project/users/${currentUser.uid}/tokens`);
+          await runTransaction(userTokenRef, (currentVal) => {
+            const cur = Number(currentVal) || 0;
+            return Math.max(0, cur - deductedTokens);
+          });
+        } catch (e) {}
 
         if (accumulatedText) {
           renderFormattedMessage(bubbleContainer, accumulatedText, deductedTokens);
@@ -1903,21 +1900,25 @@
           bubbleContainer.innerHTML = 'Không nhận được văn bản từ mô hình AI.';
         }
 
-        await push(ref(rtdb, 'aetheria_project/request_logs'), {
-          time: new Date().toTimeString().split(' ')[0],
-          model: selectedModelData.modelId,
-          userId: currentUser.uid,
-          userEmail: currentUser.email,
-          costTokens: deductedTokens,
-          status: '200 OK',
-          timestamp: Date.now()
-        });
+        try {
+          await push(ref(rtdb, 'aetheria_project/request_logs'), {
+            time: new Date().toTimeString().split(' ')[0],
+            model: selectedModelData.modelId,
+            userId: currentUser.uid,
+            userEmail: currentUser.email,
+            costTokens: deductedTokens,
+            status: '200 OK',
+            timestamp: Date.now()
+          });
+        } catch (e) {}
 
       } catch (err) {
         if (err.name === 'AbortError') {
           if (accumulatedText) {
             const partialCost = Math.max(5, Math.ceil(accumulatedText.length / 4));
-            await runTransaction(ref(rtdb, `aetheria_project/users/${currentUser.uid}/tokens`), (c) => Math.max(0, (Number(c) || 0) - partialCost));
+            try {
+              await runTransaction(ref(rtdb, `aetheria_project/users/${currentUser.uid}/tokens`), (c) => Math.max(0, (Number(c) || 0) - partialCost));
+            } catch (e) {}
             renderFormattedMessage(bubbleContainer, accumulatedText + "\n\n*[Đã dừng theo yêu cầu]*", partialCost);
             currentSess.messages.push({ role: 'ai', text: accumulatedText, cost: partialCost });
             await syncSessionToFirebase(currentSess);
@@ -1989,29 +1990,36 @@
       t.onclick = () => switchMobileView(t.getAttribute('data-mob'));
     });
 
-    const bgCanvas = document.getElementById('webgl-bg-canvas');
-    const renderer = new THREE.WebGLRenderer({ canvas: bgCanvas, antialias: true, alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 50);
-    camera.position.z = 5;
-    const mesh = new THREE.Mesh(
-      new THREE.IcosahedronGeometry(1.6, 8),
-      new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.16 })
-    );
-    scene.add(mesh);
-    function loop() {
-      requestAnimationFrame(loop);
-      mesh.rotation.y += 0.002;
-      mesh.rotation.x += 0.001;
-      renderer.render(scene, camera);
+    // HIỆU ỨNG NỀN WEBGL (BỌC TRY-CATCH AN TOÀN TUYỆT ĐỐI)
+    try {
+      const bgCanvas = document.getElementById('webgl-bg-canvas');
+      if (bgCanvas && window.WebGLRenderingContext) {
+        const renderer = new THREE.WebGLRenderer({ canvas: bgCanvas, antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 50);
+        camera.position.z = 5;
+        const mesh = new THREE.Mesh(
+          new THREE.IcosahedronGeometry(1.6, 8),
+          new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.16 })
+        );
+        scene.add(mesh);
+        function loop() {
+          requestAnimationFrame(loop);
+          mesh.rotation.y += 0.002;
+          mesh.rotation.x += 0.001;
+          renderer.render(scene, camera);
+        }
+        loop();
+        window.onresize = () => {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+        };
+      }
+    } catch (e) {
+      console.warn("WebGL background init bypassed:", e);
     }
-    loop();
-    window.onresize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    };
   </script>
 </body>
 </html>
