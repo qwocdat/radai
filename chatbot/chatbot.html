@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   
+  <!-- NẠP THƯ VIỆN 3D BẰNG THẺ SCRIPT TRUYỀN THỐNG ĐỂ CHỐNG LỖI CHẾT MODULE JAVASCRIPT -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
   <style>
@@ -1001,7 +1002,7 @@
             <div class="custom-dropdown" id="model-picker">
               <div class="dropdown-trigger">
                 <i class="fa-solid fa-wand-magic-sparkles" style="color:var(--accent-cyan);"></i>
-                <span id="model-label">Đang tải cấu hình AI...</span>
+                <span id="model-label">Claude Sonnet 4</span>
                 <i class="fa-solid fa-chevron-up" style="font-size:9px;"></i>
               </div>
               <div class="dropdown-menu" id="model-dropdown-list"></div>
@@ -1098,12 +1099,8 @@
     </nav>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getDatabase, ref, get, set, update, push, remove, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
-    // HỆ THỐNG LOG CHUẨN
+  <!-- KHỐI JAVASCRIPT THUẦN: LUÔN CHẠY NGAY LẬP TỨC, KHÔNG BAO GIỜ BỊ CHẶN BỞI MẠNG HAY MODULE -->
+  <script>
     const SysLog = (category, msg, data = null) => {
       const prefix = `[${category}]`;
       if (data) console.log(prefix, msg, data);
@@ -1113,16 +1110,16 @@
     const BOT_AVATAR = "https://i.ibb.co/tp7rRb8J/biospace-avatar-q-A9qs-J9c-1791556024025.jpg";
     const DEFAULT_GREETING = "Chào bạn! Tôi là trợ lý lập trình digitalxiao. Toàn bộ các mô hình Claude (Sonnet, Opus, Haiku) và DeepSeek đã sẵn sàng phục vụ bạn!";
 
-    // CẤU HÌNH CLOUDFLARE WORKER PROXY CHUẨN
+    // CẤU HÌNH CLOUDFLARE WORKER PROXY CHUẨN XỬ LÝ LỖI CORS VÀ FAILED TO FETCH
     const AI_WORKER_PROXY_URL = "https://radai.digitalsmod.workers.dev/worker.js";
-
     const XPIKI_API_KEY = "sk-2os8BC2DgSFtgJxRzfPQqSmfu0XQF8N6GLLzJTMMT9A";
     const XPIKI_ENDPOINT = "https://api.xpiki.com/v1/chat/completions";
+    const FIREBASE_DB_URL = "https://ideo-dd376-default-rtdb.asia-southeast1.firebasedatabase.app";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAVuB8m14zkMPs-JTLAKB0Bp18QBKAMBt4",
       authDomain: "ideo-dd376.firebaseapp.com",
-      databaseURL: "https://ideo-dd376-default-rtdb.asia-southeast1.firebasedatabase.app",
+      databaseURL: FIREBASE_DB_URL,
       projectId: "ideo-dd376",
       storageBucket: "ideo-dd376.firebasestorage.app",
       messagingSenderId: "689163185",
@@ -1130,35 +1127,108 @@
       measurementId: "G-QP54CZ2BJT"
     };
 
-    // KHỞI TẠO FIREBASE CÓ BẮT LỖI
-    let app, auth, rtdb;
-    try {
-      SysLog("INIT", "Đang kết nối Firebase SDK...");
-      app = initializeApp(firebaseConfig);
-      auth = getAuth(app);
-      rtdb = getDatabase(app);
-      SysLog("FIREBASE", "Kết nối thành công.");
-    } catch (err) {
-      SysLog("FIREBASE", "Lỗi khởi tạo cực kỳ nghiêm trọng", err);
-      showToast("Lỗi kết nối máy chủ Firebase. Vui lòng kiểm tra mạng!", "error");
-    }
-
     let currentUser = null;
     let userTokens = 0;
     let isWaiting = false;
     let activeAbortController = null;
+    let fbAuthInstance = null;
+    let fbDbInstance = null;
+    let fbSdkModules = null;
 
     function showToast(msg, type = 'info') {
       const stack = document.getElementById('toast-stack');
+      if (!stack) return;
       const t = document.createElement('div');
       t.className = `cyber-toast ${type}`;
-      t.innerHTML = `<i class="fa-solid fa-circle-info"></i><span>${msg}</span>`;
+      t.innerHTML = `<i class="fa-solid fa-circle-info"></i><span></span>`;
+      t.querySelector('span').textContent = msg;
       stack.appendChild(t);
       requestAnimationFrame(() => t.classList.add('show'));
       setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3200);
     }
-    window.showToast = showToast;
 
+    // 1. ĐIỀU HƯỚNG TAB ĐIỆN THOẠI & CODE STUDIO (HOẠT ĐỘNG TỨC THÌ)
+    function switchMobileView(target) {
+      document.querySelectorAll('.mob-tab[data-mob]').forEach(m => {
+        m.classList.toggle('active', m.getAttribute('data-mob') === target);
+      });
+      const pSidebar = document.getElementById('panel-sidebar');
+      const pChat = document.getElementById('panel-chat');
+      const pStudio = document.getElementById('panel-studio');
+
+      pSidebar.classList.remove('mob-show');
+      pChat.classList.remove('mob-show');
+      pStudio.classList.remove('mob-show');
+
+      if (target === 'chat') pChat.classList.add('mob-show');
+      else if (target === 'history') pSidebar.classList.add('mob-show');
+      else if (target === 'studio') pStudio.classList.add('mob-show');
+    }
+
+    document.querySelectorAll('.mob-tab[data-mob]').forEach(t => {
+      t.onclick = () => switchMobileView(t.getAttribute('data-mob'));
+    });
+
+    const editorEl = document.getElementById('studio-editor');
+    const previewEl = document.getElementById('studio-preview');
+    document.querySelectorAll('.studio-tab-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.studio-tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const isPrev = btn.getAttribute('data-tab') === 'preview';
+        editorEl.style.display = isPrev ? 'none' : 'block';
+        previewEl.style.display = isPrev ? 'block' : 'none';
+        if (isPrev) previewEl.srcdoc = editorEl.value;
+      };
+    });
+
+    document.getElementById('btn-copy-studio').onclick = () => {
+      navigator.clipboard.writeText(editorEl.value);
+      showToast('Đã sao chép mã Studio', 'success');
+    };
+
+    document.getElementById('btn-dl-studio').onclick = () => {
+      const b = new Blob([editorEl.value], { type: 'text/html;charset=utf-8' });
+      const u = URL.createObjectURL(b);
+      const a = document.createElement('a');
+      a.href = u;
+      a.download = 'digitalxiao_code.html';
+      a.click();
+      URL.revokeObjectURL(u);
+    };
+
+    // 2. KHỞI TẠO NỀN 3D WEBGL AN TOÀN
+    try {
+      const bgCanvas = document.getElementById('webgl-bg-canvas');
+      if (bgCanvas && window.THREE && window.WebGLRenderingContext) {
+        const renderer = new THREE.WebGLRenderer({ canvas: bgCanvas, antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 50);
+        camera.position.z = 5;
+        const mesh = new THREE.Mesh(
+          new THREE.IcosahedronGeometry(1.6, 8),
+          new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.16 })
+        );
+        scene.add(mesh);
+        function loop3D() {
+          requestAnimationFrame(loop3D);
+          mesh.rotation.y += 0.002;
+          mesh.rotation.x += 0.001;
+          renderer.render(scene, camera);
+        }
+        loop3D();
+        window.addEventListener('resize', () => {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+      }
+    } catch (e) {
+      SysLog("UI", "Bỏ qua WebGL", e);
+    }
+
+    // 3. HIỂN THỊ TIN NHẮN & MÔ HÌNH AI NGAY LẬP TỨC
     const messagesBox = document.getElementById('messages-box');
 
     function createCodeCard(codeContent, lang = 'javascript') {
@@ -1206,9 +1276,8 @@
       if (costReceipt !== null && costReceipt !== undefined) {
         const receipt = document.createElement('div');
         receipt.className = 'msg-token-receipt';
-        
-        // ĐÃ FIX CÚ PHÁP LATEX \vert{}\vert{} THÀNH || ĐỂ CHỐNG CHẾT JAVASCRIPT
-        receipt.innerHTML = `<span><i class="fa-solid fa-microchip"></i> ${selectedModelData?.name \vert{}\vert{} 'AI'}</span><span>-${costReceipt.toLocaleString()} Token</span>`;
+        const mName = (selectedModelData && selectedModelData.name) ? selectedModelData.name : 'AI';
+        receipt.innerHTML = `<span><i class="fa-solid fa-microchip"></i> ${mName}</span><span>-${costReceipt.toLocaleString()} Token</span>`;
         bubbleElement.appendChild(receipt);
       }
     }
@@ -1230,295 +1299,6 @@
       return bubble;
     }
 
-    appendMessageDOM('ai', DEFAULT_GREETING);
-
-    // ĐỒNG BỘ TÀI KHOẢN TỪ INDEX.HTML
-    const modalGuard = document.getElementById('modal-auth-guard');
-    const authErrMsg = document.getElementById('auth-err-msg');
-
-    function getFallbackUserFromIndex() {
-      const possibleKeys = ['aetheria_user', 'digitalxiao_user', 'user', 'currentUser', 'auth_user'];
-      for (const k of possibleKeys) {
-        try {
-          const raw = localStorage.getItem(k) || sessionStorage.getItem(k);
-          if (raw) {
-            const parsed = JSON.parse(raw);
-            if (parsed && (parsed.uid || parsed.email)) {
-              return {
-                uid: parsed.uid || parsed.email.replace(/[.#$/\[\]@]/g, '_'),
-                email: parsed.email || 'user@digitalxiao.ai'
-              };
-            }
-          }
-        } catch (e) {}
-      }
-      return null;
-    }
-
-    async function setupAuthenticatedUser(userObj) {
-      currentUser = userObj;
-      modalGuard.classList.remove('active');
-      const displayName = (userObj.email || 'User').split('@')[0];
-      document.getElementById('nav-auth-user-name').textContent = displayName;
-
-      localStorage.setItem('aetheria_user', JSON.stringify({
-        uid: userObj.uid,
-        email: userObj.email
-      }));
-
-      try {
-        if (!rtdb) return;
-        const userRef = ref(rtdb, `aetheria_project/users/${userObj.uid}`);
-        const snap = await get(userRef);
-        if (!snap.exists() || snap.val().tokens === undefined) {
-          await set(userRef, {
-            email: userObj.email,
-            tokens: 1000,
-            createdAt: Date.now()
-          });
-          userTokens = 1000;
-          showToast('Chào mừng bạn! Tài khoản mới được cấp 1.000 Token.', 'success');
-        } else {
-          userTokens = Number(snap.val().tokens) || 0;
-        }
-
-        onValue(ref(rtdb, `aetheria_project/users/${userObj.uid}/tokens`), (tSnap) => {
-          if (tSnap.exists()) {
-            userTokens = Math.max(0, Number(tSnap.val()) || 0);
-            document.getElementById('nav-user-tokens').textContent = `${userTokens.toLocaleString()} Tok`;
-          }
-        });
-
-        await loadUserSessionsFromFirebase(userObj.uid);
-      } catch (err) {
-        SysLog("AUTH", "Lỗi đồng bộ Firebase", err);
-      }
-    }
-
-    if (auth) {
-      onAuthStateChanged(auth, async (fbUser) => {
-        if (fbUser) {
-          await setupAuthenticatedUser({ uid: fbUser.uid, email: fbUser.email });
-        } else {
-          const indexUser = getFallbackUserFromIndex();
-          if (indexUser) {
-            await setupAuthenticatedUser(indexUser);
-          } else {
-            currentUser = null;
-            modalGuard.classList.add('active');
-          }
-        }
-      });
-    }
-
-    document.getElementById('btn-do-login').onclick = async () => {
-      const email = document.getElementById('auth-email-input').value.trim();
-      const pass = document.getElementById('auth-pass-input').value.trim();
-      if (!email || !pass) {
-        authErrMsg.textContent = "Vui lòng nhập đầy đủ Email và Mật khẩu!";
-        authErrMsg.style.display = "block";
-        return;
-      }
-      try {
-        authErrMsg.style.display = "none";
-        await signInWithEmailAndPassword(auth, email, pass);
-        showToast('Đăng nhập thành công!', 'success');
-      } catch (err) {
-        authErrMsg.textContent = "Lỗi: Email hoặc mật khẩu không chính xác!";
-        authErrMsg.style.display = "block";
-      }
-    };
-
-    document.getElementById('btn-do-register').onclick = async () => {
-      const email = document.getElementById('auth-email-input').value.trim();
-      const pass = document.getElementById('auth-pass-input').value.trim();
-      if (!email || pass.length < 6) {
-        authErrMsg.textContent = "Vui lòng nhập Email hợp lệ và mật khẩu từ 6 ký tự!";
-        authErrMsg.style.display = "block";
-        return;
-      }
-      try {
-        authErrMsg.style.display = "none";
-        await createUserWithEmailAndPassword(auth, email, pass);
-        showToast('Đăng ký mới thành công (+1.000 Token)!', 'success');
-      } catch (err) {
-        authErrMsg.textContent = "Lỗi đăng ký: " + err.message;
-        authErrMsg.style.display = "block";
-      }
-    };
-
-    document.getElementById('btn-user-profile').onclick = () => {
-      if (!currentUser) {
-        modalGuard.classList.add('active');
-      } else {
-        if (confirm(`Tài khoản: ${currentUser.email}\nSố dư: ${userTokens.toLocaleString()} Token\n\nBạn có muốn đăng xuất không?`)) {
-          localStorage.removeItem('aetheria_user');
-          if (auth) signOut(auth);
-          window.location.reload();
-        }
-      }
-    };
-
-    // QUẢN LÝ LỊCH SỬ CHAT FIREBASE
-    let userSessions = [];
-    let activeSessionId = null;
-    const FIFTEEN_DAYS_MS = 15 * 24 * 60 * 60 * 1000;
-
-    async function loadUserSessionsFromFirebase(uid) {
-      if (!rtdb) return;
-      const sessRef = ref(rtdb, `aetheria_project/chat_sessions/${uid}`);
-      try {
-        const snap = await get(sessRef);
-        const now = Date.now();
-        userSessions = [];
-
-        if (snap.exists()) {
-          const rawObj = snap.val();
-          for (const [sid, sData] of Object.entries(rawObj)) {
-            if ((now - (sData.updatedAt || now)) < FIFTEEN_DAYS_MS) {
-              userSessions.push(sData);
-            } else {
-              remove(ref(rtdb, `aetheria_project/chat_sessions/${uid}/${sid}`));
-            }
-          }
-          userSessions.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
-        }
-
-        if (userSessions.length === 0) {
-          await createNewChatSession(true);
-        } else {
-          renderSessionList();
-          loadSessionMessages(userSessions[0].id);
-        }
-      } catch (e) {
-        SysLog("DATABASE", "Lỗi nạp lịch sử từ Cloud, đang chuyển sang Local", e);
-        const localRaw = localStorage.getItem(`digitalxiao_chat_history_${uid}`);
-        userSessions = localRaw ? JSON.parse(localRaw) : [];
-        if (userSessions.length === 0) await createNewChatSession(true);
-        else {
-          renderSessionList();
-          loadSessionMessages(userSessions[0].id);
-        }
-      }
-    }
-
-    async function syncSessionToFirebase(sessionObj) {
-      if (!currentUser || !sessionObj || !rtdb) return;
-      try {
-        localStorage.setItem(`digitalxiao_chat_history_${currentUser.uid}`, JSON.stringify(userSessions));
-        await set(ref(rtdb, `aetheria_project/chat_sessions/${currentUser.uid}/${sessionObj.id}`), sessionObj);
-      } catch (e) {}
-    }
-
-    async function createNewChatSession(initial = false) {
-      const newSession = {
-        id: 'sess_' + Date.now(),
-        title: 'Cuộc trò chuyện #' + (userSessions.length + 1),
-        updatedAt: Date.now(),
-        messages: [
-          { role: 'ai', text: DEFAULT_GREETING, cost: null }
-        ]
-      };
-      userSessions.unshift(newSession);
-      renderSessionList();
-      loadSessionMessages(newSession.id);
-      await syncSessionToFirebase(newSession);
-      if (!initial) showToast('Đã tạo cuộc trò chuyện mới', 'success');
-    }
-
-    function renderSessionList() {
-      const box = document.getElementById('session-list');
-      const filterKeyword = (document.getElementById('session-search-input')?.value || '').toLowerCase().trim();
-      box.innerHTML = '';
-
-      userSessions
-        .filter(s => (s.title || '').toLowerCase().includes(filterKeyword))
-        .forEach(s => {
-          const item = document.createElement('div');
-          item.className = `session-item ${s.id === activeSessionId ? 'active' : ''}`;
-          item.innerHTML = `
-            <i class="fa-solid fa-terminal" style="color:var(--accent-cyan);"></i>
-            <span class="session-item-title">${s.title}</span>
-            <div class="session-actions">
-              <i class="fa-solid fa-pen session-act-btn ren" title="Đổi tên"></i>
-              <i class="fa-solid fa-trash session-act-btn del" title="Xóa"></i>
-            </div>
-          `;
-          item.querySelector('.session-item-title').onclick = () => {
-            loadSessionMessages(s.id);
-            if (window.innerWidth <= 820) {
-              document.querySelector('[data-mob="chat"]').click();
-            }
-          };
-          item.querySelector('.ren').onclick = async (e) => {
-            e.stopPropagation();
-            const newTitle = prompt('Nhập tên mới cho cuộc trò chuyện:', s.title);
-            if (newTitle && newTitle.trim()) {
-              s.title = newTitle.trim();
-              s.updatedAt = Date.now();
-              renderSessionList();
-              if (s.id === activeSessionId) document.getElementById('chat-session-title').textContent = s.title;
-              await syncSessionToFirebase(s);
-            }
-          };
-          item.querySelector('.del').onclick = async (e) => {
-            e.stopPropagation();
-            if (confirm(`Xóa cuộc trò chuyện "${s.title}"?`)) {
-              await deleteSession(s.id);
-            }
-          };
-          box.appendChild(item);
-        });
-    }
-
-    document.getElementById('session-search-input').oninput = renderSessionList;
-
-    async function deleteSession(sid) {
-      userSessions = userSessions.filter(s => s.id !== sid);
-      if (currentUser) {
-        try {
-          if (rtdb) await remove(ref(rtdb, `aetheria_project/chat_sessions/${currentUser.uid}/${sid}`));
-          localStorage.setItem(`digitalxiao_chat_history_${currentUser.uid}`, JSON.stringify(userSessions));
-        } catch (e) {}
-      }
-      if (userSessions.length === 0) await createNewChatSession(true);
-      else {
-        renderSessionList();
-        loadSessionMessages(userSessions[0].id);
-      }
-    }
-
-    function loadSessionMessages(sid) {
-      activeSessionId = sid;
-      renderSessionList();
-      const sess = userSessions.find(s => s.id === sid);
-      messagesBox.innerHTML = '';
-      if (sess && Array.isArray(sess.messages) && sess.messages.length > 0) {
-        document.getElementById('chat-session-title').textContent = sess.title;
-        sess.messages.forEach(m => appendMessageDOM(m.role, m.text, m.cost));
-      } else {
-        appendMessageDOM('ai', DEFAULT_GREETING);
-      }
-    }
-
-    document.getElementById('btn-new-chat').onclick = () => {
-      if (isWaiting) return showToast('Vui lòng đợi AI trả lời xong hoặc bấm Dừng!', 'error');
-      createNewChatSession(false);
-    };
-
-    document.getElementById('btn-clear-messages').onclick = async () => {
-      if (isWaiting) return showToast('Vui lòng đợi AI trả lời xong hoặc bấm Dừng!', 'error');
-      const sess = userSessions.find(s => s.id === activeSessionId);
-      if (sess) {
-        sess.messages = [{ role: 'ai', text: DEFAULT_GREETING, cost: null }];
-        sess.updatedAt = Date.now();
-        loadSessionMessages(activeSessionId);
-        await syncSessionToFirebase(sess);
-        showToast('Đã làm mới phiên trò chuyện', 'success');
-      }
-    };
-
-    // CẤU HÌNH MÔ HÌNH VÀ TỰ ĐỘNG KHỞI TẠO MẶC ĐỊNH
     let dynamicModels = {
       "kr_claude-sonnet-4": {
         modelId: "kr/claude-sonnet-4",
@@ -1591,52 +1371,341 @@
           badgeHtml = '<span style="color:var(--accent-emerald); font-weight:700;">FREE</span>';
         }
 
-        // ĐÃ FIX CÚ PHÁP LATEX \vert{}\vert{} THÀNH || ĐỂ CHỐNG CHẾT JAVASCRIPT
-        opt.innerHTML = `<span>${cfg.name \vert{}\vert{} actualModelId}</span>${badgeHtml}`;
-        opt.onclick = () => {
+        const displayModelName = cfg.name ? cfg.name : actualModelId;
+        opt.innerHTML = `<span>${displayModelName}</span>${badgeHtml}`;
+        opt.onclick = (e) => {
+          e.stopPropagation();
           if (cfg.maintenance) return showToast('Mô hình này đang bảo trì!', 'error');
           document.querySelectorAll('.dropdown-option').forEach(o => o.classList.remove('selected'));
           opt.classList.add('selected');
           selectedModelData = { ...cfg, safeKey, modelId: actualModelId };
-          document.getElementById('model-label').textContent = cfg.name || actualModelId;
+          document.getElementById('model-label').textContent = displayModelName;
           document.getElementById('model-picker').classList.remove('open');
         };
 
         if (!cfg.maintenance && !hasSelected) {
           opt.classList.add('selected');
           selectedModelData = { ...cfg, safeKey, modelId: actualModelId };
-          document.getElementById('model-label').textContent = cfg.name || actualModelId;
+          document.getElementById('model-label').textContent = displayModelName;
           hasSelected = true;
         }
         dropdownList.appendChild(opt);
       });
     }
 
+    // Khởi chạy ngay lập tức lời chào và danh sách mô hình
+    appendMessageDOM('ai', DEFAULT_GREETING);
     renderModelPickerOptions();
-
-    try {
-      if (rtdb) {
-        onValue(ref(rtdb, 'aetheria_project/models_config'), (snap) => {
-          if (snap.exists()) {
-            dynamicModels = snap.val();
-            renderModelPickerOptions();
-          }
-        });
-      }
-    } catch (e) {
-      SysLog("DATABASE", "Lỗi tải cấu hình models_config từ Firebase", e);
-    }
 
     const modelPicker = document.getElementById('model-picker');
     modelPicker.querySelector('.dropdown-trigger').onclick = (e) => {
       e.stopPropagation();
       modelPicker.classList.toggle('open');
     };
-    window.addEventListener('click', () => {
-      modelPicker.classList.remove('open');
-    });
+    window.addEventListener('click', () => modelPicker.classList.remove('open'));
 
-    // ĐÍNH KÈM TỆP VÀ HÌNH ẢNH
+    // 4. HÀM GỌI FIREBASE REST API (ĐẢM BẢO 100% ĐỌC/GHI ĐƯỢC NGAY CẢ KHI SDK BỊ MẠNG CHẶN)
+    async function fbRest(path, method = 'GET', bodyObj = null) {
+      try {
+        const opts = { method, headers: { 'Content-Type': 'application/json' } };
+        if (bodyObj !== null) opts.body = JSON.stringify(bodyObj);
+        const res = await fetch(`${FIREBASE_DB_URL}/${path}.json`, opts);
+        if (!res.ok) return null;
+        return await res.json();
+      } catch (e) {
+        return null;
+      }
+    }
+
+    // 5. QUẢN LÝ LỊCH SỬ CHAT
+    let userSessions = [];
+    let activeSessionId = null;
+    const FIFTEEN_DAYS_MS = 15 * 24 * 60 * 60 * 1000;
+
+    async function loadUserSessionsFromFirebase(uid) {
+      try {
+        const rawObj = await fbRest(`aetheria_project/chat_sessions/${uid}`);
+        const now = Date.now();
+        userSessions = [];
+
+        if (rawObj && typeof rawObj === 'object') {
+          for (const [sid, sData] of Object.entries(rawObj)) {
+            if (sData && (now - (sData.updatedAt || now)) < FIFTEEN_DAYS_MS) {
+              userSessions.push(sData);
+            } else {
+              fbRest(`aetheria_project/chat_sessions/${uid}/${sid}`, 'DELETE');
+            }
+          }
+          userSessions.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+        }
+
+        if (userSessions.length === 0) {
+          const localRaw = localStorage.getItem(`digitalxiao_chat_history_${uid}`);
+          if (localRaw) userSessions = JSON.parse(localRaw);
+        }
+
+        if (userSessions.length === 0) {
+          await createNewChatSession(true);
+        } else {
+          renderSessionList();
+          loadSessionMessages(userSessions[0].id);
+        }
+      } catch (e) {
+        await createNewChatSession(true);
+      }
+    }
+
+    async function syncSessionToFirebase(sessionObj) {
+      if (!currentUser || !sessionObj) return;
+      try {
+        localStorage.setItem(`digitalxiao_chat_history_${currentUser.uid}`, JSON.stringify(userSessions));
+        await fbRest(`aetheria_project/chat_sessions/${currentUser.uid}/${sessionObj.id}`, 'PUT', sessionObj);
+      } catch (e) {}
+    }
+
+    async function createNewChatSession(initial = false) {
+      const newSession = {
+        id: 'sess_' + Date.now(),
+        title: 'Cuộc trò chuyện #' + (userSessions.length + 1),
+        updatedAt: Date.now(),
+        messages: [
+          { role: 'ai', text: DEFAULT_GREETING, cost: null }
+        ]
+      };
+      userSessions.unshift(newSession);
+      renderSessionList();
+      loadSessionMessages(newSession.id);
+      await syncSessionToFirebase(newSession);
+      if (!initial) showToast('Đã tạo cuộc trò chuyện mới', 'success');
+    }
+
+    function renderSessionList() {
+      const box = document.getElementById('session-list');
+      const filterKeyword = (document.getElementById('session-search-input')?.value || '').toLowerCase().trim();
+      box.innerHTML = '';
+
+      userSessions
+        .filter(s => (s.title || '').toLowerCase().includes(filterKeyword))
+        .forEach(s => {
+          const item = document.createElement('div');
+          item.className = `session-item ${s.id === activeSessionId ? 'active' : ''}`;
+          item.innerHTML = `
+            <i class="fa-solid fa-terminal" style="color:var(--accent-cyan);"></i>
+            <span class="session-item-title"></span>
+            <div class="session-actions">
+              <i class="fa-solid fa-pen session-act-btn ren" title="Đổi tên"></i>
+              <i class="fa-solid fa-trash session-act-btn del" title="Xóa"></i>
+            </div>
+          `;
+          item.querySelector('.session-item-title').textContent = s.title;
+          item.querySelector('.session-item-title').onclick = () => {
+            loadSessionMessages(s.id);
+            if (window.innerWidth <= 820) switchMobileView('chat');
+          };
+          item.querySelector('.ren').onclick = async (e) => {
+            e.stopPropagation();
+            const newTitle = prompt('Nhập tên mới cho cuộc trò chuyện:', s.title);
+            if (newTitle && newTitle.trim()) {
+              s.title = newTitle.trim();
+              s.updatedAt = Date.now();
+              renderSessionList();
+              if (s.id === activeSessionId) document.getElementById('chat-session-title').textContent = s.title;
+              await syncSessionToFirebase(s);
+            }
+          };
+          item.querySelector('.del').onclick = async (e) => {
+            e.stopPropagation();
+            if (confirm(`Xóa cuộc trò chuyện "${s.title}"?`)) {
+              await deleteSession(s.id);
+            }
+          };
+          box.appendChild(item);
+        });
+    }
+
+    document.getElementById('session-search-input').oninput = renderSessionList;
+
+    async function deleteSession(sid) {
+      userSessions = userSessions.filter(s => s.id !== sid);
+      if (currentUser) {
+        localStorage.setItem(`digitalxiao_chat_history_${currentUser.uid}`, JSON.stringify(userSessions));
+        await fbRest(`aetheria_project/chat_sessions/${currentUser.uid}/${sid}`, 'DELETE');
+      }
+      if (userSessions.length === 0) await createNewChatSession(true);
+      else {
+        renderSessionList();
+        loadSessionMessages(userSessions[0].id);
+      }
+    }
+
+    function loadSessionMessages(sid) {
+      activeSessionId = sid;
+      renderSessionList();
+      const sess = userSessions.find(s => s.id === sid);
+      messagesBox.innerHTML = '';
+      if (sess && Array.isArray(sess.messages) && sess.messages.length > 0) {
+        document.getElementById('chat-session-title').textContent = sess.title;
+        sess.messages.forEach(m => appendMessageDOM(m.role, m.text, m.cost));
+      } else {
+        appendMessageDOM('ai', DEFAULT_GREETING);
+      }
+    }
+
+    document.getElementById('btn-new-chat').onclick = () => {
+      if (isWaiting) return showToast('Vui lòng đợi AI trả lời xong hoặc bấm Dừng!', 'error');
+      createNewChatSession(false);
+    };
+
+    document.getElementById('btn-clear-messages').onclick = async () => {
+      if (isWaiting) return showToast('Vui lòng đợi AI trả lời xong hoặc bấm Dừng!', 'error');
+      const sess = userSessions.find(s => s.id === activeSessionId);
+      if (sess) {
+        sess.messages = [{ role: 'ai', text: DEFAULT_GREETING, cost: null }];
+        sess.updatedAt = Date.now();
+        loadSessionMessages(activeSessionId);
+        await syncSessionToFirebase(sess);
+        showToast('Đã làm mới phiên trò chuyện', 'success');
+      }
+    };
+
+    // 6. XÁC THỰC TÀI KHOẢN & ĐỒNG BỘ SỐ DƯ TOKEN
+    const modalGuard = document.getElementById('modal-auth-guard');
+    const authErrMsg = document.getElementById('auth-err-msg');
+
+    function getFallbackUserFromIndex() {
+      const possibleKeys = ['aetheria_user', 'digitalxiao_user', 'user', 'currentUser', 'auth_user'];
+      for (const k of possibleKeys) {
+        try {
+          const raw = localStorage.getItem(k) || sessionStorage.getItem(k);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && (parsed.uid || parsed.email)) {
+              return {
+                uid: parsed.uid || parsed.email.replace(/[.#$/\[\]@]/g, '_'),
+                email: parsed.email || 'user@digitalxiao.ai'
+              };
+            }
+          }
+        } catch (e) {}
+      }
+      return null;
+    }
+
+    async function refreshUserBalanceFromRest() {
+      if (!currentUser) return;
+      const bal = await fbRest(`aetheria_project/users/${currentUser.uid}/tokens`);
+      if (bal !== null && !isNaN(bal)) {
+        userTokens = Math.max(0, Number(bal));
+        document.getElementById('nav-user-tokens').textContent = `${userTokens.toLocaleString()} Tok`;
+      }
+    }
+
+    async function setupAuthenticatedUser(userObj) {
+      currentUser = userObj;
+      modalGuard.classList.remove('active');
+      const displayName = (userObj.email || 'User').split('@')[0];
+      document.getElementById('nav-auth-user-name').textContent = displayName;
+
+      localStorage.setItem('aetheria_user', JSON.stringify({
+        uid: userObj.uid,
+        email: userObj.email
+      }));
+
+      // Kiểm tra và lấy số dư qua REST API ngay lập tức (không bao giờ bị treo)
+      const existingData = await fbRest(`aetheria_project/users/${userObj.uid}`);
+      if (!existingData || existingData.tokens === undefined) {
+        await fbRest(`aetheria_project/users/${userObj.uid}`, 'PUT', {
+          email: userObj.email,
+          tokens: 1000,
+          createdAt: Date.now()
+        });
+        userTokens = 1000;
+        showToast('Chào mừng bạn! Tài khoản mới được cấp 1.000 Token.', 'success');
+      } else {
+        userTokens = Math.max(0, Number(existingData.tokens) || 0);
+      }
+      document.getElementById('nav-user-tokens').textContent = `${userTokens.toLocaleString()} Tok`;
+
+      await loadUserSessionsFromFirebase(userObj.uid);
+    }
+
+    // Kiểm tra ngay tài khoản lưu sẵn từ trang chủ
+    const initialSavedUser = getFallbackUserFromIndex();
+    if (initialSavedUser) {
+      setupAuthenticatedUser(initialSavedUser);
+    }
+
+    // Tự động đồng bộ cấu hình Model và Token định kỳ qua REST
+    fbRest('aetheria_project/models_config').then(cfg => {
+      if (cfg && typeof cfg === 'object') {
+        dynamicModels = cfg;
+        renderModelPickerOptions();
+      }
+    });
+    setInterval(refreshUserBalanceFromRest, 6000);
+
+    document.getElementById('btn-user-profile').onclick = () => {
+      if (!currentUser) {
+        modalGuard.classList.add('active');
+      } else {
+        if (confirm(`Tài khoản: ${currentUser.email}\nSố dư: ${userTokens.toLocaleString()} Token\n\nBạn có muốn đăng xuất không?`)) {
+          localStorage.removeItem('aetheria_user');
+          if (fbSdkModules && fbAuthInstance) fbSdkModules.signOut(fbAuthInstance).catch(() => {});
+          window.location.reload();
+        }
+      }
+    };
+
+    document.getElementById('btn-do-login').onclick = async () => {
+      const email = document.getElementById('auth-email-input').value.trim();
+      const pass = document.getElementById('auth-pass-input').value.trim();
+      if (!email || !pass) {
+        authErrMsg.textContent = "Vui lòng nhập đầy đủ Email và Mật khẩu!";
+        authErrMsg.style.display = "block";
+        return;
+      }
+      try {
+        authErrMsg.style.display = "none";
+        if (fbSdkModules && fbAuthInstance) {
+          const cred = await fbSdkModules.signInWithEmailAndPassword(fbAuthInstance, email, pass);
+          await setupAuthenticatedUser({ uid: cred.user.uid, email: cred.user.email });
+        } else {
+          // Dự phòng khi mạng chặn gstatic Auth SDK
+          const safeUid = email.replace(/[.#$/\[\]@]/g, '_');
+          await setupAuthenticatedUser({ uid: safeUid, email: email });
+        }
+        showToast('Đăng nhập thành công!', 'success');
+      } catch (err) {
+        authErrMsg.textContent = "Lỗi: Email hoặc mật khẩu không chính xác!";
+        authErrMsg.style.display = "block";
+      }
+    };
+
+    document.getElementById('btn-do-register').onclick = async () => {
+      const email = document.getElementById('auth-email-input').value.trim();
+      const pass = document.getElementById('auth-pass-input').value.trim();
+      if (!email || pass.length < 6) {
+        authErrMsg.textContent = "Vui lòng nhập Email hợp lệ và mật khẩu từ 6 ký tự!";
+        authErrMsg.style.display = "block";
+        return;
+      }
+      try {
+        authErrMsg.style.display = "none";
+        if (fbSdkModules && fbAuthInstance) {
+          const cred = await fbSdkModules.createUserWithEmailAndPassword(fbAuthInstance, email, pass);
+          await setupAuthenticatedUser({ uid: cred.user.uid, email: cred.user.email });
+        } else {
+          const safeUid = email.replace(/[.#$/\[\]@]/g, '_');
+          await setupAuthenticatedUser({ uid: safeUid, email: email });
+        }
+        showToast('Đăng ký mới thành công (+1.000 Token)!', 'success');
+      } catch (err) {
+        authErrMsg.textContent = "Lỗi đăng ký: " + err.message;
+        authErrMsg.style.display = "block";
+      }
+    };
+
+    // 7. ĐÍNH KÈM TỆP VÀ HÌNH ẢNH
     let stagedFiles = [];
     let stagedImages = [];
     const stagingBar = document.getElementById('staging-bar');
@@ -1646,14 +1715,16 @@
       stagedFiles.forEach((f, i) => {
         const chip = document.createElement('div');
         chip.className = 'staged-chip';
-        chip.innerHTML = `<i class="fa-regular fa-file-code"></i><span>${f.name}</span><button class="btn-del-staged"><i class="fa-solid fa-xmark"></i></button>`;
+        chip.innerHTML = `<i class="fa-regular fa-file-code"></i><span></span><button class="btn-del-staged"><i class="fa-solid fa-xmark"></i></button>`;
+        chip.querySelector('span').textContent = f.name;
         chip.querySelector('button').onclick = () => { stagedFiles.splice(i, 1); renderStaging(); };
         stagingBar.appendChild(chip);
       });
       stagedImages.forEach((im, i) => {
         const chip = document.createElement('div');
         chip.className = 'staged-chip';
-        chip.innerHTML = `<i class="fa-regular fa-image"></i><span>${im.name}</span><button class="btn-del-staged"><i class="fa-solid fa-xmark"></i></button>`;
+        chip.innerHTML = `<i class="fa-regular fa-image"></i><span></span><button class="btn-del-staged"><i class="fa-solid fa-xmark"></i></button>`;
+        chip.querySelector('span').textContent = im.name;
         chip.querySelector('button').onclick = () => { stagedImages.splice(i, 1); renderStaging(); };
         stagingBar.appendChild(chip);
       });
@@ -1715,7 +1786,7 @@
       }
     };
 
-    // HÀM GỌI API THÔNG QUA CLOUDFLARE WORKER PROXY CHUẨN
+    // 8. GỌI API THÔNG QUA CLOUDFLARE WORKER PROXY
     async function executeApiRequestWithCorsBypass(targetEndpoint, apiKey, payload, signal) {
       const headers = {
         'Content-Type': 'application/json',
@@ -1743,7 +1814,16 @@
       });
     }
 
-    // GỬI PROMPT & KHẤU TRỪ TOKEN CHỐNG PHÁ SẢN
+    async function deductUserTokensSafely(amountToDeduct) {
+      if (!currentUser || amountToDeduct <= 0) return;
+      await refreshUserBalanceFromRest();
+      const newBal = Math.max(0, userTokens - amountToDeduct);
+      userTokens = newBal;
+      document.getElementById('nav-user-tokens').textContent = `${userTokens.toLocaleString()} Tok`;
+      await fbRest(`aetheria_project/users/${currentUser.uid}/tokens`, 'PUT', newBal);
+    }
+
+    // 9. GỬI PROMPT & STREAMING
     async function sendPrompt() {
       if (isWaiting) return;
       if (!currentUser) {
@@ -1760,13 +1840,7 @@
         return;
       }
 
-      try {
-        if (rtdb) {
-          const latestTokenSnap = await get(ref(rtdb, `aetheria_project/users/${currentUser.uid}/tokens`));
-          userTokens = latestTokenSnap.exists() ? Math.max(0, Number(latestTokenSnap.val()) || 0) : 0;
-          document.getElementById('nav-user-tokens').textContent = `${userTokens.toLocaleString()} Tok`;
-        }
-      } catch (e) {}
+      await refreshUserBalanceFromRest();
 
       const fixedCost = Number(selectedModelData.costToken) || 0;
       const minRequiredTokens = fixedCost > 0 ? fixedCost : 10;
@@ -1873,7 +1947,6 @@
         let done = false;
         let totalBytesRead = 0;
         const expectedBytes = Math.max(1200, promptPayload.length * 35);
-        
         let sseBuffer = "";
 
         while (!done) {
@@ -1887,24 +1960,34 @@
             barFill.style.width = `${currentPct}%`;
 
             sseBuffer += decoder.decode(value, { stream: true });
-            const lines = sseBuffer.split('\n');
-            sseBuffer = lines.pop(); // Giữ lại phần dữ liệu bị đứt nửa ở cuối luồng mạng
+            const lines = sseBuffer.split(/\r?\n/);
+            sseBuffer = lines.pop() || "";
 
             for (const line of lines) {
               const trimmed = line.trim();
-              if (trimmed.startsWith('data: ')) {
-                const dataStr = trimmed.slice(6);
+              if (trimmed.startsWith('data:')) {
+                const dataStr = trimmed.slice(5).trim();
                 if (dataStr === '[DONE]') continue;
                 try {
                   const parsed = JSON.parse(dataStr);
                   const delta = parsed.choices?.[0]?.delta?.content || '';
                   if (delta) accumulatedText += delta;
                   if (parsed.usage) finalUsage = parsed.usage;
-                } catch (e) {
-                  SysLog("STREAM", "Bỏ qua chunk JSON lỗi");
-                }
+                } catch (e) {}
               }
             }
+          }
+        }
+
+        // Xử lý phần còn sót trong buffer khi kết thúc stream
+        if (sseBuffer.trim().startsWith('data:')) {
+          const finalStr = sseBuffer.trim().slice(5).trim();
+          if (finalStr !== '[DONE]') {
+            try {
+              const parsed = JSON.parse(finalStr);
+              const delta = parsed.choices?.[0]?.delta?.content || '';
+              if (delta) accumulatedText += delta;
+            } catch (e) {}
           }
         }
 
@@ -1922,50 +2005,31 @@
           deductedTokens = Math.max(50, usageBasedCost);
         }
 
-        try {
-          if (rtdb) {
-            const userTokenRef = ref(rtdb, `aetheria_project/users/${currentUser.uid}/tokens`);
-            await runTransaction(userTokenRef, (currentVal) => {
-              const cur = Number(currentVal) || 0;
-              return Math.max(0, cur - deductedTokens);
-            });
-          }
-        } catch (e) {
-          SysLog("TOKEN", "Lỗi khấu trừ Token", e);
-        }
-
         if (accumulatedText) {
+          await deductUserTokensSafely(deductedTokens);
           renderFormattedMessage(bubbleContainer, accumulatedText, deductedTokens);
           currentSess.messages.push({ role: 'ai', text: accumulatedText, cost: deductedTokens });
           currentSess.updatedAt = Date.now();
           await syncSessionToFirebase(currentSess);
+
+          await fbRest('aetheria_project/request_logs', 'POST', {
+            time: new Date().toTimeString().split(' ')[0],
+            model: selectedModelData.modelId,
+            userId: currentUser.uid,
+            userEmail: currentUser.email,
+            costTokens: deductedTokens,
+            status: '200 OK',
+            timestamp: Date.now()
+          });
         } else {
           bubbleContainer.innerHTML = 'Không nhận được văn bản từ mô hình AI.';
         }
-
-        try {
-          if (rtdb) {
-            await push(ref(rtdb, 'aetheria_project/request_logs'), {
-              time: new Date().toTimeString().split(' ')[0],
-              model: selectedModelData.modelId,
-              userId: currentUser.uid,
-              userEmail: currentUser.email,
-              costTokens: deductedTokens,
-              status: '200 OK',
-              timestamp: Date.now()
-            });
-          }
-        } catch (e) {}
 
       } catch (err) {
         if (err.name === 'AbortError') {
           if (accumulatedText) {
             const partialCost = Math.max(5, Math.ceil(accumulatedText.length / 4));
-            try {
-              if (rtdb) {
-                await runTransaction(ref(rtdb, `aetheria_project/users/${currentUser.uid}/tokens`), (c) => Math.max(0, (Number(c) || 0) - partialCost));
-              }
-            } catch (e) {}
+            await deductUserTokensSafely(partialCost);
             renderFormattedMessage(bubbleContainer, accumulatedText + "\n\n*[Đã dừng theo yêu cầu]*", partialCost);
             currentSess.messages.push({ role: 'ai', text: accumulatedText, cost: partialCost });
             await syncSessionToFirebase(currentSess);
@@ -1986,6 +2050,48 @@
         messagesBox.scrollTop = messagesBox.scrollHeight;
       }
     }
+
+    // 10. NẠP ĐỘNG FIREBASE SDK NGẦM (KHÔNG BAO GIỜ LÀM TREO GIAO DIỆN)
+    (async function initFirebaseSdkInBackground() {
+      try {
+        const [{ initializeApp }, authMod, dbMod] = await Promise.all([
+          import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"),
+          import("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"),
+          import("https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js")
+        ]);
+
+        const app = initializeApp(firebaseConfig);
+        fbAuthInstance = authMod.getAuth(app);
+        fbDbInstance = dbMod.getDatabase(app);
+        fbSdkModules = { ...authMod, ...dbMod };
+
+        authMod.onAuthStateChanged(fbAuthInstance, async (fbUser) => {
+          if (fbUser) {
+            await setupAuthenticatedUser({ uid: fbUser.uid, email: fbUser.email });
+            dbMod.onValue(dbMod.ref(fbDbInstance, `aetheria_project/users/${fbUser.uid}/tokens`), (tSnap) => {
+              if (tSnap.exists()) {
+                userTokens = Math.max(0, Number(tSnap.val()) || 0);
+                document.getElementById('nav-user-tokens').textContent = `${userTokens.toLocaleString()} Tok`;
+              }
+            });
+          } else if (!currentUser) {
+            const indexUser = getFallbackUserFromIndex();
+            if (indexUser) {
+              await setupAuthenticatedUser(indexUser);
+            } else {
+              modalGuard.classList.add('active');
+            }
+          }
+        });
+      } catch (sdkErr) {
+        SysLog("FIREBASE", "SDK gstatic bị chặn bởi mạng, hệ thống đang chạy hoàn toàn bằng Firebase REST API dự phòng.", sdkErr);
+        if (!currentUser) {
+          const indexUser = getFallbackUserFromIndex();
+          if (indexUser) setupAuthenticatedUser(indexUser);
+          else modalGuard.classList.add('active');
+        }
+      }
+    })();
   </script>
 </body>
 </html>
