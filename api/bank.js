@@ -1,110 +1,136 @@
+const FIREBASE_DB = "https://ideo-dd376-default-rtdb.asia-southeast1.firebasedatabase.app";
+
 export default async function handler(req, res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  // 1. Cấu hình Headers và xử lý CORS Preflight
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
+  // 2. Chỉ chấp nhận phương thức POST từ Webhook Pay2S
+  if (req.method !== "POST") {
+    return res.status(200).json({
+      status: "online",
+      message: "Webhook endpoint Vercel đang hoạt động sẵn sàng nhận tín hiệu Pay2S"
+    });
+  }
+
+  try {
+    let data = req.body;
+
+    // Tự động phân tích nếu dữ liệu gửi dạng chuỗi thô
+    if (typeof data === "string") {
+      try {
+        data = JSON.parse(data);
+      } catch (e) {
+        const params = new URLSearchParams(data);
+        data = Object.fromEntries(params.entries());
+      }
     }
 
-    if (req.method === 'GET') {
+    if (!data || Object.keys(data).length === 0) {
+      return res.status(400).json({ status: "error", message: "Dữ liệu Webhook rỗng" });
+    }
+
+    // 3. Trích xuất số tiền chuyển khoản
+    const amount = parseInt(data.amount || data.transferAmount || data.price || 0, 10);
+
+    // Ghép toàn bộ nội dung tìm kiếm mã định danh
+    const rawSearch = `${data.orderId || ''} ${data.content || ''} ${data.description || ''} ${data.orderInfo || ''} ${JSON.stringify(data)}`;
+
+    // 4. Bóc tách UID tài khoản (AETH_...)
+    const match = rawSearch.match(/AETH_([A-Za-z0-9_-]+)/i);
+
+    if (match && amount > 0) {
+      let rawUid = match[1];
+      const parts = rawUid.split("_");
+      // Loại bỏ phần đuôi timestamp nếu có
+      if (parts.length >= 2 && !isNaN(parts[parts.length - 1])) {
+        parts.pop();
+        rawUid = parts.join("_");
+      }
+      const userUid = rawUid;
+
+      // 5. Kiểm tra chống cộng trùng lặp (Idempotency)
+      const transId = data.orderId || data.transId || data.code || `TX_${Date.now()}`;
+      const orderCheckUrl = `${FIREBASE_DB}/aetheria_project/orders/${transId}.json`;
+      
+      const checkRes = await fetch(orderCheckUrl);
+      const existingOrder = await checkRes.json();
+
+      if (existingOrder && existingOrder.status === "SUCCESS") {
         return res.status(200).json({
-            status: "success",
-            message: "Webhook Bank API đang hoạt động bình thường!",
-            time: new Date().toISOString()
+          status: "success",
+          message: "Giao dịch này đã được ghi nhận trước đó (bỏ qua trùng lặp)"
         });
+      }
+
+      // 6. Tính toán và cộng Token vào Firebase (1 VNĐ = 1 Token)
+      const tokensToAdd = amount;
+      const userTokenUrl = `${FIREBASE_DB}/aetheria_project/users/${userUid}/tokens.json`;
+
+      const getRes = await fetch(userTokenUrl);
+      const currentTokens = (await getRes.json()) || 0;
+      const newBalance = Number(currentTokens) + tokensToAdd;
+
+      // Cập nhật số dư mới
+      await fetch(userTokenUrl, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newBalance)
+      });
+
+      // 7. Đánh dấu giao dịch thành công và lưu lịch sử
+      await fetch(orderCheckUrl, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderId: transId,
+          uid: userUid,
+          amount: amount,
+          tokensAdded: tokensToAdd,
+          bank: "ACB",
+          accountNo: "28233851",
+          status: "SUCCESS",
+          timestamp: Date.now()
+        })
+      });
+
+      await fetch(`${FIREBASE_DB}/aetheria_project/recharge_logs.json`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderId: transId,
+          uid: userUid,
+          amountVND: amount,
+          tokensAdded: tokensToAdd,
+          bank: "ACB",
+          accountNo: "28233851",
+          time: new Date().toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" }),
+          status: "THÀNH CÔNG"
+        })
+      });
+
+      return res.status(200).json({
+        status: "success",
+        message: "Xác nhận nạp tiền và cộng Token thành công",
+        uid: userUid,
+        added: tokensToAdd,
+        newBalance: newBalance
+      });
     }
 
-    if (req.method !== 'POST') {
-        return res.status(405).json({ status: "error", message: "Method Not Allowed" });
-    }
-
-    try {
-        const data = req.body || {};
-        const content = (data.content || data.description || '').toUpperCase().trim();
-        const amount = parseFloat(data.transferAmount || data.accumulated || data.amount_in || 0);
-        const transId = data.id || data.referenceCode || Date.now();
-        const transferType = data.transferType || 'in';
-
-        if (transferType !== 'in' || amount <= 0) {
-            return res.status(200).json({ status: "ignored", reason: "Not money in" });
-        }
-
-        const FIREBASE_PROJECT_ID = "quocdat-396fe";
-        const BASE_URL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
-
-        // 1. Kiểm tra đơn trùng
-        const checkRes = await fetch(`${BASE_URL}/deposits/sepay_${transId}`);
-        if (checkRes.status === 200) {
-            return res.status(200).json({ status: "success", message: "Already processed" });
-        }
-
-        // 2. Lấy danh sách User từ Firestore
-        const userRes = await fetch(`${BASE_URL}/users?pageSize=300`);
-        if (!userRes.ok) throw new Error("Cannot fetch users");
-        
-        const userData = await userRes.json();
-        const documents = userData.documents || [];
-
-        // Sắp xếp danh sách user theo độ dài tên giảm dần (Ưu tiên tên dài như QUOCDATDV5 trước, tránh nhầm DAT)
-        documents.sort((a, b) => {
-            let nameA = (a.fields?.username?.stringValue || '').length;
-            let nameB = (b.fields?.username?.stringValue || '').length;
-            return nameB - nameA;
-        });
-
-        let targetUser = null;
-        for (let doc of documents) {
-            const fields = doc.fields || {};
-            const username = fields.username ? fields.username.stringValue.toUpperCase().trim() : '';
-            const email = fields.email ? fields.email.stringValue.toUpperCase().trim() : '';
-
-            // Kiểm tra nội dung chuyển khoản có chứa username hoặc email không
-            if ((username && content.includes(username)) || (email && content.includes(email))) {
-                const docId = doc.name.split('/').pop();
-                let currentBalance = 0;
-                if (fields.balance) {
-                    currentBalance = fields.balance.doubleValue !== undefined 
-                        ? parseFloat(fields.balance.doubleValue) 
-                        : parseInt(fields.balance.integerValue || 0);
-                }
-                targetUser = { id: docId, username: username || email, balance: currentBalance };
-                break;
-            }
-        }
-
-        // 3. Cộng tiền & Lưu lịch sử
-        if (targetUser) {
-            const newBalance = targetUser.balance + amount;
-
-            await fetch(`${BASE_URL}/users/${targetUser.id}?updateMask.fieldPaths=balance`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ fields: { balance: { doubleValue: newBalance } } })
-            });
-
-            await fetch(`${BASE_URL}/deposits/sepay_${transId}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    fields: {
-                        id: { stringValue: `sepay_${transId}` },
-                        user_id: { stringValue: targetUser.id },
-                        username: { stringValue: targetUser.username },
-                        amount: { doubleValue: amount },
-                        payment_method: { stringValue: 'SePay Webhook Bank Vercel' },
-                        status: { stringValue: 'success' },
-                        created_at: { stringValue: new Date().toISOString() }
-                    }
-                })
-            });
-
-            return res.status(200).json({ status: "success", user: targetUser.username, added: amount });
-        }
-
-        return res.status(200).json({ status: "ignored", reason: "User not match" });
-
-    } catch (err) {
-        return res.status(500).json({ status: "error", message: err.message });
-    }
+    return res.status(200).json({
+      status: "ignored",
+      message: "Không tìm thấy mã định danh UID hoặc số tiền không hợp lệ"
+    });
+  } catch (err) {
+    return res.status(500).json({
+      status: "error",
+      message: "Lỗi xử lý Webhook: " + err.message
+    });
+  }
 }
