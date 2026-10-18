@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
   <style>
     :root {
@@ -807,12 +808,14 @@
       padding: 18px;
       opacity: 0;
       visibility: hidden;
+      pointer-events: none;
       transition: all 0.25s ease;
     }
 
     .modal-backdrop.active {
       opacity: 1;
       visibility: visible;
+      pointer-events: auto;
     }
 
     .auth-modal-card {
@@ -990,17 +993,31 @@
           </button>
         </div>
 
-        <div class="messages-scroll-box" id="messages-box"></div>
+        <div class="messages-scroll-box" id="messages-box">
+          <div class="msg-row ai">
+            <div class="msg-avatar"><img src="https://i.ibb.co/tp7rRb8J/biospace-avatar-q-A9qs-J9c-1791556024025.jpg" /></div>
+            <div class="msg-bubble">
+              <div class="msg-text-body">Chào bạn! Tôi là trợ lý lập trình digitalxiao. Toàn bộ các mô hình Claude (Sonnet, Opus, Haiku) và DeepSeek đã sẵn sàng phục vụ bạn!</div>
+            </div>
+          </div>
+        </div>
 
         <div class="chat-input-zone">
           <div class="input-zone-top-row">
             <div class="custom-dropdown" id="model-picker">
               <div class="dropdown-trigger">
                 <i class="fa-solid fa-wand-magic-sparkles" style="color:var(--accent-cyan);"></i>
-                <span id="model-label">Đang tải mô hình...</span>
+                <span id="model-label">Claude Sonnet 4</span>
                 <i class="fa-solid fa-chevron-up" style="font-size:9px;"></i>
               </div>
-              <div class="dropdown-menu" id="model-dropdown-list"></div>
+              <div class="dropdown-menu" id="model-dropdown-list">
+                <div class="dropdown-option selected" data-model="kr/claude-sonnet-4"><span>Claude Sonnet 4</span><span style="color:var(--accent-cyan); font-weight:700;">150 Tok/lượt</span></div>
+                <div class="dropdown-option" data-model="kr/claude-sonnet-5"><span>Claude Sonnet 5</span><span style="color:var(--accent-cyan); font-weight:700;">200 Tok/lượt</span></div>
+                <div class="dropdown-option" data-model="kr/claude-opus-5"><span>Claude Opus 5</span><span style="color:var(--accent-cyan); font-weight:700;">500 Tok/lượt</span></div>
+                <div class="dropdown-option" data-model="kr/claude-opus-4.8"><span>Claude Opus 4.8</span><span style="color:var(--accent-cyan); font-weight:700;">350 Tok/lượt</span></div>
+                <div class="dropdown-option" data-model="kr/claude-haiku-4.5"><span>Claude Haiku 4.5</span><span style="color:var(--accent-cyan); font-weight:700;">50 Tok/lượt</span></div>
+                <div class="dropdown-option" data-model="deepseek-v4.1-flash-free"><span>DeepSeek V4.1 Flash</span><span style="color:var(--accent-emerald); font-weight:700;">FREE</span></div>
+              </div>
             </div>
 
             <div class="quick-prompts-row">
@@ -1094,8 +1111,97 @@
     </nav>
   </div>
 
+  <script>
+    // 1. CÁC NÚT ĐIỀU HƯỚNG VÀ THAO TÁC CƠ BẢN HOẠT ĐỘNG NGAY LẬP TỨC
+    function switchMobileView(target) {
+      document.querySelectorAll('.mob-tab[data-mob]').forEach(m => {
+        m.classList.toggle('active', m.getAttribute('data-mob') === target);
+      });
+      const pSidebar = document.getElementById('panel-sidebar');
+      const pChat = document.getElementById('panel-chat');
+      const pStudio = document.getElementById('panel-studio');
+
+      pSidebar.classList.remove('mob-show');
+      pChat.classList.remove('mob-show');
+      pStudio.classList.remove('mob-show');
+
+      if (target === 'chat') pChat.classList.add('mob-show');
+      else if (target === 'history') pSidebar.classList.add('mob-show');
+      else if (target === 'studio') pStudio.classList.add('mob-show');
+    }
+
+    document.querySelectorAll('.mob-tab[data-mob]').forEach(t => {
+      t.onclick = () => switchMobileView(t.getAttribute('data-mob'));
+    });
+
+    const modelPickerEl = document.getElementById('model-picker');
+    modelPickerEl.querySelector('.dropdown-trigger').onclick = (e) => {
+      e.stopPropagation();
+      modelPickerEl.classList.toggle('open');
+    };
+    window.onclick = () => modelPickerEl.classList.remove('open');
+
+    const editorEl = document.getElementById('studio-editor');
+    const previewEl = document.getElementById('studio-preview');
+    document.querySelectorAll('.studio-tab-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.studio-tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const isPrev = btn.getAttribute('data-tab') === 'preview';
+        editorEl.style.display = isPrev ? 'none' : 'block';
+        previewEl.style.display = isPrev ? 'block' : 'none';
+        if (isPrev) previewEl.srcdoc = editorEl.value;
+      };
+    });
+
+    document.getElementById('btn-copy-studio').onclick = () => {
+      navigator.clipboard.writeText(editorEl.value);
+      alert('Đã sao chép mã Studio');
+    };
+
+    document.getElementById('btn-dl-studio').onclick = () => {
+      const b = new Blob([editorEl.value], { type: 'text/html;charset=utf-8' });
+      const u = URL.createObjectURL(b);
+      const a = document.createElement('a');
+      a.href = u;
+      a.download = 'digitalxiao_code.html';
+      a.click();
+      URL.revokeObjectURL(u);
+    };
+
+    // 2. KHỞI TẠO NỀN WEBGL AN TOÀN TUYỆT ĐỐI
+    try {
+      if (window.THREE && window.WebGLRenderingContext) {
+        const bgCanvas = document.getElementById('webgl-bg-canvas');
+        const renderer = new THREE.WebGLRenderer({ canvas: bgCanvas, antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 50);
+        camera.position.z = 5;
+        const mesh = new THREE.Mesh(
+          new THREE.IcosahedronGeometry(1.6, 8),
+          new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.16 })
+        );
+        scene.add(mesh);
+        function loop() {
+          requestAnimationFrame(loop);
+          mesh.rotation.y += 0.002;
+          mesh.rotation.x += 0.001;
+          renderer.render(scene, camera);
+        }
+        loop();
+        window.onresize = () => {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+        };
+      }
+    } catch (e) {
+      console.warn("WebGL background bypassed:", e);
+    }
+  </script>
+
   <script type="module">
-    import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getDatabase, ref, get, set, update, push, remove, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -1103,7 +1209,7 @@
     const BOT_AVATAR = "https://i.ibb.co/tp7rRb8J/biospace-avatar-q-A9qs-J9c-1791556024025.jpg";
     const DEFAULT_GREETING = "Chào bạn! Tôi là trợ lý lập trình digitalxiao. Toàn bộ các mô hình Claude (Sonnet, Opus, Haiku) và DeepSeek đã sẵn sàng phục vụ bạn!";
 
-    // CẤU HÌNH CLOUDFLARE WORKER PROXY CHUẨN XỬ LÝ LỖI CORS VÀ FAILED TO FETCH
+    // CẤU HÌNH WORKER PROXY FIX CORS VÀ FAILED TO FETCH
     const AI_WORKER_PROXY_URL = "https://radai.digitalsmod.workers.dev/worker.js";
 
     const XPIKI_API_KEY = "sk-2os8BC2DgSFtgJxRzfPQqSmfu0XQF8N6GLLzJTMMT9A";
@@ -1206,9 +1312,6 @@
       messagesBox.scrollTop = messagesBox.scrollHeight;
       return bubble;
     }
-
-    // Hiển thị lời chào mặc định ngay lập tức
-    appendMessageDOM('ai', DEFAULT_GREETING);
 
     // ĐỒNG BỘ TÀI KHOẢN TỪ INDEX.HTML
     const modalGuard = document.getElementById('modal-auth-guard');
@@ -1540,7 +1643,7 @@
         maintenance: false
       }
     };
-    let selectedModelData = null;
+    let selectedModelData = dynamicModels["kr_claude-sonnet-4"];
 
     function renderModelPickerOptions() {
       const dropdownList = document.getElementById('model-dropdown-list');
@@ -1594,13 +1697,6 @@
     } catch (e) {
       console.warn("Lỗi tải models_config từ Firebase:", e);
     }
-
-    const modelPicker = document.getElementById('model-picker');
-    modelPicker.querySelector('.dropdown-trigger').onclick = (e) => {
-      e.stopPropagation();
-      modelPicker.classList.toggle('open');
-    };
-    window.onclick = () => modelPicker.classList.remove('open');
 
     // ĐÍNH KÈM TỆP VÀ HÌNH ẢNH
     let stagedFiles = [];
@@ -1936,87 +2032,6 @@
         chatInput.focus();
         messagesBox.scrollTop = messagesBox.scrollHeight;
       }
-    }
-
-    // STUDIO
-    const editorEl = document.getElementById('studio-editor');
-    const previewEl = document.getElementById('studio-preview');
-    document.querySelectorAll('.studio-tab-btn').forEach(btn => {
-      btn.onclick = () => {
-        document.querySelectorAll('.studio-tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const isPrev = btn.getAttribute('data-tab') === 'preview';
-        editorEl.style.display = isPrev ? 'none' : 'block';
-        previewEl.style.display = isPrev ? 'block' : 'none';
-        if (isPrev) previewEl.srcdoc = editorEl.value;
-      };
-    });
-
-    document.getElementById('btn-copy-studio').onclick = () => {
-      navigator.clipboard.writeText(editorEl.value);
-      showToast('Đã sao chép mã Studio', 'success');
-    };
-
-    document.getElementById('btn-dl-studio').onclick = () => {
-      const b = new Blob([editorEl.value], { type: 'text/html;charset=utf-8' });
-      const u = URL.createObjectURL(b);
-      const a = document.createElement('a');
-      a.href = u;
-      a.download = 'digitalxiao_code.html';
-      a.click();
-      URL.revokeObjectURL(u);
-    };
-
-    function switchMobileView(target) {
-      document.querySelectorAll('.mob-tab[data-mob]').forEach(m => {
-        m.classList.toggle('active', m.getAttribute('data-mob') === target);
-      });
-      const pSidebar = document.getElementById('panel-sidebar');
-      const pChat = document.getElementById('panel-chat');
-      const pStudio = document.getElementById('panel-studio');
-
-      pSidebar.classList.remove('mob-show');
-      pChat.classList.remove('mob-show');
-      pStudio.classList.remove('mob-show');
-
-      if (target === 'chat') pChat.classList.add('mob-show');
-      else if (target === 'history') pSidebar.classList.add('mob-show');
-      else if (target === 'studio') pStudio.classList.add('mob-show');
-    }
-
-    document.querySelectorAll('.mob-tab[data-mob]').forEach(t => {
-      t.onclick = () => switchMobileView(t.getAttribute('data-mob'));
-    });
-
-    // HIỆU ỨNG NỀN WEBGL (BỌC TRY-CATCH AN TOÀN TUYỆT ĐỐI)
-    try {
-      const bgCanvas = document.getElementById('webgl-bg-canvas');
-      if (bgCanvas && window.WebGLRenderingContext) {
-        const renderer = new THREE.WebGLRenderer({ canvas: bgCanvas, antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 50);
-        camera.position.z = 5;
-        const mesh = new THREE.Mesh(
-          new THREE.IcosahedronGeometry(1.6, 8),
-          new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.16 })
-        );
-        scene.add(mesh);
-        function loop() {
-          requestAnimationFrame(loop);
-          mesh.rotation.y += 0.002;
-          mesh.rotation.x += 0.001;
-          renderer.render(scene, camera);
-        }
-        loop();
-        window.onresize = () => {
-          camera.aspect = window.innerWidth / window.innerHeight;
-          camera.updateProjectionMatrix();
-          renderer.setSize(window.innerWidth, window.innerHeight);
-        };
-      }
-    } catch (e) {
-      console.warn("WebGL background init bypassed:", e);
     }
   </script>
 </body>
