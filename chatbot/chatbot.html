@@ -1109,9 +1109,11 @@
     import { getDatabase, ref, get, set, update, push, remove, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const BOT_AVATAR = "https://i.ibb.co/tp7rRb8J/biospace-avatar-q-A9qs-J9c-1791556024025.jpg";
-    const DEFAULT_GREETING = "Chào bạn! Tôi là trợ lý lập trình digitalxiao. Toàn bộ các mô hình Claude (Sonnet, Opus, Haiku) và DeepSeek đã được kích hoạt đầy đủ để hỗ trợ bạn lập trình!";
+    const DEFAULT_GREETING = "Chào bạn! Tôi là trợ lý lập trình digitalxiao. Toàn bộ các mô hình Claude (Sonnet, Opus, Haiku) và DeepSeek đã sẵn sàng phục vụ bạn!";
 
-    // API KEY VÀ ENDPOINT XPIKI MỚI CHO DÒNG CLAUDE
+    // CẤU HÌNH CLOUDFLARE WORKER PROXY CHUẨN XỬ LÝ LỖI CORS VÀ FAILED TO FETCH
+    const AI_WORKER_PROXY_URL = "https://radai.digitalsmod.workers.dev/worker.js";
+
     const XPIKI_API_KEY = "sk-2os8BC2DgSFtgJxRzfPQqSmfu0XQF8N6GLLzJTMMT9A";
     const XPIKI_ENDPOINT = "https://api.xpiki.com/v1/chat/completions";
 
@@ -1191,7 +1193,7 @@
       if (costReceipt !== null && costReceipt !== undefined) {
         const receipt = document.createElement('div');
         receipt.className = 'msg-token-receipt';
-        receipt.innerHTML = `<span><i class="fa-solid fa-microchip"></i> ${selectedModelData?.name || 'AI'}</span><span>-${costReceipt.toLocaleString()} Token</span>`;
+        receipt.innerHTML = `<span><i class="fa-solid fa-microchip"></i> ${selectedModelData?.name \vert{}\vert{} 'AI'}</span><span>-${costReceipt.toLocaleString()} Token</span>`;
         bubbleElement.appendChild(receipt);
       }
     }
@@ -1215,7 +1217,7 @@
 
     appendMessageDOM('ai', DEFAULT_GREETING);
 
-    // ĐỒNG BỘ TÀI KHOẢN TỪ INDEX.HTML & FIREBASE AUTH
+    // ĐỒNG BỘ TÀI KHOẢN TỪ INDEX.HTML
     const modalGuard = document.getElementById('modal-auth-guard');
     const authErrMsg = document.getElementById('auth-err-msg');
 
@@ -1490,7 +1492,7 @@
       }
     };
 
-    // MỞ LẠI TOÀN BỘ CÁC MÔ HÌNH CLAUDE & DEEPSEEK
+    // MÔ HÌNH VÀ CẤU HÌNH CLAUDE / DEEPSEEK
     let dynamicModels = {};
     let selectedModelData = null;
 
@@ -1501,11 +1503,10 @@
       if (snap.exists()) {
         dynamicModels = snap.val();
       } else {
-        // CẤU HÌNH BAN ĐẦU: CLAUDE DÙNG XPIKI, DEEPSEEK DÙNG KIRAAI
         dynamicModels = {
           "kr_claude-sonnet-4": {
             modelId: "kr/claude-sonnet-4",
-            name: "Claude Sonnet 4 (Xpiki)",
+            name: "Claude Sonnet 4",
             endpoint: XPIKI_ENDPOINT,
             apiKey: XPIKI_API_KEY,
             costToken: 150,
@@ -1515,7 +1516,7 @@
           },
           "kr_claude-sonnet-5": {
             modelId: "kr/claude-sonnet-5",
-            name: "Claude Sonnet 5 (Xpiki)",
+            name: "Claude Sonnet 5",
             endpoint: XPIKI_ENDPOINT,
             apiKey: XPIKI_API_KEY,
             costToken: 200,
@@ -1525,7 +1526,7 @@
           },
           "kr_claude-opus-5": {
             modelId: "kr/claude-opus-5",
-            name: "Claude Opus 5 (Xpiki)",
+            name: "Claude Opus 5",
             endpoint: XPIKI_ENDPOINT,
             apiKey: XPIKI_API_KEY,
             costToken: 500,
@@ -1535,7 +1536,7 @@
           },
           "kr_claude-opus-4-8": {
             modelId: "kr/claude-opus-4.8",
-            name: "Claude Opus 4.8 (Xpiki)",
+            name: "Claude Opus 4.8",
             endpoint: XPIKI_ENDPOINT,
             apiKey: XPIKI_API_KEY,
             costToken: 350,
@@ -1545,7 +1546,7 @@
           },
           "kr_claude-haiku-4-5": {
             modelId: "kr/claude-haiku-4.5",
-            name: "Claude Haiku 4.5 (Xpiki)",
+            name: "Claude Haiku 4.5",
             endpoint: XPIKI_ENDPOINT,
             apiKey: XPIKI_API_KEY,
             costToken: 50,
@@ -1583,7 +1584,7 @@
           badgeHtml = '<span style="color:var(--accent-emerald); font-weight:700;">FREE</span>';
         }
 
-        opt.innerHTML = `<span>${cfg.name || actualModelId}</span>${badgeHtml}`;
+        opt.innerHTML = `<span>${cfg.name \vert{}\vert{} actualModelId}</span>${badgeHtml}`;
         opt.onclick = () => {
           if (cfg.maintenance) return showToast('Mô hình này đang bảo trì!', 'error');
           document.querySelectorAll('.dropdown-option').forEach(o => o.classList.remove('selected'));
@@ -1689,6 +1690,34 @@
       }
     };
 
+    // HÀM GỌI API THÔNG QUA CLOUDFLARE WORKER PROXY (radai.digitalsmod.workers.dev)
+    async function executeApiRequestWithCorsBypass(targetEndpoint, apiKey, payload, signal) {
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      };
+
+      const cleanProxyUrl = (AI_WORKER_PROXY_URL || "").trim().replace(/\/worker\.js$/i, '');
+      if (cleanProxyUrl) {
+        return await fetch(cleanProxyUrl, {
+          method: 'POST',
+          headers: {
+            ...headers,
+            'x-target-url': targetEndpoint
+          },
+          body: JSON.stringify(payload),
+          signal: signal
+        });
+      }
+
+      return await fetch(targetEndpoint, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(payload),
+        signal: signal
+      });
+    }
+
     // GỬI PROMPT & KHẤU TRỪ TOKEN CHỐNG PHÁ SẢN
     async function sendPrompt() {
       if (isWaiting) return;
@@ -1706,7 +1735,6 @@
         return;
       }
 
-      // Kiểm tra số dư Token trực tiếp
       const latestTokenSnap = await get(ref(rtdb, `aetheria_project/users/${currentUser.uid}/tokens`));
       userTokens = latestTokenSnap.exists() ? Math.max(0, Number(latestTokenSnap.val()) || 0) : 0;
       document.getElementById('nav-user-tokens').textContent = `${userTokens.toLocaleString()} Tok`;
@@ -1795,19 +1823,16 @@
       let finalUsage = null;
 
       try {
-        const response = await fetch(selectedModelData.endpoint, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${selectedModelData.apiKey}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
+        const response = await executeApiRequestWithCorsBypass(
+          selectedModelData.endpoint,
+          selectedModelData.apiKey,
+          {
             model: selectedModelData.modelId,
             messages: messagesPayload,
             stream: true
-          }),
-          signal: activeAbortController.signal
-        });
+          },
+          activeAbortController.signal
+        );
 
         if (!response.ok) {
           const errData = await response.json().catch(() => ({}));
@@ -1852,7 +1877,6 @@
         pctLabel.textContent = "100,00%";
         barFill.style.width = "100%";
 
-        // THUẬT TOÁN KHẤU TRỪ TOKEN CHỐNG PHÁ SẢN
         const estPromptTokens = finalUsage?.prompt_tokens || Math.max(10, Math.ceil(promptPayload.length / 3.5));
         const estCompletionTokens = finalUsage?.completion_tokens || Math.max(15, Math.ceil(accumulatedText.length / 3.5));
         const usageBasedCost = Math.ceil(estPromptTokens * 0.5 + estCompletionTokens * 1.0);
@@ -1864,7 +1888,6 @@
           deductedTokens = Math.max(50, usageBasedCost);
         }
 
-        // Khấu trừ nguyên tử trên Firebase
         const userTokenRef = ref(rtdb, `aetheria_project/users/${currentUser.uid}/tokens`);
         await runTransaction(userTokenRef, (currentVal) => {
           const cur = Number(currentVal) || 0;
@@ -1902,7 +1925,7 @@
             bubbleContainer.innerHTML = `<span style="color:var(--accent-amber);"><i class="fa-solid fa-circle-stop"></i> Đã dừng tạo câu trả lời.</span>`;
           }
         } else {
-          bubbleContainer.innerHTML = `<span style="color:var(--accent-magenta);"><i class="fa-solid fa-triangle-exclamation"></i> Lỗi: ${err.message}</span>`;
+          bubbleContainer.innerHTML = `<span style="color:var(--accent-magenta);"><i class="fa-solid fa-triangle-exclamation"></i> Lỗi kết nối: ${err.message}</span>`;
         }
       } finally {
         isWaiting = false;
