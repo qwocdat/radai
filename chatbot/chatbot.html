@@ -1582,10 +1582,8 @@
       });
     }
 
-    // Hiển thị danh sách model mặc định ngay lập tức
     renderModelPickerOptions();
 
-    // Lắng nghe cấu hình thời gian thực từ Firebase
     try {
       onValue(ref(rtdb, 'aetheria_project/models_config'), (snap) => {
         if (snap.exists()) {
@@ -1683,7 +1681,7 @@
       }
     };
 
-    // HÀM GỌI API THÔNG QUA CLOUDFLARE WORKER PROXY
+    // HÀM GỌI API THÔNG QUA CLOUDFLARE WORKER PROXY (radai.digitalsmod.workers.dev)
     async function executeApiRequestWithCorsBypass(targetEndpoint, apiKey, payload, signal) {
       const headers = {
         'Content-Type': 'application/json',
