@@ -1,27 +1,26 @@
 const FIREBASE_DB = "https://ideo-dd376-default-rtdb.asia-southeast1.firebasedatabase.app";
 
 export default async function handler(req, res) {
-  // 1. Cấu hình Headers và xử lý CORS Preflight
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
 
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
 
-  // 2. Chỉ chấp nhận phương thức POST từ Webhook Pay2S
   if (req.method !== "POST") {
     return res.status(200).json({
       status: "online",
-      message: "Webhook endpoint Vercel đang hoạt động sẵn sàng nhận tín hiệu Pay2S"
+      service: "digitalxiao Pay2S Webhook Gateway",
+      endpoint: "https://radai-nine.vercel.app/api/bank.js",
+      ready: true
     });
   }
 
   try {
     let data = req.body;
 
-    // Tự động phân tích nếu dữ liệu gửi dạng chuỗi thô
     if (typeof data === "string") {
       try {
         data = JSON.parse(data);
@@ -35,29 +34,33 @@ export default async function handler(req, res) {
       return res.status(400).json({ status: "error", message: "Dữ liệu Webhook rỗng" });
     }
 
-    // 3. Trích xuất số tiền chuyển khoản
-    const amount = parseInt(data.amount || data.transferAmount || data.price || 0, 10);
+    // 1. TRÍCH XUẤT THÔNG TIN GIAO DỊCH TỪ MẢNG TRANSACTIONS CỦA PAY2S
+    let tx = data;
+    if (Array.isArray(data.transactions) && data.transactions.length > 0) {
+      tx = data.transactions[0];
+    }
 
-    // Ghép toàn bộ nội dung tìm kiếm mã định danh
-    const rawSearch = `${data.orderId || ''} ${data.content || ''} ${data.description || ''} ${data.orderInfo || ''} ${JSON.stringify(data)}`;
+    // Lấy số tiền chuyển khoản
+    const amount = parseInt(tx.transferAmount || tx.amount || data.transferAmount || data.amount || 0, 10);
 
-    // 4. Bóc tách UID tài khoản (AETH_...)
-    const match = rawSearch.match(/AETH_([A-Za-z0-9_-]+)/i);
+    // Lấy nội dung chuyển khoản
+    const content = tx.content || tx.description || tx.orderInfo || data.content || "";
+    const rawSearch = `${content} ${JSON.stringify(data)}`;
+
+    // 2. NHẬN DIỆN UID TÀI KHOẢN (HỖ TRỢ CẢ AETH_ LẪN AETH KHÔNG CÓ GẠCH DƯỚI DO ACB LỌC BỎ)
+    const match = rawSearch.match(/AETH_?([A-Za-z0-9]{20,36})/i) || rawSearch.match(/AETH_?([A-Za-z0-9_-]+)/i);
 
     if (match && amount > 0) {
       let rawUid = match[1];
-      const parts = rawUid.split("_");
-      // Loại bỏ phần đuôi timestamp nếu có
-      if (parts.length >= 2 && !isNaN(parts[parts.length - 1])) {
-        parts.pop();
-        rawUid = parts.join("_");
-      }
-      const userUid = rawUid;
 
-      // 5. Kiểm tra chống cộng trùng lặp (Idempotency)
-      const transId = data.orderId || data.transId || data.code || `TX_${Date.now()}`;
+      // Tách bỏ các từ khóa đuôi do ngân hàng tự nối thêm (GD, ACB, timestamp...)
+      const cleanParts = rawUid.split(/[\s_]+/);
+      let userUid = cleanParts[0];
+
+      // 3. XỬ LÝ CHỐNG CỘNG TRÙNG LẶP (IDEMPOTENCY)
+      const transId = String(tx.id || tx.transactionNumber || data.orderId || `TX_${Date.now()}`);
       const orderCheckUrl = `${FIREBASE_DB}/aetheria_project/orders/${transId}.json`;
-      
+
       const checkRes = await fetch(orderCheckUrl);
       const existingOrder = await checkRes.json();
 
@@ -68,7 +71,7 @@ export default async function handler(req, res) {
         });
       }
 
-      // 6. Tính toán và cộng Token vào Firebase (1 VNĐ = 1 Token)
+      // 4. CỘNG TOKEN VÀO FIREBASE (TỶ LỆ: 1 VNĐ = 1 TOKEN)
       const tokensToAdd = amount;
       const userTokenUrl = `${FIREBASE_DB}/aetheria_project/users/${userUid}/tokens.json`;
 
@@ -76,14 +79,13 @@ export default async function handler(req, res) {
       const currentTokens = (await getRes.json()) || 0;
       const newBalance = Number(currentTokens) + tokensToAdd;
 
-      // Cập nhật số dư mới
       await fetch(userTokenUrl, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newBalance)
       });
 
-      // 7. Đánh dấu giao dịch thành công và lưu lịch sử
+      // 5. GHI LỊCH SỬ GIAO DỊCH
       await fetch(orderCheckUrl, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -125,7 +127,9 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       status: "ignored",
-      message: "Không tìm thấy mã định danh UID hoặc số tiền không hợp lệ"
+      message: "Không tìm thấy mã định danh UID hoặc số tiền không hợp lệ",
+      content_received: content,
+      amount_received: amount
     });
   } catch (err) {
     return res.status(500).json({
