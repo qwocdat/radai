@@ -145,6 +145,16 @@ if (typeof window !== "undefined") {
 
     resolveInitialRoute: function(defaultRoute) {
       try {
+        const sp = new URLSearchParams(window.location.search || "");
+        if (sp.get("go")) {
+          return "/go/" + encodeURIComponent(sp.get("go"));
+        }
+        if (sp.get("verify") === "1" || (sp.get("task") && sp.get("attempt") && sp.get("token"))) {
+          return "/verify?" + sp.toString();
+        }
+        if (sp.get("route")) {
+          return sp.get("route");
+        }
         const hash = window.location.hash ? window.location.hash.slice(1) : "";
         if (hash && hash.startsWith("/")) return hash;
         const path = window.location.pathname;
@@ -157,19 +167,14 @@ if (typeof window !== "undefined") {
     },
 
     pushRoute: function(route, isAdminPage) {
-      if (!isAdminPage && (route === "/admin" || route.indexOf("/admin/") === 0)) {
-        if (window.location.pathname.endsWith("index.html")) {
-          window.location.href = "adminn.html#" + route;
-          return true;
-        }
-      }
-      if (isAdminPage && route.indexOf("/admin") !== 0) {
-        if (window.location.pathname.endsWith("adminn.html")) {
-          window.location.href = "index.html#" + route;
-          return true;
-        }
-      }
       try {
+        if (window.history && window.history.replaceState) {
+          if (route.indexOf("/go/") === 0) {
+            const tid = route.slice(4);
+            window.history.replaceState(null, "", "?go=" + encodeURIComponent(tid) + "#" + route);
+            return false;
+          }
+        }
         window.location.hash = route;
       } catch (e) {}
       return false;
