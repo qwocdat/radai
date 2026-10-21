@@ -1,0 +1,3140 @@
+<!DOCTYPE html>
+<html lang="vi" class="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>DIGITALSMOD.SITE — Quản trị hệ thống</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="router.js"></script>
+  <style>
+    :root {
+      --surface-card: rgba(255, 255, 255, 0.78);
+      --surface-border: rgba(15, 15, 20, 0.09);
+      --surface-highlight: rgba(255, 255, 255, 0.94);
+      --surface-shadow: 0 14px 34px -10px rgba(0, 0, 0, 0.07), 0 2px 8px -2px rgba(0, 0, 0, 0.04);
+      --page-bg: #f4f4f7;
+      --text-primary: #09090b;
+    }
+    html.dark {
+      --surface-card: rgba(18, 18, 22, 0.80);
+      --surface-border: rgba(255, 255, 255, 0.13);
+      --surface-highlight: rgba(255, 255, 255, 0.15);
+      --surface-shadow: 0 18px 42px -12px rgba(0, 0, 0, 0.65), 0 2px 10px -2px rgba(0, 0, 0, 0.45);
+      --page-bg: #09090b;
+      --text-primary: #f4f4f6;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      background-color: var(--page-bg);
+      color: var(--text-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+      margin: 0;
+      transition: background-color 0.22s ease, color 0.22s ease;
+    }
+    .glass-surface {
+      background: var(--surface-card);
+      backdrop-filter: blur(24px) saturate(165%);
+      -webkit-backdrop-filter: blur(24px) saturate(165%);
+      border: 1px solid var(--surface-border);
+      box-shadow: var(--surface-shadow), inset 0 1px 1px 0 var(--surface-highlight);
+      border-radius: 24px;
+      position: relative;
+      transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s ease;
+    }
+    .glass-interactive:hover {
+      transform: translateY(-2px);
+    }
+    .glass-btn {
+      border-radius: 18px;
+      white-space: nowrap;
+      transition: transform 0.15s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.15s ease, background-color 0.15s ease;
+    }
+    .glass-btn:active:not(:disabled) {
+      transform: scale(0.96);
+    }
+    .view-transition {
+      animation: viewEnter 0.24s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    @keyframes viewEnter {
+      0% { opacity: 0; transform: translateY(5px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .view-transition { animation: none !important; }
+      .glass-surface, .glass-btn { transition: none !important; }
+    }
+    body.reduced-motion .view-transition { animation: none !important; }
+    body.reduced-motion .glass-surface, body.reduced-motion .glass-btn { transition: none !important; }
+    *:focus-visible {
+      outline: 2px solid currentColor;
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-neutral-900 selection:text-white dark:selection:bg-white dark:selection:text-neutral-900">
+  <!-- Ambient Background Canvas -->
+  <canvas id="webgl-liquid-canvas" aria-hidden="true" class="fixed inset-0 w-full h-full pointer-events-none z-0 opacity-85"></canvas>
+
+  <!-- Responsive Header (Zero Mobile Overflow) -->
+  <header class="sticky top-0 z-30 px-3 sm:px-6 pt-3">
+    <div class="max-w-7xl mx-auto glass-surface px-3 sm:px-5 py-2.5 flex items-center justify-between gap-2 overflow-hidden">
+      <div class="flex items-center gap-2 min-w-0 shrink">
+        <button type="button" id="btn-mobile-menu" aria-label="Mở danh mục" class="lg:hidden w-9 h-9 rounded-xl flex items-center justify-center shrink-0 hover:bg-black/5 dark:hover:bg-white/10">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <button type="button" data-route="/admin" class="nav-route-btn flex items-center gap-2 text-left min-w-0">
+          <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-[12px] bg-neutral-950 dark:bg-white text-white dark:text-neutral-950 flex items-center justify-center font-bold tracking-tighter text-xs sm:text-sm shrink-0 shadow-sm">
+            DM
+          </div>
+          <div class="min-w-0">
+            <span class="font-bold tracking-tight text-xs sm:text-base block truncate leading-tight">DIGITALSMOD</span>
+            <span class="hidden sm:block text-[10px] font-mono text-neutral-500 dark:text-neutral-400 truncate leading-none mt-0.5">digitalsmod.site</span>
+          </div>
+        </button>
+      </div>
+
+      <!-- Desktop Navigation -->
+      <nav aria-label="Điều hướng chính" class="hidden lg:flex items-center gap-1 text-xs font-medium shrink-0">
+        
+        <button type="button" data-route="/admin" class="nav-route-btn px-3 py-1.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/10 whitespace-nowrap">Tổng quan</button>
+        <button type="button" data-route="/admin/tasks" class="nav-route-btn px-3 py-1.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/10 whitespace-nowrap">Nhiệm vụ</button>
+        <button type="button" data-route="/admin/users" class="nav-route-btn px-3 py-1.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/10 whitespace-nowrap">Người dùng</button>
+        <button type="button" data-route="/admin/sellers" class="nav-route-btn px-3 py-1.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/10 whitespace-nowrap">Seller</button>
+        <button type="button" data-route="/admin/withdrawals" class="nav-route-btn px-3 py-1.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/10 whitespace-nowrap">Rút tiền</button>
+        <button type="button" data-route="/admin/settings" class="nav-route-btn px-3 py-1.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/10 whitespace-nowrap">Cài đặt</button>
+        <button type="button" data-route="/admin/logs" class="nav-route-btn px-3 py-1.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/10 whitespace-nowrap">Nhật ký</button>
+        
+      </nav>
+
+      <!-- Compact Action Bar (Fits 320px+ screens without clipping) -->
+      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <button type="button" data-route="/notifications" aria-label="Thông báo" class="nav-route-btn relative w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/10 shrink-0">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span id="nav-unread-badge" class="hidden absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-neutral-900 dark:bg-white"></span>
+        </button>
+
+        <button type="button" id="btn-toggle-theme" aria-label="Đổi giao diện Sáng/Tối" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/10 shrink-0">
+          <svg id="icon-theme-sun" class="w-4 h-4 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+          <svg id="icon-theme-moon" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+
+        <div id="nav-auth-area" class="flex items-center gap-1.5 shrink-0"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Navigation Drawer -->
+  <div id="mobile-drawer" class="fixed inset-0 z-40 hidden bg-black/50 backdrop-blur-sm">
+    <div class="w-72 max-w-[84vw] h-full glass-surface rounded-none rounded-r-[26px] p-5 flex flex-col justify-between overflow-y-auto">
+      <div>
+        <div class="flex items-center justify-between pb-3.5 border-b border-black/10 dark:border-white/10">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-neutral-950 dark:bg-white text-white dark:text-neutral-950 flex items-center justify-center font-bold text-xs">DM</div>
+            <span class="font-bold text-sm">DIGITALSMOD</span>
+          </div>
+          <button type="button" id="btn-close-drawer" aria-label="Đóng danh mục" class="p-1.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/10">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="mt-3 flex flex-col gap-1 text-xs font-medium" id="mobile-route-list"></div>
+      </div>
+      <div class="pt-4 mt-4 border-t border-black/10 dark:border-white/10 text-[11px] text-neutral-500">
+        Hệ thống chính thức:<br/>
+        <span class="font-mono font-semibold text-neutral-800 dark:text-neutral-200">https://digitalsmod.site</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <main id="app-main" class="relative z-10 flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-5 sm:py-7"></main>
+
+  <!-- Official Footer -->
+  <footer class="relative z-10 max-w-7xl w-full mx-auto px-3 sm:px-6 pb-8 pt-2">
+    <div class="glass-surface p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs text-neutral-600 dark:text-neutral-400">
+      <div class="space-y-1">
+        <div class="font-bold text-neutral-900 dark:text-white text-sm">DIGITALSMOD.SITE</div>
+        <p class="leading-relaxed">Hệ thống quản lý nhiệm vụ, rút gọn liên kết, xác thực hoàn thành và đối soát tập trung tại <span class="font-mono">https://digitalsmod.site</span>.</p>
+      </div>
+      <div class="flex flex-wrap gap-x-5 gap-y-2 font-medium shrink-0">
+        <button type="button" data-route="/" data-scroll="section-terms" class="nav-route-btn hover:underline">Điều khoản sử dụng</button>
+        <button type="button" data-route="/" data-scroll="section-privacy" class="nav-route-btn hover:underline">Chính sách quyền riêng tư</button>
+        <button type="button" data-route="/" data-scroll="section-support" class="nav-route-btn hover:underline">Liên hệ hỗ trợ</button>
+        <button type="button" data-route="/settings" class="nav-route-btn hover:underline">Cài đặt</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Custom Modal -->
+  <div id="glass-modal-backdrop" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/55 backdrop-blur-md p-4">
+    <div class="glass-surface w-full max-w-lg p-5 sm:p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-black/10 dark:border-white/10 pb-3">
+        <h3 id="glass-modal-title" class="text-base font-bold">Thông báo</h3>
+        <button type="button" id="btn-close-modal" aria-label="Đóng hộp thoại" class="p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div id="glass-modal-body" class="text-sm text-neutral-700 dark:text-neutral-300 space-y-3"></div>
+      <div id="glass-modal-footer" class="flex flex-wrap justify-end gap-2 pt-2"></div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="glass-toast-container" class="fixed bottom-4 right-4 left-4 sm:left-auto z-50 flex flex-col gap-2 sm:max-w-sm pointer-events-none"></div>
+
+  <script>
+    (function() {
+      "use strict";
+
+      const PAGE_MODE = "admin";
+      const DEFAULT_ROUTE = "/admin";
+      const APP_BASE_URL = "https://digitalsmod.site";
+      const FIREBASE_CONFIG = {
+        apiKey: "AIzaSyAVuB8m14zkMPs-JTLAKB0Bp18QBKAMBt4",
+        authDomain: "ideo-dd376.firebaseapp.com",
+        databaseURL: "https://ideo-dd376-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "ideo-dd376",
+        storageBucket: "ideo-dd376.firebasestorage.app",
+        messagingSenderId: "689163185",
+        appId: "1:689163185:web:af4091213001180f364b90",
+        measurementId: "G-QP54CZ2BJT"
+      };
+
+      function initAmbientShader() {
+        const canvas = document.getElementById("webgl-liquid-canvas");
+        if (!canvas) return;
+        let gl = null;
+        try {
+          gl = canvas.getContext("webgl2", { alpha: true, antialias: true });
+        } catch (e) {
+          gl = null;
+        }
+        if (!gl) return;
+
+        const vsSource = `#version 300 es
+          in vec2 a_pos;
+          out vec2 v_uv;
+          void main() {
+            v_uv = a_pos * 0.5 + 0.5;
+            gl_Position = vec4(a_pos, 0.0, 1.0);
+          }
+        `;
+        const fsSource = `#version 300 es
+          precision highp float;
+          in vec2 v_uv;
+          out vec4 outColor;
+          uniform vec2 u_res;
+          uniform vec2 u_ptr;
+          uniform float u_time;
+          uniform float u_dark;
+          uniform float u_press;
+
+          void main() {
+            vec2 uv = v_uv;
+            float aspect = u_res.x / max(u_res.y, 1.0);
+            vec2 diff = (uv - u_ptr) * vec2(aspect, 1.0);
+            float dist = length(diff);
+            float wave = sin(dist * 16.0 - u_time * 2.0) * exp(-dist * 4.5) * (0.01 + u_press * 0.018);
+            float spec = pow(max(0.0, 1.0 - dist * 1.4), 3.0) * (0.12 + u_press * 0.08);
+            vec2 edge = min(uv, 1.0 - uv);
+            float fresnel = pow(1.0 - smoothstep(0.0, 0.22, min(edge.x, edge.y)), 2.0) * 0.10;
+            float r = spec * (1.06 + wave * 2.5) + fresnel;
+            float g = spec + fresnel * 0.98;
+            float b = spec * (1.03 - wave * 2.5) + fresnel * 1.04;
+            vec3 base = mix(vec3(0.96, 0.965, 0.98), vec3(0.04, 0.04, 0.055), u_dark);
+            outColor = vec4(clamp(base + vec3(r, g, b), 0.0, 1.0), 0.5);
+          }
+        `;
+
+        function compile(type, src) {
+          const s = gl.createShader(type);
+          gl.shaderSource(s, src);
+          gl.compileShader(s);
+          if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) return null;
+          return s;
+        }
+        const vs = compile(gl.VERTEX_SHADER, vsSource);
+        const fs = compile(gl.FRAGMENT_SHADER, fsSource);
+        if (!vs || !fs) return;
+
+        const prog = gl.createProgram();
+        gl.attachShader(prog, vs);
+        gl.attachShader(prog, fs);
+        gl.linkProgram(prog);
+        if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return;
+
+        const buf = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]), gl.STATIC_DRAW);
+        const aPos = gl.getAttribLocation(prog, "a_pos");
+        gl.enableVertexAttribArray(aPos);
+        gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+        const uRes = gl.getUniformLocation(prog, "u_res");
+        const uPtr = gl.getUniformLocation(prog, "u_ptr");
+        const uTime = gl.getUniformLocation(prog, "u_time");
+        const uDark = gl.getUniformLocation(prog, "u_dark");
+        const uPress = gl.getUniformLocation(prog, "u_press");
+
+        let ptrX = 0.5, ptrY = 0.5, press = 0.0;
+        window.addEventListener("pointermove", function(e) {
+          ptrX = e.clientX / Math.max(window.innerWidth, 1);
+          ptrY = 1.0 - (e.clientY / Math.max(window.innerHeight, 1));
+        });
+        window.addEventListener("pointerdown", function() { press = 1.0; });
+        window.addEventListener("pointerup", function() { press = 0.0; });
+
+        const t0 = performance.now();
+        function frame(now) {
+          if (document.body.classList.contains("reduced-motion")) return;
+          const w = window.innerWidth;
+          const h = window.innerHeight;
+          if (canvas.width !== w || canvas.height !== h) {
+            canvas.width = w;
+            canvas.height = h;
+            gl.viewport(0, 0, w, h);
+          }
+          const isDark = document.documentElement.classList.contains("dark") ? 1.0 : 0.0;
+          gl.useProgram(prog);
+          gl.uniform2f(uRes, w, h);
+          gl.uniform2f(uPtr, ptrX, ptrY);
+          gl.uniform1f(uTime, (now - t0) * 0.001);
+          gl.uniform1f(uDark, isDark);
+          gl.uniform1f(uPress, press);
+          gl.drawArrays(gl.TRIANGLES, 0, 6);
+          requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+      }
+
+      const ALPHABET = "abcdefghjkmnpqrstuvwxyz23456789";
+
+      function randomSegment(len) {
+        const arr = new Uint8Array(len);
+        if (window.crypto && window.crypto.getRandomValues) {
+          window.crypto.getRandomValues(arr);
+        } else {
+          for (let i = 0; i < len; i++) arr[i] = Math.floor(Math.random() * 256);
+        }
+        let s = "";
+        for (let i = 0; i < len; i++) s += ALPHABET[arr[i] % ALPHABET.length];
+        return s;
+      }
+
+      function generateUserKey() {
+        return "dgtf-" + randomSegment(3) + "-" + randomSegment(4) + "-" + randomSegment(3) + "-" + randomSegment(4);
+      }
+
+      function generateAdminSecretCode() {
+        return "dgtf-adm-" + randomSegment(4) + "-" + randomSegment(4) + "-" + randomSegment(4) + "-" + randomSegment(4);
+      }
+
+      function normalizeKey(k) {
+        return String(k || "").trim().toLowerCase();
+      }
+
+      function isValidUserKeyFormat(k) {
+        return /^dgtf-[a-z0-9]{3}-[a-z0-9]{4}-[a-z0-9]{3}-[a-z0-9]{4}$/.test(normalizeKey(k));
+      }
+
+      function isValidAdminCodeFormat(k) {
+        return /^dgtf-adm-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}$/.test(normalizeKey(k));
+      }
+
+      function maskKey(k) {
+        const clean = normalizeKey(k);
+        if (clean.length < 4) return "dgtf-***-****-***-****";
+        return "dgtf-***-****-***-" + clean.slice(-4);
+      }
+
+      function computeKeyHash(rawKey) {
+        const str = "digitalsmod_salt_v1::" + normalizeKey(rawKey);
+        let h1 = 0xdeadbeef ^ str.length;
+        let h2 = 0x41c6ce57 ^ str.length;
+        for (let i = 0, ch; i < str.length; i++) {
+          ch = str.charCodeAt(i);
+          h1 = Math.imul(h1 ^ ch, 2654435761);
+          h2 = Math.imul(h2 ^ ch, 1597334677);
+        }
+        h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+        h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+        return (h2 >>> 0).toString(16).padStart(8, "0") + (h1 >>> 0).toString(16).padStart(8, "0");
+      }
+
+      function signAttemptToken(taskId, attemptId, uid, expiresAt) {
+        const payload = taskId + ":" + attemptId + ":" + uid + ":" + expiresAt;
+        return expiresAt + "." + computeKeyHash(payload);
+      }
+
+      function verifyAttemptToken(taskId, attemptId, uid, token) {
+        if (!token || !token.includes(".")) return { valid: false, reason: "Mã xác thực không đúng định dạng." };
+        const parts = token.split(".");
+        const exp = Number(parts[0]);
+        if (!Number.isFinite(exp) || Date.now() > exp) {
+          return { valid: false, reason: "Phiên thực hiện nhiệm vụ đã hết thời hạn." };
+        }
+        const expected = signAttemptToken(taskId, attemptId, uid, exp);
+        if (expected !== token) {
+          return { valid: false, reason: "Chữ ký xác thực không hợp lệ." };
+        }
+        return { valid: true };
+      }
+
+      function validateDestinationUrl(raw) {
+        try {
+          const u = new URL(String(raw || "").trim());
+          if (u.protocol !== "https:" && u.protocol !== "http:") {
+            return { valid: false, reason: "Chỉ hỗ trợ liên kết HTTP/HTTPS an toàn." };
+          }
+          const h = u.hostname.toLowerCase();
+          if (h === "localhost" || h === "127.0.0.1" || h === "dgtraffic.site" || h.endsWith(".dgtraffic.site")) {
+            return { valid: false, reason: "Tên miền đích nằm trong danh sách bị chặn bảo mật." };
+          }
+          return { valid: true, url: u.toString() };
+        } catch (e) {
+          return { valid: false, reason: "Địa chỉ URL đích không hợp lệ." };
+        }
+      }
+
+      function formatVnd(amount) {
+        const n = Math.trunc(Number(amount || 0));
+        return n.toLocaleString("vi-VN") + " VND";
+      }
+
+      function formatTime(ts) {
+        if (!ts) return "—";
+        return new Date(ts).toLocaleString("vi-VN");
+      }
+
+      const BANK_DIRECTORY = [
+        { code: "VCB", shortName: "Vietcombank", fullName: "Ngân hàng TMCP Ngoại thương Việt Nam" },
+        { code: "TCB", shortName: "Techcombank", fullName: "Ngân hàng TMCP Kỹ thương Việt Nam" },
+        { code: "MB", shortName: "MBBank", fullName: "Ngân hàng TMCP Quân đội" },
+        { code: "CTG", shortName: "VietinBank", fullName: "Ngân hàng TMCP Công thương Việt Nam" },
+        { code: "BIDV", shortName: "BIDV", fullName: "Ngân hàng TMCP Đầu tư và Phát triển Việt Nam" },
+        { code: "ACB", shortName: "ACB", fullName: "Ngân hàng TMCP Á Châu" },
+        { code: "VPB", shortName: "VPBank", fullName: "Ngân hàng TMCP Việt Nam Thịnh Vượng" },
+        { code: "TPB", shortName: "TPBank", fullName: "Ngân hàng TMCP Tiên Phong" },
+        { code: "STB", shortName: "Sacombank", fullName: "Ngân hàng TMCP Sài Gòn Thương Tín" },
+        { code: "VIB", shortName: "VIB", fullName: "Ngân hàng TMCP Quốc tế Việt Nam" }
+      ];
+
+      const TELCO_DIRECTORY = [
+        { code: "VIETTEL", name: "Viettel", denominations: [10000, 20000, 50000, 100000, 200000, 500000], feePercent: 0 },
+        { code: "VINAPHONE", name: "VinaPhone", denominations: [10000, 20000, 50000, 100000, 200000, 500000], feePercent: 0 },
+        { code: "MOBIFONE", name: "MobiFone", denominations: [10000, 20000, 50000, 100000, 200000, 500000], feePercent: 0 },
+        { code: "VIETNAMOBILE", name: "Vietnamobile", denominations: [20000, 50000, 100000, 200000], feePercent: 0 }
+      ];
+
+      function createDefaultDatabase() {
+        const now = Date.now();
+        const db = {
+          system: {
+            adminBootstrap: {
+              completed: false,
+              adminUid: null,
+              codeHash: null,
+              bootstrappedAt: null,
+              bootstrappedIp: "103.190.232.18"
+            },
+            settings: {
+              platformName: "DIGITALSMOD.SITE",
+              baseUrl: "https://digitalsmod.site",
+              defaultRewardVnd: 500,
+              sellerKpiPerVerifyVnd: 650,
+              adminKpiPerVerifyVnd: 800,
+              registrationEnabled: true,
+              maintenanceMode: false,
+              minWithdrawVnd: 10000,
+              maxWithdrawVnd: 50000000,
+              link4mConfigured: false,
+              link4mApiBase: "https://link4m.co/st",
+              supportContact: "support@digitalsmod.site"
+            }
+          },
+          users: {},
+          usernames: {},
+          keyHashes: {},
+          tasks: {},
+          links: {},
+          attempts: {},
+          completions: {},
+          userTaskCompletions: {},
+          wallets: {},
+          transactions: {},
+          idempotencyKeys: {},
+          withdrawals: {},
+          sellerKpi: {},
+          adminKpi: {
+            summary: {
+              verifiedCount: 0,
+              userRewardVnd: 0,
+              sellerRevenueKpiVnd: 0,
+              adminRevenueKpiVnd: 0,
+              partnerConfirmedRevenueVnd: 0,
+              totalClicks: 0,
+              updatedAt: now
+            }
+          },
+          notifications: {},
+          notificationReads: {},
+          auditLogs: {}
+        };
+
+        const initialTasks = [
+          {
+            taskId: "tsk_8f92a1",
+            title: "Tra cứu hướng dẫn bảo mật khóa định danh DIGITALSMOD",
+            description: "Truy cập liên kết tài liệu hướng dẫn bảo quản khóa định danh dgtf và hoàn tất bước xác thực.",
+            contentType: "Link",
+            mediaUrl: "",
+            destinationUrl: "https://digitalsmod.site/docs/key-security",
+            rewardVnd: 500,
+            status: "active",
+            expiresAt: now + 14 * 86400000,
+            maxCompletions: 500,
+            completedCount: 0,
+            oneTimeOnly: false,
+            notes: "Nhiệm vụ tiêu chuẩn toàn hệ thống",
+            createdBy: "system",
+            createdAt: now - 3600000,
+            updatedAt: now - 3600000
+          },
+          {
+            taskId: "tsk_3c41b9",
+            title: "Kiểm tra quy trình đối soát KPI Seller & Link4m",
+            description: "Xem sơ đồ luồng chuyển hướng nhiệm vụ và quy tắc tách biệt lượt truy cập với lượt xác thực hợp lệ.",
+            contentType: "Image",
+            mediaUrl: "https://digitalsmod.site/assets/seller-kpi-diagram.svg",
+            destinationUrl: "https://digitalsmod.site/docs/seller-kpi",
+            rewardVnd: 500,
+            status: "active",
+            expiresAt: now + 7 * 86400000,
+            maxCompletions: 200,
+            completedCount: 0,
+            oneTimeOnly: false,
+            notes: "Có kèm hình minh họa hướng dẫn",
+            createdBy: "system",
+            createdAt: now - 1800000,
+            updatedAt: now - 1800000
+          },
+          {
+            taskId: "tsk_1x09e4",
+            title: "Nhiệm vụ 1 lượt duy nhất: Kiểm thử tự động đóng liên kết",
+            description: "Chế độ 1 lượt duy nhất toàn hệ thống: Ngay sau khi người đầu tiên hoàn thành hợp lệ, liên kết này sẽ tự động vô hiệu hóa vĩnh viễn.",
+            contentType: "Mixed",
+            mediaUrl: "",
+            destinationUrl: "https://digitalsmod.site/docs/one-time-mode",
+            rewardVnd: 500,
+            status: "active",
+            expiresAt: now + 3 * 86400000,
+            maxCompletions: 1,
+            completedCount: 0,
+            oneTimeOnly: true,
+            notes: "Chế độ một lượt duy nhất toàn hệ thống",
+            createdBy: "system",
+            createdAt: now - 900000,
+            updatedAt: now - 900000
+          }
+        ];
+        initialTasks.forEach(function(t) { db.tasks[t.taskId] = t; });
+
+        db.notifications["ntf_welcome_01"] = {
+          notificationId: "ntf_welcome_01",
+          title: "Hệ thống DIGITALSMOD.SITE sẵn sàng hoạt động",
+          body: "Chào mừng bạn đến với nền tảng quản lý nhiệm vụ và liên kết tại https://digitalsmod.site. Hãy lưu giữ khóa định danh cẩn thận.",
+          targetType: "all_users",
+          targetUid: null,
+          internalRoute: "/tasks",
+          createdAt: now
+        };
+
+        return db;
+      }
+
+      const state = {
+        currentRoute: DEFAULT_ROUTE,
+        routeParams: {},
+        queryParams: {},
+        currentSession: null,
+        pendingCreatedKey: null,
+        pendingAdminBootstrapCode: null,
+        verifyLock: false,
+        loginAttempts: 0,
+        db: window.DigitalsModRouter
+          ? window.DigitalsModRouter.loadSharedDb(createDefaultDatabase())
+          : createDefaultDatabase()
+      };
+
+      function persistDatabase() {
+        if (window.DigitalsModRouter) {
+          window.DigitalsModRouter.saveSharedDb(state.db);
+        } else {
+          try {
+            window.localStorage.setItem("digitalsmod_shared_db_v2", JSON.stringify(state.db));
+          } catch (e) {}
+        }
+      }
+
+      if (window.DigitalsModRouter && window.DigitalsModRouter.channel) {
+        window.DigitalsModRouter.channel.onmessage = function(ev) {
+          if (ev.data && ev.data.type === "DB_UPDATED") {
+            state.db = window.DigitalsModRouter.loadSharedDb(state.db);
+            renderApp();
+          }
+        };
+      }
+
+      function appendAuditLog(actorUid, action, details) {
+        const logId = "log_" + randomSegment(8);
+        state.db.auditLogs[logId] = {
+          logId: logId,
+          actorUid: actorUid || "system",
+          action: action,
+          details: details || {},
+          ip: "103.190.232.18",
+          createdAt: Date.now()
+        };
+        persistDatabase();
+      }
+
+      function escapeHtml(str) {
+        return String(str == null ? "" : str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function showToast(message, type) {
+        const container = document.getElementById("glass-toast-container");
+        if (!container) return;
+        const el = document.createElement("div");
+        const borderCol = type === "error" ? "border-red-500/40" : type === "success" ? "border-emerald-500/40" : "border-black/10 dark:border-white/15";
+        el.className = "glass-surface pointer-events-auto px-4 py-3 flex items-center justify-between gap-3 border " + borderCol + " view-transition";
+        el.innerHTML =
+          '<div class="text-xs font-medium leading-relaxed">' + escapeHtml(message) + '</div>' +
+          '<button type="button" class="text-[11px] font-semibold opacity-70 hover:opacity-100 shrink-0">Đóng</button>';
+        el.querySelector("button").addEventListener("click", function() { el.remove(); });
+        container.appendChild(el);
+        setTimeout(function() { if (el.parentNode) el.remove(); }, 4000);
+      }
+
+      function openGlassModal(options) {
+        const backdrop = document.getElementById("glass-modal-backdrop");
+        const titleEl = document.getElementById("glass-modal-title");
+        const bodyEl = document.getElementById("glass-modal-body");
+        const footerEl = document.getElementById("glass-modal-footer");
+        if (!backdrop || !titleEl || !bodyEl || !footerEl) return;
+
+        titleEl.textContent = options.title || "Thông báo";
+        bodyEl.innerHTML = options.bodyHtml || "";
+        footerEl.innerHTML = "";
+
+        if (Array.isArray(options.actions)) {
+          options.actions.forEach(function(act) {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = act.primary
+              ? "glass-btn px-4 py-2 text-xs font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950"
+              : "glass-btn px-4 py-2 text-xs font-semibold bg-neutral-200/80 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100";
+            btn.textContent = act.label;
+            btn.addEventListener("click", function() {
+              if (act.onClick) act.onClick();
+              if (!act.keepOpen) closeGlassModal();
+            });
+            footerEl.appendChild(btn);
+          });
+        } else {
+          const closeBtn = document.createElement("button");
+          closeBtn.type = "button";
+          closeBtn.className = "glass-btn px-4 py-2 text-xs font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950";
+          closeBtn.textContent = "Đóng";
+          closeBtn.addEventListener("click", closeGlassModal);
+          footerEl.appendChild(closeBtn);
+        }
+
+        backdrop.classList.remove("hidden");
+        backdrop.classList.add("flex");
+      }
+
+      function closeGlassModal() {
+        const backdrop = document.getElementById("glass-modal-backdrop");
+        if (!backdrop) return;
+        backdrop.classList.add("hidden");
+        backdrop.classList.remove("flex");
+      }
+
+      document.getElementById("btn-close-modal").addEventListener("click", closeGlassModal);
+
+      function copyTextSafe(text, label) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function() {
+            showToast("Đã sao chép " + (label || "nội dung") + " vào bộ nhớ tạm.", "success");
+          }).catch(function() { fallbackCopy(text, label); });
+        } else {
+          fallbackCopy(text, label);
+        }
+      }
+
+      function fallbackCopy(text, label) {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand("copy");
+          showToast("Đã sao chép " + (label || "nội dung") + ".", "success");
+        } catch (e) {
+          showToast("Vui lòng chọn và sao chép thủ công.", "error");
+        }
+        ta.remove();
+      }
+
+      function downloadTxtFile(filename, content) {
+        const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+        showToast("Đã tải xuống tệp " + filename, "success");
+      }
+
+      const USER_MENU_ROUTES = [
+        { path: "/", label: "Trang chủ", group: "Hệ thống" },
+        { path: "/register", label: "Đăng ký tài khoản", group: "Tài khoản" },
+        { path: "/login", label: "Đăng nhập", group: "Tài khoản" },
+        { path: "/dashboard", label: "Dashboard", group: "Cá nhân" },
+        { path: "/tasks", label: "Danh sách nhiệm vụ", group: "Nhiệm vụ" },
+        { path: "/verify", label: "Xác thực hoàn thành", group: "Nhiệm vụ" },
+        { path: "/wallet", label: "Ví nội bộ & Giao dịch", group: "Tài chính" },
+        { path: "/withdraw", label: "Yêu cầu rút tiền", group: "Tài chính" },
+        { path: "/seller", label: "Tổng quan Seller", group: "Seller" },
+        { path: "/seller/links", label: "Quản lý liên kết", group: "Seller" },
+        { path: "/seller/analytics", label: "Thống kê hiệu quả", group: "Seller" },
+        { path: "/notifications", label: "Trung tâm thông báo", group: "Tiện ích" },
+        { path: "/settings", label: "Cài đặt", group: "Tiện ích" }
+      ];
+
+      const ADMIN_MENU_ROUTES = [
+        { path: "/admin", label: "Tổng quan hệ thống", group: "Quản trị" },
+        { path: "/admin/tasks", label: "Quản lý nhiệm vụ", group: "Quản trị" },
+        { path: "/admin/users", label: "Quản lý người dùng", group: "Quản trị" },
+        { path: "/admin/sellers", label: "Quản lý đối tác Seller", group: "Quản trị" },
+        { path: "/admin/links", label: "Quản lý liên kết", group: "Quản trị" },
+        { path: "/admin/withdrawals", label: "Duyệt yêu cầu rút tiền", group: "Tài chính" },
+        { path: "/admin/transactions", label: "Sổ cái giao dịch", group: "Tài chính" },
+        { path: "/admin/notifications", label: "Phát hành thông báo", group: "Hệ thống" },
+        { path: "/admin/settings", label: "Cài đặt hệ thống", group: "Hệ thống" },
+        { path: "/admin/logs", label: "Nhật ký bảo mật", group: "Hệ thống" },
+        { path: "/", label: "Về trang người dùng", group: "Điều hướng" }
+      ];
+
+      function getMenuRoutes() {
+        if (PAGE_MODE === "admin") return ADMIN_MENU_ROUTES;
+        if (PAGE_MODE === "user") return USER_MENU_ROUTES;
+        return USER_MENU_ROUTES.concat([{ path: "/admin", label: "Quản trị (/admin)", group: "Admin" }]);
+      }
+
+      function navigate(rawRoute, scrollTargetId) {
+        if (window.DigitalsModRouter) {
+          const redirected = window.DigitalsModRouter.pushRoute(rawRoute, PAGE_MODE === "admin");
+          if (redirected) return;
+        }
+
+        const qIndex = rawRoute.indexOf("?");
+        const pathOnly = qIndex >= 0 ? rawRoute.slice(0, qIndex) : rawRoute;
+        const queryString = qIndex >= 0 ? rawRoute.slice(qIndex + 1) : "";
+
+        const queryParams = {};
+        if (queryString) {
+          const sp = new URLSearchParams(queryString);
+          sp.forEach(function(v, k) { queryParams[k] = v; });
+        }
+
+        state.queryParams = queryParams;
+        state.routeParams = {};
+
+        if (pathOnly.indexOf("/go/") === 0) {
+          state.routeParams.id = decodeURIComponent(pathOnly.slice(4));
+          state.currentRoute = "/go/[id]";
+        } else {
+          state.currentRoute = pathOnly;
+        }
+
+        const drawer = document.getElementById("mobile-drawer");
+        if (drawer) drawer.classList.add("hidden");
+
+        renderApp();
+
+        if (scrollTargetId) {
+          setTimeout(function() {
+            const targetEl = document.getElementById(scrollTargetId);
+            if (targetEl) targetEl.scrollIntoView({ behavior: "smooth" });
+          }, 50);
+        } else {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      }
+
+      function updateHeaderUi() {
+        const authArea = document.getElementById("nav-auth-area");
+        const unreadBadge = document.getElementById("nav-unread-badge");
+        if (authArea) {
+          if (state.currentSession) {
+            const s = state.currentSession;
+            const wallet = state.db.wallets[s.uid];
+            const bal = wallet ? formatVnd(wallet.availableBalanceVnd) : "0 VND";
+            authArea.innerHTML =
+              '<button type="button" data-route="/wallet" class="nav-route-btn hidden md:inline-flex items-center px-3 py-1.5 rounded-xl bg-neutral-900/5 dark:bg-white/10 text-xs font-mono font-semibold whitespace-nowrap">' +
+                escapeHtml(bal) +
+              '</button>' +
+              '<button type="button" data-route="' + (s.role === "admin" ? "/admin" : "/dashboard") + '" class="nav-route-btn px-2.5 sm:px-3 py-1.5 rounded-xl border border-black/10 dark:border-white/15 text-xs font-semibold truncate max-w-[110px] sm:max-w-[160px]">' +
+                escapeHtml(s.username) +
+              '</button>' +
+              '<button type="button" id="btn-header-logout" class="glass-btn px-2.5 sm:px-3 py-1.5 text-xs font-medium bg-neutral-200/80 dark:bg-neutral-800">Thoát</button>';
+            const logoutBtn = document.getElementById("btn-header-logout");
+            if (logoutBtn) {
+              logoutBtn.addEventListener("click", function() {
+                appendAuditLog(s.uid, "USER_LOGOUT", {});
+                state.currentSession = null;
+                showToast("Đã đăng xuất khỏi phiên làm việc.", "info");
+                navigate(PAGE_MODE === "admin" ? "/admin" : "/login");
+              });
+            }
+          } else {
+            authArea.innerHTML =
+              '<button type="button" data-route="/login" class="nav-route-btn glass-btn px-3 py-1.5 text-xs font-semibold bg-neutral-200/80 dark:bg-neutral-800">Đăng nhập</button>' +
+              '<button type="button" data-route="/register" class="nav-route-btn hidden sm:inline-flex glass-btn px-3.5 py-1.5 text-xs font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950">Bắt đầu</button>';
+          }
+        }
+
+        if (unreadBadge) {
+          const unreadCount = getUnreadNotificationsForCurrentUser().length;
+          if (unreadCount > 0) unreadBadge.classList.remove("hidden");
+          else unreadBadge.classList.add("hidden");
+        }
+
+        const mobileList = document.getElementById("mobile-route-list");
+        if (mobileList) {
+          mobileList.innerHTML = getMenuRoutes().map(function(r) {
+            return '<button type="button" data-route="' + r.path + '" class="nav-route-btn text-left px-3 py-2.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/10 flex items-center justify-between gap-2">' +
+              '<span class="truncate">' + escapeHtml(r.label) + '</span>' +
+              '<span class="text-[10px] uppercase opacity-50 shrink-0">' + escapeHtml(r.group) + '</span>' +
+            '</button>';
+          }).join("");
+        }
+
+        bindRouteButtons(document);
+      }
+
+      function bindRouteButtons(root) {
+        root.querySelectorAll(".nav-route-btn").forEach(function(btn) {
+          if (btn.dataset.bound === "1") return;
+          btn.dataset.bound = "1";
+          btn.addEventListener("click", function() {
+            const target = btn.getAttribute("data-route") || "/";
+            const scrollId = btn.getAttribute("data-scroll") || null;
+            navigate(target, scrollId);
+          });
+        });
+      }
+
+      function getUnreadNotificationsForCurrentUser() {
+        const uid = state.currentSession ? state.currentSession.uid : "guest";
+        const reads = state.db.notificationReads[uid] || {};
+        return Object.values(state.db.notifications).filter(function(n) {
+          if (reads[n.notificationId]) return false;
+          if (n.targetType === "all_users") return true;
+          if (state.currentSession && n.targetType === "all_sellers" && (state.currentSession.role === "seller" || state.currentSession.role === "admin")) return true;
+          if (state.currentSession && n.targetUid === state.currentSession.uid) return true;
+          return false;
+        });
+      }
+
+      function renderApp() {
+        updateHeaderUi();
+        const main = document.getElementById("app-main");
+        if (!main) return;
+
+        const r = state.currentRoute;
+        if (r === "/") return renderHomePage(main);
+        if (r === "/register") return renderRegisterPage(main);
+        if (r === "/login") return renderLoginPage(main);
+        if (r === "/dashboard") return renderUserDashboard(main);
+        if (r === "/tasks") return renderTasksPage(main);
+        if (r === "/go/[id]") return renderGoRedirectPage(main);
+        if (r === "/verify") return renderVerifyPage(main);
+        if (r === "/seller" || r === "/seller/links" || r === "/seller/analytics") return renderSellerPages(main, r);
+        if (r === "/wallet") return renderWalletPage(main);
+        if (r === "/withdraw") return renderWithdrawPage(main);
+        if (r === "/notifications") return renderNotificationsPage(main);
+        if (r === "/settings") return renderSettingsPage(main);
+        if (r.indexOf("/admin") === 0) return renderAdminPages(main, r);
+
+        main.innerHTML =
+          '<div class="glass-surface p-8 sm:p-10 text-center view-transition">' +
+            '<h2 class="text-xl font-bold">Không tìm thấy trang yêu cầu</h2>' +
+            '<p class="text-xs text-neutral-500 mt-2">Đường dẫn bạn truy cập không tồn tại trên hệ thống https://digitalsmod.site.</p>' +
+            '<button type="button" data-route="' + DEFAULT_ROUTE + '" class="nav-route-btn glass-btn mt-4 px-5 py-2.5 bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 text-xs font-semibold">Quay lại trang chính</button>' +
+          '</div>';
+        bindRouteButtons(main);
+      }
+
+      function renderHomePage(main) {
+        main.innerHTML = `
+          <div class="space-y-6 sm:space-y-8 view-transition">
+            <section class="glass-surface p-6 sm:p-12">
+              <div class="max-w-3xl space-y-4 sm:space-y-5">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-900/5 dark:bg-white/10 border border-black/10 dark:border-white/15 text-xs font-medium">
+                  <span class="w-2 h-2 rounded-full bg-neutral-900 dark:bg-white"></span>
+                  <span>Hệ thống chính thức • digitalsmod.site</span>
+                </div>
+                <h1 class="text-2xl sm:text-5xl font-bold tracking-tight leading-tight">
+                  DIGITALSMOD — Hệ thống nhiệm vụ và quản lý liên kết thông minh.
+                </h1>
+                <p class="text-xs sm:text-base text-neutral-600 dark:text-neutral-300 leading-relaxed">
+                  Nền tảng hỗ trợ quản lý nhiệm vụ, tạo liên kết, theo dõi lượt hoàn thành và thống kê hiệu quả hoạt động trên một hệ thống thống nhất.
+                </p>
+                <div class="flex flex-wrap gap-2.5 sm:gap-3 pt-1">
+                  <button type="button" data-route="/register" class="nav-route-btn glass-btn px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950">
+                    Bắt đầu sử dụng
+                  </button>
+                  <button type="button" data-route="/login" class="nav-route-btn glass-btn px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold bg-neutral-200/80 dark:bg-neutral-800">
+                    Đăng nhập
+                  </button>
+                  <button type="button" data-route="/tasks" class="nav-route-btn glass-btn px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold border border-black/15 dark:border-white/20">
+                    Khám phá nền tảng
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <section class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+              <div class="glass-surface glass-interactive p-6 space-y-2.5">
+                <div class="w-10 h-10 rounded-2xl bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 flex items-center justify-center">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                </div>
+                <h2 class="text-base font-bold">Tài khoản bằng Khóa định danh</h2>
+                <p class="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                  Không yêu cầu email hay số điện thoại. Mỗi tài khoản được cấp khóa mật mã ngẫu nhiên định dạng <code class="font-mono">dgtf-xxx-xxxx-xxx-xxxx</code> và chỉ lưu mã băm một chiều.
+                </p>
+              </div>
+
+              <div class="glass-surface glass-interactive p-6 space-y-2.5">
+                <div class="w-10 h-10 rounded-2xl bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 flex items-center justify-center">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                </div>
+                <h2 class="text-base font-bold">Quản lý Liên kết &amp; Nhiệm vụ</h2>
+                <p class="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                  Kiểm tra tự động thời hạn, giới hạn lượt và chế độ một lượt duy nhất, kết hợp chữ ký số chống giả mạo và rút gọn liên kết qua API Link4m.
+                </p>
+              </div>
+
+              <div class="glass-surface glass-interactive p-6 space-y-2.5">
+                <div class="w-10 h-10 rounded-2xl bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 flex items-center justify-center">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                </div>
+                <h2 class="text-base font-bold">Ví Nội bộ &amp; Đối soát Minh bạch</h2>
+                <p class="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                  Ghi nhận phần thưởng nguyên tử (mặc định 500 VND/lượt hoàn thành hợp lệ), giữ số dư an toàn khi tạo lệnh rút tiền ngân hàng hoặc thẻ cào.
+                </p>
+              </div>
+            </section>
+
+            <section class="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
+              <div class="glass-surface p-6 space-y-4">
+                <h3 class="text-lg font-bold">Hướng dẫn hoàn thành nhiệm vụ</h3>
+                <ol class="space-y-3 text-xs text-neutral-700 dark:text-neutral-300">
+                  <li class="flex gap-3">
+                    <span class="w-6 h-6 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 flex items-center justify-center font-bold shrink-0">1</span>
+                    <div><strong>Chọn nhiệm vụ khả dụng:</strong> Mở danh sách nhiệm vụ và xem hướng dẫn chi tiết theo từng loại nội dung.</div>
+                  </li>
+                  <li class="flex gap-3">
+                    <span class="w-6 h-6 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 flex items-center justify-center font-bold shrink-0">2</span>
+                    <div><strong>Truy cập liên kết nhiệm vụ:</strong> Hệ thống kiểm tra điều kiện hợp lệ và khởi tạo phiên thực hiện có chữ ký bảo mật.</div>
+                  </li>
+                  <li class="flex gap-3">
+                    <span class="w-6 h-6 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 flex items-center justify-center font-bold shrink-0">3</span>
+                    <div><strong>Xác thực hoàn thành:</strong> Nhấn nút Xác thực tại trang đích để cộng phần thưởng trực tiếp vào ví nội bộ.</div>
+                  </li>
+                </ol>
+              </div>
+
+              <div class="glass-surface p-6 space-y-4">
+                <h3 class="text-lg font-bold">Hệ thống Seller &amp; Cách tạo tài khoản bằng Key</h3>
+                <div class="space-y-3 text-xs text-neutral-700 dark:text-neutral-300 leading-relaxed">
+                  <p>
+                    <strong>Cách tạo tài khoản bằng Key:</strong> Nhập tên tài khoản tại mục Đăng ký. Hệ thống sẽ tạo một khóa <code class="font-mono">dgtf-xxx-xxxx-xxx-xxxx</code> duy nhất. Bạn chỉ cần sao chép hoặc tải file <code class="font-mono">.txt</code> về máy và xác nhận đã lưu.
+                  </p>
+                  <p>
+                    <strong>Hệ thống Seller:</strong> Hỗ trợ đối tác tạo liên kết rút gọn, quản lý danh sách liên kết thuộc quyền sở hữu và theo dõi tách biệt số lượt truy cập với số lượt xác thực hợp lệ theo thời gian.
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            <section class="glass-surface p-6 space-y-4">
+              <h3 class="text-lg font-bold">Câu hỏi thường gặp</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                <div class="p-4 rounded-2xl bg-black/[0.03] dark:bg-white/[0.04] space-y-1">
+                  <div class="font-semibold">Làm mất khóa định danh có khôi phục được không?</div>
+                  <p class="text-neutral-600 dark:text-neutral-400">Không. Để bảo mật tuyệt đối, hệ thống chỉ lưu trữ mã băm một chiều của khóa. Hãy tải file TXT và cất giữ cẩn thận ngay khi tạo tài khoản.</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-black/[0.03] dark:bg-white/[0.04] space-y-1">
+                  <div class="font-semibold">Khi nào yêu cầu rút tiền được duyệt?</div>
+                  <p class="text-neutral-600 dark:text-neutral-400">Khi gửi yêu cầu, số dư tương ứng sẽ được tạm giữ nguyên tử. Quản trị viên sẽ kiểm tra đối soát và chuyển trạng thái thanh toán hoặc hoàn trả nếu thông tin sai.</p>
+                </div>
+              </div>
+            </section>
+
+            <section class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 text-xs">
+              <div id="section-terms" class="glass-surface p-5 space-y-2">
+                <h4 class="font-bold text-sm">Điều khoản sử dụng</h4>
+                <p class="text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                  Nghiêm cấm hành vi gian lận, gửi yêu cầu tự động lặp lại hoặc phát tán liên kết độc hại trên nền tảng <span class="font-mono">digitalsmod.site</span>.
+                </p>
+              </div>
+              <div id="section-privacy" class="glass-surface p-5 space-y-2">
+                <h4 class="font-bold text-sm">Chính sách quyền riêng tư</h4>
+                <p class="text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                  Không thu thập email hoặc số điện thoại cá nhân. Thông tin phiên làm việc chỉ dùng để bảo vệ tài khoản và đối soát giao dịch.
+                </p>
+              </div>
+              <div id="section-support" class="glass-surface p-5 space-y-2">
+                <h4 class="font-bold text-sm">Liên hệ hỗ trợ</h4>
+                <p class="text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                  Bộ phận hỗ trợ đối soát: <span class="font-mono font-medium">support@digitalsmod.site</span>. Vui lòng đính kèm mã giao dịch hoặc mã yêu cầu rút tiền khi liên hệ.
+                </p>
+              </div>
+            </section>
+          </div>
+        `;
+        bindRouteButtons(main);
+      }
+
+      function renderRegisterPage(main) {
+        if (state.pendingCreatedKey) {
+          const pk = state.pendingCreatedKey;
+          main.innerHTML = `
+            <div class="max-w-xl mx-auto glass-surface p-6 sm:p-8 space-y-5 view-transition">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <span class="px-3 py-1 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 text-[11px] font-semibold">KHÓA ĐỊNH DANH CÁ NHÂN</span>
+                <span class="text-xs font-mono text-neutral-500">ID: ${escapeHtml(pk.uid)}</span>
+              </div>
+              <h1 class="text-xl sm:text-2xl font-bold">Lưu khóa đăng nhập của bạn</h1>
+              <p class="text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed">
+                Tài khoản <strong>${escapeHtml(pk.username)}</strong> (${escapeHtml(pk.role)}) đã được tạo. Khóa dưới đây <strong>chỉ hiển thị đầy đủ một lần duy nhất</strong>.
+              </p>
+
+              <div class="p-4 rounded-[20px] bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 font-mono text-center text-sm sm:text-lg tracking-wider select-all break-all">
+                ${escapeHtml(pk.rawKey)}
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                <button type="button" id="btn-copy-key" class="glass-btn py-2.5 px-4 text-xs font-semibold bg-neutral-200/90 dark:bg-neutral-800">
+                  Sao chép
+                </button>
+                <button type="button" id="btn-save-key-note" class="glass-btn py-2.5 px-4 text-xs font-semibold bg-neutral-200/90 dark:bg-neutral-800">
+                  Lưu khóa
+                </button>
+                <button type="button" id="btn-download-key-txt" class="glass-btn py-2.5 px-4 text-xs font-semibold bg-neutral-900 text-white dark:bg-white dark:text-neutral-900">
+                  Tải file TXT
+                </button>
+              </div>
+
+              <div class="p-4 rounded-2xl border border-black/10 dark:border-white/15 bg-black/[0.02] dark:bg-white/[0.03] text-xs space-y-1.5">
+                <div class="font-semibold">Hướng dẫn bảo quản:</div>
+                <ul class="list-disc pl-4 space-y-1 text-neutral-600 dark:text-neutral-400">
+                  <li>Sử dụng khóa này để đăng nhập vào hệ thống ở các lần tiếp theo.</li>
+                  <li>Không chia sẻ khóa cho người khác để bảo vệ số dư ví nội bộ.</li>
+                </ul>
+              </div>
+
+              <label class="flex items-start sm:items-center gap-2.5 text-xs font-medium cursor-pointer pt-1">
+                <input type="checkbox" id="chk-confirm-key-saved" class="w-4 h-4 rounded mt-0.5 sm:mt-0 shrink-0" ${pk.confirmed ? "checked" : ""} />
+                <span>Tôi xác nhận đã sao chép hoặc tải xuống và lưu trữ khóa định danh an toàn.</span>
+              </label>
+
+              <button type="button" id="btn-finish-register" class="w-full glass-btn py-3 text-sm font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950">
+                Xác nhận đã lưu &amp; Tiếp tục
+              </button>
+            </div>
+          `;
+
+          document.getElementById("btn-copy-key").addEventListener("click", function() {
+            copyTextSafe(pk.rawKey, "khóa định danh");
+          });
+          document.getElementById("btn-save-key-note").addEventListener("click", function() {
+            copyTextSafe(pk.rawKey, "khóa định danh");
+            showToast("Đã lưu khóa vào bộ nhớ tạm.", "success");
+          });
+          document.getElementById("btn-download-key-txt").addEventListener("click", function() {
+            const lines = [
+              "=== DIGITALSMOD.SITE - KHOA DINH DANH TAI KHOAN ===",
+              "Website: https://digitalsmod.site",
+              "Username: " + pk.username,
+              "UID: " + pk.uid,
+              "Vai tro: " + pk.role,
+              "Key dang nhap (Chi hien thi 1 lan): " + pk.rawKey,
+              "Thoi gian tao: " + new Date().toISOString()
+            ];
+            downloadTxtFile("digitalsmod-key-" + pk.username + ".txt", lines.join("\n"));
+          });
+          document.getElementById("btn-finish-register").addEventListener("click", function() {
+            const chk = document.getElementById("chk-confirm-key-saved");
+            if (!chk || !chk.checked) {
+              showToast("Vui lòng tích chọn 'Xác nhận đã lưu' trước khi tiếp tục.", "error");
+              return;
+            }
+            const userRecord = state.db.users[pk.uid];
+            if (userRecord) userRecord.keySavedConfirmed = true;
+            state.currentSession = {
+              uid: pk.uid,
+              username: pk.username,
+              role: pk.role,
+              maskedKey: maskKey(pk.rawKey)
+            };
+            state.pendingCreatedKey = null;
+            persistDatabase();
+            showToast("Chào mừng " + pk.username + "!", "success");
+            navigate(pk.role === "seller" ? "/seller" : "/dashboard");
+          });
+          return;
+        }
+
+        main.innerHTML = `
+          <div class="max-w-md mx-auto glass-surface p-6 sm:p-8 space-y-5 view-transition">
+            <div>
+              <h1 class="text-xl sm:text-2xl font-bold">Đăng ký tài khoản</h1>
+              <p class="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+                Nhập tên tài khoản mong muốn để hệ thống cấp khóa định danh <code class="font-mono">dgtf-xxx-xxxx-xxx-xxxx</code>.
+              </p>
+            </div>
+
+            <form id="form-register" class="space-y-4">
+              <div class="space-y-1.5">
+                <label for="reg-username" class="text-xs font-semibold text-neutral-700 dark:text-neutral-300">Tên tài khoản (Username)</label>
+                <input id="reg-username" type="text" required minlength="3" maxlength="24" placeholder="vd: minhtuan_99" class="w-full rounded-[16px] border border-black/15 dark:border-white/15 bg-white/80 dark:bg-neutral-900/80 px-4 py-2.5 text-sm" />
+                <span class="text-[11px] text-neutral-500 block">Gồm chữ cái, chữ số hoặc dấu gạch dưới (3–24 ký tự).</span>
+              </div>
+
+              <div class="space-y-1.5">
+                <label for="reg-role" class="text-xs font-semibold text-neutral-700 dark:text-neutral-300">Vai trò sử dụng</label>
+                <select id="reg-role" class="w-full rounded-[16px] border border-black/15 dark:border-white/15 bg-white/80 dark:bg-neutral-900/80 px-4 py-2.5 text-sm">
+                  <option value="user">Thành viên thực hiện nhiệm vụ (User)</option>
+                  <option value="seller">Đối tác phân phối liên kết (Seller)</option>
+                </select>
+              </div>
+
+              <button type="submit" class="w-full glass-btn py-3 text-sm font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950">
+                Tạo tài khoản &amp; Nhận Key
+              </button>
+            </form>
+
+            <div class="pt-3 border-t border-black/10 dark:border-white/10 text-center text-xs">
+              Đã có khóa định danh? <button type="button" data-route="/login" class="nav-route-btn font-semibold underline">Đăng nhập</button>
+            </div>
+          </div>
+        `;
+        bindRouteButtons(main);
+
+        document.getElementById("form-register").addEventListener("submit", function(e) {
+          e.preventDefault();
+          if (!state.db.system.settings.registrationEnabled) {
+            showToast("Chức năng đăng ký hiện đang tạm đóng.", "error");
+            return;
+          }
+          const rawInput = document.getElementById("reg-username").value;
+          const roleInput = document.getElementById("reg-role").value;
+          const normalized = String(rawInput || "").trim().toLowerCase();
+
+          if (!/^[a-z0-9_]{3,24}$/.test(normalized)) {
+            showToast("Tên tài khoản chỉ gồm chữ cái, số, dấu gạch dưới (3–24 ký tự).", "error");
+            return;
+          }
+          if (state.db.usernames[normalized]) {
+            showToast("Tên tài khoản này đã được sử dụng. Vui lòng chọn tên khác.", "error");
+            return;
+          }
+
+          const safeRole = roleInput === "seller" ? "seller" : "user";
+          let rawKey = generateUserKey();
+          let keyHash = computeKeyHash(rawKey);
+          while (state.db.keyHashes[keyHash]) {
+            rawKey = generateUserKey();
+            keyHash = computeKeyHash(rawKey);
+          }
+
+          const uid = "usr_" + randomSegment(6);
+          const now = Date.now();
+          state.db.usernames[normalized] = uid;
+          state.db.keyHashes[keyHash] = uid;
+          state.db.users[uid] = {
+            uid: uid,
+            username: String(rawInput).trim(),
+            normalizedUsername: normalized,
+            keyHash: keyHash,
+            maskedKey: maskKey(rawKey),
+            role: safeRole,
+            status: "active",
+            keySavedConfirmed: false,
+            createdAt: now,
+            updatedAt: now
+          };
+          state.db.wallets[uid] = {
+            uid: uid,
+            availableBalanceVnd: 0,
+            heldBalanceVnd: 0,
+            totalEarnedVnd: 0,
+            totalWithdrawnVnd: 0,
+            completedTasksCount: 0,
+            updatedAt: now
+          };
+          if (safeRole === "seller") {
+            state.db.sellerKpi[uid] = {
+              uid: uid,
+              totalLinks: 0,
+              totalClicks: 0,
+              verifiedCount: 0,
+              sellerRevenueKpiVnd: 0,
+              updatedAt: now
+            };
+          }
+
+          appendAuditLog(uid, "USER_REGISTER", { username: normalized, role: safeRole });
+          state.pendingCreatedKey = {
+            uid: uid,
+            username: String(rawInput).trim(),
+            role: safeRole,
+            rawKey: rawKey,
+            confirmed: false
+          };
+          renderApp();
+        });
+      }
+
+      function renderLoginPage(main) {
+        main.innerHTML = `
+          <div class="max-w-md mx-auto glass-surface p-6 sm:p-8 space-y-5 view-transition">
+            <div>
+              <h1 class="text-xl sm:text-2xl font-bold">Đăng nhập</h1>
+              <p class="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+                Nhập khóa định danh <code class="font-mono">dgtf-xxx-xxxx-xxx-xxxx</code> của bạn để mở phiên làm việc.
+              </p>
+            </div>
+
+            <form id="form-key-login" class="space-y-4">
+              <div class="space-y-1.5">
+                <label for="login-key-input" class="text-xs font-semibold text-neutral-700 dark:text-neutral-300">Khóa định danh</label>
+                <input id="login-key-input" type="password" required placeholder="dgtf-xxx-xxxx-xxx-xxxx" class="w-full rounded-[16px] border border-black/15 dark:border-white/15 bg-white/80 dark:bg-neutral-900/80 px-4 py-2.5 text-sm font-mono" />
+              </div>
+
+              <button type="submit" class="w-full glass-btn py-3 text-sm font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950">
+                Đăng nhập
+              </button>
+            </form>
+
+            <div class="pt-3 border-t border-black/10 dark:border-white/10 text-center text-xs">
+              Chưa có tài khoản? <button type="button" data-route="/register" class="nav-route-btn font-semibold underline">Đăng ký tài khoản mới</button>
+            </div>
+          </div>
+        `;
+        bindRouteButtons(main);
+
+        document.getElementById("form-key-login").addEventListener("submit", function(e) {
+          e.preventDefault();
+          if (state.loginAttempts >= 8) {
+            showToast("Bạn đã thử sai quá nhiều lần. Vui lòng đợi ít phút.", "error");
+            return;
+          }
+          const rawKey = normalizeKey(document.getElementById("login-key-input").value);
+          if (!isValidUserKeyFormat(rawKey)) {
+            state.loginAttempts += 1;
+            showToast("Khóa không đúng định dạng dgtf-xxx-xxxx-xxx-xxxx.", "error");
+            return;
+          }
+          const keyHash = computeKeyHash(rawKey);
+          const uid = state.db.keyHashes[keyHash];
+          if (!uid || !state.db.users[uid]) {
+            state.loginAttempts += 1;
+            appendAuditLog("anonymous", "LOGIN_FAILED_BAD_KEY", {});
+            showToast("Khóa định danh không chính xác.", "error");
+            return;
+          }
+          const user = state.db.users[uid];
+          if (user.status !== "active") {
+            showToast("Tài khoản này hiện đang bị khóa.", "error");
+            return;
+          }
+          state.loginAttempts = 0;
+          state.currentSession = {
+            uid: user.uid,
+            username: user.username,
+            role: user.role,
+            maskedKey: user.maskedKey
+          };
+          appendAuditLog(user.uid, "USER_LOGIN_SUCCESS", { role: user.role });
+          showToast("Đăng nhập thành công!", "success");
+          navigate(user.role === "seller" ? "/seller" : "/dashboard");
+        });
+      }
+
+      function renderUserDashboard(main) {
+        if (!state.currentSession) {
+          main.innerHTML = `
+            <div class="max-w-lg mx-auto glass-surface p-6 sm:p-8 text-center space-y-4 view-transition">
+              <h2 class="text-lg sm:text-xl font-bold">Vui lòng đăng nhập</h2>
+              <p class="text-xs text-neutral-600 dark:text-neutral-400">Đăng nhập bằng khóa định danh hoặc tạo tài khoản mới để quản lý nhiệm vụ và số dư.</p>
+              <div class="flex justify-center gap-3 pt-1">
+                <button type="button" data-route="/login" class="nav-route-btn glass-btn px-5 py-2.5 text-xs font-semibold bg-neutral-200/80 dark:bg-neutral-800">Đăng nhập</button>
+                <button type="button" data-route="/register" class="nav-route-btn glass-btn px-5 py-2.5 text-xs font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950">Tạo tài khoản</button>
+              </div>
+            </div>
+          `;
+          bindRouteButtons(main);
+          return;
+        }
+
+        const s = state.currentSession;
+        const wallet = state.db.wallets[s.uid] || {
+          availableBalanceVnd: 0,
+          heldBalanceVnd: 0,
+          totalEarnedVnd: 0,
+          totalWithdrawnVnd: 0,
+          completedTasksCount: 0
+        };
+        const availableTasks = Object.values(state.db.tasks).filter(function(t) {
+          return t.status === "active" && !state.db.userTaskCompletions[s.uid + ":" + t.taskId];
+        });
+        const myCompletions = Object.values(state.db.completions).filter(function(c) { return c.uid === s.uid; });
+        const myTxs = Object.values(state.db.transactions).filter(function(tx) { return tx.uid === s.uid; }).sort(function(a, b) { return b.createdAt - a.createdAt; });
+        const unreadNotifs = getUnreadNotificationsForCurrentUser();
+
+        main.innerHTML = `
+          <div class="space-y-5 sm:space-y-6 view-transition">
+            <div class="glass-surface p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-0.5 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 text-[10px] font-bold uppercase">${escapeHtml(s.role)}</span>
+                  <span class="font-mono text-xs text-neutral-500">ID: ${escapeHtml(s.uid)}</span>
+                </div>
+                <h1 class="text-xl sm:text-2xl font-bold">${escapeHtml(s.username)}</h1>
+                <p class="text-xs font-mono text-neutral-500">Khóa định danh: ${escapeHtml(s.maskedKey)}</p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button type="button" data-route="/tasks" class="nav-route-btn glass-btn px-4 py-2 text-xs font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950">Nhận nhiệm vụ (${availableTasks.length})</button>
+                <button type="button" data-route="/withdraw" class="nav-route-btn glass-btn px-4 py-2 text-xs font-semibold bg-neutral-200/80 dark:bg-neutral-800">Rút tiền</button>
+                <button type="button" data-route="/settings" class="nav-route-btn glass-btn px-4 py-2 text-xs font-semibold border border-black/15 dark:border-white/15">Cài đặt</button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              <div class="glass-surface p-4 sm:p-5 space-y-1">
+                <span class="text-[11px] sm:text-xs text-neutral-500">Số dư khả dụng</span>
+                <div class="text-lg sm:text-2xl font-bold font-mono">${formatVnd(wallet.availableBalanceVnd)}</div>
+              </div>
+              <div class="glass-surface p-4 sm:p-5 space-y-1">
+                <span class="text-[11px] sm:text-xs text-neutral-500">Đang chờ xử lý</span>
+                <div class="text-lg sm:text-2xl font-bold font-mono">${formatVnd(wallet.heldBalanceVnd)}</div>
+              </div>
+              <div class="glass-surface p-4 sm:p-5 space-y-1">
+                <span class="text-[11px] sm:text-xs text-neutral-500">Tổng tiền đã nhận</span>
+                <div class="text-lg sm:text-2xl font-bold font-mono">${formatVnd(wallet.totalEarnedVnd)}</div>
+              </div>
+              <div class="glass-surface p-4 sm:p-5 space-y-1">
+                <span class="text-[11px] sm:text-xs text-neutral-500">Nhiệm vụ hoàn thành</span>
+                <div class="text-lg sm:text-2xl font-bold font-mono">${wallet.completedTasksCount}</div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6">
+              <div class="lg:col-span-2 glass-surface p-5 sm:p-6 space-y-4">
+                <div class="flex items-center justify-between gap-2">
+                  <h2 class="text-base font-bold">Nhiệm vụ khả dụng (${availableTasks.length})</h2>
+                  <button type="button" data-route="/tasks" class="nav-route-btn text-xs font-semibold underline shrink-0">Xem tất cả</button>
+                </div>
+                <div class="space-y-3">
+                  ${availableTasks.length === 0 ? '<p class="text-xs text-neutral-500 py-4">Hiện không còn nhiệm vụ mới.</p>' : availableTasks.slice(0, 3).map(function(t) {
+                    return `
+                      <div class="p-4 rounded-2xl border border-black/10 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="space-y-1">
+                          <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded bg-neutral-200 dark:bg-neutral-800 text-[10px] font-mono">${escapeHtml(t.contentType)}</span>
+                            <span class="font-semibold text-sm">${escapeHtml(t.title)}</span>
+                          </div>
+                          <p class="text-xs text-neutral-500">${escapeHtml(t.description)}</p>
+                        </div>
+                        <div class="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-black/5 dark:border-white/5">
+                          <span class="font-mono font-bold text-xs">+${formatVnd(t.rewardVnd)}</span>
+                          <button type="button" data-route="/go/${encodeURIComponent(t.taskId)}" class="nav-route-btn glass-btn px-4 py-2 text-xs font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950">Thực hiện</button>
+                        </div>
+                      </div>
+                    `;
+                  }).join("")}
+                </div>
+              </div>
+
+              <div class="glass-surface p-5 sm:p-6 space-y-4">
+                <div class="flex items-center justify-between gap-2">
+                  <h2 class="text-base font-bold">Thông báo chưa đọc (${unreadNotifs.length})</h2>
+                  <button type="button" data-route="/notifications" class="nav-route-btn text-xs font-semibold underline shrink-0">Chi tiết</button>
+                </div>
+                <div class="space-y-3">
+                  ${unreadNotifs.length === 0 ? '<p class="text-xs text-neutral-500 py-4">Không có thông báo mới.</p>' : unreadNotifs.map(function(n) {
+                    return `
+                      <div class="p-3.5 rounded-2xl bg-black/[0.03] dark:bg-white/[0.04] space-y-1">
+                        <div class="text-xs font-semibold">${escapeHtml(n.title)}</div>
+                        <p class="text-[11px] text-neutral-600 dark:text-neutral-400 leading-relaxed">${escapeHtml(n.body)}</p>
+                      </div>
+                    `;
+                  }).join("")}
+                </div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
+              <div class="glass-surface p-5 sm:p-6 space-y-3">
+                <h2 class="text-base font-bold">Lịch sử nhiệm vụ (${myCompletions.length})</h2>
+                ${myCompletions.length === 0 ? '<p class="text-xs text-neutral-500 py-4">Chưa có nhiệm vụ hoàn thành.</p>' : `
+                  <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                      <thead class="border-b border-black/10 dark:border-white/10 text-neutral-500">
+                        <tr><th class="py-2">Mã xác nhận</th><th class="py-2">Nhiệm vụ</th><th class="py-2 text-right">Phần thưởng</th></tr>
+                      </thead>
+                      <tbody class="divide-y divide-black/5 dark:divide-white/5">
+                        ${myCompletions.map(function(c) {
+                          return `<tr><td class="py-2 font-mono">${escapeHtml(c.completionId)}</td><td class="py-2">${escapeHtml(c.taskId)}</td><td class="py-2 text-right font-mono font-semibold">+${formatVnd(c.rewardVnd)}</td></tr>`;
+                        }).join("")}
+                      </tbody>
+                    </table>
+                  </div>
+                `}
+              </div>
+
+              <div class="glass-surface p-5 sm:p-6 space-y-3">
+                <h2 class="text-base font-bold">Lịch sử giao dịch gần đây (${myTxs.length})</h2>
+                ${myTxs.length === 0 ? '<p class="text-xs text-neutral-500 py-4">Chưa có giao dịch phát sinh.</p>' : `
+                  <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                      <thead class="border-b border-black/10 dark:border-white/10 text-neutral-500">
+                        <tr><th class="py-2">Mã GD</th><th class="py-2">Nội dung</th><th class="py-2 text-right">Số tiền</th></tr>
+                      </thead>
+                      <tbody class="divide-y divide-black/5 dark:divide-white/5">
+                        ${myTxs.slice(0, 5).map(function(tx) {
+                          const sign = tx.direction === "credit" ? "+" : "-";
+                          return `<tr><td class="py-2 font-mono">${escapeHtml(tx.transactionId)}</td><td class="py-2">${escapeHtml(tx.description)}</td><td class="py-2 text-right font-mono font-semibold">${sign}${formatVnd(tx.amountVnd)}</td></tr>`;
+                        }).join("")}
+                      </tbody>
+                    </table>
+                  </div>
+                `}
+              </div>
+            </div>
+          </div>
+        `;
+        bindRouteButtons(main);
+      }
+
+      function renderTasksPage(main) {
+        const allTasks = Object.values(state.db.tasks);
+        const uid = state.currentSession ? state.currentSession.uid : null;
+
+        main.innerHTML = `
+          <div class="space-y-5 sm:space-y-6 view-transition">
+            <div class="glass-surface p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h1 class="text-xl sm:text-2xl font-bold">Danh sách Nhiệm vụ</h1>
+                <p class="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+                  Hoàn thành và xác thực hợp lệ nhận ngay <strong>${formatVnd(state.db.system.settings.defaultRewardVnd)}</strong> vào ví nội bộ.
+                </p>
+              </div>
+              <div class="flex items-center gap-2">
+                <select id="filter-task-type" aria-label="Lọc loại nội dung" class="w-full sm:w-auto rounded-[14px] border border-black/15 dark:border-white/15 bg-white/80 dark:bg-neutral-900 px-3.5 py-2 text-xs">
+                  <option value="ALL">Tất cả loại nhiệm vụ</option>
+                  <option value="Link">Liên kết (Link)</option>
+                  <option value="Image">Hình ảnh (Image)</option>
+                  <option value="Video">Video</option>
+                  <option value="Mixed">Tổng hợp (Mixed)</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="tasks-grid-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5"></div>
+          </div>
+        `;
+
+        function renderFilteredTasks(filterType) {
+          const container = document.getElementById("tasks-grid-container");
+          if (!container) return;
+          const list = allTasks.filter(function(t) {
+            if (filterType !== "ALL" && t.contentType !== filterType) return false;
+            if (uid && state.db.userTaskCompletions[uid + ":" + t.taskId]) return false;
+            return true;
+          });
+
+          if (list.length === 0) {
+            container.innerHTML = `<div class="col-span-full glass-surface p-8 text-center text-xs text-neutral-500">Không có nhiệm vụ nào phù hợp với bộ lọc.</div>`;
+            return;
+          }
+
+          container.innerHTML = list.map(function(t) {
+            const isActive = t.status === "active" && Date.now() < t.expiresAt && t.completedCount < t.maxCompletions;
+            return `
+              <div class="glass-surface p-5 sm:p-6 flex flex-col justify-between gap-4">
+                <div class="space-y-2">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="px-2.5 py-0.5 rounded-full bg-neutral-900/10 dark:bg-white/10 text-[11px] font-mono font-semibold">${escapeHtml(t.contentType)}</span>
+                    <span class="text-xs font-mono text-neutral-500">Hoàn thành: ${t.completedCount}/${t.maxCompletions} ${t.oneTimeOnly ? "• 1 Lượt" : ""}</span>
+                  </div>
+                  <h3 class="text-base font-bold">${escapeHtml(t.title)}</h3>
+                  <p class="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">${escapeHtml(t.description)}</p>
+                </div>
+                <div class="pt-3 border-t border-black/10 dark:border-white/10 flex items-center justify-between gap-3">
+                  <div>
+                    <span class="text-[10px] uppercase text-neutral-500 block">Mức thưởng</span>
+                    <span class="text-base font-bold font-mono">+${formatVnd(t.rewardVnd)}</span>
+                  </div>
+                  ${isActive
+                    ? `<button type="button" data-route="/go/${encodeURIComponent(t.taskId)}" class="nav-route-btn glass-btn px-5 py-2.5 text-xs font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950">Thực hiện nhiệm vụ</button>`
+                    : `<span class="px-3 py-1.5 rounded-xl bg-red-500/10 text-red-600 dark:text-red-400 text-xs font-semibold">Đã đóng</span>`
+                  }
+                </div>
+              </div>
+            `;
+          }).join("");
+          bindRouteButtons(container);
+        }
+
+        renderFilteredTasks("ALL");
+        document.getElementById("filter-task-type").addEventListener("change", function(e) {
+          renderFilteredTasks(e.target.value);
+        });
+      }
+
+      function renderGoRedirectPage(main) {
+        const taskId = state.routeParams.id;
+        const task = state.db.tasks[taskId];
+
+        if (!state.currentSession) {
+          main.innerHTML = `
+            <div class="max-w-lg mx-auto glass-surface p-6 sm:p-8 text-center space-y-4 view-transition">
+              <h2 class="text-lg sm:text-xl font-bold">Vui lòng đăng nhập để nhận nhiệm vụ</h2>
+              <p class="text-xs text-neutral-600 dark:text-neutral-400">Bạn cần đăng nhập trước khi truy cập cổng nhiệm vụ để hệ thống ghi nhận phần thưởng chính xác.</p>
+              <div class="flex justify-center gap-3">
+                <button type="button" data-route="/login" class="nav-route-btn glass-btn px-5 py-2.5 text-xs font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950">Đăng nhập</button>
+                <button type="button" data-route="/register" class="nav-route-btn glass-btn px-5 py-2.5 text-xs font-semibold bg-neutral-200 dark:bg-neutral-800">Tạo tài khoản</button>
+              </div>
+            </div>
+          `;
+          bindRouteButtons(main);
+          return;
+        }
+
+        const uid = state.currentSession.uid;
+        if (!task) {
+          main.innerHTML = `<div class="max-w-lg mx-auto glass-surface p-8 text-center space-y-3 view-transition"><h2 class="text-lg font-bold text-red-600">Nhiệm vụ không tồn tại</h2><button type="button" data-route="/tasks" class="nav-route-btn glass-btn px-4 py-2 text-xs bg-neutral-900 text-white">Quay lại danh sách</button></div>`;
+          bindRouteButtons(main);
+          return;
+        }
+
+        const urlCheck = validateDestinationUrl(task.destinationUrl);
+        const now = Date.now();
+        let blockReason = null;
+        if (task.status !== "active") blockReason = "Nhiệm vụ này đã ngừng hoạt động hoặc bị vô hiệu hóa.";
+        else if (now > task.expiresAt) { task.status = "expired"; blockReason = "Nhiệm vụ này đã hết hạn hoàn thành."; }
+        else if (task.completedCount >= task.maxCompletions) blockReason = "Nhiệm vụ đã đủ số lượng hoàn thành tối đa.";
+        else if (state.db.userTaskCompletions[uid + ":" + taskId]) blockReason = "Bạn đã hoàn thành và nhận thưởng nhiệm vụ này rồi.";
+        else if (!urlCheck.valid) blockReason = urlCheck.reason;
+
+        if (blockReason) {
+          main.innerHTML = `
+            <div class="max-w-lg mx-auto glass-surface p-6 sm:p-8 text-center space-y-4 view-transition">
+              <span class="px-3 py-1 rounded-full bg-red-500/15 text-red-600 dark:text-red-400 text-xs font-semibold">KHÔNG THỂ TIẾP TỤC</span>
+              <h2 class="text-lg sm:text-xl font-bold">${escapeHtml(task.title)}</h2>
+              <p class="text-xs text-neutral-600 dark:text-neutral-300">${escapeHtml(blockReason)}</p>
+              <button type="button" data-route="/tasks" class="nav-route-btn glass-btn px-5 py-2.5 text-xs font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950">Quay lại danh sách nhiệm vụ</button>
+            </div>
+          `;
+          bindRouteButtons(main);
+          return;
+        }
+
+        const attemptId = "att_" + randomSegment(7);
+        const exp = now + 15 * 60 * 1000;
+        const signedToken = signAttemptToken(taskId, attemptId, uid, exp);
+        state.db.attempts[attemptId] = {
+          attemptId: attemptId,
+          taskId: taskId,
+          uid: uid,
+          status: "redirected",
+          tokenSignature: signedToken,
+          expiresAt: exp,
+          createdAt: now
+        };
+        state.db.adminKpi.summary.totalClicks += 1;
+        persistDatabase();
+
+        const verifyPath = "/verify?task=" + encodeURIComponent(taskId) + "&attempt=" + encodeURIComponent(attemptId) + "&token=" + encodeURIComponent(signedToken);
+
+        main.innerHTML = `
+          <div class="max-w-xl mx-auto glass-surface p-6 sm:p-8 space-y-5 view-transition">
+            <div class="flex items-center justify-between gap-2">
+              <span class="px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 text-xs font-semibold">ĐÃ KHỞI TẠO PHIÊN NHIỆM VỤ</span>
+              <span class="font-mono text-xs text-neutral-500">${escapeHtml(attemptId)}</span>
+            </div>
+            <h1 class="text-lg sm:text-xl font-bold">${escapeHtml(task.title)}</h1>
+            <p class="text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed">
+              Phiên thực hiện nhiệm vụ của bạn đã sẵn sàng. Nhấn nút bên dưới để tiến hành xác thực hoàn thành và nhận thưởng.
+            </p>
+            <div class="p-4 rounded-2xl bg-black/[0.03] dark:bg-white/[0.04] font-mono text-[11px] space-y-1 break-all">
+              <div><strong>Liên kết đích:</strong> ${escapeHtml(task.destinationUrl)}</div>
+              <div><strong>Mức thưởng:</strong> +${formatVnd(task.rewardVnd)}</div>
+            </div>
+            <div class="flex flex-wrap gap-3 pt-1">
+              <button type="button" data-route="${escapeHtml(verifyPath)}" class="nav-route-btn glass-btn flex-1 py-3 px-5 text-xs font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950">
+                Tiến hành Xác thực Hoàn thành
+              </button>
+              <button type="button" data-route="/tasks" class="nav-route-btn glass-btn py-3 px-4 text-xs font-semibold bg-neutral-200 dark:bg-neutral-800">
+                Quay lại
+              </button>
+            </div>
+          </div>
+        `;
+        bindRouteButtons(main);
+      }
+
+      function renderVerifyPage(main) {
+        const taskId = state.queryParams.task || "";
+        const attemptId = state.queryParams.attempt || "";
+        const token = state.queryParams.token || "";
+        const task = state.db.tasks[taskId];
+        const attempt = state.db.attempts[attemptId];
+
+        main.innerHTML = `
+          <div class="max-w-lg mx-auto glass-surface p-6 sm:p-10 space-y-5 view-transition">
+            <div class="flex items-center justify-between border-b border-black/10 dark:border-white/10 pb-4">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-neutral-950 dark:bg-white text-white dark:text-neutral-950 flex items-center justify-center font-bold text-xs">DM</div>
+                <span class="font-bold tracking-tight text-sm">DIGITALSMOD</span>
+              </div>
+              <span class="text-xs font-mono text-neutral-500">digitalsmod.site</span>
+            </div>
+
+            <div class="space-y-1.5">
+              <h1 class="text-xl sm:text-2xl font-bold">Xác thực hoàn thành</h1>
+              <p class="text-xs text-neutral-600 dark:text-neutral-400">
+                Kiểm tra thông tin phiên nhiệm vụ bên dưới và nhấn xác thực để nhận thưởng vào ví nội bộ.
+              </p>
+            </div>
+
+            <div class="p-4 rounded-2xl border border-black/10 dark:border-white/15 bg-black/[0.02] dark:bg-white/[0.03] space-y-2 text-xs">
+              <div class="flex justify-between gap-2"><span class="text-neutral-500 shrink-0">Nhiệm vụ:</span><span class="font-semibold text-right">${task ? escapeHtml(task.title) : "Chưa chọn nhiệm vụ"}</span></div>
+              <div class="flex justify-between gap-2"><span class="text-neutral-500 shrink-0">Mã phiên:</span><span class="font-mono">${attemptId ? escapeHtml(attemptId) : "—"}</span></div>
+              <div class="flex justify-between gap-2"><span class="text-neutral-500 shrink-0">Trạng thái:</span><span id="verify-status-label" class="font-mono font-semibold">${attempt ? escapeHtml(attempt.status) : "chưa khởi tạo"}</span></div>
+              <div class="flex justify-between gap-2"><span class="text-neutral-500 shrink-0">Phần thưởng:</span><span class="font-mono font-bold">+${formatVnd(task ? task.rewardVnd : state.db.system.settings.defaultRewardVnd)}</span></div>
+            </div>
+
+            <div id="verify-result-box" class="hidden p-4 rounded-2xl text-xs"></div>
+
+            <div class="flex flex-col sm:flex-row gap-3 pt-1">
+              <button type="button" id="btn-submit-verify" class="glass-btn flex-1 py-3 px-5 text-sm font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950">
+                Xác thực
+              </button>
+              <button type="button" data-route="/dashboard" class="nav-route-btn glass-btn py-3 px-5 text-sm font-semibold bg-neutral-200/80 dark:bg-neutral-800">
+                Quay về Dashboard
+              </button>
+            </div>
+          </div>
+        `;
+        bindRouteButtons(main);
+
+        const verifyBtn = document.getElementById("btn-submit-verify");
+        const resultBox = document.getElementById("verify-result-box");
+        const statusLabel = document.getElementById("verify-status-label");
+
+        verifyBtn.addEventListener("click", function() {
+          if (state.verifyLock) return;
+          if (!state.currentSession) {
+            showToast("Vui lòng đăng nhập để xác thực nhận thưởng.", "error");
+            return;
+          }
+          if (!taskId || !attemptId || !token) {
+            showToast("Vui lòng chọn và thực hiện nhiệm vụ từ danh sách Nhiệm vụ.", "error");
+            return;
+          }
+
+          state.verifyLock = true;
+          verifyBtn.disabled = true;
+          verifyBtn.textContent = "Đang xác thực...";
+
+          setTimeout(function() {
+            try {
+              const uid = state.currentSession.uid;
+              const idemKey = "idem_verify_" + attemptId;
+
+              if (state.db.idempotencyKeys[idemKey]) {
+                showVerifyResult(false, "Phiên nhiệm vụ này đã được xác thực và cộng thưởng trước đó.");
+                return;
+              }
+
+              const sigCheck = verifyAttemptToken(taskId, attemptId, uid, token);
+              if (!sigCheck.valid) {
+                showVerifyResult(false, sigCheck.reason);
+                return;
+              }
+
+              if (!attempt || attempt.uid !== uid || attempt.taskId !== taskId) {
+                showVerifyResult(false, "Thông tin phiên nhiệm vụ không khớp với tài khoản của bạn.");
+                return;
+              }
+              if (attempt.status === "verified") {
+                showVerifyResult(false, "Phiên nhiệm vụ này đã được nhận thưởng.");
+                return;
+              }
+              if (!task || task.status !== "active") {
+                showVerifyResult(false, "Nhiệm vụ không còn hoạt động hoặc đã đóng.");
+                return;
+              }
+              if (Date.now() > task.expiresAt || task.completedCount >= task.maxCompletions) {
+                showVerifyResult(false, "Nhiệm vụ đã hết hạn hoặc đạt giới hạn số lượt.");
+                return;
+              }
+              const userTaskKey = uid + ":" + taskId;
+              if (state.db.userTaskCompletions[userTaskKey]) {
+                showVerifyResult(false, "Bạn đã nhận thưởng cho nhiệm vụ này trước đó.");
+                return;
+              }
+
+              const now = Date.now();
+              attempt.status = "verified";
+              attempt.verifiedAt = now;
+              task.completedCount += 1;
+              if (task.oneTimeOnly || task.completedCount >= task.maxCompletions) {
+                task.status = "disabled_permanently";
+              }
+
+              const rewardVnd = Math.trunc(task.rewardVnd || state.db.system.settings.defaultRewardVnd);
+              const wallet = state.db.wallets[uid];
+              wallet.availableBalanceVnd += rewardVnd;
+              wallet.totalEarnedVnd += rewardVnd;
+              wallet.completedTasksCount += 1;
+              wallet.updatedAt = now;
+
+              const txId = "tx_" + randomSegment(7);
+              state.db.transactions[txId] = {
+                transactionId: txId,
+                uid: uid,
+                type: "task_reward",
+                direction: "credit",
+                amountVnd: rewardVnd,
+                balanceAfterVnd: wallet.availableBalanceVnd,
+                status: "completed",
+                idempotencyKey: idemKey,
+                referenceId: attemptId,
+                description: "Thưởng hoàn thành nhiệm vụ: " + task.title,
+                performedBy: uid,
+                createdAt: now,
+                updatedAt: now
+              };
+              state.db.idempotencyKeys[idemKey] = txId;
+
+              const cmpId = "cmp_" + randomSegment(7);
+              state.db.completions[cmpId] = {
+                completionId: cmpId,
+                taskId: taskId,
+                attemptId: attemptId,
+                uid: uid,
+                rewardVnd: rewardVnd,
+                transactionId: txId,
+                createdAt: now
+              };
+              state.db.userTaskCompletions[userTaskKey] = cmpId;
+
+              const kpi = state.db.adminKpi.summary;
+              kpi.verifiedCount += 1;
+              kpi.userRewardVnd += rewardVnd;
+              kpi.sellerRevenueKpiVnd += state.db.system.settings.sellerKpiPerVerifyVnd;
+              kpi.adminRevenueKpiVnd += state.db.system.settings.adminKpiPerVerifyVnd;
+              kpi.updatedAt = now;
+
+              appendAuditLog(uid, "TASK_VERIFIED_SUCCESS", { taskId: taskId, attemptId: attemptId, rewardVnd: rewardVnd, txId: txId });
+              if (statusLabel) statusLabel.textContent = "verified";
+              updateHeaderUi();
+              showVerifyResult(true, "Xác thực hoàn tất! Đã cộng +" + formatVnd(rewardVnd) + " vào ví nội bộ (Mã GD: " + txId + ").");
+            } finally {
+              state.verifyLock = false;
+              verifyBtn.textContent = "Đã xử lý";
+            }
+          }, 280);
+        });
+
+        function showVerifyResult(ok, msg) {
+          if (!resultBox) return;
+          resultBox.classList.remove("hidden");
+          resultBox.className = "p-4 rounded-2xl text-xs font-medium " + (ok ? "bg-emerald-500/15 text-emerald-800 dark:text-emerald-300" : "bg-red-500/15 text-red-700 dark:text-red-300");
+          resultBox.textContent = msg;
+          showToast(msg, ok ? "success" : "error");
+        }
+      }
+
+      function renderSellerPages(main, subRoute) {
+        if (!state.currentSession) {
+          main.innerHTML = `<div class="max-w-lg mx-auto glass-surface p-6 sm:p-8 text-center space-y-4 view-transition"><h2 class="text-xl font-bold">Khu vực đối tác Seller</h2><p class="text-xs text-neutral-500">Vui lòng đăng nhập tài khoản Seller để tạo liên kết rút gọn và theo dõi thống kê KPI.</p><button type="button" data-route="/login" class="nav-route-btn glass-btn px-5 py-2.5 text-xs font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950">Đăng nhập</button></div>`;
+          bindRouteButtons(main);
+          return;
+        }
+        const s = state.currentSession;
+        const myLinks = Object.values(state.db.links).filter(function(l) {
+          return s.role === "admin" || l.ownerUid === s.uid;
+        });
+        const wallet = state.db.wallets[s.uid] || { availableBalanceVnd: 0, heldBalanceVnd: 0, totalWithdrawnVnd: 0 };
+        const totalClicks = myLinks.reduce(function(acc, l) { return acc + l.clickCount; }, 0);
+        const totalVerified = myLinks.reduce(function(acc, l) { return acc + l.verifiedCount; }, 0);
+        const totalKpiVnd = myLinks.reduce(function(acc, l) { return acc + l.sellerRevenueKpiVnd; }, 0);
+
+        main.innerHTML = `
+          <div class="space-y-5 sm:space-y-6 view-transition">
+            <div class="glass-surface p-4 flex flex-wrap items-center justify-between gap-2">
+              <div class="flex flex-wrap items-center gap-2">
+                <button type="button" data-route="/seller" class="nav-route-btn glass-btn px-4 py-2 text-xs font-semibold ${subRoute === "/seller" ? "bg-neutral-950 text-white dark:bg-white dark:text-neutral-950" : "bg-neutral-200/70 dark:bg-neutral-800"}">Tổng quan &amp; Tạo liên kết</button>
+                <button type="button" data-route="/seller/links" class="nav-route-btn glass-btn px-4 py-2 text-xs font-semibold ${subRoute === "/seller/links" ? "bg-neutral-950 text-white dark:bg-white dark:text-neutral-950" : "bg-neutral-200/70 dark:bg-neutral-800"}">Liên kết (${myLinks.length})</button>
+                <button type="button" data-route="/seller/analytics" class="nav-route-btn glass-btn px-4 py-2 text-xs font-semibold ${subRoute === "/seller/analytics" ? "bg-neutral-950 text-white dark:bg-white dark:text-neutral-950" : "bg-neutral-200/70 dark:bg-neutral-800"}">Thống kê KPI</button>
+              </div>
+              <button type="button" data-route="/withdraw" class="nav-route-btn glass-btn px-4 py-2 text-xs font-semibold border border-black/15 dark:border-white/15">Rút tiền</button>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+              <div class="glass-surface p-4"><span class="text-[11px] text-neutral-500">Tổng liên kết</span><div class="text-lg sm:text-xl font-bold font-mono mt-1">${myLinks.length}</div></div>
+              <div class="glass-surface p-4"><span class="text-[11px] text-neutral-500">Lượt truy cập</span><div class="text-lg sm:text-xl font-bold font-mono mt-1">${totalClicks}</div></div>
+              <div class="glass-surface p-4"><span class="text-[11px] text-neutral-500">Xác thực hợp lệ</span><div class="text-lg sm:text-xl font-bold font-mono mt-1">${totalVerified}</div></div>
+              <div class="glass-surface p-4"><span class="text-[11px] text-neutral-500">KPI tích lũy</span><div class="text-lg sm:text-xl font-bold font-mono mt-1">${formatVnd(totalKpiVnd)}</div></div>
+              <div class="glass-surface p-4 col-span-2 sm:col-span-1"><span class="text-[11px] text-neutral-500">Số dư khả dụng</span><div class="text-lg sm:text-xl font-bold font-mono mt-1">${formatVnd(wallet.availableBalanceVnd)}</div></div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6">
+              <div class="glass-surface p-5 sm:p-6 space-y-4">
+                <h2 class="text-base font-bold">Tạo liên kết rút gọn (Link4m)</h2>
+                <form id="form-seller-create-link" class="space-y-3 text-xs">
+                  <div>
+                    <label for="sl-title" class="font-semibold block mb-1">Tiêu đề liên kết</label>
+                    <input id="sl-title" type="text" required placeholder="Chiến dịch tháng 10" class="w-full rounded-2xl border border-black/15 dark:border-white/15 bg-white/80 dark:bg-neutral-900 px-3.5 py-2" />
+                  </div>
+                  <div>
+                    <label for="sl-url" class="font-semibold block mb-1">URL đích</label>
+                    <input id="sl-url" type="url" required placeholder="https://digitalsmod.site/landing" class="w-full rounded-2xl border border-black/15 dark:border-white/15 bg-white/80 dark:bg-neutral-900 px-3.5 py-2 font-mono" />
+                  </div>
+                  <div>
+                    <label for="sl-type" class="font-semibold block mb-1">Loại nội dung</label>
+                    <select id="sl-type" class="w-full rounded-2xl border border-black/15 dark:border-white/15 bg-white/80 dark:bg-neutral-900 px-3.5 py-2">
+                      <option value="Link">Link</option>
+                      <option value="Image">Image</option>
+                      <option value="Video">Video</option>
+                      <option value="Mixed">Mixed</option>
+                    </select>
+                  </div>
+                  <button type="submit" class="w-full glass-btn py-2.5 font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950">
+                    Tạo liên kết rút gọn
+                  </button>
+                </form>
+              </div>
+
+              <div class="lg:col-span-2 glass-surface p-5 sm:p-6 space-y-4">
+                <h2 class="text-base font-bold">Danh sách liên kết của bạn</h2>
+                ${myLinks.length === 0 ? `<div class="p-8 text-center text-xs text-neutral-500 border border-dashed border-black/15 dark:border-white/15 rounded-2xl">Chưa có liên kết rút gọn nào.</div>` : `
+                  <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                      <thead class="border-b border-black/10 dark:border-white/10 text-neutral-500">
+                        <tr><th class="py-2">Tiêu đề</th><th class="py-2">Liên kết</th><th class="py-2">Click / Xác thực</th><th class="py-2">Trạng thái</th><th class="py-2 text-right">Thao tác</th></tr>
+                      </thead>
+                      <tbody class="divide-y divide-black/5 dark:divide-white/5">
+                        ${myLinks.map(function(l) {
+                          return `
+                            <tr>
+                              <td class="py-2.5 font-medium">${escapeHtml(l.title)}</td>
+                              <td class="py-2.5 font-mono text-[11px]">${escapeHtml(l.shortenedUrl)}</td>
+                              <td class="py-2.5 font-mono">${l.clickCount} / <strong>${l.verifiedCount}</strong></td>
+                              <td class="py-2.5"><span class="px-2 py-0.5 rounded-full bg-neutral-200 dark:bg-neutral-800 text-[10px] font-mono">${escapeHtml(l.status)}</span></td>
+                              <td class="py-2.5 text-right space-x-2">
+                                <button type="button" data-copy-link="${escapeHtml(l.shortenedUrl)}" class="btn-seller-copy underline">Sao chép</button>
+                                <button type="button" data-toggle-link="${escapeHtml(l.linkId)}" class="btn-seller-toggle underline">${l.status === "active" ? "Tạm dừng" : "Kích hoạt"}</button>
+                              </td>
+                            </tr>
+                          `;
+                        }).join("")}
+                      </tbody>
+                    </table>
+                  </div>
+                `}
+              </div>
+            </div>
+          </div>
+        `;
+        bindRouteButtons(main);
+
+        document.getElementById("form-seller-create-link").addEventListener("submit", function(e) {
+          e.preventDefault();
+          const title = document.getElementById("sl-title").value.trim();
+          const dest = document.getElementById("sl-url").value.trim();
+          const ctype = document.getElementById("sl-type").value;
+
+          const urlCheck = validateDestinationUrl(dest);
+          if (!urlCheck.valid) {
+            showToast(urlCheck.reason, "error");
+            return;
+          }
+
+          if (!state.db.system.settings.link4mConfigured) {
+            showToast("Máy chủ chưa cấu hình khóa API Link4m thực tế. Vui lòng bật kết nối Link4m trong Cài đặt quản trị.", "error");
+            return;
+          }
+
+          const linkId = "lnk_" + randomSegment(6);
+          const now = Date.now();
+          state.db.links[linkId] = {
+            linkId: linkId,
+            ownerUid: s.uid,
+            ownerUsername: s.username,
+            title: title,
+            contentType: ctype,
+            destinationUrl: urlCheck.url,
+            shortenedUrl: "https://link4m.co/" + randomSegment(6),
+            status: "active",
+            clickCount: 0,
+            verifiedCount: 0,
+            sellerRevenueKpiVnd: 0,
+            createdAt: now,
+            updatedAt: now
+          };
+          appendAuditLog(s.uid, "SELLER_LINK_CREATED", { linkId: linkId });
+          showToast("Đã tạo liên kết rút gọn thành công.", "success");
+          renderApp();
+        });
+
+        main.querySelectorAll(".btn-seller-copy").forEach(function(btn) {
+          btn.addEventListener("click", function() { copyTextSafe(btn.getAttribute("data-copy-link"), "liên kết"); });
+        });
+        main.querySelectorAll(".btn-seller-toggle").forEach(function(btn) {
+          btn.addEventListener("click", function() {
+            const lid = btn.getAttribute("data-toggle-link");
+            const rec = state.db.links[lid];
+            if (!rec) return;
+            if (s.role !== "admin" && rec.ownerUid !== s.uid) {
+              showToast("Bạn không có quyền sửa liên kết của người khác.", "error");
+              return;
+            }
+            rec.status = rec.status === "active" ? "paused" : "active";
+            persistDatabase();
+            showToast("Đã cập nhật trạng thái liên kết.", "info");
+            renderApp();
+          });
+        });
+      }
+
+      function renderWalletPage(main) {
+        if (!state.currentSession) {
+          main.innerHTML = `<div class="max-w-lg mx-auto glass-surface p-6 sm:p-8 text-center space-y-4 view-transition"><h2 class="text-xl font-bold">Ví nội bộ</h2><p class="text-xs text-neutral-500">Vui lòng đăng nhập để kiểm tra số dư và lịch sử giao dịch.</p><button type="button" data-route="/login" class="nav-route-btn glass-btn px-5 py-2.5 text-xs font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950">Đăng nhập</button></div>`;
+          bindRouteButtons(main);
+          return;
+        }
+        const s = state.currentSession;
+        const wallet = state.db.wallets[s.uid] || { availableBalanceVnd: 0, heldBalanceVnd: 0, totalEarnedVnd: 0, totalWithdrawnVnd: 0 };
+        const myTxs = Object.values(state.db.transactions).filter(function(tx) { return tx.uid === s.uid; }).sort(function(a, b) { return b.createdAt - a.createdAt; });
+
+        main.innerHTML = `
+          <div class="space-y-5 sm:space-y-6 view-transition">
+            <div class="glass-surface p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h1 class="text-xl sm:text-2xl font-bold">Ví Nội bộ &amp; Lịch sử Giao dịch</h1>
+                <p class="text-xs text-neutral-500 mt-1">Quản lý số dư khả dụng, số tiền đang chờ duyệt rút và đối soát giao dịch.</p>
+              </div>
+              <button type="button" data-route="/withdraw" class="nav-route-btn glass-btn px-5 py-2.5 text-xs font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 self-start sm:self-auto">Tạo yêu cầu rút tiền</button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div class="glass-surface p-5"><span class="text-xs text-neutral-500">Số dư khả dụng</span><div class="text-2xl font-bold font-mono mt-1">${formatVnd(wallet.availableBalanceVnd)}</div></div>
+              <div class="glass-surface p-5"><span class="text-xs text-neutral-500">Số dư đang tạm giữ rút tiền</span><div class="text-2xl font-bold font-mono mt-1">${formatVnd(wallet.heldBalanceVnd)}</div></div>
+              <div class="glass-surface p-5"><span class="text-xs text-neutral-500">Tổng tiền đã rút thành công</span><div class="text-2xl font-bold font-mono mt-1">${formatVnd(wallet.totalWithdrawnVnd)}</div></div>
+            </div>
+
+            <div class="glass-surface p-5 sm:p-6 space-y-4">
+              <h2 class="text-base font-bold">Chi tiết giao dịch (${myTxs.length})</h2>
+              ${myTxs.length === 0 ? `<p class="text-xs text-neutral-500 py-6 text-center">Chưa có giao dịch nào phát sinh.</p>` : `
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left text-xs">
+                    <thead class="border-b border-black/10 dark:border-white/10 text-neutral-500">
+                      <tr>
+                        <th class="py-2.5">Mã GD</th>
+                        <th class="py-2.5">Nội dung</th>
+                        <th class="py-2.5">Trạng thái</th>
+                        <th class="py-2.5">Thời gian</th>
+                        <th class="py-2.5 text-right">Số tiền</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-black/5 dark:divide-white/5">
+                      ${myTxs.map(function(tx) {
+                        const sign = tx.direction === "credit" ? "+" : "-";
+                        return `
+                          <tr>
+                            <td class="py-2.5 font-mono">${escapeHtml(tx.transactionId)}</td>
+                            <td class="py-2.5">${escapeHtml(tx.description)}</td>
+                            <td class="py-2.5"><span class="px-2 py-0.5 rounded-full bg-neutral-200 dark:bg-neutral-800 font-mono text-[10px]">${escapeHtml(tx.status)}</span></td>
+                            <td class="py-2.5 text-neutral-500">${formatTime(tx.createdAt)}</td>
+                            <td class="py-2.5 text-right font-mono font-bold">${sign}${formatVnd(tx.amountVnd)}</td>
+                          </tr>
+                        `;
+                      }).join("")}
+                    </tbody>
+                  </table>
+                </div>
+              `}
+            </div>
+          </div>
+        `;
+        bindRouteButtons(main);
+      }
+
+      function renderWithdrawPage(main) {
+        if (!state.currentSession) {
+          main.innerHTML = `<div class="max-w-lg mx-auto glass-surface p-6 sm:p-8 text-center space-y-4 view-transition"><h2 class="text-xl font-bold">Rút tiền</h2><p class="text-xs text-neutral-500">Vui lòng đăng nhập để tạo yêu cầu rút tiền ngân hàng hoặc đổi thẻ cào.</p><button type="button" data-route="/login" class="nav-route-btn glass-btn px-5 py-2.5 text-xs font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950">Đăng nhập</button></div>`;
+          bindRouteButtons(main);
+          return;
+        }
+        const s = state.currentSession;
+        const wallet = state.db.wallets[s.uid] || { availableBalanceVnd: 0, heldBalanceVnd: 0 };
+        const myWithdrawals = Object.values(state.db.withdrawals).filter(function(w) { return w.uid === s.uid; }).sort(function(a, b) { return b.createdAt - a.createdAt; });
+        let selectedBankCode = BANK_DIRECTORY[0].code;
+
+        main.innerHTML = `
+          <div class="space-y-5 sm:space-y-6 view-transition">
+            <div class="glass-surface p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h1 class="text-xl sm:text-2xl font-bold">Yêu cầu Rút tiền</h1>
+                <p class="text-xs text-neutral-500 mt-1">
+                  Số dư khả dụng: <strong class="font-mono text-neutral-900 dark:text-white">${formatVnd(wallet.availableBalanceVnd)}</strong> • Tối thiểu: <strong class="font-mono">${formatVnd(state.db.system.settings.minWithdrawVnd)}</strong>
+                </p>
+              </div>
+              <button type="button" data-route="/wallet" class="nav-route-btn glass-btn px-4 py-2 text-xs font-semibold bg-neutral-200 dark:bg-neutral-800 self-start sm:self-auto">Lịch sử giao dịch</button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
+              <div class="glass-surface p-5 sm:p-6 space-y-4">
+                <h2 class="text-base font-bold">Rút tiền về Tài khoản Ngân hàng</h2>
+                <form id="form-withdraw-bank" class="space-y-3 text-xs">
+                  <div class="relative space-y-1">
+                    <label class="font-semibold block">Ngân hàng thụ hưởng</label>
+                    <button type="button" id="btn-bank-select-trigger" class="w-full rounded-2xl border border-black/15 dark:border-white/15 bg-white/80 dark:bg-neutral-900 px-3.5 py-2.5 flex items-center justify-between text-left gap-2">
+                      <span id="bank-selected-label" class="truncate">${escapeHtml(BANK_DIRECTORY[0].shortName)} (${escapeHtml(BANK_DIRECTORY[0].code)}) — ${escapeHtml(BANK_DIRECTORY[0].fullName)}</span>
+                      <svg class="w-4 h-4 opacity-60 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                    </button>
+                    <div id="bank-dropdown-panel" class="hidden absolute left-0 right-0 top-full mt-1 z-30 glass-surface p-3 space-y-2">
+                      <input type="text" id="bank-search-input" placeholder="Tìm tên hoặc mã ngân hàng (VD: VCB, MB)..." class="w-full rounded-xl border border-black/15 dark:border-white/15 bg-white dark:bg-neutral-900 px-3 py-1.5 text-xs" />
+                      <div id="bank-options-list" class="max-h-44 overflow-y-auto divide-y divide-black/5 dark:divide-white/5"></div>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label for="wb-acc-num" class="font-semibold block mb-1">Số tài khoản</label>
+                      <input id="wb-acc-num" type="text" required placeholder="0123456789" class="w-full rounded-2xl border border-black/15 dark:border-white/15 bg-white/80 dark:bg-neutral-900 px-3.5 py-2 font-mono" />
+                    </div>
+                    <div>
+                      <label for="wb-acc-holder" class="font-semibold block mb-1">Tên chủ tài khoản</label>
+                      <input id="wb-acc-holder" type="text" required placeholder="NGUYEN VAN A" class="w-full rounded-2xl border border-black/15 dark:border-white/15 bg-white/80 dark:bg-neutral-900 px-3.5 py-2 uppercase" />
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label for="wb-amount" class="font-semibold block mb-1">Số tiền rút (VND)</label>
+                      <input id="wb-amount" type="number" step="1000" min="10000" required placeholder="10000" class="w-full rounded-2xl border border-black/15 dark:border-white/15 bg-white/80 dark:bg-neutral-900 px-3.5 py-2 font-mono" />
+                    </div>
+                    <div>
+                      <label for="wb-note" class="font-semibold block mb-1">Ghi chú</label>
+                      <input id="wb-note" type="text" placeholder="Ghi chú thêm (nếu có)" class="w-full rounded-2xl border border-black/15 dark:border-white/15 bg-white/80 dark:bg-neutral-900 px-3.5 py-2" />
+                    </div>
+                  </div>
+
+                  <button type="submit" class="w-full glass-btn py-2.5 font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950">
+                    Gửi yêu cầu rút Ngân hàng
+                  </button>
+                </form>
+              </div>
+
+              <div class="glass-surface p-5 sm:p-6 space-y-4">
+                <h2 class="text-base font-bold">Đổi Thẻ cào Viễn thông</h2>
+                <p class="text-[11px] text-neutral-500 leading-relaxed">
+                  Hỗ trợ Viettel, VinaPhone, MobiFone, Vietnamobile. Yêu cầu rút thẻ cào sẽ được giữ số dư và duyệt thanh toán bởi quản trị viên.
+                </p>
+                <form id="form-withdraw-card" class="space-y-3 text-xs">
+                  <div>
+                    <label for="wc-telco" class="font-semibold block mb-1">Nhà mạng</label>
+                    <select id="wc-telco" class="w-full rounded-2xl border border-black/15 dark:border-white/15 bg-white/80 dark:bg-neutral-900 px-3.5 py-2">
+                      ${TELCO_DIRECTORY.map(function(t) {
+                        return `<option value="${escapeHtml(t.code)}">${escapeHtml(t.name)} (Phí: ${t.feePercent}%)</option>`;
+                      }).join("")}
+                    </select>
+                  </div>
+                  <div>
+                    <label for="wc-denom" class="font-semibold block mb-1">Mệnh giá thẻ</label>
+                    <select id="wc-denom" class="w-full rounded-2xl border border-black/15 dark:border-white/15 bg-white/80 dark:bg-neutral-900 px-3.5 py-2 font-mono">
+                      <option value="10000">10.000 VND</option>
+                      <option value="20000">20.000 VND</option>
+                      <option value="50000">50.000 VND</option>
+                      <option value="100000">100.000 VND</option>
+                      <option value="200000">200.000 VND</option>
+                      <option value="500000">500.000 VND</option>
+                    </select>
+                  </div>
+                  <button type="submit" class="w-full glass-btn py-2.5 font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950">
+                    Gửi yêu cầu đổi Thẻ cào
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <div class="glass-surface p-5 sm:p-6 space-y-3">
+              <h2 class="text-base font-bold">Lịch sử yêu cầu rút tiền (${myWithdrawals.length})</h2>
+              ${myWithdrawals.length === 0 ? `<p class="text-xs text-neutral-500 py-4 text-center">Chưa có yêu cầu rút tiền nào.</p>` : `
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left text-xs">
+                    <thead class="border-b border-black/10 dark:border-white/10 text-neutral-500">
+                      <tr><th class="py-2">Mã YC</th><th class="py-2">Hình thức</th><th class="py-2">Thông tin nhận</th><th class="py-2">Số tiền</th><th class="py-2">Trạng thái</th><th class="py-2">Phản hồi</th></tr>
+                    </thead>
+                    <tbody class="divide-y divide-black/5 dark:divide-white/5">
+                      ${myWithdrawals.map(function(w) {
+                        const detail = w.method === "bank"
+                          ? (w.bankDetails.bankName + " • " + w.bankDetails.accountNumber + " (" + w.bankDetails.accountHolder + ")")
+                          : (w.cardDetails.telcoName + " • " + formatVnd(w.cardDetails.denominationVnd));
+                        return `
+                          <tr>
+                            <td class="py-2.5 font-mono">${escapeHtml(w.withdrawalId)}</td>
+                            <td class="py-2.5 uppercase font-mono">${escapeHtml(w.method)}</td>
+                            <td class="py-2.5">${escapeHtml(detail)}</td>
+                            <td class="py-2.5 font-mono font-bold">${formatVnd(w.amountVnd)}</td>
+                            <td class="py-2.5"><span class="px-2 py-0.5 rounded-full bg-neutral-200 dark:bg-neutral-800 font-mono text-[10px]">${escapeHtml(w.status)}</span></td>
+                            <td class="py-2.5 text-neutral-500">${escapeHtml(w.rejectionReason || w.note || "—")}</td>
+                          </tr>
+                        `;
+                      }).join("")}
+                    </tbody>
+                  </table>
+                </div>
+              `}
+            </div>
+          </div>
+        `;
+        bindRouteButtons(main);
+
+        const triggerBtn = document.getElementById("btn-bank-select-trigger");
+        const panel = document.getElementById("bank-dropdown-panel");
+        const searchInput = document.getElementById("bank-search-input");
+        const optionsList = document.getElementById("bank-options-list");
+        const selectedLabel = document.getElementById("bank-selected-label");
+
+        function renderBankOptions(q) {
+          const clean = String(q || "").trim().toLowerCase();
+          const filtered = BANK_DIRECTORY.filter(function(b) {
+            return !clean || b.code.toLowerCase().includes(clean) || b.shortName.toLowerCase().includes(clean) || b.fullName.toLowerCase().includes(clean);
+          });
+          optionsList.innerHTML = filtered.map(function(b) {
+            return `<button type="button" data-code="${escapeHtml(b.code)}" class="w-full text-left px-3 py-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-xl flex items-center justify-between gap-2">
+              <span class="font-semibold shrink-0">${escapeHtml(b.shortName)} (${escapeHtml(b.code)})</span>
+              <span class="text-[11px] text-neutral-500 truncate">${escapeHtml(b.fullName)}</span>
+            </button>`;
+          }).join("");
+          optionsList.querySelectorAll("button").forEach(function(bEl) {
+            bEl.addEventListener("click", function() {
+              selectedBankCode = bEl.getAttribute("data-code");
+              const found = BANK_DIRECTORY.find(function(x) { return x.code === selectedBankCode; });
+              if (found) selectedLabel.textContent = found.shortName + " (" + found.code + ") — " + found.fullName;
+              panel.classList.add("hidden");
+            });
+          });
+        }
+        renderBankOptions("");
+        triggerBtn.addEventListener("click", function() { panel.classList.toggle("hidden"); });
+        searchInput.addEventListener("input", function(e) { renderBankOptions(e.target.value); });
+
+        function submitWithdrawalRequest(method, amountVnd, bankDetails, cardDetails, note) {
+          if (!Number.isInteger(amountVnd) || amountVnd < state.db.system.settings.minWithdrawVnd) {
+            showToast("Số tiền rút tối thiểu là " + formatVnd(state.db.system.settings.minWithdrawVnd), "error");
+            return;
+          }
+          if (wallet.availableBalanceVnd < amountVnd) {
+            showToast("Số dư khả dụng không đủ.", "error");
+            return;
+          }
+
+          const now = Date.now();
+          wallet.availableBalanceVnd -= amountVnd;
+          wallet.heldBalanceVnd += amountVnd;
+          wallet.updatedAt = now;
+
+          const wdId = "wd_" + randomSegment(6);
+          const holdTxId = "tx_" + randomSegment(7);
+          state.db.transactions[holdTxId] = {
+            transactionId: holdTxId,
+            uid: s.uid,
+            type: "withdrawal_hold",
+            direction: "debit",
+            amountVnd: amountVnd,
+            balanceAfterVnd: wallet.availableBalanceVnd,
+            status: "pending",
+            idempotencyKey: "hold_" + wdId,
+            referenceId: wdId,
+            description: "Tạm giữ số dư cho yêu cầu rút tiền #" + wdId,
+            performedBy: s.uid,
+            createdAt: now,
+            updatedAt: now
+          };
+
+          state.db.withdrawals[wdId] = {
+            withdrawalId: wdId,
+            uid: s.uid,
+            username: s.username,
+            method: method,
+            amountVnd: amountVnd,
+            feeVnd: 0,
+            netAmountVnd: amountVnd,
+            status: "pending",
+            bankDetails: bankDetails,
+            cardDetails: cardDetails,
+            note: note,
+            holdTransactionId: holdTxId,
+            refunded: false,
+            createdAt: now,
+            updatedAt: now
+          };
+
+          appendAuditLog(s.uid, "WITHDRAWAL_CREATED", { withdrawalId: wdId, amountVnd: amountVnd, method: method });
+          showToast("Đã gửi yêu cầu rút tiền #" + wdId + ".", "success");
+          renderApp();
+        }
+
+        document.getElementById("form-withdraw-bank").addEventListener("submit", function(e) {
+          e.preventDefault();
+          const bankObj = BANK_DIRECTORY.find(function(x) { return x.code === selectedBankCode; }) || BANK_DIRECTORY[0];
+          const accNum = document.getElementById("wb-acc-num").value.trim();
+          const holder = document.getElementById("wb-acc-holder").value.trim().toUpperCase();
+          const amt = Math.trunc(Number(document.getElementById("wb-amount").value));
+          const note = document.getElementById("wb-note").value.trim();
+          submitWithdrawalRequest("bank", amt, {
+            bankCode: bankObj.code,
+            bankName: bankObj.shortName,
+            accountNumber: accNum,
+            accountHolder: holder
+          }, null, note);
+        });
+
+        document.getElementById("form-withdraw-card").addEventListener("submit", function(e) {
+          e.preventDefault();
+          const telcoCode = document.getElementById("wc-telco").value;
+          const denom = Math.trunc(Number(document.getElementById("wc-denom").value));
+          const telcoObj = TELCO_DIRECTORY.find(function(x) { return x.code === telcoCode; }) || TELCO_DIRECTORY[0];
+          submitWithdrawalRequest("card", denom, null, {
+            telcoCode: telcoObj.code,
+            telcoName: telcoObj.name,
+            denominationVnd: denom,
+            quantity: 1
+          }, "Đổi thẻ cào " + telcoObj.name);
+        });
+      }
+
+      function renderNotificationsPage(main) {
+        const uid = state.currentSession ? state.currentSession.uid : "guest";
+        if (!state.db.notificationReads[uid]) state.db.notificationReads[uid] = {};
+        const reads = state.db.notificationReads[uid];
+        const list = Object.values(state.db.notifications).sort(function(a, b) { return b.createdAt - a.createdAt; });
+
+        main.innerHTML = `
+          <div class="max-w-3xl mx-auto space-y-4 sm:space-y-5 view-transition">
+            <div class="glass-surface p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h1 class="text-xl sm:text-2xl font-bold">Trung tâm Thông báo</h1>
+                <p class="text-xs text-neutral-500 mt-1">Cập nhật từ hệ thống quản trị DIGITALSMOD.SITE</p>
+              </div>
+              <button type="button" id="btn-mark-all-read" class="glass-btn px-4 py-2 text-xs font-semibold bg-neutral-200 dark:bg-neutral-800 self-start sm:self-auto">
+                Đánh dấu đã đọc tất cả
+              </button>
+            </div>
+            <div class="space-y-3">
+              ${list.map(function(n) {
+                const isRead = Boolean(reads[n.notificationId]);
+                return `
+                  <div class="glass-surface p-5 flex flex-col sm:flex-row sm:items-start justify-between gap-3 ${isRead ? "opacity-70" : ""}">
+                    <div class="space-y-1">
+                      <div class="flex items-center gap-2">
+                        ${!isRead ? '<span class="w-2 h-2 rounded-full bg-neutral-900 dark:bg-white shrink-0"></span>' : ""}
+                        <h3 class="text-sm font-bold">${escapeHtml(n.title)}</h3>
+                      </div>
+                      <p class="text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed">${escapeHtml(n.body)}</p>
+                      <span class="text-[11px] text-neutral-400 block pt-0.5">${formatTime(n.createdAt)}</span>
+                    </div>
+                    ${!isRead ? `<button type="button" data-read-id="${escapeHtml(n.notificationId)}" class="btn-mark-one glass-btn px-3.5 py-1.5 text-xs font-semibold bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 self-start sm:self-auto shrink-0">Đã đọc</button>` : ""}
+                  </div>
+                `;
+              }).join("")}
+            </div>
+          </div>
+        `;
+        document.getElementById("btn-mark-all-read").addEventListener("click", function() {
+          list.forEach(function(n) { reads[n.notificationId] = { readAt: Date.now() }; });
+          persistDatabase();
+          showToast("Đã đánh dấu đọc tất cả thông báo.", "success");
+          renderApp();
+        });
+        main.querySelectorAll(".btn-mark-one").forEach(function(b) {
+          b.addEventListener("click", function() {
+            reads[b.getAttribute("data-read-id")] = { readAt: Date.now() };
+            persistDatabase();
+            renderApp();
+          });
+        });
+      }
+
+      function renderSettingsPage(main) {
+        const isDark = document.documentElement.classList.contains("dark");
+        const isReduced = document.body.classList.contains("reduced-motion");
+        main.innerHTML = `
+          <div class="max-w-2xl mx-auto glass-surface p-5 sm:p-8 space-y-5 view-transition">
+            <div>
+              <h1 class="text-xl sm:text-2xl font-bold">Tùy chọn Hệ thống</h1>
+              <p class="text-xs text-neutral-500 mt-1">Quản lý chế độ hiển thị và kết nối tài khoản trên DIGITALSMOD.SITE.</p>
+            </div>
+
+            <div class="space-y-3 text-xs">
+              <div class="p-4 rounded-2xl border border-black/10 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <div class="font-semibold text-sm">Chế độ Sáng / Tối</div>
+                  <p class="text-neutral-500 mt-0.5">Thay đổi tông màu nền phù hợp với môi trường làm việc của bạn.</p>
+                </div>
+                <button type="button" id="btn-settings-theme" class="glass-btn px-4 py-2 font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 self-start sm:self-auto">
+                  Đang dùng: ${isDark ? "Tối" : "Sáng"}
+                </button>
+              </div>
+
+              <div class="p-4 rounded-2xl border border-black/10 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <div class="font-semibold text-sm">Tối ưu cho thiết bị cấu hình thấp</div>
+                  <p class="text-neutral-500 mt-0.5">Giảm bớt chuyển động để tiết kiệm pin và tăng tốc độ phản hồi.</p>
+                </div>
+                <button type="button" id="btn-settings-motion" class="glass-btn px-4 py-2 font-semibold bg-neutral-200 dark:bg-neutral-800 self-start sm:self-auto">
+                  ${isReduced ? "Đang bật" : "Đang tắt"}
+                </button>
+              </div>
+
+              <div class="p-4 rounded-2xl border border-black/10 dark:border-white/10 space-y-1.5 font-mono text-[11px]">
+                <div class="font-sans font-semibold text-xs">Thông tin kết nối máy chủ:</div>
+                <div>Tên miền: https://digitalsmod.site</div>
+                <div>Cơ sở dữ liệu: ${escapeHtml(FIREBASE_CONFIG.projectId)} (Trực tuyến)</div>
+              </div>
+            </div>
+          </div>
+        `;
+        document.getElementById("btn-settings-theme").addEventListener("click", function() {
+          document.getElementById("btn-toggle-theme").click();
+          renderApp();
+        });
+        document.getElementById("btn-settings-motion").addEventListener("click", function() {
+          document.body.classList.toggle("reduced-motion");
+          showToast("Đã lưu cài đặt hiển thị.", "info");
+          renderApp();
+        });
+      }
+
+      function renderAdminPages(main, adminRoute) {
+        const boot = state.db.system.adminBootstrap;
+
+        if (!boot.completed) {
+          main.innerHTML = `
+            <div class="max-w-xl mx-auto glass-surface p-6 sm:p-8 space-y-5 view-transition">
+              <span class="px-3 py-1 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 text-[11px] font-semibold">KHỞI TẠO QUẢN TRỊ VIÊN ĐẦU TIÊN</span>
+              <h1 class="text-xl sm:text-2xl font-bold">Thiết lập Quản trị Hệ thống</h1>
+              <p class="text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed">
+                Hệ thống chưa có quản trị viên. Nhấn nút bên dưới để khởi tạo danh tính quản trị đầu tiên và nhận mã định danh bí mật (chỉ thực hiện được một lần duy nhất).
+              </p>
+              <button type="button" id="btn-run-admin-bootstrap" class="w-full glass-btn py-3 text-sm font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950">
+                Khởi tạo Quản trị viên &amp; Nhận Mã Bí mật
+              </button>
+            </div>
+          `;
+          document.getElementById("btn-run-admin-bootstrap").addEventListener("click", function() {
+            if (boot.completed) {
+              showToast("Hệ thống đã có quản trị viên, không thể khởi tạo lần hai.", "error");
+              return;
+            }
+            const secretCode = generateAdminSecretCode();
+            const codeHash = computeKeyHash(secretCode);
+            const adminUid = "adm_" + randomSegment(6);
+            const now = Date.now();
+
+            boot.completed = true;
+            boot.adminUid = adminUid;
+            boot.codeHash = codeHash;
+            boot.bootstrappedAt = now;
+
+            state.db.users[adminUid] = {
+              uid: adminUid,
+              username: "administrator",
+              normalizedUsername: "administrator",
+              keyHash: codeHash,
+              maskedKey: "dgtf-adm-****-****-" + secretCode.slice(-4),
+              role: "admin",
+              status: "active",
+              keySavedConfirmed: false,
+              createdAt: now,
+              updatedAt: now
+            };
+            state.db.wallets[adminUid] = {
+              uid: adminUid,
+              availableBalanceVnd: 0,
+              heldBalanceVnd: 0,
+              totalEarnedVnd: 0,
+              totalWithdrawnVnd: 0,
+              completedTasksCount: 0,
+              updatedAt: now
+            };
+
+            state.pendingAdminBootstrapCode = {
+              adminUid: adminUid,
+              secretCode: secretCode,
+              confirmed: false
+            };
+            appendAuditLog(adminUid, "ADMIN_BOOTSTRAP_COMPLETED", { node: "system/adminBootstrap" });
+            renderApp();
+          });
+          return;
+        }
+
+        if (state.pendingAdminBootstrapCode) {
+          const pac = state.pendingAdminBootstrapCode;
+          main.innerHTML = `
+            <div class="max-w-xl mx-auto glass-surface p-6 sm:p-8 space-y-5 view-transition">
+              <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-xs font-semibold">CHỈ HIỂN THỊ MỘT LẦN DUY NHẤT</span>
+              <h1 class="text-xl sm:text-2xl font-bold">Lưu Mã Bí Mật Quản Trị</h1>
+              <p class="text-xs text-neutral-600 dark:text-neutral-300">
+                Vui lòng sao chép hoặc tải xuống mã bí mật bên dưới. Hệ thống chỉ lưu trữ mã băm và sẽ không bao giờ cấp lại mã này lần thứ hai.
+              </p>
+              <div class="p-4 rounded-2xl bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 font-mono text-center text-sm sm:text-lg select-all break-all">
+                ${escapeHtml(pac.secretCode)}
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button type="button" id="btn-copy-admin-code" class="glass-btn py-2.5 text-xs font-semibold bg-neutral-200 dark:bg-neutral-800">Sao chép Mã</button>
+                <button type="button" id="btn-dl-admin-code" class="glass-btn py-2.5 text-xs font-semibold bg-neutral-900 text-white dark:bg-white dark:text-neutral-900">Tải file TXT</button>
+              </div>
+              <label class="flex items-start sm:items-center gap-2.5 text-xs font-medium cursor-pointer">
+                <input type="checkbox" id="chk-admin-code-saved" class="w-4 h-4 rounded mt-0.5 sm:mt-0 shrink-0" />
+                <span>Tôi xác nhận đã lưu mã quản trị bí mật này an toàn.</span>
+              </label>
+              <button type="button" id="btn-enter-admin-console" class="w-full glass-btn py-3 text-sm font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950">
+                Xác nhận &amp; Mở Bảng Quản Trị
+              </button>
+            </div>
+          `;
+          document.getElementById("btn-copy-admin-code").addEventListener("click", function() {
+            copyTextSafe(pac.secretCode, "mã quản trị");
+          });
+          document.getElementById("btn-dl-admin-code").addEventListener("click", function() {
+            const lines = [
+              "=== DIGITALSMOD.SITE - MA QUAN TRI BI MAT ===",
+              "Admin UID: " + pac.adminUid,
+              "Secret Code: " + pac.secretCode,
+              "Created At: " + new Date().toISOString()
+            ];
+            downloadTxtFile("digitalsmod-admin-secret.txt", lines.join("\n"));
+          });
+          document.getElementById("btn-enter-admin-console").addEventListener("click", function() {
+            const chk = document.getElementById("chk-admin-code-saved");
+            if (!chk || !chk.checked) {
+              showToast("Vui lòng xác nhận đã lưu mã quản trị trước khi tiếp tục.", "error");
+              return;
+            }
+            state.currentSession = {
+              uid: pac.adminUid,
+              username: "administrator",
+              role: "admin",
+              maskedKey: "dgtf-adm-****-****-" + pac.secretCode.slice(-4)
+            };
+            state.pendingAdminBootstrapCode = null;
+            persistDatabase();
+            showToast("Đã mở phiên Quản trị viên.", "success");
+            renderApp();
+          });
+          return;
+        }
+
+        if (!state.currentSession || state.currentSession.role !== "admin") {
+          main.innerHTML = `
+            <div class="max-w-md mx-auto glass-surface p-6 sm:p-8 space-y-5 view-transition">
+              <div>
+                <h1 class="text-xl sm:text-2xl font-bold">Đăng nhập Quản trị</h1>
+                <p class="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+                  Nhập mã định danh quản trị viên <code class="font-mono">dgtf-adm-xxxx-xxxx-xxxx-xxxx</code> đã được cấp khi khởi tạo hệ thống.
+                </p>
+              </div>
+              <form id="form-admin-login" class="space-y-4">
+                <div>
+                  <label for="admin-secret-input" class="text-xs font-semibold block mb-1">Mã quản trị bí mật</label>
+                  <input id="admin-secret-input" type="password" required placeholder="dgtf-adm-xxxx-xxxx-xxxx-xxxx" class="w-full rounded-2xl border border-black/15 dark:border-white/15 bg-white/80 dark:bg-neutral-900 px-4 py-2.5 text-sm font-mono" />
+                </div>
+                <button type="submit" class="w-full glass-btn py-3 text-sm font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950">
+                  Xác minh &amp; Truy cập
+                </button>
+              </form>
+            </div>
+          `;
+          document.getElementById("form-admin-login").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const code = normalizeKey(document.getElementById("admin-secret-input").value);
+            if (!isValidAdminCodeFormat(code) || computeKeyHash(code) !== boot.codeHash) {
+              appendAuditLog("anonymous", "ADMIN_LOGIN_FAILED", {});
+              showToast("Mã quản trị không chính xác.", "error");
+              return;
+            }
+            const adm = state.db.users[boot.adminUid];
+            state.currentSession = {
+              uid: adm.uid,
+              username: adm.username,
+              role: "admin",
+              maskedKey: adm.maskedKey
+            };
+            appendAuditLog(adm.uid, "ADMIN_LOGIN_SUCCESS", {});
+            showToast("Đăng nhập Quản trị thành công.", "success");
+            renderApp();
+          });
+          return;
+        }
+
+        const adminTabs = [
+          { path: "/admin", label: "Tổng quan" },
+          { path: "/admin/tasks", label: "Nhiệm vụ" },
+          { path: "/admin/users", label: "Người dùng" },
+          { path: "/admin/sellers", label: "Seller" },
+          { path: "/admin/links", label: "Liên kết" },
+          { path: "/admin/withdrawals", label: "Duyệt Rút tiền" },
+          { path: "/admin/transactions", label: "Giao dịch" },
+          { path: "/admin/notifications", label: "Thông báo" },
+          { path: "/admin/settings", label: "Cài đặt" },
+          { path: "/admin/logs", label: "Nhật ký" }
+        ];
+
+        const navHtml = `
+          <div class="glass-surface p-2.5 flex items-center gap-1.5 overflow-x-auto">
+            ${adminTabs.map(function(t) {
+              const active = adminRoute === t.path;
+              return `<button type="button" data-route="${t.path}" class="nav-route-btn glass-btn px-3.5 py-2 text-xs font-semibold shrink-0 ${active ? "bg-neutral-950 text-white dark:bg-white dark:text-neutral-950" : "hover:bg-black/5 dark:hover:bg-white/10"}">${escapeHtml(t.label)}</button>`;
+            }).join("")}
+          </div>
+        `;
+
+        const kpi = state.db.adminKpi.summary;
+        const usersList = Object.values(state.db.users);
+        const sellersList = usersList.filter(function(u) { return u.role === "seller"; });
+        const tasksList = Object.values(state.db.tasks);
+        const linksList = Object.values(state.db.links);
+        const withdrawalsList = Object.values(state.db.withdrawals).sort(function(a, b) { return b.createdAt - a.createdAt; });
+        const txList = Object.values(state.db.transactions).sort(function(a, b) { return b.createdAt - a.createdAt; });
+        const logsList = Object.values(state.db.auditLogs).sort(function(a, b) { return b.createdAt - a.createdAt; });
+
+        let bodyContent = "";
+
+        if (adminRoute === "/admin") {
+          const totalUserBalances = Object.values(state.db.wallets).reduce(function(acc, w) { return acc + w.availableBalanceVnd; }, 0);
+          const pendingWithdrawalsCount = withdrawalsList.filter(function(w) { return w.status === "pending"; }).length;
+
+          bodyContent = `
+            <div class="space-y-5 sm:space-y-6">
+              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+                <div class="glass-surface p-4"><span class="text-[11px] text-neutral-500">Tài khoản / Seller</span><div class="text-lg sm:text-xl font-bold font-mono mt-1">${usersList.length} / ${sellersList.length}</div></div>
+                <div class="glass-surface p-4"><span class="text-[11px] text-neutral-500">Nhiệm vụ / Link</span><div class="text-lg sm:text-xl font-bold font-mono mt-1">${tasksList.length} / ${linksList.length}</div></div>
+                <div class="glass-surface p-4"><span class="text-[11px] text-neutral-500">Click / Xác thực</span><div class="text-lg sm:text-xl font-bold font-mono mt-1">${kpi.totalClicks} / ${kpi.verifiedCount}</div></div>
+                <div class="glass-surface p-4"><span class="text-[11px] text-neutral-500">Tổng thưởng User</span><div class="text-lg sm:text-xl font-bold font-mono mt-1">${formatVnd(kpi.userRewardVnd)}</div></div>
+                <div class="glass-surface p-4 col-span-2 sm:col-span-1"><span class="text-[11px] text-neutral-500">Rút tiền chờ duyệt</span><div class="text-lg sm:text-xl font-bold font-mono mt-1">${pendingWithdrawalsCount} yêu cầu</div></div>
+              </div>
+
+              <div class="glass-surface p-5 sm:p-6 space-y-3">
+                <h2 class="text-base font-bold">Thống kê Đối soát Tài chính &amp; KPI</h2>
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left text-xs">
+                    <thead class="border-b border-black/10 dark:border-white/10 text-neutral-500">
+                      <tr><th class="py-2">Chỉ số</th><th class="py-2">Mô tả</th><th class="py-2 text-right">Giá trị</th></tr>
+                    </thead>
+                    <tbody class="divide-y divide-black/5 dark:divide-white/5 font-mono">
+                      <tr><td class="py-2.5 font-semibold">verifiedCount</td><td class="py-2.5 font-sans">Số lượt xác thực hoàn thành hợp lệ</td><td class="py-2.5 text-right font-bold">${kpi.verifiedCount} lượt</td></tr>
+                      <tr><td class="py-2.5 font-semibold">userRewardVnd</td><td class="py-2.5 font-sans">Khoản thưởng đã chi trả người dùng</td><td class="py-2.5 text-right font-bold">${formatVnd(kpi.userRewardVnd)}</td></tr>
+                      <tr><td class="py-2.5 font-semibold">sellerRevenueKpiVnd</td><td class="py-2.5 font-sans">KPI doanh thu phân bổ đối tác Seller</td><td class="py-2.5 text-right font-bold">${formatVnd(kpi.sellerRevenueKpiVnd)}</td></tr>
+                      <tr><td class="py-2.5 font-semibold">adminRevenueKpiVnd</td><td class="py-2.5 font-sans">KPI vận hành nội bộ</td><td class="py-2.5 text-right font-bold">${formatVnd(kpi.adminRevenueKpiVnd)}</td></tr>
+                      <tr><td class="py-2.5 font-semibold">partnerConfirmedRevenueVnd</td><td class="py-2.5 font-sans">Doanh thu đối tác đã xác nhận qua Callback</td><td class="py-2.5 text-right font-bold">${formatVnd(kpi.partnerConfirmedRevenueVnd)}</td></tr>
+                      <tr><td class="py-2.5 font-semibold">totalUserBalances</td><td class="py-2.5 font-sans">Tổng số dư khả dụng trong ví thành viên</td><td class="py-2.5 text-right font-bold">${formatVnd(totalUserBalances)}</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          `;
+        } else if (adminRoute === "/admin/tasks") {
+          bodyContent = `
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6">
+              <div class="glass-surface p-5 sm:p-6 space-y-4">
+                <h2 class="text-base font-bold">Tạo Nhiệm vụ mới</h2>
+                <form id="form-admin-create-task" class="space-y-3 text-xs">
+                  <div>
+                    <label class="font-semibold block mb-1">Tiêu đề nhiệm vụ</label>
+                    <input id="at-title" type="text" required placeholder="Nhiệm vụ xác thực tài liệu" class="w-full rounded-2xl border border-black/15 dark:border-white/15 bg-white/80 dark:bg-neutral-900 px-3.5 py-2" />
+                  </div>
+                  <div>
+                    <label class="font-semibold block mb-1">Mô tả hướng dẫn</label>
+                    <textarea id="at-desc" rows="2" required placeholder="Hướng dẫn chi tiết..." class="w-full rounded-2xl border border-black/15 dark:border-white/15 bg-white/80 dark:bg-neutral-900 px-3.5 py-2"></textarea>
+                  </div>
+                  <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                      <label class="font-semibold block mb-1">Loại nội dung</label>
+                      <select id="at-type" class="w-full rounded-2xl border border-black/15 dark:border-white/15 bg-white/80 dark:bg-neutral-900 px-3 py-2">
+                        <option value="Link">Link</option>
+                        <option value="Image">Image</option>
+                        <option value="Video">Video</option>
+                        <option value="Mixed">Mixed</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="font-semibold block mb-1">Thưởng (VND)</label>
+                      <input id="at-reward" type="number" value="${state.db.system.settings.defaultRewardVnd}" required class="w-full rounded-2xl border border-black/15 dark:border-white/15 bg-white/80 dark:bg-neutral-900 px-3 py-2 font-mono" />
+                    </div>
+                  </div>
+                  <div>
+                    <label class="font-semibold block mb-1">URL đích</label>
+                    <input id="at-dest" type="url" required placeholder="https://digitalsmod.site/campaign" class="w-full rounded-2xl border border-black/15 dark:border-white/15 bg-white/80 dark:bg-neutral-900 px-3.5 py-2 font-mono" />
+                  </div>
+                  <div>
+                    <label class="font-semibold block mb-1">Giới hạn lượt hoàn thành</label>
+                    <input id="at-max" type="number" value="100" min="1" required class="w-full rounded-2xl border border-black/15 dark:border-white/15 bg-white/80 dark:bg-neutral-900 px-3.5 py-2 font-mono" />
+                  </div>
+                  <label class="flex items-center gap-2 cursor-pointer pt-1">
+                    <input type="checkbox" id="at-onetime" class="w-4 h-4 rounded shrink-0" />
+                    <span>Chế độ 1 lượt duy nhất (Tự đóng sau lượt đầu tiên)</span>
+                  </label>
+                  <div class="flex gap-2 pt-2">
+                    <button type="button" id="btn-preview-task" class="glass-btn flex-1 py-2.5 font-semibold bg-neutral-200 dark:bg-neutral-800">Xem trước</button>
+                    <button type="submit" class="glass-btn flex-1 py-2.5 font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950">Xuất bản</button>
+                  </div>
+                </form>
+              </div>
+
+              <div class="lg:col-span-2 glass-surface p-5 sm:p-6 space-y-4">
+                <h2 class="text-base font-bold">Danh sách Nhiệm vụ (${tasksList.length})</h2>
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left text-xs">
+                    <thead class="border-b border-black/10 dark:border-white/10 text-neutral-500">
+                      <tr><th class="py-2">Tiêu đề / Liên kết</th><th class="py-2">Thưởng</th><th class="py-2">Lượt</th><th class="py-2">Trạng thái</th><th class="py-2 text-right">Thao tác</th></tr>
+                    </thead>
+                    <tbody class="divide-y divide-black/5 dark:divide-white/5">
+                      ${tasksList.map(function(t) {
+                        return `
+                          <tr>
+                            <td class="py-2.5"><div class="font-semibold">${escapeHtml(t.title)}</div><div class="font-mono text-[10px] text-neutral-500">https://digitalsmod.site/go/${escapeHtml(t.taskId)}</div></td>
+                            <td class="py-2.5 font-mono">${formatVnd(t.rewardVnd)}</td>
+                            <td class="py-2.5 font-mono">${t.completedCount}/${t.maxCompletions}</td>
+                            <td class="py-2.5"><span class="px-2 py-0.5 rounded-full bg-neutral-200 dark:bg-neutral-800 font-mono text-[10px]">${escapeHtml(t.status)}</span></td>
+                            <td class="py-2.5 text-right space-x-2">
+                              <button type="button" data-copy-task="https://digitalsmod.site/go/${escapeHtml(t.taskId)}" class="btn-admin-copy-task underline">Sao chép</button>
+                              ${t.status !== "disabled_permanently" ? `<button type="button" data-disable-task="${escapeHtml(t.taskId)}" class="btn-admin-disable-task text-red-600 underline">Vô hiệu hóa</button>` : ""}
+                            </td>
+                          </tr>
+                        `;
+                      }).join("")}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          `;
+        } else if (adminRoute === "/admin/users" || adminRoute === "/admin/sellers") {
+          const targetUsers = adminRoute === "/admin/sellers" ? sellersList : usersList;
+          bodyContent = `
+            <div class="glass-surface p-5 sm:p-6 space-y-4">
+              <h2 class="text-base font-bold">${adminRoute === "/admin/sellers" ? "Danh sách Đối tác Seller" : "Quản lý Người dùng"} (${targetUsers.length})</h2>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead class="border-b border-black/10 dark:border-white/10 text-neutral-500">
+                    <tr><th class="py-2">Tài khoản</th><th class="py-2">Vai trò</th><th class="py-2">Khóa đã che</th><th class="py-2">Số dư</th><th class="py-2">Trạng thái</th><th class="py-2 text-right">Thao tác</th></tr>
+                  </thead>
+                  <tbody class="divide-y divide-black/5 dark:divide-white/5">
+                    ${targetUsers.map(function(u) {
+                      const w = state.db.wallets[u.uid] || { availableBalanceVnd: 0 };
+                      return `
+                        <tr>
+                          <td class="py-2.5"><div class="font-semibold">${escapeHtml(u.username)}</div><div class="font-mono text-[10px] text-neutral-500">${escapeHtml(u.uid)}</div></td>
+                          <td class="py-2.5 uppercase font-mono">${escapeHtml(u.role)}</td>
+                          <td class="py-2.5 font-mono">${escapeHtml(u.maskedKey)}</td>
+                          <td class="py-2.5 font-mono font-bold">${formatVnd(w.availableBalanceVnd)}</td>
+                          <td class="py-2.5"><span class="px-2 py-0.5 rounded-full bg-neutral-200 dark:bg-neutral-800 font-mono text-[10px]">${escapeHtml(u.status)}</span></td>
+                          <td class="py-2.5 text-right space-x-2">
+                            <button type="button" data-adj-uid="${escapeHtml(u.uid)}" class="btn-admin-adj-bal underline font-semibold">+/- Số dư</button>
+                            ${u.role !== "admin" ? `<button type="button" data-lock-uid="${escapeHtml(u.uid)}" class="btn-admin-lock-user underline">${u.status === "active" ? "Khóa" : "Mở"}</button>` : ""}
+                          </td>
+                        </tr>
+                      `;
+                    }).join("")}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          `;
+        } else if (adminRoute === "/admin/withdrawals") {
+          bodyContent = `
+            <div class="glass-surface p-5 sm:p-6 space-y-4">
+              <h2 class="text-base font-bold">Duyệt Yêu cầu Rút tiền (${withdrawalsList.length})</h2>
+              ${withdrawalsList.length === 0 ? `<p class="text-xs text-neutral-500 py-6 text-center">Chưa có yêu cầu rút tiền nào.</p>` : `
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left text-xs">
+                    <thead class="border-b border-black/10 dark:border-white/10 text-neutral-500">
+                      <tr><th class="py-2">Mã YC</th><th class="py-2">Tài khoản</th><th class="py-2">Hình thức</th><th class="py-2">Số tiền</th><th class="py-2">Trạng thái</th><th class="py-2 text-right">Xử lý</th></tr>
+                    </thead>
+                    <tbody class="divide-y divide-black/5 dark:divide-white/5">
+                      ${withdrawalsList.map(function(w) {
+                        return `
+                          <tr>
+                            <td class="py-2.5 font-mono">${escapeHtml(w.withdrawalId)}</td>
+                            <td class="py-2.5 font-semibold">${escapeHtml(w.username)}</td>
+                            <td class="py-2.5 uppercase font-mono">${escapeHtml(w.method)}</td>
+                            <td class="py-2.5 font-mono font-bold">${formatVnd(w.amountVnd)}</td>
+                            <td class="py-2.5"><span class="px-2 py-0.5 rounded-full bg-neutral-200 dark:bg-neutral-800 font-mono text-[10px]">${escapeHtml(w.status)}</span></td>
+                            <td class="py-2.5 text-right space-x-1.5">
+                              ${w.status === "pending" ? `<button type="button" data-wd-id="${escapeHtml(w.withdrawalId)}" data-wd-act="approve" class="btn-wd-action glass-btn px-2.5 py-1 bg-neutral-900 text-white dark:bg-white dark:text-neutral-900">Duyệt</button>` : ""}
+                              ${w.status === "approved" ? `<button type="button" data-wd-id="${escapeHtml(w.withdrawalId)}" data-wd-act="processing" class="btn-wd-action glass-btn px-2.5 py-1 bg-neutral-200 dark:bg-neutral-800">Đang xử lý</button>` : ""}
+                              ${(w.status === "approved" || w.status === "processing") ? `<button type="button" data-wd-id="${escapeHtml(w.withdrawalId)}" data-wd-act="complete" class="btn-wd-action glass-btn px-2.5 py-1 bg-emerald-600 text-white">Đã thanh toán</button>` : ""}
+                              ${(w.status !== "completed" && w.status !== "rejected") ? `<button type="button" data-wd-id="${escapeHtml(w.withdrawalId)}" data-wd-act="reject" class="btn-wd-action glass-btn px-2.5 py-1 bg-red-600 text-white">Từ chối</button>` : ""}
+                            </td>
+                          </tr>
+                        `;
+                      }).join("")}
+                    </tbody>
+                  </table>
+                </div>
+              `}
+            </div>
+          `;
+        } else if (adminRoute === "/admin/transactions") {
+          bodyContent = `
+            <div class="glass-surface p-5 sm:p-6 space-y-4">
+              <h2 class="text-base font-bold">Sổ cái Giao dịch (${txList.length})</h2>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead class="border-b border-black/10 dark:border-white/10 text-neutral-500">
+                    <tr><th class="py-2">Mã GD</th><th class="py-2">UID</th><th class="py-2">Loại</th><th class="py-2">Mã đối soát</th><th class="py-2">Trạng thái</th><th class="py-2 text-right">Số tiền</th></tr>
+                  </thead>
+                  <tbody class="divide-y divide-black/5 dark:divide-white/5 font-mono">
+                    ${txList.map(function(tx) {
+                      return `<tr><td class="py-2">${escapeHtml(tx.transactionId)}</td><td class="py-2">${escapeHtml(tx.uid)}</td><td class="py-2">${escapeHtml(tx.type)}</td><td class="py-2 text-[10px]">${escapeHtml(tx.idempotencyKey)}</td><td class="py-2">${escapeHtml(tx.status)}</td><td class="py-2 text-right font-bold">${tx.direction === "credit" ? "+" : "-"}` + formatVnd(tx.amountVnd) + `</td></tr>`;
+                    }).join("")}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          `;
+        } else if (adminRoute === "/admin/notifications") {
+          bodyContent = `
+            <div class="glass-surface p-5 sm:p-6 max-w-xl space-y-4">
+              <h2 class="text-base font-bold">Phát hành Thông báo</h2>
+              <form id="form-admin-send-notif" class="space-y-3 text-xs">
+                <div>
+                  <label class="font-semibold block mb-1">Người nhận</label>
+                  <select id="an-target" class="w-full rounded-2xl border border-black/15 dark:border-white/15 bg-white/80 dark:bg-neutral-900 px-3.5 py-2">
+                    <option value="all_users">Tất cả thành viên</option>
+                    <option value="all_sellers">Tất cả đối tác Seller</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="font-semibold block mb-1">Tiêu đề</label>
+                  <input id="an-title" type="text" required placeholder="Thông báo hệ thống" class="w-full rounded-2xl border border-black/15 dark:border-white/15 bg-white/80 dark:bg-neutral-900 px-3.5 py-2" />
+                </div>
+                <div>
+                  <label class="font-semibold block mb-1">Nội dung</label>
+                  <textarea id="an-body" rows="3" required placeholder="Nội dung chi tiết..." class="w-full rounded-2xl border border-black/15 dark:border-white/15 bg-white/80 dark:bg-neutral-900 px-3.5 py-2"></textarea>
+                </div>
+                <button type="submit" class="glass-btn px-5 py-2.5 font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950">Gửi thông báo</button>
+              </form>
+            </div>
+          `;
+        } else if (adminRoute === "/admin/settings") {
+          const st = state.db.system.settings;
+          bodyContent = `
+            <div class="glass-surface p-5 sm:p-6 max-w-2xl space-y-4">
+              <h2 class="text-base font-bold">Cài đặt Hệ thống</h2>
+              <form id="form-admin-settings" class="space-y-3 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label class="font-semibold block mb-1">Tên thương hiệu</label>
+                    <input id="as-name" type="text" value="${escapeHtml(st.platformName)}" class="w-full rounded-2xl border border-black/15 dark:border-white/15 bg-white/80 dark:bg-neutral-900 px-3.5 py-2" />
+                  </div>
+                  <div>
+                    <label class="font-semibold block mb-1">Mức thưởng mặc định (VND)</label>
+                    <input id="as-reward" type="number" value="${st.defaultRewardVnd}" class="w-full rounded-2xl border border-black/15 dark:border-white/15 bg-white/80 dark:bg-neutral-900 px-3.5 py-2 font-mono" />
+                  </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label class="font-semibold block mb-1">Hạn mức rút tối thiểu (VND)</label>
+                    <input id="as-min-wd" type="number" value="${st.minWithdrawVnd}" class="w-full rounded-2xl border border-black/15 dark:border-white/15 bg-white/80 dark:bg-neutral-900 px-3.5 py-2 font-mono" />
+                  </div>
+                  <div>
+                    <label class="font-semibold block mb-1">Kết nối API Link4m</label>
+                    <select id="as-link4m" class="w-full rounded-2xl border border-black/15 dark:border-white/15 bg-white/80 dark:bg-neutral-900 px-3.5 py-2">
+                      <option value="false" ${!st.link4mConfigured ? "selected" : ""}>Chưa kết nối (Chặn tạo liên kết giả)</option>
+                      <option value="true" ${st.link4mConfigured ? "selected" : ""}>Đã kết nối khóa API hợp lệ</option>
+                    </select>
+                  </div>
+                </div>
+                <label class="flex items-center gap-2 pt-1">
+                  <input type="checkbox" id="as-reg" class="w-4 h-4 rounded shrink-0" ${st.registrationEnabled ? "checked" : ""} />
+                  <span>Cho phép đăng ký tài khoản mới</span>
+                </label>
+                <button type="submit" class="glass-btn px-5 py-2.5 font-semibold bg-neutral-950 text-white dark:bg-white dark:text-neutral-950">Lưu cài đặt</button>
+              </form>
+            </div>
+          `;
+        } else {
+          bodyContent = `
+            <div class="glass-surface p-5 sm:p-6 space-y-4">
+              <h2 class="text-base font-bold">Nhật ký Kiểm toán (${logsList.length})</h2>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead class="border-b border-black/10 dark:border-white/10 text-neutral-500">
+                    <tr><th class="py-2">Mã Log</th><th class="py-2">Tài khoản</th><th class="py-2">Thao tác</th><th class="py-2">IP</th><th class="py-2">Thời gian</th></tr>
+                  </thead>
+                  <tbody class="divide-y divide-black/5 dark:divide-white/5 font-mono">
+                    ${logsList.map(function(l) {
+                      return `<tr><td class="py-2">${escapeHtml(l.logId)}</td><td class="py-2">${escapeHtml(l.actorUid)}</td><td class="py-2 font-semibold">${escapeHtml(l.action)}</td><td class="py-2">${escapeHtml(l.ip)}</td><td class="py-2 font-sans text-neutral-500">${formatTime(l.createdAt)}</td></tr>`;
+                    }).join("")}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          `;
+        }
+
+        main.innerHTML = `<div class="space-y-5 sm:space-y-6 view-transition">${navHtml}${bodyContent}</div>`;
+        bindRouteButtons(main);
+
+        const createTaskForm = document.getElementById("form-admin-create-task");
+        if (createTaskForm) {
+          document.getElementById("btn-preview-task").addEventListener("click", function() {
+            const title = document.getElementById("at-title").value || "Chưa nhập tiêu đề";
+            const desc = document.getElementById("at-desc").value || "Chưa nhập mô tả";
+            const reward = Number(document.getElementById("at-reward").value || 500);
+            openGlassModal({
+              title: "Xem trước Nhiệm vụ",
+              bodyHtml: `<div class="space-y-2"><div class="font-bold text-base">${escapeHtml(title)}</div><p class="text-xs">${escapeHtml(desc)}</p><div class="font-mono text-xs font-bold">Phần thưởng: +${formatVnd(reward)}</div></div>`
+            });
+          });
+
+          createTaskForm.addEventListener("submit", function(e) {
+            e.preventDefault();
+            const title = document.getElementById("at-title").value.trim();
+            const desc = document.getElementById("at-desc").value.trim();
+            const ctype = document.getElementById("at-type").value;
+            const reward = Math.trunc(Number(document.getElementById("at-reward").value || 500));
+            const dest = document.getElementById("at-dest").value.trim();
+            const maxC = Math.trunc(Number(document.getElementById("at-max").value || 100));
+            const oneTime = document.getElementById("at-onetime").checked;
+
+            const uCheck = validateDestinationUrl(dest);
+            if (!uCheck.valid) {
+              showToast(uCheck.reason, "error");
+              return;
+            }
+            const taskId = "tsk_" + randomSegment(6);
+            const now = Date.now();
+            state.db.tasks[taskId] = {
+              taskId: taskId,
+              title: title,
+              description: desc,
+              contentType: ctype,
+              destinationUrl: uCheck.url,
+              rewardVnd: reward,
+              status: "active",
+              expiresAt: now + 7 * 86400000,
+              maxCompletions: oneTime ? 1 : maxC,
+              completedCount: 0,
+              oneTimeOnly: oneTime,
+              createdBy: state.currentSession.uid,
+              createdAt: now,
+              updatedAt: now
+            };
+            appendAuditLog(state.currentSession.uid, "ADMIN_TASK_CREATED", { taskId: taskId, oneTimeOnly: oneTime });
+            showToast("Đã xuất bản nhiệm vụ mới.", "success");
+            renderApp();
+          });
+        }
+
+        main.querySelectorAll(".btn-admin-copy-task").forEach(function(b) {
+          b.addEventListener("click", function() { copyTextSafe(b.getAttribute("data-copy-task"), "liên kết nhiệm vụ"); });
+        });
+        main.querySelectorAll(".btn-admin-disable-task").forEach(function(b) {
+          b.addEventListener("click", function() {
+            const tid = b.getAttribute("data-disable-task");
+            if (state.db.tasks[tid]) {
+              state.db.tasks[tid].status = "disabled_permanently";
+              appendAuditLog(state.currentSession.uid, "ADMIN_TASK_DISABLED_PERMANENTLY", { taskId: tid });
+              showToast("Đã vô hiệu hóa vĩnh viễn nhiệm vụ #" + tid, "info");
+              renderApp();
+            }
+          });
+        });
+
+        main.querySelectorAll(".btn-admin-adj-bal").forEach(function(b) {
+          b.addEventListener("click", function() {
+            const targetUid = b.getAttribute("data-adj-uid");
+            const targetUser = state.db.users[targetUid];
+            openGlassModal({
+              title: "Điều chỉnh số dư: " + (targetUser ? targetUser.username : targetUid),
+              bodyHtml: `
+                <div class="space-y-3 text-xs">
+                  <div>
+                    <label class="font-semibold block mb-1">Số tiền điều chỉnh (VND, nhập số âm nếu trừ)</label>
+                    <input id="modal-adj-amount" type="number" step="500" value="5000" class="w-full rounded-xl border border-black/15 dark:border-white/15 bg-white dark:bg-neutral-900 px-3 py-2 font-mono" />
+                  </div>
+                  <div>
+                    <label class="font-semibold block mb-1">Lý do điều chỉnh (Bắt buộc)</label>
+                    <input id="modal-adj-reason" type="text" placeholder="Thưởng đối soát chiến dịch..." class="w-full rounded-xl border border-black/15 dark:border-white/15 bg-white dark:bg-neutral-900 px-3 py-2" />
+                  </div>
+                </div>
+              `,
+              actions: [
+                { label: "Hủy", primary: false },
+                {
+                  label: "Xác nhận",
+                  primary: true,
+                  onClick: function() {
+                    const delta = Math.trunc(Number(document.getElementById("modal-adj-amount").value || 0));
+                    const reason = String(document.getElementById("modal-adj-reason").value || "").trim();
+                    if (!reason || delta === 0) {
+                      showToast("Vui lòng nhập lý do và số tiền hợp lệ.", "error");
+                      return;
+                    }
+                    const w = state.db.wallets[targetUid];
+                    if (w.availableBalanceVnd + delta < 0) {
+                      showToast("Không thể trừ vượt quá số dư khả dụng.", "error");
+                      return;
+                    }
+                    const now = Date.now();
+                    w.availableBalanceVnd += delta;
+                    const txId = "tx_" + randomSegment(7);
+                    state.db.transactions[txId] = {
+                      transactionId: txId,
+                      uid: targetUid,
+                      type: "admin_adjustment",
+                      direction: delta >= 0 ? "credit" : "debit",
+                      amountVnd: Math.abs(delta),
+                      balanceAfterVnd: w.availableBalanceVnd,
+                      status: "completed",
+                      idempotencyKey: "adj_" + txId,
+                      referenceId: state.currentSession.uid,
+                      description: "Điều chỉnh bởi Quản trị viên: " + reason,
+                      performedBy: state.currentSession.uid,
+                      createdAt: now,
+                      updatedAt: now
+                    };
+                    appendAuditLog(state.currentSession.uid, "ADMIN_BALANCE_ADJUSTMENT", { targetUid: targetUid, deltaVnd: delta, reason: reason, txId: txId });
+                    showToast("Đã cập nhật số dư thành công.", "success");
+                    renderApp();
+                  }
+                }
+              ]
+            });
+          });
+        });
+
+        main.querySelectorAll(".btn-admin-lock-user").forEach(function(b) {
+          b.addEventListener("click", function() {
+            const targetUid = b.getAttribute("data-lock-uid");
+            const u = state.db.users[targetUid];
+            if (!u) return;
+            u.status = u.status === "active" ? "locked" : "active";
+            appendAuditLog(state.currentSession.uid, "ADMIN_USER_STATUS_CHANGED", { targetUid: targetUid, status: u.status });
+            showToast("Đã cập nhật trạng thái tài khoản " + u.username, "info");
+            renderApp();
+          });
+        });
+
+        main.querySelectorAll(".btn-wd-action").forEach(function(b) {
+          b.addEventListener("click", function() {
+            const wdId = b.getAttribute("data-wd-id");
+            const act = b.getAttribute("data-wd-act");
+            const wd = state.db.withdrawals[wdId];
+            if (!wd) return;
+            const w = state.db.wallets[wd.uid];
+            const now = Date.now();
+
+            if (act === "approve" && wd.status === "pending") {
+              wd.status = "approved";
+              state.db.transactions[wd.holdTransactionId].status = "approved";
+              appendAuditLog(state.currentSession.uid, "WITHDRAWAL_APPROVED", { withdrawalId: wdId });
+              showToast("Đã duyệt yêu cầu #" + wdId, "success");
+              renderApp();
+            } else if (act === "processing" && wd.status === "approved") {
+              wd.status = "processing";
+              state.db.transactions[wd.holdTransactionId].status = "processing";
+              appendAuditLog(state.currentSession.uid, "WITHDRAWAL_PROCESSING", { withdrawalId: wdId });
+              showToast("Đã chuyển sang đang xử lý #" + wdId, "info");
+              renderApp();
+            } else if (act === "complete" && (wd.status === "approved" || wd.status === "processing")) {
+              wd.status = "completed";
+              w.heldBalanceVnd -= wd.amountVnd;
+              w.totalWithdrawnVnd += wd.amountVnd;
+              state.db.transactions[wd.holdTransactionId].status = "completed";
+              appendAuditLog(state.currentSession.uid, "WITHDRAWAL_COMPLETED", { withdrawalId: wdId });
+              showToast("Đã xác nhận thanh toán #" + wdId, "success");
+              renderApp();
+            } else if (act === "reject") {
+              openGlassModal({
+                title: "Từ chối yêu cầu rút tiền #" + wdId,
+                bodyHtml: `<div><label class="text-xs font-semibold block mb-1">Nhập lý do từ chối (Hệ thống sẽ hoàn trả số dư đúng 1 lần):</label><input id="modal-reject-reason" type="text" placeholder="Sai thông tin tài khoản thụ hưởng..." class="w-full rounded-xl border border-black/15 dark:border-white/15 bg-white dark:bg-neutral-900 px-3 py-2 text-xs" /></div>`,
+                actions: [
+                  { label: "Hủy", primary: false },
+                  {
+                    label: "Từ chối & Hoàn tiền",
+                    primary: true,
+                    onClick: function() {
+                      const reason = String(document.getElementById("modal-reject-reason").value || "").trim();
+                      if (!reason) {
+                        showToast("Vui lòng nhập lý do từ chối.", "error");
+                        return;
+                      }
+                      if (wd.refunded || wd.status === "rejected" || wd.status === "completed") {
+                        showToast("Yêu cầu này đã được xử lý trước đó.", "error");
+                        return;
+                      }
+                      wd.status = "rejected";
+                      wd.rejectionReason = reason;
+                      wd.refunded = true;
+                      w.heldBalanceVnd -= wd.amountVnd;
+                      w.availableBalanceVnd += wd.amountVnd;
+                      state.db.transactions[wd.holdTransactionId].status = "rejected";
+
+                      const refTxId = "tx_" + randomSegment(7);
+                      state.db.transactions[refTxId] = {
+                        transactionId: refTxId,
+                        uid: wd.uid,
+                        type: "withdrawal_refund",
+                        direction: "credit",
+                        amountVnd: wd.amountVnd,
+                        balanceAfterVnd: w.availableBalanceVnd,
+                        status: "completed",
+                        idempotencyKey: "refund_" + wdId,
+                        referenceId: wdId,
+                        description: "Hoàn tiền yêu cầu rút #" + wdId + ": " + reason,
+                        performedBy: state.currentSession.uid,
+                        createdAt: now,
+                        updatedAt: now
+                      };
+                      appendAuditLog(state.currentSession.uid, "WITHDRAWAL_REJECTED_REFUNDED", { withdrawalId: wdId, reason: reason });
+                      showToast("Đã từ chối và hoàn trả " + formatVnd(wd.amountVnd) + ".", "info");
+                      renderApp();
+                    }
+                  }
+                ]
+              });
+            }
+          });
+        });
+
+        const notifForm = document.getElementById("form-admin-send-notif");
+        if (notifForm) {
+          notifForm.addEventListener("submit", function(e) {
+            e.preventDefault();
+            const target = document.getElementById("an-target").value;
+            const title = document.getElementById("an-title").value.trim();
+            const body = document.getElementById("an-body").value.trim();
+            const nid = "ntf_" + randomSegment(6);
+            state.db.notifications[nid] = {
+              notificationId: nid,
+              title: title,
+              body: body,
+              targetType: target,
+              targetUid: null,
+              createdAt: Date.now()
+            };
+            appendAuditLog(state.currentSession.uid, "ADMIN_NOTIFICATION_SENT", { notificationId: nid, targetType: target });
+            showToast("Đã phát hành thông báo mới.", "success");
+            renderApp();
+          });
+        }
+
+        const settingsForm = document.getElementById("form-admin-settings");
+        if (settingsForm) {
+          settingsForm.addEventListener("submit", function(e) {
+            e.preventDefault();
+            const st = state.db.system.settings;
+            st.platformName = document.getElementById("as-name").value.trim() || "DIGITALSMOD.SITE";
+            st.defaultRewardVnd = Math.max(100, Math.trunc(Number(document.getElementById("as-reward").value || 500)));
+            st.minWithdrawVnd = Math.max(1000, Math.trunc(Number(document.getElementById("as-min-wd").value || 10000)));
+            st.link4mConfigured = document.getElementById("as-link4m").value === "true";
+            st.registrationEnabled = document.getElementById("as-reg").checked;
+            appendAuditLog(state.currentSession.uid, "ADMIN_SETTINGS_UPDATED", { defaultRewardVnd: st.defaultRewardVnd, link4mConfigured: st.link4mConfigured });
+            showToast("Đã lưu cài đặt hệ thống.", "success");
+            renderApp();
+          });
+        }
+      }
+
+      document.getElementById("btn-toggle-theme").addEventListener("click", function() {
+        const html = document.documentElement;
+        const isDark = html.classList.toggle("dark");
+        document.getElementById("icon-theme-sun").classList.toggle("hidden", !isDark);
+        document.getElementById("icon-theme-moon").classList.toggle("hidden", isDark);
+      });
+
+      document.getElementById("btn-mobile-menu").addEventListener("click", function() {
+        document.getElementById("mobile-drawer").classList.remove("hidden");
+      });
+      document.getElementById("btn-close-drawer").addEventListener("click", function() {
+        document.getElementById("mobile-drawer").classList.add("hidden");
+      });
+
+      window.addEventListener("load", function() {
+        initAmbientShader();
+        if (window.DigitalsModRouter) {
+          const initRoute = window.DigitalsModRouter.resolveInitialRoute(DEFAULT_ROUTE);
+          navigate(initRoute);
+        } else {
+          renderApp();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
